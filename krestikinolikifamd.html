@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Крестики-нолики</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #004d00, #8B7500);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border: 8px solid gold;
+            max-width: 420px;
+            position: relative;
+        }
+        h2 {
+            color: gold;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 12px;
+            margin: 0 auto 20px auto;
+        }
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            font-size: 60px;
+            font-weight: bold;
+            border: 4px solid gold;
+            cursor: pointer;
+            height: 100px;
+            width: 100px;
+            border-radius: 12px;
+            transition: 0.3s;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        .cell:hover {
+            background: rgba(255, 215, 0, 0.5);
+            transform: scale(1.1);
+        }
+        .winner-message {
+            display: none;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            border: 8px solid gold;
+            z-index: 999;
+        }
+        .winner-message h3 {
+            color: gold;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .winner-message button {
+            background: gold;
+            color: black;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 10px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+        .winner-message button:hover {
+            background: #8B7500;
+            transform: scale(1.05);
+        }
+        #restart-btn {
+            background-color: gold;
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #restart-btn:hover {
+            background-color: #8B7500;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h2>Крестики-нолики</h2>
+        <div class="grid">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <button id="restart-btn">Начать заново</button>
+    </div>
+
+    <div class="winner-message" id="winner-message">
+        <h3 id="winner-text"></h3>
+        <button onclick="restartGame()">Начать заново</button>
+    </div>
+
+    <script>
+        const cells = document.querySelectorAll('.cell');
+        const restartBtn = document.getElementById('restart-btn');
+        const winnerMessage = document.getElementById('winner-message');
+        const winnerText = document.getElementById('winner-text');
+
+        let board = Array(9).fill("");
+        let currentPlayer = "X";
+        let gameOver = false;
+        let playerTurn = true;
+
+        function handleClick(event) {
+            if (!playerTurn || gameOver) return;
+            
+            const index = event.target.getAttribute("data-index");
+            if (board[index]) return;
+
+            board[index] = "X";
+            event.target.textContent = "X";
+            playerTurn = false;
+
+            if (checkWinner("X")) {
+                showWinner("X выиграл!");
+                return;
+            }
+
+            if (!board.includes("")) {
+                showWinner("Ничья!");
+                return;
+            }
+
+            setTimeout(computerMove, 500);
+        }
+
+        function checkWinner(player) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            return winPatterns.some(pattern => pattern.every(index => board[index] === player));
+        }
+
+        function showWinner(message) {
+            gameOver = true;
+            winnerText.textContent = message;
+            winnerMessage.style.display = "block";
+        }
+
+        function restartGame() {
+            board = Array(9).fill("");
+            gameOver = false;
+            currentPlayer = "X";
+            playerTurn = true;
+            cells.forEach(cell => cell.textContent = "");
+            winnerMessage.style.display = "none";
+        }
+
+        function computerMove() {
+            if (gameOver) return;
+
+            let availableCells = board.map((val, i) => val === "" ? i : null).filter(v => v !== null);
+            let randomMove = availableCells[Math.floor(Math.random() * availableCells.length)];
+
+            board[randomMove] = "O";
+            cells[randomMove].textContent = "O";
+
+            if (checkWinner("O")) {
+                showWinner("O выиграл!");
+            } else if (!board.includes("")) {
+                showWinner("Ничья!");
+            }
+
+            playerTurn = true;
+        }
+
+        cells.forEach(cell => cell.addEventListener("click", handleClick));
+        restartBtn.addEventListener("click", restartGame);
+    </script>
+</body>
+</html>

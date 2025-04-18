@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DorosTranslate - Переводчик нового поколения</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #FFC107;
+            --dark: #121212;
+            --darker: #0A0A0A;
+            --light: #F5F5F5;
+            --gray: #424242;
+            --accent: #8BC34A;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-image: radial-gradient(circle at 10% 20%, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 90%);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .tagline {
+            color: var(--secondary);
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--darker);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--gray);
+            transition: all 0.3s ease;
+        }
+        
+        .container:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary);
+        }
+        
+        .input-section, .output-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--gray);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            font-style: italic;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        select {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid var(--gray);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex: 0 0 auto;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .output-text {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 100px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .output-text.empty {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            select, button {
+                width: 100%;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* Иконки (можно заменить на реальные иконки из FontAwesome) */
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .icon-translate {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234CAF50"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>');
+        }
+        
+        .icon-language {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234CAF50"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>');
+        }
+        
+        .icon-result {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234CAF50"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>');
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">DorosTranslate</div>
+        <div class="tagline">Мощный переводчик с поддержкой 100+ языков</div>
+    </div>
+
+    <div class="container">
+        <div class="input-section">
+            <div class="section-title">
+                <span class="icon icon-translate"></span>
+                Текст для перевода
+            </div>
+            <textarea id="textInput" placeholder="Введите текст, который нужно перевести..."></textarea>
+            
+            <div class="controls">
+                <select id="langSelect"></select>
+                <button id="translateButton">
+                    <span class="icon icon-translate"></span>
+                    Перевести
+                </button>
+            </div>
+        </div>
+        
+        <div class="output-section">
+            <div class="section-title">
+                <span class="icon icon-result"></span>
+                Результат перевода
+            </div>
+            <div id="translatedText" class="output-text empty">Здесь появится перевод...</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2025 DorosTranslate | Все права защищены
+    </div>
+
+    <script>
+        const languages = {
+            "af": "Африкаанс",
+            "sq": "Албанский",
+            "am": "Амхарский",
+            "ar": "Арабский",
+            "hy": "Армянский",
+            "az": "Азербайджанский",
+            "eu": "Баскский",
+            "bn": "Бенгальский",
+            "be": "Белорусский",
+            "bs": "Боснийский",
+            "bg": "Болгарский",
+            "my": "Бирманский",
+            "km": "Кхмерский",
+            "zh-CN": "Китайский (упрощённый)",
+            "zh-TW": "Китайский (традиционный)",
+            "hr": "Хорватский",
+            "cs": "Чешский",
+            "da": "Датский",
+            "nl": "Голландский",
+            "en": "Английский",
+            "eo": "Эсперанто",
+            "et": "Эстонский",
+            "tl": "Филиппинский",
+            "fi": "Финский",
+            "fr": "Французский",
+            "gl": "Галисийский",
+            "ka": "Грузинский",
+            "de": "Немецкий",
+            "el": "Греческий",
+            "gu": "Гуджарати",
+            "he": "Иврит",
+            "hi": "Хинди",
+            "hu": "Венгерский",
+            "is": "Исландский",
+            "id": "Индонезийский",
+            "it": "Итальянский",
+            "ja": "Японский",
+            "kn": "Каннада",
+            "kk": "Казахский",
+            "lo": "Лаосский",
+            "la": "Латинский",
+            "lv": "Латышский",
+            "lt": "Литовский",
+            "mk": "Македонский",
+            "mg": "Малагасийский",
+            "ms": "Малайский",
+            "ml": "Малаялам",
+            "mt": "Мальтийский",
+            "mi": "Маори",
+            "mr": "Маратхи",
+            "mn": "Монгольский",
+            "ne": "Непальский",
+            "no": "Норвежский",
+            "fa": "Персидский",
+            "pl": "Польский",
+            "pt": "Португальский",
+            "pa": "Панджаби",
+            "ro": "Румынский",
+            "ru": "Русский",
+            "sr": "Сербский",
+            "sk": "Словацкий",
+            "sl": "Словенский",
+            "es": "Испанский",
+            "sw": "Суахили",
+            "sv": "Шведский",
+            "ta": "Тамильский",
+            "th": "Тайский",
+            "tr": "Турецкий",
+            "uk": "Украинский",
+            "ur": "Урду",
+            "uz": "Узбекский",
+            "vi": "Вьетнамский",
+            "cy": "Валлийский",
+            "xh": "Коса",
+            "yi": "Идиш",
+            "yo": "Йоруба",
+            "zu": "Зулу",
+            "si": "Сингальский",
+            "tlh": "Тлингит",
+            "jw": "Яванский",
+            "tg": "Таджикский",
+            "kmr": "Курдский (Курманджи)",
+            "qu": "Кечуа",
+            "ia": "Интерлингва",
+            "oc": "Окситанский",
+            "mlt": "Мальтийский",
+            "ga": "Гэльский",
+            "ky": "Киргизский"
+        };
+
+        const langSelect = document.getElementById('langSelect');
+        
+        // Сортируем языки по алфавиту
+        const sortedLanguages = Object.entries(languages).sort((a, b) => a[1].localeCompare(b[1]));
+        
+        // Добавляем опции в выпадающий список
+        for (const [code, name] of sortedLanguages) {
+            const option = document.createElement('option');
+            option.value = code;
+            option.textContent = name;
+            langSelect.appendChild(option);
+        }
+
+        // Устанавливаем русский язык по умолчанию
+        langSelect.value = 'ru';
+
+        async function translateText(text, targetLang) {
+            const outputElement = document.getElementById('translatedText');
+            outputElement.classList.remove('empty', 'fade-in');
+            outputElement.textContent = "Перевод...";
+            
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Ошибка сети');
+                
+                const data = await response.json();
+                let result = data[0].map(item => item[0]).join(" ");
+                
+                outputElement.textContent = result;
+                outputElement.classList.add('fade-in');
+            } catch (error) {
+                outputElement.textContent = "Ошибка перевода. Пожалуйста, попробуйте позже.";
+                outputElement.classList.add('fade-in');
+                console.error('Ошибка перевода:', error);
+            }
+        }
+
+        document.getElementById('translateButton').addEventListener('click', async () => {
+            const text = document.getElementById('textInput').value.trim();
+            const targetLang = document.getElementById('langSelect').value;
+
+            if (!text) {
+                alert("Пожалуйста, введите текст для перевода!");
+                return;
+            }
+
+            await translateText(text, targetLang);
+        });
+
+        // Добавляем обработчик нажатия Enter в текстовом поле
+        document.getElementById('textInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                document.getElementById('translateButton').click();
+            }
+        });
+    </script>
+</body>
+</html>

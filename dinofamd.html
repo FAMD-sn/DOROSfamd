@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бегущий медведь</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #87CEEB;
+            touch-action: manipulation;
+        }
+
+        #game {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(#87CEEB, #4CAF50);
+        }
+
+        #sun {
+            position: absolute;
+            top: 5%;
+            left: 10%;
+            width: 80px;
+            height: 80px;
+            background: yellow;
+            border-radius: 50%;
+            box-shadow: 0 0 20px yellow;
+        }
+
+        #cloud, #cloud2 {
+            position: absolute;
+            width: 100px;
+            height: 50px;
+            background: white;
+            border-radius: 50px;
+            top: 10%;
+        }
+
+        #cloud2 {
+            left: 70%;
+            top: 15%;
+        }
+
+        /* Медведь */
+        #bear {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            width: 50px;
+            height: 80px;
+            background-image: url('medved.png'); /* Замените на ваше изображение медведя */
+            background-size: cover;
+        }
+
+        #ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            background: #654321;
+            z-index: 1;
+        }
+
+        .spike {
+            position: absolute;
+            bottom: 50px;
+            width: 40px;
+            height: 40px;
+            background-color: transparent;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 30px solid red;
+        }
+
+        #score {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            z-index: 10;
+        }
+
+        #resetButton {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 50px;
+            font-size: 18px;
+            text-align: center;
+            background: orange;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div id="sun"></div>
+        <div id="cloud"></div>
+        <div id="cloud2"></div>
+        <div id="bear"></div>
+        <div id="ground"></div>
+    </div>
+    <div id="score">Очки: 0</div>
+    <button id="resetButton">Начать заново</button>
+
+    <script>
+        let bear = document.getElementById("bear");
+        let scoreDisplay = document.getElementById("score");
+        let resetButton = document.getElementById("resetButton");
+        let jumping = false;
+        let gameOver = false;
+        let score = 0;
+
+        function jump() {
+            if (!jumping && !gameOver) {
+                jumping = true;
+                let jumpHeight = 180;
+                let jumpSpeed = 6;
+                let bottom = parseInt(window.getComputedStyle(bear).bottom);
+
+                let jumpInterval = setInterval(() => {
+                    if (bottom >= jumpHeight) {
+                        clearInterval(jumpInterval);
+                        let fallInterval = setInterval(() => {
+                            bottom -= jumpSpeed;
+                            bear.style.bottom = bottom + "px";
+                            if (bottom <= 50) {
+                                clearInterval(fallInterval);
+                                jumping = false;
+                            }
+                        }, 20);
+                    } else {
+                        bottom += jumpSpeed;
+                        bear.style.bottom = bottom + "px";
+                    }
+                }, 20);
+            }
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.code === "Space") {
+                jump();
+            }
+        });
+
+        document.addEventListener("touchstart", function() {
+            jump();
+        });
+
+        function spawnSpike() {
+            if (!gameOver) {
+                let spike = document.createElement("div");
+                spike.classList.add("spike");
+                document.getElementById("game").appendChild(spike);
+
+                // Случайное расстояние
+                let distance = Math.random() * 150 + 200; // минимальное расстояние 200px, максимальное 350px
+                spike.style.left = `100vw`;
+
+                let moveInterval = setInterval(() => {
+                    if (gameOver) {
+                        clearInterval(moveInterval);
+                        spike.remove();
+                        return;
+                    }
+
+                    let left = parseInt(window.getComputedStyle(spike).left);
+                    if (left <= -40) {
+                        clearInterval(moveInterval);
+                        spike.remove();
+                        score++;
+                        scoreDisplay.innerHTML = "Очки: " + score;
+                    } else {
+                        spike.style.left = (left - 5) + "px";
+                    }
+
+                    let bearBottom = parseInt(window.getComputedStyle(bear).bottom);
+                    let bearLeft = parseInt(window.getComputedStyle(bear).left);
+                    let spikeLeft = parseInt(window.getComputedStyle(spike).left);
+
+                    if (spikeLeft <= bearLeft + 50 && spikeLeft >= bearLeft && bearBottom <= 80) {
+                        gameOver = true;
+                        alert("Игра окончена! Очки: " + score);
+                        resetButton.style.display = "block";
+                        clearInterval(moveInterval);
+                        spike.remove();
+                    }
+                }, 20);
+            }
+        }
+
+        setInterval(spawnSpike, 2000); // каждый 2 секунды создаётся новый шип
+
+        resetButton.addEventListener("click", function() {
+            score = 0;
+            scoreDisplay.innerHTML = "Очки: " + score;
+            resetButton.style.display = "none";
+            bear.style.left = "50px";
+            bear.style.bottom = "50px";
+            gameOver = false;
+            document.querySelectorAll(".spike").forEach(spike => spike.remove());
+        });
+    </script>
+</body>
+</html>

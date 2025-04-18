@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAMDcurrency - Конвертер валют</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-dark: #1b5e20;
+            --primary-light: #81c784;
+            --accent-color: #ffc107;
+            --text-color: #333;
+            --light-text: #f5f5f5;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #e4f0f5 100%);
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px;
+            padding: 0 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            color: var(--accent-color);
+            font-size: 2.8rem;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            background-color: #fff;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            appearance: none;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+        }
+
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 1em;
+        }
+
+        .swap-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin: 10px auto;
+            display: block;
+            transition: transform 0.3s, color 0.3s;
+        }
+
+        .swap-btn:hover {
+            color: var(--primary-dark);
+            transform: rotate(180deg);
+        }
+
+        .convert-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .convert-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .convert-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(46, 125, 50, 0.1);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .result-amount {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin: 10px 0;
+        }
+
+        .result-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            .app-container {
+                padding: 0 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .result-container {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo">
+                <span class="logo-icon">$</span>
+                <span>FAMDcurrency</span>
+            </div>
+            <p class="tagline">Конвертер валют с актуальными курсами</p>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label for="fromCurrency">Из валюты:</label>
+                <select id="fromCurrency"></select>
+            </div>
+
+            <button class="swap-btn" onclick="swapCurrencies()">⇅</button>
+
+            <div class="input-group">
+                <label for="toCurrency">В валюту:</label>
+                <select id="toCurrency"></select>
+            </div>
+
+            <div class="input-group">
+                <label for="amount">Сумма:</label>
+                <input type="number" id="amount" placeholder="Введите сумму" value="1" min="0" step="0.01">
+            </div>
+
+            <button class="convert-btn" onclick="convertCurrency()">Конвертировать</button>
+
+            <div class="result-container" id="result" style="display: none;">
+                <div class="result-amount" id="resultAmount">0.00</div>
+                <div class="result-details" id="resultDetails"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Используются актуальные курсы валют</p>
+            <p>© 2023 FAMDcurrency</p>
+        </div>
+    </div>
+
+    <script>
+        const currencies = [
+            { code: "AFN", country: "Афганистан (AFN)" },
+            { code: "ALL", country: "Албания (ALL)" },
+            { code: "DZD", country: "Алжир (DZD)" },
+            { code: "AOA", country: "Ангола (AOA)" },
+            { code: "ARS", country: "Аргентина (ARS)" },
+            { code: "AMD", country: "Армения (AMD)" },
+            { code: "AWG", country: "Аруба (AWG)" },
+            { code: "AUD", country: "Австралия (AUD)" },
+            { code: "AZN", country: "Азербайджан (AZN)" },
+            { code: "BSD", country: "Багамы (BSD)" },
+            { code: "BHD", country: "Бахрейн (BHD)" },
+            { code: "BDT", country: "Бангладеш (BDT)" },
+            { code: "BBD", country: "Барбадос (BBD)" },
+            { code: "BYN", country: "Беларусь (BYN)" },
+            { code: "BZD", country: "Белиз (BZD)" },
+            { code: "BMD", country: "Бермуды (BMD)" },
+            { code: "BTN", country: "Бутан (BTN)" },
+            { code: "BOB", country: "Боливия (BOB)" },
+            { code: "BAM", country: "Босния и Герцеговина (BAM)" },
+            { code: "BWP", country: "Ботсвана (BWP)" },
+            { code: "BRL", country: "Бразилия (BRL)" },
+            { code: "BND", country: "Бруней (BND)" },
+            { code: "BGN", country: "Болгария (BGN)" },
+            { code: "BIF", country: "Бурунди (BIF)" },
+            { code: "KHR", country: "Камбоджа (KHR)" },
+            { code: "CAD", country: "Канада (CAD)" },
+            { code: "CVE", country: "Кабо-Верде (CVE)" },
+            { code: "KYD", country: "Каймановы острова (KYD)" },
+            { code: "CLP", country: "Чили (CLP)" },
+            { code: "CNY", country: "Китай (CNY)" },
+            { code: "COP", country: "Колумбия (COP)" },
+            { code: "KMF", country: "Коморы (KMF)" },
+            { code: "CRC", country: "Коста-Рика (CRC)" },
+            { code: "HRK", country: "Хорватия (HRK)" },
+            { code: "CUP", country: "Куба (CUP)" },
+            { code: "CZK", country: "Чехия (CZK)" },
+            { code: "DJF", country: "Джибути (DJF)" },
+            { code: "DKK", country: "Дания (DKK)" },
+            { code: "DOP", country: "Доминиканская Республика (DOP)" },
+            { code: "EGP", country: "Египет (EGP)" },
+            { code: "ERN", country: "Эритрея (ERN)" },
+            { code: "ETB", country: "Эфиопия (ETB)" },
+            { code: "EUR", country: "Евро (EUR)" },
+            { code: "FJD", country: "Фиджи (FJD)" },
+            { code: "GEL", country: "Грузия (GEL)" },
+            { code: "GHS", country: "Гана (GHS)" },
+            { code: "GIP", country: "Гибралтар (GIP)" },
+            { code: "GNF", country: "Гвинея (GNF)" },
+            { code: "GTQ", country: "Гватемала (GTQ)" },
+            { code: "GYD", country: "Гайана (GYD)" },
+            { code: "HKD", country: "Гонконг (HKD)" },
+            { code: "HNL", country: "Гондурас (HNL)" },
+            { code: "HTG", country: "Гаити (HTG)" },
+            { code: "HUF", country: "Венгрия (HUF)" },
+            { code: "IDR", country: "Индонезия (IDR)" },
+            { code: "INR", country: "Индия (INR)" },
+            { code: "IQD", country: "Ирак (IQD)" },
+            { code: "IRR", country: "Иран (IRR)" },
+            { code: "ISK", country: "Исландия (ISK)" },
+            { code: "JMD", country: "Ямайка (JMD)" },
+            { code: "JOD", country: "Иордания (JOD)" },
+            { code: "JPY", country: "Япония (JPY)" },
+            { code: "KES", country: "Кения (KES)" },
+            { code: "KGS", country: "Кыргызстан (KGS)" },
+            { code: "KRW", country: "Южная Корея (KRW)" },
+            { code: "KWD", country: "Кувейт (KWD)" },
+            { code: "KZT", country: "Казахстан (KZT)" },
+            { code: "LAK", country: "Лаос (LAK)" },
+            { code: "LBP", country: "Ливан (LBP)" },
+            { code: "LKR", country: "Шри-Ланка (LKR)" },
+            { code: "LRD", country: "Либерия (LRD)" },
+            { code: "LSL", country: "Лесото (LSL)" },
+            { code: "LYD", country: "Ливия (LYD)" },
+            { code: "MAD", country: "Марокко (MAD)" },
+            { code: "MDL", country: "Молдова (MDL)" },
+            { code: "MGA", country: "Мадагаскар (MGA)" },
+            { code: "MKD", country: "Македония (MKD)" },
+            { code: "MMK", country: "Мьянма (MMK)" },
+            { code: "MNT", country: "Монголия (MNT)" },
+            { code: "MOP", country: "Макао (MOP)" },
+            { code: "MUR", country: "Маврикий (MUR)" },
+            { code: "MXN", country: "Мексика (MXN)" },
+            { code: "MYR", country: "Малайзия (MYR)" },
+            { code: "MZN", country: "Мозамбик (MZN)" },
+            { code: "NAD", country: "Намибия (NAD)" },
+            { code: "NGN", country: "Нигерия (NGN)" },
+            { code: "NIO", country: "Никарагуа (NIO)" },
+            { code: "NOK", country: "Норвегия (NOK)" },
+            { code: "NPR", country: "Непал (NPR)" },
+            { code: "NZD", country: "Новая Зеландия (NZD)" },
+            { code: "OMR", country: "Оман (OMR)" },
+            { code: "PAB", country: "Панама (PAB)" },
+            { code: "PEN", country: "Перу (PEN)" },
+            { code: "PGK", country: "Папуа - Новая Гвинея (PGK)" },
+            { code: "PHP", country: "Филиппины (PHP)" },
+            { code: "PKR", country: "Пакистан (PKR)" },
+            { code: "PLN", country: "Польша (PLN)" },
+            { code: "PYG", country: "Парагвай (PYG)" },
+            { code: "QAR", country: "Катар (QAR)" },
+            { code: "RON", country: "Румыния (RON)" },
+            { code: "RUB", country: "Россия (RUB)" },
+            { code: "RWF", country: "Руанда (RWF)" },
+            { code: "SAR", country: "Саудовская Аравия (SAR)" },
+            { code: "SBD", country: "Соломоновы острова (SBD)" },
+            { code: "SCR", country: "Сейшельские острова (SCR)" },
+            { code: "SEK", country: "Швеция (SEK)" },
+            { code: "SGD", country: "Сингапур (SGD)" },
+            { code: "SOS", country: "Сомали (SOS)" },
+            { code: "SRD", country: "Суринам (SRD)" },
+            { code: "SSP", country: "Южный Судан (SSP)" },
+            { code: "SYP", country: "Сирия (SYP)" },
+            { code: "THB", country: "Таиланд (THB)" },
+            { code: "TJS", country: "Таджикистан (TJS)" },
+            { code: "TMT", country: "Туркменистан (TMT)" },
+            { code: "TND", country: "Тунис (TND)" },
+            { code: "TRY", country: "Турция (TRY)" },
+            { code: "TTD", country: "Тринидад и Тобаго (TTD)" },
+            { code: "TWD", country: "Тайвань (TWD)" },
+            { code: "TZS", country: "Танзания (TZS)" },
+            { code: "UAH", country: "Украина (UAH)" },
+            { code: "UGX", country: "Уганда (UGX)" },
+            { code: "USD", country: "Доллар США (USD)" },
+            { code: "UYU", country: "Уругвай (UYU)" },
+            { code: "UZS", country: "Узбекистан (UZS)" },
+            { code: "VND", country: "Вьетнам (VND)" },
+            { code: "XOF", country: "Западноафриканский франк (XOF)" },
+            { code: "YER", country: "Йемен (YER)" },
+            { code: "ZAR", country: "Южная Африка (ZAR)" },
+            { code: "ZMW", country: "Замбия (ZMW)" }
+        ];
+
+        function populateCurrencies() {
+            const fromSelect = document.getElementById("fromCurrency");
+            const toSelect = document.getElementById("toCurrency");
+
+            // Сортируем валюты по названию страны
+            currencies.sort((a, b) => a.country.localeCompare(b.country));
+            
+            // Добавляем популярные валюты в начало списка
+            const popularCurrencies = ["USD", "EUR", "RUB", "GBP", "JPY", "CNY"];
+            const popular = currencies.filter(c => popularCurrencies.includes(c.code));
+            const others = currencies.filter(c => !popularCurrencies.includes(c.code));
+            
+            // Добавляем популярные валюты
+            popular.forEach(currency => {
+                const option1 = new Option(currency.country, currency.code);
+                const option2 = new Option(currency.country, currency.code);
+                fromSelect.add(option1);
+                toSelect.add(option2);
+            });
+            
+            // Добавляем разделитель
+            const separator1 = new Option("──────────", "");
+            separator1.disabled = true;
+            const separator2 = new Option("──────────", "");
+            separator2.disabled = true;
+            fromSelect.add(separator1);
+            toSelect.add(separator2);
+            
+            // Добавляем остальные валюты
+            others.forEach(currency => {
+                const option1 = new Option(currency.country, currency.code);
+                const option2 = new Option(currency.country, currency.code);
+                fromSelect.add(option1);
+                toSelect.add(option2);
+            });
+
+            // Устанавливаем значения по умолчанию
+            fromSelect.value = "USD";
+            toSelect.value = "RUB";
+        }
+
+        function swapCurrencies() {
+            const fromSelect = document.getElementById("fromCurrency");
+            const toSelect = document.getElementById("toCurrency");
+            const temp = fromSelect.value;
+            fromSelect.value = toSelect.value;
+            toSelect.value = temp;
+            
+            // Если есть результат, пересчитываем
+            if (document.getElementById("result").style.display !== "none") {
+                convertCurrency();
+            }
+        }
+
+        async function convertCurrency() {
+            const amount = parseFloat(document.getElementById("amount").value);
+            const fromCurrency = document.getElementById("fromCurrency").value;
+            const toCurrency = document.getElementById("toCurrency").value;
+            const resultContainer = document.getElementById("result");
+            const resultAmount = document.getElementById("resultAmount");
+            const resultDetails = document.getElementById("resultDetails");
+
+            if (isNaN(amount) || amount <= 0) {
+                resultContainer.style.display = "block";
+                resultAmount.textContent = "0.00";
+                resultDetails.textContent = "Введите корректную сумму";
+                return;
+            }
+
+            try {
+                // Показываем загрузку
+                resultContainer.style.display = "block";
+                resultAmount.textContent = "...";
+                resultDetails.textContent = "Загрузка данных...";
+                
+                const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${fromCurrency}`);
+                const data = await response.json();
+
+                if (!data.rates || !data.rates[toCurrency]) {
+                    throw new Error("Не удалось получить курс");
+                }
+
+                const rate = data.rates[toCurrency];
+                const convertedAmount = (amount * rate).toFixed(2);
+                const inverseRate = (1 / rate).toFixed(6);
+                
+                resultAmount.textContent = convertedAmount + " " + toCurrency;
+                resultDetails.innerHTML = `
+                    1 ${fromCurrency} = ${rate.toFixed(6)} ${toCurrency}<br>
+                    1 ${toCurrency} = ${inverseRate} ${fromCurrency}
+                `;
+                
+            } catch (error) {
+                resultAmount.textContent = "Ошибка";
+                resultDetails.textContent = "Не удалось загрузить курсы валют. Пожалуйста, попробуйте позже.";
+                console.error("Ошибка конвертации:", error);
+            }
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            populateCurrencies();
+            
+            // Конвертация при изменении значений
+            document.getElementById('amount').addEventListener('input', convertCurrency);
+            document.getElementById('fromCurrency').addEventListener('change', convertCurrency);
+            document.getElementById('toCurrency').addEventListener('change', convertCurrency);
+        });
+    </script>
+</body>
+</html>

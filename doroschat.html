@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOROS Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #141a1f;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background: #1e242a;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.3);
+        }
+        h2 {
+            text-align: center;
+            color: #00aaff;
+        }
+        .chat-window {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 10px;
+            background: #2a2f35;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 10px;
+            background: #005bbb;
+            color: white;
+            max-width: 80%;
+        }
+        .message.self {
+            background: #0077ff;
+            align-self: flex-end;
+        }
+        .chat-input {
+            display: flex;
+            background: #333;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .chat-input input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            padding: 10px;
+        }
+        .send-btn {
+            background: none;
+            border: none;
+            color: #00aaff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ff5555;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>DOROS Chat</h2>
+
+        <!-- Регистрация / Вход -->
+        <div id="authContainer">
+            <h3 id="formTitle">Регистрация</h3>
+            <input type="text" id="username" placeholder="Введите никнейм">
+            <input type="password" id="password" placeholder="Введите пароль">
+            <button id="authBtn">Регистрация</button>
+            <p><a href="#" id="toggleForm" style="color: #00aaff;">Уже есть аккаунт? Войти</a></p>
+        </div>
+
+        <!-- Чат -->
+        <div id="chatContainer" style="display:none;">
+            <div class="chat-window" id="chat"></div>
+            <div class="chat-input">
+                <input type="text" id="message" placeholder="Введите сообщение">
+                <button class="send-btn" id="sendBtn">📤</button>
+            </div>
+            <button id="logoutBtn">Выйти</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCczUiqXKnCN7LDTv2zeSU7yzP3AO1N-MY",
+            authDomain: "doroschat.firebaseapp.com",
+            databaseURL: "https://doroschat-default-rtdb.firebaseio.com/",
+            projectId: "doroschat",
+            storageBucket: "doroschat.appspot.com",
+            messagingSenderId: "859595263053",
+            appId: "1:859595263053:web:b536df40f4cefa02952004",
+            measurementId: "G-L2SJL2KTLM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getDatabase(app);
+        const chatRef = ref(db, "messages");
+
+        let isRegisterMode = true;
+
+        document.getElementById("toggleForm").addEventListener("click", function () {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById("formTitle").textContent = isRegisterMode ? "Регистрация" : "Вход";
+            document.getElementById("authBtn").textContent = isRegisterMode ? "Регистрация" : "Войти";
+            document.getElementById("toggleForm").textContent = isRegisterMode ? "Уже есть аккаунт? Войти" : "Нет аккаунта? Зарегистрироваться";
+        });
+
+        document.getElementById("authBtn").addEventListener("click", function () {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const email = username + "@example.com";
+
+            if (username && password) {
+                if (isRegisterMode) {
+                    createUserWithEmailAndPassword(auth, email, password).then(() => {
+                        alert("Регистрация успешна!");
+                    }).catch((error) => alert("Ошибка: " + error.message));
+                } else {
+                    signInWithEmailAndPassword(auth, email, password).then(() => {
+                        showChat(username);
+                    }).catch((error) => alert("Ошибка: " + error.message));
+                }
+            }
+        });
+
+        function showChat(username) {
+            document.getElementById("authContainer").style.display = "none";
+            document.getElementById("chatContainer").style.display = "block";
+            document.getElementById("chat").innerHTML = "";
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                showChat(user.email.split("@")[0]);
+            }
+        });
+
+        document.getElementById("logoutBtn").addEventListener("click", function () {
+            signOut(auth).then(() => {
+                document.getElementById("authContainer").style.display = "block";
+                document.getElementById("chatContainer").style.display = "none";
+            });
+        });
+
+        document.getElementById("sendBtn").addEventListener("click", function () {
+            const message = document.getElementById("message").value;
+            if (message.trim() !== "") {
+                push(chatRef, {
+                    username: auth.currentUser.email.split("@")[0],
+                    text: message
+                }).catch((error) => alert("Ошибка при отправке сообщения: " + error.message));
+                document.getElementById("message").value = "";
+            } else {
+                alert("Сообщение не может быть пустым.");
+            }
+        });
+
+        onChildAdded(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.username && data.text) { // Добавил проверку на наличие данных
+                const chatWindow = document.getElementById("chat");
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add("message");
+                if (data.username === auth.currentUser.email.split("@")[0]) {
+                    messageDiv.classList.add("self");
+                }
+                messageDiv.innerHTML = `<strong>${data.username}:</strong> ${data.text}`;
+                chatWindow.appendChild(messageDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>

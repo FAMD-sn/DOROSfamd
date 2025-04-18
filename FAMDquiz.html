@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создай и проходи викторины!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #222;
+            color: gold;
+            text-align: center;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        input, button, textarea {
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background: gold;
+            color: black;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: orange;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Создай свою викторину!</h2>
+        <div id="createQuiz">
+            <input type="text" id="quizTitle" placeholder="Название викторины">
+            <div id="questions"></div>
+            <button onclick="addQuestion()">Добавить вопрос</button>
+            <button onclick="generateQuizLink()">Создать викторину</button>
+        </div>
+        <div id="quizLink" class="hidden">
+            <p>Ссылка на викторину:</p>
+            <input type="text" id="quizUrl" readonly>
+            <button onclick="copyLink()">Скопировать</button>
+        </div>
+        <div id="takeQuiz" class="hidden">
+            <h2 id="quizTitleDisplay"></h2>
+            <div id="quizContent"></div>
+            <button onclick="submitQuiz()">Отправить ответы</button>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+
+        function addQuestion() {
+            const qIndex = questions.length;
+            const questionDiv = document.createElement('div');
+            questionDiv.innerHTML = `
+                <input type="text" placeholder="Вопрос" id="q${qIndex}">
+                <textarea placeholder="Ответы через запятую" id="a${qIndex}"></textarea>
+                <input type="text" placeholder="Правильный ответ" id="c${qIndex}">
+            `;
+            document.getElementById("questions").appendChild(questionDiv);
+            questions.push(qIndex);
+        }
+
+        function generateQuizLink() {
+            const title = document.getElementById("quizTitle").value;
+            if (!title || questions.length === 0) {
+                alert("Введите название и добавьте хотя бы один вопрос!");
+                return;
+            }
+
+            const quizData = { title, questions: [] };
+            questions.forEach(i => {
+                const questionText = document.getElementById(`q${i}`).value;
+                const answers = document.getElementById(`a${i}`).value.split(',').map(a => a.trim());
+                const correct = document.getElementById(`c${i}`).value.trim();
+                if (questionText && answers.length > 1 && correct) {
+                    quizData.questions.push({ questionText, answers, correct });
+                }
+            });
+
+            const quizId = Date.now().toString(); // Уникальный ID викторины
+            localStorage.setItem(`quiz_${quizId}`, JSON.stringify(quizData)); // Сохраняем в localStorage
+
+            const link = `${window.location.origin}${window.location.pathname}?id=${quizId}`;
+            document.getElementById("quizUrl").value = link;
+            document.getElementById("quizLink").classList.remove("hidden");
+        }
+
+        function copyLink() {
+            const link = document.getElementById("quizUrl");
+            link.select();
+            document.execCommand("copy");
+            alert("Ссылка скопирована!");
+        }
+
+        function loadQuizFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const quizId = urlParams.get("id");
+
+            if (quizId) {
+                const quizData = localStorage.getItem(`quiz_${quizId}`);
+                if (!quizData) {
+                    alert("Викторина не найдена!");
+                    return;
+                }
+
+                const quiz = JSON.parse(quizData);
+                document.getElementById("createQuiz").classList.add("hidden");
+                document.getElementById("takeQuiz").classList.remove("hidden");
+                document.getElementById("quizTitleDisplay").innerText = quiz.title;
+                const quizContent = document.getElementById("quizContent");
+
+                quiz.questions.forEach((q, index) => {
+                    const div = document.createElement("div");
+                    let options = "";
+                    q.answers.forEach(a => {
+                        options += `<input type="radio" name="q${index}" value="${a}"> ${a} <br>`;
+                    });
+                    div.innerHTML = `<p><b>${q.questionText}</b></p>${options}`;
+                    quizContent.appendChild(div);
+                });
+
+                localStorage.setItem("correctAnswers", JSON.stringify(quiz.questions.map(q => q.correct)));
+            }
+        }
+
+        function submitQuiz() {
+            const correctAnswers = JSON.parse(localStorage.getItem("correctAnswers"));
+            let score = 0;
+            correctAnswers.forEach((answer, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected && selected.value === answer) {
+                    score++;
+                }
+            });
+            alert(`Вы набрали ${score} из ${correctAnswers.length} баллов!`);
+        }
+
+        window.onload = loadQuizFromUrl;
+    </script>
+</body>
+</html>

@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DOROS Видео — платформа для обмена видео и историями">
+  <title>DOROS Видео</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1e88e5; /* Синий, как у X */
+      --accent: #ff4081; /* Розовый, как у Instagram */
+      --background: #121212; /* Тёмный фон, как у SpaceX */
+      --card-bg: #1e1e1e;
+      --text-color: #ffffff;
+      --text-secondary: #b0bec5;
+      --border-color: #333;
+      --shadow: 0 4px 12px rgba(0,0,0,0.3);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background);
+      color: var(--text-color);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-color);
+      font-size: 16px;
+    }
+
+    .search-bar button {
+      padding: 12px 20px;
+      border-radius: 20px;
+      background: var(--primary);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .search-bar button:hover {
+      background: #1565c0;
+    }
+
+    .stories {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 16px 0;
+      scrollbar-width: none;
+    }
+
+    .stories::-webkit-scrollbar {
+      display: none;
+    }
+
+    .story {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, var(--accent), var(--primary));
+      padding: 3px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .story:hover {
+      transform: scale(1.1);
+    }
+
+    .story img {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      border: 2px solid var(--card-bg);
+      object-fit: cover;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 16px;
+      margin: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .tab:hover {
+      color: var(--text-color);
+    }
+
+    #feed > div {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .user-info img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .user-info img:hover {
+      transform: scale(1.1);
+    }
+
+    .user-text p {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .user-text small {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 8px;
+      background: #000;
+      cursor: pointer;
+    }
+
+    .video-stats {
+      display: flex;
+      gap: 16px;
+      margin: 12px 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .video-stats span {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .video-stats span:hover {
+      color: var(--text-color);
+    }
+
+    .video-stats i {
+      margin-right: 8px;
+    }
+
+    .video-description {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .video-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      background: var(--primary);
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    button:hover {
+      background: #1565c0;
+      transform: scale(1.05);
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--text-secondary);
+      color: var(--text-secondary);
+    }
+
+    button.secondary:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    button.danger {
+      background: #d32f2f;
+    }
+
+    button.danger:hover {
+      background: #b71c1c;
+    }
+
+    .follow-btn {
+      margin-left: auto;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+
+    .follow-btn.following {
+      background: var(--card-bg);
+      color: var(--text-secondary);
+    }
+
+    .liked {
+      color: var(--accent);
+      animation: pulse 0.5s ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .like-animation {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      color: var(--accent);
+      opacity: 0;
+      animation: likePop 0.5s ease forwards;
+    }
+
+    @keyframes likePop {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      display: none;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .modal-container {
+      background: var(--card-bg);
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .close-modal {
+      background: none;
+      color: var(--text-secondary);
+      font-size: 24px;
+      cursor: pointer;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+
+    .comments-list {
+      max-height: 500px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .comment {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .comment-content {
+      display: flex;
+      gap: 12px;
+      flex-grow: 1;
+    }
+
+    .comment-user {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .comment-text {
+      font-size: 14px;
+    }
+
+    .comment-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .comment-actions i:hover {
+      color: var(--accent);
+    }
+
+    .add-comment {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding-top: 16px;
+    }
+
+    .add-comment input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+
+    .add-comment button {
+      padding: 12px 20px;
+      border-radius: 20px;
+    }
+
+    #upload-section {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      padding: 24px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+      display: none;
+      z-index: 1000;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    #upload-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+
+    #upload-section input,
+    #upload-section textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-color);
+      margin-bottom: 12px;
+    }
+
+    #upload-section textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .progress-container {
+      background: var(--border-color);
+      border-radius: 4px;
+      height: 8px;
+      margin: 12px 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 0;
+      transition: width 0.3s ease;
+    }
+
+    .add-post-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--primary);
+      color: var(--text-color);
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      transition: var(--transition);
+    }
+
+    .add-post-btn:hover {
+      background: #1565c0;
+      transform: scale(1.1);
+    }
+
+    .notification {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background: var(--primary);
+      color: var(--text-color);
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .notification.error {
+      background: #d32f2f;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .profile-container {
+      text-align: center;
+      padding: 24px;
+    }
+
+    .profile-container img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 16px;
+      border: 2px solid var(--primary);
+    }
+
+    .profile-container h2 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+
+    .profile-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .profile-videos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    .profile-video video {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .story-viewer {
+      max-width: 400px;
+      margin: 40px auto;
+      text-align: center;
+    }
+
+    .story-viewer img,
+    .story-viewer video {
+      width: 100%;
+      border-radius: 12px;
+      border: 2px solid var(--primary);
+    }
+
+    .story-progress {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+    }
+
+    .story-progress-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .story-progress-bar div {
+      height: 100%;
+      background: var(--primary);
+      width: 0;
+      transition: width linear;
+    }
+
+    /* Медиа-запросы для адаптивности */
+    @media (max-width: 1024px) {
+      body {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .profile-videos {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .modal-container {
+        margin: 20px;
+        padding: 16px;
+      }
+
+      .profile-container img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .search-bar {
+        flex-direction: column;
+      }
+
+      .search-bar input,
+      .search-bar button {
+        width: 100%;
+      }
+
+      .story {
+        width: 64px;
+        height: 64px;
+      }
+
+      .story img {
+        width: 58px;
+        height: 58px;
+      }
+
+      .tabs {
+        font-size: 14px;
+      }
+
+      .tab {
+        padding: 8px 12px;
+      }
+
+      .add-post-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+      }
+
+      .video-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="notification" id="notification"></div>
+
+  <div class="modal" id="authModal" role="dialog" aria-labelledby="authTitle" aria-hidden="true">
+    <div class="modal-container">
+      <h2 id="authTitle">Вход</h2>
+      <button class="close-modal" onclick="app.closeAuthModal()">×</button>
+      <input type="email" id="authEmail" placeholder="Почта">
+      <input type="password" id="authPassword" placeholder="Пароль">
+      <button onclick="app.signIn()">Войти</button>
+      <button class="secondary" onclick="app.signUp()">Зарегистрироваться</button>
+    </div>
+  </div>
+
+  <div class="modal" id="commentsModal" role="dialog" aria-labelledby="commentsTitle" aria-hidden="true">
+    <div class="modal-container">
+      <h2 id="commentsTitle" class="sr-only">Комментарии</h2>
+      <button class="close-modal" onclick="app.closeComments()">×</button>
+      <div id="commentsContent"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="profileModal" role="dialog" aria-labelledby="profileTitle" aria-hidden="true">
+    <div class="modal-container">
+      <h2 id="profileTitle" class="sr-only">Профиль</h2>
+      <button class="close-modal" onclick="app.closeProfile()">×</button>
+      <div id="profileContent"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="storyModal" role="dialog" aria-labelledby="storyTitle" aria-hidden="true">
+    <div class="story-viewer">
+      <h2 id="storyTitle" class="sr-only">Истории</h2>
+      <button class="close-modal" onclick="app.closeStory()">×</button>
+      <div id="storyContent"></div>
+    </div>
+  </div>
+
+  <header>
+    <h1><i class="fas fa-camera"></i> DOROS Видео</h1>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Поиск по #хэштег или пользователю">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+  </header>
+
+  <main>
+    <div id="user">
+      <p>Войдите или зарегистрируйтесь</p>
+      <button onclick="app.showAuthModal('signin')"><i class="fas fa-sign-in-alt"></i> Войти</button>
+      <button onclick="app.showAuthModal('signup')"><i class="fas fa-user-plus"></i> Зарегистрироваться</button>
+    </div>
+
+    <div class="stories" id="stories"></div>
+
+    <div id="upload-section">
+      <h2><i class="fas fa-upload"></i> Загрузить</h2>
+      <input type="file" id="videoFile" accept="video/*">
+      <input type="file" id="storyFile" accept="image/*,video/*">
+      <textarea id="description" placeholder="Опишите ваше видео или историю... #хэштег"></textarea>
+      <div class="progress-container">
+        <div class="progress-bar" id="upload-progress"></div>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button onclick="app.uploadVideo()"><i class="fas fa-cloud-upload-alt"></i> Видео</button>
+        <button onclick="app.uploadStory()"><i class="fas fa-camera"></i> История</button>
+        <button class="secondary" onclick="app.toggleUploadSection()"><i class="fas fa-times"></i> Отмена</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="all">Все</div>
+      <div class="tab" data-tab="following">Подписки</div>
+    </div>
+
+    <div id="feed"></div>
+  </main>
+
+  <div class="add-post-btn"><i class="fas fa-plus"></i></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script>
+    class DorosApp {
+      constructor() {
+        this.currentUserLikes = {};
+        this.followingList = [];
+        this.followersCount = {};
+        this.followingCount = {};
+        this.videoCache = new Map();
+        this.currentTab = 'all';
+        this.lastVideoKey = null;
+        this.isLoading = false;
+        this.storyTimer = null;
+        this.initFirebase();
+        this.bindEvents();
+      }
+
+      initFirebase() {
+        const firebaseConfig = {
+      apiKey: "AIzaSyDX14zgvDk57Wy1q7WTrLCO1o8U1MdqP-w",
+      authDomain: "doros-f9d89.firebaseapp.com",
+      projectId: "doros-f9d89",
+      storageBucket: "doros-f9d89.appspot.com",
+      messagingSenderId: "351289560916",
+      appId: "1:351289560916:web:c5ef1d0ab49cf451ca82c1",
+      databaseURL: "https://doros-f9d89-default-rtdb.firebaseio.com/"
+    };
+        firebase.initializeApp(firebaseConfig);
+        this.auth = firebase.auth();
+        this.db = firebase.database();
+      }
+
+      bindEvents() {
+        this.auth.onAuthStateChanged(user => this.handleAuthState(user));
+        document.querySelector('.add-post-btn').addEventListener('click', () => this.toggleUploadSection());
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.addEventListener('click', () => this.showTab(tab.dataset.tab));
+        });
+        document.getElementById('searchInput').addEventListener('input', this.debounce(this.searchVideos, 300));
+        document.querySelector('.search-bar button').addEventListener('click', () => this.searchVideos());
+      }
+
+      debounce(fn, ms) {
+        let timeout;
+        return (...args) => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => fn.apply(this, args), ms);
+        };
+      }
+
+      showNotification(message, type = 'info') {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = `notification ${type}`;
+        notification.style.display = 'block';
+        setTimeout(() => {
+          notification.style.display = 'none';
+        }, 3000);
+      }
+
+      toggleUploadSection() {
+        const uploadSection = document.getElementById('upload-section');
+        const isVisible = uploadSection.style.display === 'block';
+        uploadSection.style.display = isVisible ? 'none' : 'block';
+        if (!isVisible && this.auth.currentUser) {
+          document.getElementById('videoFile').value = '';
+          document.getElementById('storyFile').value = '';
+          document.getElementById('description').value = '';
+          document.getElementById('upload-progress').style.width = '0%';
+        } else if (!this.auth.currentUser) {
+          this.showNotification('Войдите, чтобы загружать контент', 'error');
+          uploadSection.style.display = 'none';
+        }
+      }
+
+      showTab(tab) {
+        this.currentTab = tab;
+        this.lastVideoKey = null;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+        document.getElementById('feed').innerHTML = '';
+        this.loadFeed();
+      }
+
+      handleAuthState(user) {
+        if (user) {
+          this.updateUI(user);
+          this.loadUserLikes(user.uid);
+          this.loadFollowing(user.uid);
+          this.loadUserStats(user.uid);
+          this.loadStories();
+          this.loadFeed();
+        } else {
+          document.getElementById('user').innerHTML = `
+            <p>Войдите или зарегистрируйтесь</p>
+            <button onclick="app.showAuthModal('signin')"><i class="fas fa-sign-in-alt"></i> Войти</button>
+            <button onclick="app.showAuthModal('signup')"><i class="fas fa-user-plus"></i> Зарегистрироваться</button>
+          `;
+          document.getElementById('upload-section').style.display = 'none';
+          document.getElementById('stories').innerHTML = '';
+          document.getElementById('feed').innerHTML = '';
+        }
+      }
+
+      updateUI(user) {
+        document.getElementById('user').innerHTML = `
+          <div class="user-info">
+            <img src="${user.photoURL || 'https://via.placeholder.com/40'}" alt="Аватар" onclick="app.showProfile('${user.uid}')">
+            <div class="user-text">
+              <p>${user.displayName || user.email.split('@')[0]}</p>
+              <small>${user.email}</small>
+              <div class="user-stats">
+                <span><i class="fas fa-users"></i> <span id="followersCount">0</span></span>
+                <span><i class="fas fa-user-friends"></i> <span id="followingCount">0</span></span>
+              </div>
+            </div>
+          </div>
+          <button class="secondary" onclick="app.editProfile()"><i class="fas fa-edit"></i> Редактировать</button>
+          <button class="secondary" onclick="app.signOut()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+        `;
+      }
+
+      loadUserLikes(userId) {
+        this.db.ref(`userLikes/${userId}`).on('value', snapshot => {
+          this.currentUserLikes = snapshot.val() || {};
+        });
+      }
+
+      loadFollowing(userId) {
+        this.db.ref(`following/${userId}`).on('value', snapshot => {
+          this.followingList = snapshot.val() ? Object.keys(snapshot.val()) : [];
+          this.loadStories();
+        });
+      }
+
+      loadUserStats(userId) {
+        this.db.ref(`followers/${userId}`).on('value', snapshot => {
+          this.followersCount[userId] = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
+          this.updateUserStats(userId);
+        });
+        this.db.ref(`following/${userId}`).on('value', snapshot => {
+          this.followingCount[userId] = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
+          this.updateUserStats(userId);
+        });
+      }
+
+      updateUserStats(userId) {
+        const followersElement = document.getElementById('followersCount');
+        const followingElement = document.getElementById('followingCount');
+        if (followersElement) followersElement.textContent = this.followersCount[userId] || 0;
+        if (followingElement) followingElement.textContent = this.followingCount[userId] || 0;
+      }
+
+      showAuthModal(mode) {
+        const modal = document.getElementById('authModal');
+        const title = document.getElementById('authTitle');
+        title.textContent = mode === 'signin' ? 'Вход' : 'Регистрация';
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+
+      closeAuthModal() {
+        document.getElementById('authModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+
+      signUp() {
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPassword').value;
+        const displayName = prompt('Введите имя пользователя:');
+        if (!email || !password || password.length < 6 || !displayName) {
+          this.showNotification('Заполните все поля корректно', 'error');
+          return;
+        }
+
+        this.auth.createUserWithEmailAndPassword(email, password)
+          .then(userCredential => {
+            const user = userCredential.user;
+            return user.updateProfile({
+              displayName,
+              photoURL: 'https://via.placeholder.com/40'
+            });
+          })
+          .then(() => {
+            this.showNotification('Регистрация успешна!');
+            this.closeAuthModal();
+          })
+          .catch(error => this.showNotification(`Ошибка: ${error.message}`, 'error'));
+      }
+
+      signIn() {
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPassword').value;
+        if (!email || !password) {
+          this.showNotification('Введите почту и пароль', 'error');
+          return;
+        }
+
+        this.auth.signInWithEmailAndPassword(email, password)
+          .then(() => {
+            this.showNotification('Вход успешен!');
+            this.closeAuthModal();
+          })
+          .catch(error => this.showNotification(`Ошибка: ${error.message}`, 'error'));
+      }
+
+      signOut() {
+        this.auth.signOut().then(() => this.showNotification('Вы вышли из системы'));
+      }
+
+      editProfile() {
+        const user = this.auth.currentUser;
+        if (!user) return;
+
+        const displayName = prompt('Новое имя:', user.displayName);
+        const photo = document.createElement('input');
+        photo.type = 'file';
+        photo.accept = 'image/*';
+        photo.click();
+
+        photo.onchange = async () => {
+          const file = photo.files[0];
+          let photoURL = user.photoURL;
+
+          if (file) {
+            try {
+              photoURL = await this.uploadToCloudinary(file, progress => {
+                console.log(`Upload progress: ${progress}%`);
+              });
+              this.db.ref(`users/${user.uid}`).update({ photoURL });
+            } catch (error) {
+              this.showNotification(`Ошибка загрузки аватара: ${error.message}`, 'error');
+              return;
+            }
+          }
+
+          if (displayName || photoURL !== user.photoURL) {
+            user.updateProfile({
+              displayName: displayName || user.displayName,
+              photoURL
+            }).then(() => this.showNotification('Профиль обновлен!'))
+              .catch(error => this.showNotification(`Ошибка: ${error.message}`, 'error'));
+          }
+        };
+      }
+
+      async uploadToCloudinary(file, progressCallback) {
+        if (file.size > 100 * 1024 * 1024) {
+          throw new Error('Файл слишком большой. Максимум 100 МБ.');
+        }
+        const cloudinaryConfig = {
+          cloudName: 'dieplvnvc',
+          uploadPreset: 'unsigned_preset' // Замени на реальный пресет из Cloudinary
+        };
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+
+        try {
+          const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/auto/upload`, {
+            method: 'POST',
+            body: formData
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error?.message || 'Ошибка загрузки');
+          progressCallback(100);
+          return data.secure_url;
+        } catch (error) {
+          throw new Error(`Ошибка Cloudinary: ${error.message}`);
+        }
+      }
+
+      async uploadVideo() {
+        const file = document.getElementById('videoFile').files[0];
+        const description = document.getElementById('description').value.trim();
+        const user = this.auth.currentUser;
+
+        if (!user || !file || !description) {
+          this.showNotification('Заполните все поля', 'error');
+          return;
+        }
+
+        const uploadButton = document.querySelector('#upload-section button');
+        uploadButton.disabled = true;
+        uploadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Загрузка...';
+
+        try {
+          const downloadURL = await this.uploadToCloudinary(file, progress => {
+            document.getElementById('upload-progress').style.width = `${progress}%`;
+          });
+
+          const videoRef = this.db.ref('videos').push();
+          await videoRef.set({
+            id: videoRef.key,
+            url: downloadURL,
+            description,
+            likes: 0,
+            views: 0,
+            comments: {},
+            userId: user.uid,
+            userName: user.displayName || user.email.split('@')[0],
+            userAvatar: user.photoURL || 'https://via.placeholder.com/40',
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            hashtags: this.extractHashtags(description)
+          });
+
+          this.showNotification('Видео загружено!');
+          this.toggleUploadSection();
+        } catch (error) {
+          this.showNotification(`Ошибка: ${error.message}`, 'error');
+        } finally {
+          uploadButton.disabled = false;
+          uploadButton.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Видео';
+        }
+      }
+
+      async uploadStory() {
+        const file = document.getElementById('storyFile').files[0];
+        const description = document.getElementById('description').value.trim();
+        const user = this.auth.currentUser;
+
+        if (!user || !file) {
+          this.showNotification('Выберите файл', 'error');
+          return;
+        }
+
+        const uploadButton = document.querySelector('#upload-section button:nth-child(2)');
+        uploadButton.disabled = true;
+        uploadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Загрузка...';
+
+        try {
+          const downloadURL = await this.uploadToCloudinary(file, progress => {
+            document.getElementById('upload-progress').style.width = `${progress}%`;
+          });
+
+          const storyRef = this.db.ref(`stories/${user.uid}`).push();
+          await storyRef.set({
+            id: storyRef.key,
+            url: downloadURL,
+            description,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            type: file.type.startsWith('video') ? 'video' : 'image'
+          });
+
+          this.showNotification('История загружена!');
+          this.toggleUploadSection();
+        } catch (error) {
+          this.showNotification(`Ошибка: ${error.message}`, 'error');
+        } finally {
+          uploadButton.disabled = false;
+          uploadButton.innerHTML = '<i class="fas fa-camera"></i> История';
+        }
+      }
+
+      extractHashtags(text) {
+        const regex = /#[\wа-яА-Я]+/g;
+        return text.match(regex) || [];
+      }
+
+      loadStories() {
+        const stories = document.getElementById('stories');
+        if (this.followingList.length === 0 && (!this.auth.currentUser || !this.followingList.includes(this.auth.currentUser.uid))) {
+          stories.innerHTML = '<p style="color: var(--text-secondary); padding: 16px;">Нет историй</p>';
+          return;
+        }
+
+        const users = [...new Set([...this.followingList, this.auth.currentUser?.uid].filter(Boolean))];
+        stories.innerHTML = users.map(userId => `
+          <div class="story" onclick="app.showStory('${userId}')">
+            <img src="https://via.placeholder.com/74" id="avatar-${userId}" alt="История">
+          </div>
+        `).join('');
+
+        users.forEach(userId => {
+          this.db.ref(`users/${userId}/photoURL`).once('value', snap => {
+            const avatar = snap.val() || 'https://via.placeholder.com/74';
+            const img = document.getElementById(`avatar-${userId}`);
+            if (img) img.src = avatar;
+          });
+        });
+      }
+
+      showStory(userId) {
+        clearInterval(this.storyTimer);
+        const modal = document.getElementById('storyModal');
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        this.db.ref(`stories/${userId}`).once('value', snapshot => {
+          const stories = snapshot.val() ? Object.entries(snapshot.val()).map(([key, story]) => ({ id: key, ...story })) : [];
+          if (stories.length === 0) {
+            document.getElementById('storyContent').innerHTML = '<p style="color: var(--text-secondary);">Нет историй</p>';
+            return;
+          }
+
+          let currentIndex = 0;
+          const renderStory = () => {
+            const story = stories[currentIndex];
+            const progressBars = stories.map((_, i) => `
+              <div class="story-progress-bar">
+                <div style="width: ${i < currentIndex ? '100%' : i === currentIndex ? '0%' : '0%'}"></div>
+              </div>
+            `).join('');
+
+            document.getElementById('storyContent').innerHTML = `
+              <div class="story-progress">${progressBars}</div>
+              <div class="user-info">
+                <img src="${story.userAvatar || 'https://via.placeholder.com/40'}" alt="Аватар">
+                <p>${story.userName || 'Пользователь'}</p>
+              </div>
+              ${story.type === 'video' ? `<video src="${story.url}" autoplay loop></video>` : `<img src="${story.url}" alt="История">`}
+              <p>${story.description || ''}</p>
+            `;
+
+            const progressBar = document.querySelectorAll('.story-progress-bar div')[currentIndex];
+            progressBar.style.transition = 'width 5s linear';
+            progressBar.style.width = '100%';
+
+            this.storyTimer = setTimeout(() => {
+              currentIndex++;
+              if (currentIndex >= stories.length) {
+                this.closeStory();
+              } else {
+                renderStory();
+              }
+            }, 5000);
+          };
+
+          renderStory();
+        });
+      }
+
+      closeStory() {
+        clearInterval(this.storyTimer);
+        document.getElementById('storyModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+
+      shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+      loadFeed() {
+        if (this.isLoading) return;
+        this.isLoading = true;
+
+        let videosRef = this.db.ref('videos').orderByKey().limitToLast(10);
+        if (this.lastVideoKey) {
+          videosRef = videosRef.endAt(this.lastVideoKey);
+        }
+
+        if (this.currentTab === 'following' && this.followingList.length === 0) {
+          document.getElementById('feed').innerHTML = `
+            <div style="text-align: center; padding: 32px; color: var(--text-secondary);">
+              <p>Вы ни на кого не подписаны</p>
+            </div>
+          `;
+          this.isLoading = false;
+          return;
+        }
+
+        videosRef.once('value', snapshot => {
+          const container = document.getElementById('feed');
+          const videos = [];
+
+          snapshot.forEach(child => {
+            const videoData = child.val();
+            if (this.currentTab !== 'following' || this.followingList.includes(videoData.userId)) {
+              videos.push({ key: child.key, ...videoData });
+              this.lastVideoKey = child.key;
+            }
+          });
+
+          if (videos.length === 0 && container.innerHTML === '') {
+            container.innerHTML = `
+              <div style="text-align: center; padding: 32px; color: var(--text-secondary);">
+                <p>Видео отсутствуют</p>
+              </div>
+            `;
+          }
+
+          this.shuffleArray(videos).forEach(videoData => {
+            const div = this.createVideoElement(videoData);
+            container.appendChild(div);
+          });
+
+          this.isLoading = false;
+          this.autoPlayVideos();
+        });
+
+        window.onscroll = () => {
+          if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200 && !this.isLoading) {
+            this.loadFeed();
+          }
+        };
+      }
+
+      searchVideos() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        if (!query) {
+          this.loadFeed();
+          return;
+        }
+
+        this.db.ref('videos').once('value', snapshot => {
+          const container = document.getElementById('feed');
+          container.innerHTML = '';
+          const videos = [];
+
+          snapshot.forEach(child => {
+            const videoData = child.val();
+            const description = videoData.description?.toLowerCase() || '';
+            const userName = videoData.userName?.toLowerCase() || '';
+            const hashtags = videoData.hashtags?.map(tag => tag.toLowerCase()) || [];
+
+            if (description.includes(query) || userName.includes(query) || hashtags.some(tag => tag.includes(query))) {
+              videos.push({ key: child.key, ...videoData });
+            }
+          });
+
+          if (videos.length === 0) {
+            container.innerHTML = `
+              <div style="text-align: center; padding: 32px; color: var(--text-secondary);">
+                <p>Ничего не найдено</p>
+              </div>
+            `;
+          }
+
+          this.shuffleArray(videos).forEach(videoData => {
+            const div = this.createVideoElement(videoData);
+            container.appendChild(div);
+          });
+        });
+      }
+
+      createVideoElement(videoData) {
+        const div = document.createElement('div');
+        const user = this.auth.currentUser;
+        const isAdmin = user && user.email === 'doriush@example.com';
+        const isOwner = user && user.uid === videoData.userId;
+        const isFollowing = user && this.followingList.includes(videoData.userId);
+        const isLiked = user && this.currentUserLikes[videoData.key];
+
+        div.innerHTML = `
+          <div class="user-info">
+            <img src="${videoData.userAvatar}" alt="Аватар" onclick="app.showProfile('${videoData.userId}')">
+            <div class="user-text">
+              <p>${videoData.userName}</p>
+              <small>${this.formatTime(videoData.timestamp)}</small>
+            </div>
+            ${user && !isOwner && user.uid !== videoData.userId ? `
+              <button class="follow-btn ${isFollowing ? 'following' : ''}" 
+                      onclick="app.toggleFollow('${videoData.userId}', this)">
+                <i class="fas ${isFollowing ? 'fa-user-check' : 'fa-user-plus'}"></i>
+                ${isFollowing ? 'Отписаться' : 'Подписаться'}
+              </button>
+            ` : ''}
+          </div>
+          <div style="position: relative;">
+            <video src="${videoData.url}" controls data-key="${videoData.key}" onclick="this.requestFullscreen()"></video>
+          </div>
+          <div class="video-stats">
+            <span class="like-stat" onclick="app.likeVideo('${videoData.key}', this.parentElement.parentElement)">
+              <i class="fas fa-heart ${isLiked ? 'liked' : ''}"></i> <span class="like-count">${videoData.likes || 0}</span>
+            </span>
+            <span>
+              <i class="fas fa-eye"></i> ${videoData.views || 0}
+            </span>
+            <span onclick="app.showComments('${videoData.key}')">
+              <i class="fas fa-comment"></i> ${Object.keys(videoData.comments || {}).length}
+            </span>
+          </div>
+          <div class="video-description">${this.highlightHashtags(videoData.description)}</div>
+          <div class="video-actions">
+            <button class="like-btn" onclick="app.likeVideo('${videoData.key}', this.parentElement.parentElement)">
+              <i class="fas fa-heart ${isLiked ? 'liked' : ''}"></i> ${isLiked ? 'Не нравится' : 'Нравится'}
+            </button>
+            <button onclick="app.showComments('${videoData.key}')">
+              <i class="fas fa-comment"></i> Комментировать
+            </button>
+            <button onclick="app.shareVideo('${videoData.url}')">
+              <i class="fas fa-share"></i> Поделиться
+            </button>
+            ${(isAdmin || isOwner) ? `
+              <button class="danger" onclick="app.deleteVideo('${videoData.key}')">
+                <i class="fas fa-trash"></i> Удалить
+              </button>
+            ` : ''}
+          </div>
+        `;
+        return div;
+      }
+
+      highlightHashtags(text) {
+        return text.replace(/(#[\wа-яА-Я]+)/g, `<span style="color: var(--primary);">$1</span>`);
+      }
+
+      formatTime(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const seconds = Math.floor(diff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+
+        if (days > 0) return `${days} д. назад`;
+        if (hours > 0) return `${hours} ч. назад`;
+        if (minutes > 0) return `${minutes} мин. назад`;
+        return 'только что';
+      }
+
+      showComments(key) {
+        this.currentVideoKey = key;
+        const modal = document.getElementById('commentsModal');
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        this.loadComments(key);
+      }
+
+      closeComments() {
+        document.getElementById('commentsModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        this.currentVideoKey = null;
+      }
+
+      loadComments(key) {
+        this.db.ref(`videos/${key}`).once('value').then(videoSnap => {
+          if (!videoSnap.exists()) {
+            this.showNotification('Видео не найдено', 'error');
+            this.closeComments();
+            return;
+          }
+
+          const videoData = videoSnap.val();
+          this.db.ref(`videos/${key}/comments`).once('value').then(commentsSnap => {
+            const comments = commentsSnap.val() || {};
+            const container = document.getElementById('commentsContent');
+            container.innerHTML = `
+              <div class="video-description">
+                <strong>${videoData.userName}</strong> ${this.highlightHashtags(videoData.description)}
+              </div>
+              <div class="comments-list">
+                ${this.renderComments(comments)}
+              </div>
+              ${this.auth.currentUser ? `
+                <div class="add-comment">
+                  <input type="text" id="newComment" placeholder="Добавить комментарий..."
+                        onkeypress="if(event.key === 'Enter') app.postComment('${videoData.userId}')">
+                  <button onclick="app.postComment('${videoData.userId}')"><i class="fas fa-paper-plane"></i></button>
+                </div>
+              ` : '<p style="text-align: center; color: var(--text-secondary);">Войдите, чтобы комментировать</p>'}
+            `;
+            const commentsList = container.querySelector('.comments-list');
+            if (commentsList) commentsList.scrollTop = commentsList.scrollHeight;
+          }).catch(error => this.showNotification(`Ошибка загрузки комментариев: ${error.message}`, 'error'));
+        }).catch(error => this.showNotification(`Ошибка загрузки видео: ${error.message}`, 'error'));
+      }
+
+      postComment(videoOwnerId) {
+        const user = this.auth.currentUser;
+        if (!user || !this.currentVideoKey) {
+          this.showNotification('Войдите в систему', 'error');
+          return;
+        }
+
+        const commentInput = document.getElementById('newComment');
+        const commentText = this.sanitizeInput(commentInput.value.trim());
+        if (!commentText) {
+          this.showNotification('Введите комментарий', 'error');
+          return;
+        }
+
+        const commentRef = this.db.ref(`videos/${this.currentVideoKey}/comments`).push();
+        commentRef.set({
+          text: commentText,
+          userId: user.uid,
+          userName: user.displayName || user.email.split('@')[0],
+          userAvatar: user.photoURL || 'https://via.placeholder.com/40',
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+          commentInput.value = '';
+          this.showNotification('Комментарий добавлен');
+          if (videoOwnerId !== user.uid) {
+            this.notifyUser(videoOwnerId, `${user.displayName} прокомментировал ваше видео`);
+          }
+        }).catch(error => this.showNotification(`Ошибка: ${error.message}`, 'error'));
+      }
+
+      sanitizeInput(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      editComment(videoKey, commentKey, text) {
+        const newText = prompt('Редактировать комментарий:', text);
+        if (newText && newText.trim()) {
+          this.db.ref(`videos/${videoKey}/comments/${commentKey}`).update({
+            text: this.sanitizeInput(newText.trim()),
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+          }).then(() => this.showNotification('Комментарий обновлен'))
+            .catch(error => this.showNotification(`Ошибка: ${error.message}`, 'error'));
+        }
+      }
+
+      deleteComment(videoKey, commentKey) {
+        if (confirm('Удалить комментарий?')) {
+          this.db.ref(`videos/${videoKey}/comments/${commentKey}`).remove()
+            .then(() => this.showNotification('Комментарий удален'))
+            .catch(error => this.showNotification(`Ошибка: ${error.message}`, 'error'));
+        }
+      }
+
+      renderComments(comments) {
+        if (!comments || Object.keys(comments).length === 0) {
+          return '<p style="text-align: center; color: var(--text-secondary);">Нет комментариев</p>';
+        }
+
+        const user = this.auth.currentUser;
+        return Object.entries(comments)
+          .sort((a, b) => a[1].timestamp - b[1].timestamp)
+          .map(([key, comment]) => `
+            <div class="comment">
+              <div class="comment-content">
+                <img src="${comment.userAvatar}" alt="Аватар" style="width: 32px; height: 32px; border-radius: 50%;">
+                <div>
+                  <span class="comment-user">${comment.userName}</span>
+                  <span class="comment-text">${comment.text}</span>
+                </div>
+              </div>
+              <div>
+                <span class="comment-time">${this.formatTime(comment.timestamp)}</span>
+                ${user && user.uid === comment.userId ? `
+                  <div class="comment-actions">
+                    <i class="fas fa-edit" onclick="app.editComment('${this.currentVideoKey}', '${key}', '${comment.text.replace(/'/g, "\\'")}')"></i>
+                    <i class="fas fa-trash" onclick="app.deleteComment('${this.currentVideoKey}', '${key}')"></i>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `).join('');
+      }
+
+      likeVideo(key, videoElement) {
+        const user = this.auth.currentUser;
+        if (!user) {
+          this.showNotification('Войдите, чтобы ставить лайки', 'error');
+          return;
+        }
+
+        const isLiked = this.currentUserLikes[key];
+        const likeStat = videoElement.querySelector('.like-stat');
+        const likeIcon = likeStat.querySelector('i');
+        const likeCount = likeStat.querySelector('.like-count');
+        const likeBtn = videoElement.querySelector('.like-btn');
+        const likeBtnIcon = likeBtn.querySelector('i');
+        const currentLikes = parseInt(likeCount.textContent);
+
+        if (isLiked) {
+          likeIcon.classList.remove('liked');
+          likeBtnIcon.classList.remove('liked');
+          likeCount.textContent = currentLikes - 1;
+          likeBtn.innerHTML = `<i class="fas fa-heart"></i> Нравится`;
+          this.showNotification('Лайк убран');
+        } else {
+          likeIcon.classList.add('liked');
+          likeBtnIcon.classList.add('liked');
+          likeCount.textContent = currentLikes + 1;
+          likeBtn.innerHTML = `<i class="fas fa-heart liked"></i> Не нравится`;
+          this.showNotification('Лайк поставлен');
+          const heart = document.createElement('span');
+          heart.className = 'like-animation';
+          heart.innerHTML = '❤️';
+          videoElement.querySelector('video').parentElement.appendChild(heart);
+          setTimeout(() => heart.remove(), 500);
+        }
+
+        const updates = {};
+        if (isLiked) {
+          updates[`videos/${key}/likes`] = firebase.database.ServerValue.increment(-1);
+          updates[`userLikes/${user.uid}/${key}`] = null;
+        } else {
+          updates[`videos/${key}/likes`] = firebase.database.ServerValue.increment(1);
+          updates[`userLikes/${user.uid}/${key}`] = true;
+        }
+
+        this.db.ref().update(updates).catch(error => {
+          if (isLiked) {
+            likeIcon.classList.add('liked');
+            likeBtnIcon.classList.add('liked');
+            likeCount.textContent = currentLikes;
+            likeBtn.innerHTML = `<i class="fas fa-heart liked"></i> Не нравится`;
+          } else {
+            likeIcon.classList.remove('liked');
+            likeBtnIcon.classList.remove('liked');
+            likeCount.textContent = currentLikes;
+            likeBtn.innerHTML = `<i class="fas fa-heart"></i> Нравится`;
+          }
+          this.showNotification(`Ошибка: ${error.message}`, 'error');
+        });
+      }
+
+      viewVideo(key) {
+        this.db.ref(`videos/${key}/views`).transaction(current => (current || 0) + 1)
+          .catch(error => console.error(`Ошибка просмотра: ${error.message}`));
+      }
+
+      deleteVideo(key) {
+        if (!confirm('Удалить видео?')) return;
+
+        this.db.ref(`videos/${key}`).remove()
+          .then(() => this.showNotification('Видео удалено'))
+          .catch(error => this.showNotification(`Ошибка: ${error.message}`, 'error'));
+      }
+
+      shareVideo(url) {
+        if (navigator.share) {
+          navigator.share({
+            title: 'Видео на DOROS',
+            url
+          }).catch(() => this.copyToClipboard(url));
+        } else {
+          this.copyToClipboard(url);
+        }
+      }
+
+      copyToClipboard(text) {
+        navigator.clipboard.writeText(text)
+          .then(() => this.showNotification('Ссылка скопирована!'))
+          .catch(() => this.showNotification('Ошибка копирования', 'error'));
+      }
+
+      showProfile(userId) {
+        const modal = document.getElementById('profileModal');
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        this.db.ref(`users/${userId}`).once('value', userSnap => {
+          const userData = userSnap.val() || {};
+          this.db.ref('videos').once('value', videosSnap => {
+            const videos = [];
+            videosSnap.forEach(child => {
+              const videoData = child.val();
+              if (videoData.userId === userId) {
+                videos.push({ key: child.key, ...videoData });
+              }
+            });
+
+            const isFollowing = this.auth.currentUser && this.followingList.includes(userId);
+            const isCurrentUser = this.auth.currentUser && this.auth.currentUser.uid === userId;
+
+            document.getElementById('profileContent').innerHTML = `
+              <div class="profile-container">
+                <img src="${userData.photoURL || 'https://via.placeholder.com/100'}" alt="Аватар">
+                <h2>${userData.displayName || 'Пользователь'}</h2>
+                <div class="profile-stats">
+                  <span><i class="fas fa-users"></i> ${this.followersCount[userId] || 0}</span>
+                  <span><i class="fas fa-user-friends"></i> ${this.followingCount[userId] || 0}</span>
+                  <span><i class="fas fa-video"></i> ${videos.length}</span>
+                </div>
+                ${!isCurrentUser && this.auth.currentUser && this.auth.currentUser.uid !== userId ? `
+                  <button class="follow-btn ${isFollowing ? 'following' : ''}" 
+                          onclick="app.toggleFollow('${userId}', this)">
+                    <i class="fas ${isFollowing ? 'fa-user-check' : 'fa-user-plus'}"></i>
+                    ${isFollowing ? 'Отписаться' : 'Подписаться'}
+                  </button>
+                ` : ''}
+                <div class="profile-videos">
+                  ${videos.length ? videos.map(video => `
+                    <div class="profile-video" onclick="app.showComments('${video.key}')">
+                      <video src="${video.url}" muted></video>
+                    </div>
+                  `).join('') : '<p style="color: var(--text-secondary);">Нет видео</p>'}
+                </div>
+              </div>
+            `;
+          });
+        });
+      }
+
+      closeProfile() {
+        document.getElementById('profileModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+
+      toggleFollow(userId, button) {
+        const currentUser = this.auth.currentUser;
+        if (!currentUser) {
+          this.showNotification('Войдите в систему', 'error');
+          return;
+        }
+        if (userId === currentUser.uid) {
+          this.showNotification('Нельзя подписаться на себя', 'error');
+          return;
+        }
+
+        const isFollowing = this.followingList.includes(userId);
+        const originalText = button.innerHTML;
+        button.classList.add('loading');
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        const updates = {};
+        if (isFollowing) {
+          updates[`following/${currentUser.uid}/${userId}`] = null;
+          updates[`followers/${userId}/${currentUser.uid}`] = null;
+        } else {
+          updates[`following/${currentUser.uid}/${userId}`] = true;
+          updates[`followers/${userId}/${currentUser.uid}`] = true;
+        }
+
+        this.db.ref().update(updates)
+          .then(() => {
+            button.classList.remove('loading');
+            button.disabled = false;
+            button.classList.toggle('following', !isFollowing);
+            button.innerHTML = isFollowing ? '<i class="fas fa-user-plus"></i> Подписаться' : '<i class="fas fa-user-check"></i> Отписаться';
+            this.showNotification(isFollowing ? 'Вы отписались' : 'Вы подписались');
+            this.notifyUser(userId, isFollowing ? null : `${currentUser.displayName} подписался на вас`);
+          })
+          .catch(error => {
+            button.classList.remove('loading');
+            button.disabled = false;
+            button.innerHTML = originalText;
+            this.showNotification(`Ошибка: ${error.message}`, 'error');
+          });
+      }
+
+      notifyUser(userId, message) {
+        if (!message) return;
+        this.db.ref(`notifications/${userId}`).push({
+          message,
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
+
+      autoPlayVideos() {
+        const videos = document.querySelectorAll('video');
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            const video = entry.target;
+            if (entry.isIntersecting) {
+              video.play();
+              this.viewVideo(video.dataset.key);
+            } else {
+              video.pause();
+            }
+          });
+        }, { threshold: 0.5 });
+
+        videos.forEach(video => observer.observe(video));
+      }
+    }
+
+    const app = new DorosApp();
+  </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чёт-Нечёт FAMD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #d4af37;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .game-container {
+            background: linear-gradient(135deg, #0f2d0f, #1e4d1e);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
+            text-align: center;
+            width: 350px;
+        }
+
+        h1 {
+            color: #d4af37;
+        }
+
+        button {
+            background-color: #d4af37;
+            color: black;
+            padding: 12px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #b9972e;
+        }
+
+        #play-again {
+            display: none;
+        }
+
+        .timer {
+            font-size: 18px;
+            margin-top: 15px;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Чёт-Нечёт FAMD</h1>
+        <p>Выберите чёт или нечёт.</p>
+
+        <p class="timer">Осталось времени: <span id="time">03:00</span></p>
+
+        <button id="play">Играть</button>
+        <div class="choices" style="display: none;">
+            <button class="choice" id="even">Чёт</button>
+            <button class="choice" id="odd">Нечёт</button>
+        </div>
+
+        <p id="your-choice"></p>
+        <p id="computer-choice"></p>
+        <p id="result-message"></p>
+        <p id="remaining-marbles">Осталось шариков: 10</p>
+
+        <button id="play-again" style="display: none;">Играть снова</button>
+    </div>
+
+    <script>
+        const playButton = document.getElementById('play');
+        const evenButton = document.getElementById('even');
+        const oddButton = document.getElementById('odd');
+        const playAgainButton = document.getElementById('play-again');
+        const yourChoiceText = document.getElementById('your-choice');
+        const computerChoiceText = document.getElementById('computer-choice');
+        const resultMessage = document.getElementById('result-message');
+        const remainingMarblesText = document.getElementById('remaining-marbles');
+        const timerText = document.getElementById('time');
+
+        let userMarbles = 10;
+        let timeLeft;
+        let timer;
+
+        function getRandomNumber() {
+            return Math.floor(Math.random() * 21);
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 180;
+            timer = setInterval(() => {
+                if (timeLeft <= 0 || userMarbles === 0 || userMarbles >= 20) {
+                    clearInterval(timer);
+                    alert(userMarbles >= 20 ? "Вы выиграли!" : "Время вышло. Вы проиграли!");
+                    resetGame();
+                    return;
+                }
+                timeLeft--;
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                timerText.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }, 1000);
+        }
+
+        function playGame(userChoice) {
+            const computerNumber = getRandomNumber();
+            const isEven = computerNumber % 2 === 0;
+            const computerChoice = isEven ? 'Чёт' : 'Нечёт';
+            const result = (userChoice === computerChoice) ? 'Вы выиграли раунд!' : 'Вы проиграли раунд!';
+            const points = computerNumber;
+
+            userMarbles = (userChoice === computerChoice) ? userMarbles + points : userMarbles - points;
+
+            if (userMarbles <= 0) {
+                alert("Вы проиграли!");
+                resetGame();
+                return;
+            }
+
+            if (userMarbles >= 20) {
+                alert("Вы выиграли!");
+                resetGame();
+                return;
+            }
+
+            yourChoiceText.textContent = `Ваш выбор: ${userChoice}`;
+            computerChoiceText.textContent = `Выбор компьютера: ${computerChoice} (Число: ${computerNumber})`;
+            resultMessage.textContent = result;
+            remainingMarblesText.textContent = `Осталось шариков: ${userMarbles}`;
+
+            playAgainButton.style.display = 'block';
+        }
+
+        function resetGame() {
+            userMarbles = 10;
+            yourChoiceText.textContent = '';
+            computerChoiceText.textContent = '';
+            resultMessage.textContent = '';
+            remainingMarblesText.textContent = 'Осталось шариков: 10';
+            playAgainButton.style.display = 'none';
+            playButton.style.display = 'block';
+            document.querySelector('.choices').style.display = 'none';
+            timerText.textContent = "03:00";
+            clearInterval(timer);
+        }
+
+        playButton.addEventListener('click', () => {
+            playButton.style.display = 'none';
+            document.querySelector('.choices').style.display = 'block';
+            startTimer();
+        });
+
+        evenButton.addEventListener('click', () => playGame('Чёт'));
+        oddButton.addEventListener('click', () => playGame('Нечёт'));
+        playAgainButton.addEventListener('click', resetGame);
+    </script>
+</body>
+</html>
