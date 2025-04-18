@@ -4,55 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Добро пожаловать на официальный сайт FAMD и DOROS. Здесь вы найдёте DOROShop, DOROS Video, Исламские материалы, игры, словарь и многое другое.">
-<meta name="keywords" content="FAMD, DOROS, ДОРОС, ФЭМД, ФАМД, DOROShop, DOROSvideo, дорос шоп, дорос видео, ислам, словарь, чат, игры, мусульманский контент">
-<meta name="author" content="FAMD-sn">
-<meta name="robots" content="index, follow">
-    <title>FAMD Сервисы</title>
+    <meta name="keywords" content="FAMD, DOROS, ДОРОС, ФЭМД, ФАМД, DOROShop, DOROSvideo, дорос шоп, дорос видео, ислам, словарь, чат, игры, мусульманский контент">
+    <meta name="author" content="FAMD-sn">
+    <meta name="robots" content="index, follow">
+    <title>FAMD - Сервисы с характером</title>
     <style>
         :root {
-            --primary: #4CAF50;
-            --primary-dark: #388E3C;
-            --secondary: #FFC107;
-            --background: #f5f5f5;
+            --primary: #43a047;
+            --primary-dark: #2e7d32;
+            --accent: #ffd600;
+            --background: #f5f7fa;
             --surface: #ffffff;
-            --on-surface: #212121;
-            --on-background: #424242;
-            --border: #e0e0e0;
-            --shadow: rgba(0, 0, 0, 0.1);
+            --on-surface: #263238;
+            --on-background: #546e7a;
+            --border: #cfd8dc;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --error: #ff5252;
         }
 
         .dark-mode {
-            --primary: #81C784;
-            --primary-dark: #66BB6A;
-            --secondary: #FFCA28;
+            --primary: #66bb6a;
+            --primary-dark: #43a047;
+            --accent: #ffca28;
             --background: #121212;
-            --surface: #1E1E1E;
-            --on-surface: #E0E0E0;
-            --on-background: #9E9E9E;
+            --surface: #1e1e1e;
+            --on-surface: #e0e0e0;
+            --on-background: #9e9e9e;
             --border: #333333;
             --shadow: rgba(0, 0, 0, 0.3);
+            --error: #ff6b6b;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: background-color 0.3s, color 0.2s;
+            transition: background-color 0.3s, color 0.2s, transform 0.2s;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+            font-family: 'Comic Neue', 'Segoe UI', sans-serif;
             background-color: var(--background);
             color: var(--on-surface);
             line-height: 1.6;
             padding: 0;
             margin: 0;
             min-height: 100vh;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .container {
-            max-width: 100%;
-            padding: 16px;
+            max-width: 1200px;
+            padding: 20px;
             margin: 0 auto;
         }
 
@@ -60,33 +68,64 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 0;
-            margin-bottom: 16px;
-            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         h1 {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: var(--primary);
-            font-weight: 600;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .theme-toggle {
             background: none;
             border: none;
-            color: var(--secondary);
-            font-size: 1.2rem;
+            color: var(--accent);
+            font-size: 1.5rem;
             cursor: pointer;
             padding: 8px;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s;
         }
 
         .theme-toggle:hover {
+            transform: rotate(30deg);
             background-color: rgba(0, 0, 0, 0.05);
         }
 
@@ -95,88 +134,143 @@
         }
 
         .search-container {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            position: relative;
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            padding: 15px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
             font-size: 1rem;
             background-color: var(--surface);
             color: var(--on-surface);
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: all 0.3s;
         }
 
         .search-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: var(--on-background);
+            opacity: 0.7;
         }
 
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .service-card {
             background-color: var(--surface);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 2px 8px var(--shadow);
-            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
         }
 
         .service-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 12px var(--shadow);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        .service-card:active {
+            transform: translateY(-2px);
         }
 
         .service-icon {
-            font-size: 1.8rem;
-            margin-bottom: 12px;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
             color: var(--primary);
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover .service-icon {
+            transform: scale(1.1);
         }
 
         .service-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 8px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
             color: var(--on-surface);
+            position: relative;
+            display: inline-block;
+        }
+
+        .service-title::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
         }
 
         .service-desc {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--on-background);
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             flex-grow: 1;
+            line-height: 1.5;
         }
 
         .service-link {
             color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-size: 0.9rem;
+            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .service-link::after {
+            content: "→";
+            transition: transform 0.2s;
         }
 
         .service-link:hover {
+            color: var(--primary-dark);
             text-decoration: underline;
+        }
+
+        .service-link:hover::after {
+            transform: translateX(3px);
         }
 
         .privacy-container {
             background-color: var(--surface);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 24px;
-            box-shadow: 0 2px 8px var(--shadow);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+            box-shadow: 0 4px 12px var(--shadow);
             border: 1px solid var(--border);
         }
 
@@ -185,25 +279,28 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            padding: 8px 0;
+            padding: 10px 0;
+            margin-bottom: 10px;
         }
 
         .privacy-title {
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 700;
             color: var(--on-surface);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .privacy-icon {
-            font-size: 1.2rem;
-            color: var(--secondary);
+            font-size: 1.3rem;
+            color: var(--error);
         }
 
         .privacy-arrow {
             transition: transform 0.3s;
+            font-size: 1.2rem;
+            color: var(--on-background);
         }
 
         .privacy-content {
@@ -211,63 +308,107 @@
             overflow: hidden;
             transition: max-height 0.3s ease;
             color: var(--on-background);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            line-height: 1.7;
         }
 
         .privacy-content.show {
-            max-height: 1000px;
-            padding-top: 12px;
+            max-height: 2000px;
+            padding-top: 15px;
         }
 
         .privacy-content h4 {
-            margin: 12px 0 8px;
+            margin: 20px 0 10px;
             color: var(--on-surface);
-            font-size: 0.95rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .privacy-content p {
+            margin-bottom: 15px;
         }
 
         .privacy-content ul {
-            padding-left: 20px;
-            margin-bottom: 12px;
+            padding-left: 25px;
+            margin-bottom: 15px;
         }
 
         .privacy-content li {
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            position: relative;
         }
 
-        @media (max-width: 600px) {
+        .privacy-content li::before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            color: var(--on-background);
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
             .services-grid {
                 grid-template-columns: 1fr;
             }
             
             h1 {
-                font-size: 1.3rem;
+                font-size: 1.7rem;
             }
             
             .service-card {
-                padding: 14px;
+                padding: 18px;
             }
         }
 
-        /* Анимация переключения темы */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        body {
-            animation: fadeIn 0.5s ease-in;
+        @media (max-width: 480px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .theme-toggle {
+                position: absolute;
+                top: 20px;
+                right: 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>FAMD Сервисы</h1>
+            <div class="header-content">
+                <div class="logo">🐻</div>
+                <h1>FAMD Сервисы</h1>
+            </div>
             <button class="theme-toggle" id="themeToggle">🌓</button>
         </header>
 
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="Поиск сервисов..." id="searchInput">
+            <input type="text" class="search-input" placeholder="Ищите сервис... или медведя 🐻" id="searchInput">
         </div>
 
         <div class="services-grid" id="servicesGrid">
@@ -275,152 +416,152 @@
             <div class="service-card" onclick="location.href='словарь.html'">
                 <div class="service-icon">📚</div>
                 <h3 class="service-title">ФАМД Словарь</h3>
-                <p class="service-desc">Умный словарь с объяснениями на человеческом языке. Даже бабушка поймёт, что такое "NFT".</p>
-                <a class="service-link">Перейти →</a>
+                <p class="service-desc">Толковый словарь, который объяснит даже вашей кошке, что такое "блокчейн". Теперь с функцией "Как это сказать по-медвежьи?"</p>
+                <a class="service-link">Открыть словарь</a>
             </div>
 
             <!-- Dino FAMD -->
             <div class="service-card" onclick="location.href='dinofamd.html'">
                 <div class="service-icon">🦖</div>
                 <h3 class="service-title">Медвежья Пробежка</h3>
-                <p class="service-desc">Беги, медведь, беги! Избегай кактусов и собирай мёд в этой увлекательной игре.</p>
-                <a class="service-link">Играть →</a>
+                <p class="service-desc">Бегите от кактусов и собирайте мёд! (Не пытайтесь повторить это в зоопарке). Наш медведь быстрее Google-динозавра!</p>
+                <a class="service-link">Начать бегство</a>
             </div>
 
             <!-- DOROSchat -->
             <div class="service-card" onclick="location.href='DOROSchat.html'">
                 <div class="service-icon">💬</div>
-                <h3 class="service-title">Глобальный Чат</h3>
-                <p class="service-desc">Общайтесь со всем миром без границ. Предупреждение: могут быть медведи!</p>
-                <a class="service-link">Чатить →</a>
+                <h3 class="service-title">Глобальный Медвежий Чат</h3>
+                <p class="service-desc">Общайтесь со всем миром, как будто вы на дереве с мёдом. Предупреждение: могут встречаться настоящие медведи (шутка... или нет?)</p>
+                <a class="service-link">Присоединиться</a>
             </div>
 
             <!-- DOROSchat v4 -->
             <div class="service-card" onclick="location.href='DOROSchatv4.html'">
                 <div class="service-icon">📱</div>
-                <h3 class="service-title">Приватный Чат</h3>
-                <p class="service-desc">Личные сообщения как в WhatsApp, но с медвежьим шифрованием.</p>
-                <a class="service-link">Общаться →</a>
+                <h3 class="service-title">Медвежий WhatsApp</h3>
+                <p class="service-desc">Приватные беседы для тех, кто предпочитает мёд большим компаниям. Шифрование гарантируем - лапы в мёде!</p>
+                <a class="service-link">Шептать</a>
             </div>
 
             <!-- Dr.Zulfon -->
             <div class="service-card" onclick="location.href='Dr.Zulfon.html'">
                 <div class="service-icon">🎤</div>
                 <h3 class="service-title">Доктор Зульфон</h3>
-                <p class="service-desc">Голосовой словарь, который выговорит даже самое сложное слово без запинки.</p>
-                <a class="service-link">Слушать →</a>
+                <p class="service-desc">Говорящий словарь, который произнесёт "антидисestablishmentarianism" без запинки. Рычит лучше Siri и Алисы вместе взятых!</p>
+                <a class="service-link">Поговорить</a>
             </div>
 
             <!-- FAMDai -->
             <div class="service-card" onclick="location.href='FAMDai.html'">
                 <div class="service-icon">🤖</div>
                 <h3 class="service-title">FAMD Переводчик</h3>
-                <p class="service-desc">Переводит между языками и диалектами, включая медвежий. Точность 98,7%.</p>
-                <a class="service-link">Перевести →</a>
+                <p class="service-desc">Переводит с человеческого на медвежий и обратно. Особенно хорошо справляется с рычанием и урчанием. Точность 98,7% (остальное - творчество)</p>
+                <a class="service-link">Перевести</a>
             </div>
 
             <!-- FAMDquiz -->
             <div class="service-card" onclick="location.href='FAMDquiz.html'">
                 <div class="service-icon">🧩</div>
                 <h3 class="service-title">FAMD Викторина</h3>
-                <p class="service-desc">Создавайте и проходите викторины. Проверь, кто умнее - ты или медведь!</p>
-                <a class="service-link">Играть →</a>
+                <p class="service-desc">Создай викторину, которая поставит в тупик даже профессора! Вопросы про мёд приветствуются. Ответы проверяет строгий медведь-экзаменатор.</p>
+                <a class="service-link">Играть</a>
             </div>
 
             <!-- incoklopedia -->
             <div class="service-card" onclick="location.href='incoklopedia.html'">
                 <div class="service-icon">🤪</div>
                 <h3 class="service-title">Инциклопедия</h3>
-                <p class="service-desc">Альтернативные факты и неожиданные истины. 37% правды гарантировано!</p>
-                <a class="service-link">Узнать →</a>
+                <p class="service-desc">Энциклопедия альтернативных фактов. Здесь вы узнаете, что медведи на самом деле создали интернет, а Wi-Fi расшифровывается как "Wild Fuzzy Internet".</p>
+                <a class="service-link">Узнать правду</a>
             </div>
 
             <!-- index2.html -->
             <div class="service-card" onclick="location.href='index2.html'">
                 <div class="service-icon">🎲</div>
                 <h3 class="service-title">Чёт/Нечёт</h3>
-                <p class="service-desc">Игра из "Кальмара" без смертельного исхода. Просто выбери сторону!</p>
-                <a class="service-link">Играть →</a>
+                <p class="service-desc">Игра из "Кальмара", но без смертельного исхода. Просто выберите сторону и надейтесь, что медведь согласится. Ставки - банка мёда!</p>
+                <a class="service-link">Играть</a>
             </div>
 
             <!-- index5.html -->
             <div class="service-card" onclick="location.href='index5.html'">
                 <div class="service-icon">📰</div>
                 <h3 class="service-title">Медвежьи Новости</h3>
-                <p class="service-desc">Все важные события без фейков (надеемся). Курс мёда в реальном времени.</p>
-                <a class="service-link">Читать →</a>
+                <p class="service-desc">Все важные события: от падения курса рубля до повышения цен на мёд. Без фейков (мы надеемся). Главный редактор - бурый мишка.</p>
+                <a class="service-link">Читать</a>
             </div>
 
             <!-- index3.html -->
             <div class="service-card" onclick="location.href='index3.html'">
                 <div class="service-icon">🗺️</div>
                 <h3 class="service-title">Медвежья Карта</h3>
-                <p class="service-desc">Найдите ближайшие места с мёдом и безопасные берлоги. Навигация для мишек!</p>
-                <a class="service-link">Смотреть →</a>
+                <p class="service-desc">Найдите ближайшие места с мёдом, берлоги и опасные пчелиные ульи. Навигация для настоящих мишек! (GPS - Great Panda Service)</p>
+                <a class="service-link">Исследовать</a>
             </div>
 
             <!-- index8.html -->
             <div class="service-card" onclick="location.href='index8.html'">
                 <div class="service-icon">🖼️</div>
                 <h3 class="service-title">Медвежья Галерея</h3>
-                <p class="service-desc">Выставка ваших лучших медвежьих фото. Фильтр "Медовый загар" включён!</p>
-                <a class="service-link">Смотреть →</a>
+                <p class="service-desc">Фотоархив для ваших медвежьих селфи. Фильтр "Медовый загар" в подарок! (Автопортреты с рыбой - по желанию)</p>
+                <a class="service-link">Смотреть</a>
             </div>
 
             <!-- DOROShop -->
             <div class="service-card" onclick="location.href='DOROShop.html'">
                 <div class="service-icon">🛍️</div>
                 <h3 class="service-title">DOROShop</h3>
-                <p class="service-desc">Маркетплейс с мёдом и не только. Гарантируем - никаких пчёл в банке!</p>
-                <a class="service-link">Покупать →</a>
+                <p class="service-desc">Маркетплейс где можно купить всё: от мёда до медвежьих услуг. Гарантируем - никаких пчёл в банке! (Хотя... зависит от продавца)</p>
+                <a class="service-link">Покупать</a>
             </div>
 
             <!-- FAMDweather -->
             <div class="service-card" onclick="location.href='FAMDweather.html'">
                 <div class="service-icon">☀️</div>
                 <h3 class="service-title">Медвежий Прогноз</h3>
-                <p class="service-desc">Узнайте, когда лучше впадать в спячку. Точность как у других - 50%.</p>
-                <a class="service-link">Проверить →</a>
+                <p class="service-desc">Узнайте, когда лучше впадать в спячку. Точность прогноза - 50% (как у всех остальных). Дождь из мёда пока не предвидится.</p>
+                <a class="service-link">Проверить</a>
             </div>
 
             <!-- DOROSvid -->
             <div class="service-card" onclick="location.href='DOROSvid.html'">
                 <div class="service-icon">🎥</div>
                 <h3 class="service-title">DOROS Видео</h3>
-                <p class="service-desc">Смотрите и загружайте видео. От медведей в реке до уроков сбора мёда.</p>
-                <a class="service-link">Смотреть →</a>
+                <p class="service-desc">Смотрите и загружайте видео. От медведей в реке до уроков по сбору мёда. Без рекламы (пока что). "Медведи на льду" - хит сезона!</p>
+                <a class="service-link">Смотреть</a>
             </div>
 
             <!-- FAMDvaluta -->
             <div class="service-card" onclick="location.href='FAMDvaluta.html'">
                 <div class="service-icon">💱</div>
                 <h3 class="service-title">Медвежий Курс</h3>
-                <p class="service-desc">Конвертер валют: сомни в рубль, доллары в мёд. Котировки обновляются.</p>
-                <a class="service-link">Конвертировать →</a>
+                <p class="service-desc">Конвертер валют: сомни в рубль, доллары в мёд. Котировки обновляются, когда медведь просыпается. Курс мёда стабилен.</p>
+                <a class="service-link">Конвертировать</a>
             </div>
 
             <!-- krestikinolikifamd -->
             <div class="service-card" onclick="location.href='krestikinolikifamd.html'">
                 <div class="service-icon">❌⭕</div>
                 <h3 class="service-title">Медвежьи Крестики-Нолики</h3>
-                <p class="service-desc">Классика с медвежьим рыком при победе. Играйте против AI, который иногда поддаётся.</p>
-                <a class="service-link">Играть →</a>
+                <p class="service-desc">Классика с медвежьим рыком при победе. Играйте против AI, который иногда поддаётся. Проигравший делится мёдом!</p>
+                <a class="service-link">Играть</a>
             </div>
 
             <!-- muslim.html -->
             <div class="service-card" onclick="location.href='muslim.html'">
                 <div class="service-icon">☪️</div>
                 <h3 class="service-title">Ислам Online</h3>
-                <p class="service-desc">Мудрость Корана в цифре. Учимся терпению и правильным молитвам.</p>
-                <a class="service-link">Изучать →</a>
+                <p class="service-desc">Мудрость Корана в цифре: учимся терпению и правильному использованию ковриков. Без экстремизма, только мёд и духовность.</p>
+                <a class="service-link">Изучать</a>
             </div>
 
             <!-- paint.html -->
             <div class="service-card" onclick="location.href='paint.html'">
                 <div class="service-icon">🎨</div>
                 <h3 class="service-title">Медвежий Paint</h3>
-                <p class="service-desc">Рисуйте лапами! Единственное место, где можно изрисовать стену без последствий.</p>
-                <a class="service-link">Рисовать →</a>
+                <p class="service-desc">Рисуйте лапами! Единственное место, где можно изрисовать стену без последствий. Кисть "Медовый мазок" включена по умолчанию.</p>
+                <a class="service-link">Рисовать</a>
             </div>
         </div>
 
@@ -430,40 +571,64 @@
                 <span class="privacy-arrow">▼</span>
             </div>
             <div class="privacy-content" id="privacyContent">
-                <h4>1. Основные положения</h4>
-                <p>Мы, команда FAMD, гарантируем:</p>
+                <h4>1. Общие положения</h4>
+                <p>1.1. Настоящая Политика конфиденциальности регулирует порядок обработки и использования персональных данных пользователей сервисов FAMD (далее - "Сервисы").</p>
+                <p>1.2. Используя Сервисы, пользователь дает согласие на обработку своих персональных данных в соответствии с настоящей Политикой.</p>
+                
+                <h4>2. Собираемые данные</h4>
+                <p>2.1. В процессе использования Сервисов мы можем собирать следующую информацию:</p>
                 <ul>
-                    <li>Не используем ваши данные в корыстных целях (если только это не очень вкусное печенье)</li>
-                    <li>Не продаём вашу информацию третьим лицам (разве что за очень много мёда)</li>
-                    <li>Не несём ответственность за контент, создаваемый пользователями</li>
+                    <li>Персональные данные, предоставленные пользователем при регистрации (имя, электронная почта и др.)</li>
+                    <li>Данные об использовании Сервисов (логи действий, предпочтения, настройки)</li>
+                    <li>Технические данные (IP-адрес, тип браузера, данные об устройстве)</li>
+                    <li>Контент, создаваемый пользователем в рамках Сервисов</li>
                 </ul>
-
-                <h4>2. Что мы собираем</h4>
-                <p>Минимум необходимого:</p>
+                
+                <h4>3. Цели обработки данных</h4>
+                <p>3.1. Персональные данные обрабатываются в следующих целях:</p>
                 <ul>
-                    <li>Данные для работы сервисов (логины, настройки)</li>
-                    <li>Анонимную статистику использования</li>
-                    <li>Ваши шедевры в FAMD Paint (чтобы восхищаться)</li>
+                    <li>Предоставление и улучшение функциональности Сервисов</li>
+                    <li>Обеспечение безопасности и предотвращение мошенничества</li>
+                    <li>Анализ использования Сервисов для улучшения качества</li>
+                    <li>Выполнение обязательств перед пользователями</li>
                 </ul>
-
-                <h4>3. Ваши обязательства</h4>
-                <p>Используя наши сервисы, вы соглашаетесь:</p>
+                
+                <h4>4. Защита данных</h4>
+                <p>4.1. Мы применяем соответствующие технические и организационные меры для защиты персональных данных от несанкционированного доступа, изменения, раскрытия или уничтожения.</p>
+                <p>4.2. Доступ к персональным данным имеют только уполномоченные сотрудники, которым эта информация необходима для выполнения служебных обязанностей.</p>
+                
+                <h4>5. Передача данных третьим лицам</h4>
+                <p>5.1. Мы не передаем персональные данные пользователей третьим лицам, за исключением случаев:</p>
                 <ul>
-                    <li>Не нарушать законы и права других пользователей</li>
-                    <li>Не загружать опасный или незаконный контент</li>
-                    <li>Не пытаться взломать медвежьи серверы (мы всё равно сильнее)</li>
+                    <li>Получения явного согласия пользователя</li>
+                    <li>Требований з��конодательства Российской Федерации</li>
+                    <li>Обеспечения работы Сервисов (хостинг-провайдеры, платежные системы)</li>
                 </ul>
-
-                <h4>4. Наши гарантии</h4>
-                <p>Мы обещаем:</p>
+                
+                <h4>6. Права пользователей</h4>
+                <p>6.1. Пользователь имеет право:</p>
                 <ul>
-                    <li>Защищать ваши данные как свой последний бочонок мёда</li>
-                    <li>Не передавать ваши пароли даже самым милым медвежатам</li>
-                    <li>Развивать сервисы и добавлять новые функции</li>
+                    <li>Запрашивать доступ к своим персональным данным</li>
+                    <li>Требовать исправления неточных данных</li>
+                    <li>Отзывать согласие на обработку данных</li>
+                    <li>Требовать удаления персональных данных</li>
                 </ul>
-
-                <p><em>Последнее обновление: когда медведь перевернулся на другой бок</em></p>
+                
+                <h4>7. Ответственность</h4>
+                <p>7.1. Администрация Сервисов не несет ответственности за действия третьих лиц, получивших доступ к персональным данным пользователя вследствие нарушения им мер безопасности.</p>
+                <p>7.2. Администрация не контролирует и не несет ответственности за содержание информации, создаваемой пользователями в рамках Сервисов.</p>
+                
+                <h4>8. Заключительные положения</h4>
+                <p>8.1. Настоящая Политика может быть изменена администрацией Сервисов. Новая редакция вступает в силу с момента ее публикации.</p>
+                <p>8.2. Продолжение использования Сервисов после внесения изменений означает согласие пользователя с новой редакцией Политики.</p>
+                
+                <p><em>Дата последнего обновления: 01.01.2023</em></p>
             </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2023 FAMD Сервисы | <a href="#">Наши контакты</a> | <a href="#">Помощь</a></p>
+            <p>Сделано с 🍯 для людей и медведей</p>
         </div>
     </div>
 
@@ -476,7 +641,8 @@
         });
 
         // Проверка сохранённой темы
-        if (localStorage.getItem('theme') === 'dark') {
+        if (localStorage.getItem('theme') === 'dark' || 
+            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
             document.body.classList.add('dark-mode');
         }
 
@@ -516,6 +682,13 @@
                 document.body.style.opacity = '1';
             }, 100);
         });
+
+        // Системная тема
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('theme')) {
+                document.body.classList.toggle('dark-mode', e.matches);
+            }
+        });
     </script>
 </body>
-</html>
+    </html>
