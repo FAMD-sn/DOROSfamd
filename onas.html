@@ -3,621 +3,746 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOROSfamd | Бизнес-империя Холмирзоева Дориуша</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="description" content="DOROSfamd — проект из 20 фронтенд-сайтов, от 'Словаря' 2020 года до запусков в Google в апреле 2025.">
+    <meta name="keywords" content="DOROSfamd, фронтенд, веб-разработка, Словарь, сайты">
+    <meta property="og:title" content="DOROSfamd | Фронтенд-творчество">
+    <meta property="og:description" content="20 фронтенд-сайтов, созданных с 2020 по 2025 год, от 'Словаря' до запусков в Google.">
+    <meta property="og:image" content="gerb.png">
+    <meta property="og:url" content="https://dorosfamd.com">
+    <title>DOROSfamd | Фронтенд-творчество</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
-            --imperial-gold: #FFD700;
-            --russian-red: #CC0000;
-            --soviet-red: #C11B17;
-            --usa-blue: #3C3B6E;
-            --china-red: #DE2910;
-            --light: #ffffff;
-            --dark: #1A1A1A;
-            --whatsapp: #25D366;
-            --telegram: #0088CC;
-            --instagram: #E1306C;
+            --gold: #FFD700;
+            --teal: #20B2AA;
+            --charcoal: #2F2F2F;
+            --silver: #E0E0E0;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --diamond: #b9f2ff;
         }
-        
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            color: var(--light);
+            background: var(--charcoal);
+            color: var(--silver);
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--teal), var(--charcoal), var(--gold));
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
+            z-index: -1;
+            opacity: 0.4;
         }
-        
+
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-            position: relative;
-            animation: fadeIn 1s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .logo-container {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 1.5rem;
-        }
-        
-        .logo-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            border: 3px solid var(--imperial-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-            transition: all 0.5s ease;
-        }
-        
-        .logo-circle:hover {
-            transform: rotate(15deg);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.7);
-        }
-        
-        .logo-circle img {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
-        }
-        
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, #FFD700, #FFFFFF);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            font-family: 'Playfair Display', serif;
-            letter-spacing: 1px;
-        }
-        
-        .tagline {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-            position: relative;
-            display: inline-block;
-        }
-        
-        .tagline::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50%;
-            height: 2px;
-            background: var(--imperial-gold);
-        }
-        
-        .about-content {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 3rem;
-            margin-bottom: 3rem;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .about-content::before {
-            content: '';
-            position: absolute;
+
+        .navbar {
+            position: fixed;
             top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, transparent 70%);
-        }
-        
-        .about-content p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .owner-card {
-            background: linear-gradient(145deg, rgba(204, 0, 0, 0.7), rgba(0, 0, 0, 0.8));
-            border-radius: 20px;
-            padding: 2.5rem;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 2rem;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 4rem;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--imperial-gold);
-            animation: slideUp 1s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .navbar-logo {
+            font-size: 2rem;
+            font-family: 'Cinzel Decorative', cursive;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
-        
-        .owner-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
-            transform: rotate(30deg);
-        }
-        
-        .owner-avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #1a2a6c, #b21f1f);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 3rem;
-            border: 3px solid var(--imperial-gold);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .owner-avatar::after {
-            content: '';
-            position: absolute;
-            inset: -5px;
-            background: linear-gradient(45deg, #FFD700, #FFFFFF, #FFD700);
-            z-index: -1;
-            border-radius: 50%;
-            animation: rotate 4s linear infinite;
-        }
-        
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .owner-avatar i {
-            font-size: 4rem;
-            color: var(--imperial-gold);
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
-        }
-        
-        .owner-info {
-            flex: 1;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .owner-name {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--imperial-gold);
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .owner-title {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            opacity: 0.9;
-            font-weight: 600;
-        }
-        
-        .owner-quote {
-            font-style: italic;
-            position: relative;
-            padding-left: 2rem;
-            border-left: 3px solid var(--imperial-gold);
-        }
-        
-        .owner-quote::before {
-            content: '"';
-            position: absolute;
-            left: 0;
-            top: -10px;
-            font-size: 3rem;
-            color: rgba(255, 215, 0, 0.3);
-        }
-        
-        .contacts-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin: 3rem 0;
-            color: var(--imperial-gold);
-            position: relative;
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .contacts-title::after, .contacts-title::before {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            width: 100px;
-            height: 3px;
-            background: var(--imperial-gold);
-        }
-        
-        .contacts-title::after {
-            left: calc(50% - 110px);
-        }
-        
-        .contacts-title::before {
-            right: calc(50% - 110px);
-        }
-        
-        .contacts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-        
-        .contact-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.8rem 2rem;
-            border-radius: 15px;
+
+        .nav-links { display: flex; list-style: none; }
+        .nav-links li { margin-left: 2rem; }
+        .nav-links a {
+            color: var(--silver);
             text-decoration: none;
-            color: white;
-            font-weight: 700;
-            font-size: 1.2rem;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            z-index: 1;
+            font-weight: 600;
+            transition: color 0.3s ease;
         }
-        
-        .contact-btn::before {
+        .nav-links a:hover { color: var(--gold); }
+        .hamburger { display: none; font-size: 1.8rem; cursor: pointer; color: var(--gold); }
+
+        .header {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: url('hero-bg.jpg') center/cover no-repeat;
+            overflow: hidden;
+        }
+
+        .header::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s ease;
-            z-index: -1;
-        }
-        
-        .contact-btn:hover::before {
-            transform: translateX(100%);
-        }
-        
-        .contact-btn:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-        }
-        
-        .contact-btn:active {
-            transform: translateY(-2px);
-        }
-        
-        .phone-btn {
-            background: linear-gradient(45deg, #25aae1, #0d7a0d);
-        }
-        
-        .whatsapp-btn {
-            background: linear-gradient(45deg, var(--whatsapp), #075E54);
-        }
-        
-        .telegram-btn {
-            background: linear-gradient(45deg, var(--telegram), #00405d);
-        }
-        
-        .instagram-btn {
-            background: linear-gradient(45deg, var(--instagram), #833AB4);
-        }
-        
-        .btn-icon {
-            font-size: 2rem;
-            margin-right: 15px;
-            transition: transform 0.3s ease;
-        }
-        
-        .contact-btn:hover .btn-icon {
-            transform: scale(1.2);
-        }
-        
-        .cultural-section {
-            margin: 5rem 0;
-            text-align: center;
-        }
-        
-        .cultural-title {
-            font-size: 1.8rem;
-            margin-bottom: 2rem;
-            color: var(--imperial-gold);
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .cultural-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-        }
-        
-        .cultural-card {
             background: rgba(0, 0, 0, 0.5);
-            border-radius: 15px;
-            padding: 2rem;
-            transition: all 0.4s ease;
-            border: 1px solid transparent;
+            z-index: 0;
+        }
+
+        .header-content { z-index: 1; }
+
+        .logo-container {
             position: relative;
-            overflow: hidden;
+            display: inline-block;
+            margin-bottom: 2rem;
         }
-        
-        .cultural-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            border-color: rgba(255, 215, 0, 0.5);
+
+        .logo-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 3px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            transition: all 0.5s ease;
         }
-        
-        .cultural-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
+
+        .logo-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
         }
-        
-        .soviet::before {
-            background: var(--soviet-red);
+
+        .logo-circle img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
         }
-        
-        .russian::before {
-            background: var(--russian-red);
-        }
-        
-        .usa::before {
-            background: var(--usa-blue);
-        }
-        
-        .china::before {
-            background: var(--china-red);
-        }
-        
-        .cultural-icon {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-            transition: all 0.4s ease;
-        }
-        
-        .cultural-card:hover .cultural-icon {
-            transform: scale(1.1) rotate(10deg);
-        }
-        
-        .soviet .cultural-icon {
-            color: var(--soviet-red);
-        }
-        
-        .russian .cultural-icon {
-            color: var(--imperial-gold);
-        }
-        
-        .usa .cultural-icon {
-            color: var(--usa-blue);
-        }
-        
-        .china .cultural-icon {
-            color: var(--china-red);
-        }
-        
-        .cultural-name {
-            font-size: 1.5rem;
-            font-weight: 700;
+
+        h1 {
+            font-size: 4rem;
             margin-bottom: 1rem;
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .cultural-desc {
-            font-size: 0.95rem;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 5rem;
-            padding-top: 3rem;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            font-size: 1rem;
-            opacity: 0.8;
-            position: relative;
-        }
-        
-        footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--imperial-gold), transparent);
-        }
-        
-        .footer-logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, #FFD700, #FFFFFF);
+            background: linear-gradient(to right, var(--gold), var(--silver));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            display: inline-block;
+            font-family: 'Cinzel Decorative', cursive;
         }
-        
+
+        .tagline {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            font-weight: 300;
+            letter-spacing: 1px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            text-align: center;
+        }
+
+        .about-content p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .glowing-text {
+            color: var(--gold);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+            font-weight: 700;
+        }
+
+        .contacts-title {
+            text-align: center;
+            font-size: 3rem;
+            margin: 4rem 0;
+            color: var(--gold);
+            font-family: 'Cinzel Decorative', cursive;
+        }
+
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            text-decoration: none;
+            color: var(--silver);
+            font-weight: 700;
+            font-size: 1.2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--gold);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .contact-btn:hover {
+            background: var(--gold);
+            color: var(--charcoal);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        .contact-btn i {
+            margin-right: 10px;
+            color: var(--silver);
+            animation: pulse 2s infinite;
+        }
+        .contact-btn:hover i { color: var(--charcoal); }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .values-section { margin: 6rem 0; text-align: center; }
+
+        .values-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--gold);
+            font-family: 'Cinzel Decorative', cursive;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+        }
+
+        .value-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid transparent;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.5s ease;
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border-color: var(--gold);
+        }
+
+        .value-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+            transition: all 0.5s ease;
+            animation: bounce 2s infinite;
+        }
+
+        .value-card:hover .value-icon {
+            transform: scale(1.2);
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .value-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+        }
+
+        .value-desc {
+            font-size: 1rem;
+            line-height: 1.6;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .mission-section { margin: 6rem 0; text-align: center; }
+
+        .mission-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--gold);
+            font-family: 'Cinzel Decorative', cursive;
+        }
+
+        .mission-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .mission-content p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .timeline-section { margin: 6rem 0; text-align: center; }
+
+        .timeline-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--gold);
+            font-family: 'Cinzel Decorative', cursive;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background: var(--gold);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            padding: 10px 30px;
+            position: relative;
+            background: inherit;
+            width: 50%;
+        }
+
+        .timeline-item:nth-child(odd) { left: 0; }
+        .timeline-item:nth-child(even) { left: 50%; }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--gold);
+            border: 3px solid var(--charcoal);
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .timeline-item:nth-child(odd)::after { right: -13px; }
+        .timeline-item:nth-child(even)::after { left: -13px; }
+
+        .timeline-content {
+            padding: 15px 25px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .timeline-content h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+        }
+
+        .timeline-content p {
+            font-size: 1rem;
+            line-height: 1.6;
+            font-family: 'Playfair Display', serif;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 6rem;
+            padding: 4rem 0;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--gold), var(--silver));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-family: 'Cinzel Decorative', cursive;
+        }
+
+        .footer-quote {
+            font-style: italic;
+            font-size: 1.2rem;
+            margin: 1.5rem auto;
+            max-width: 600px;
+            line-height: 1.6;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--gold);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+        }
+
+        .social-link:hover {
+            background: var(--gold);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .social-link i {
+            color: var(--silver);
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        .social-link:hover i { color: var(--charcoal); }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background: var(--gold);
+            color: var(--charcoal);
+            padding: 0.8rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+        }
+
+        .diamond-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .diamond {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--diamond);
+            transform: rotate(45deg);
+            animation: diamondFall linear infinite;
+        }
+
+        @keyframes diamondFall {
+            0% { transform: translateY(-100vh) rotate(45deg); }
+            100% { transform: translateY(100vh) rotate(45deg); }
+        }
+
+        @media (max-width: 992px) {
+            h1 { font-size: 3rem; }
+            .contacts-title { font-size: 2.5rem; }
+            .values-title, .mission-title, .timeline-title { font-size: 2rem; }
+        }
+
         @media (max-width: 768px) {
-            .owner-card {
+            .hamburger { display: block; }
+            .nav-links {
+                display: none;
                 flex-direction: column;
-                text-align: center;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: var(--glass-bg);
+                padding: 1rem;
             }
-            
-            .owner-avatar {
-                margin-right: 0;
-                margin-bottom: 2rem;
+            .nav-links.active { display: flex; }
+            h1 { font-size: 2.5rem; }
+            .contacts-title { font-size: 2rem; }
+            .contact-btn { padding: 1.2rem; font-size: 1rem; }
+            .values-grid { grid-template-columns: 1fr; }
+            .value-card { min-height: 220px; }
+            .timeline::after { left: 25px; }
+            .timeline-item {
+                width: 100%;
+                padding-left: 60px;
+                padding-right: 20px;
             }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .contacts-title {
-                font-size: 2rem;
-            }
-            
-            .owner-name {
-                font-size: 1.8rem;
-            }
-            
-            .owner-title {
-                font-size: 1.1rem;
-            }
-            
-            .contact-btn {
-                padding: 1.5rem;
-                font-size: 1rem;
-            }
-            
-            .btn-icon {
-                font-size: 1.5rem;
-                margin-right: 10px;
-            }
-            
-            .cultural-grid {
-                grid-template-columns: 1fr;
-            }
+            .timeline-item:nth-child(even), .timeline-item:nth-child(odd) { left: 0; }
+            .timeline-item::after { left: 12px; }
+        }
+
+        @media (max-width: 576px) {
+            h1 { font-size: 2rem; }
+            .tagline { font-size: 1rem; }
+            .about-content { padding: 2rem 1rem; }
+            .contacts-title { font-size: 1.8rem; }
+            .contacts-grid { grid-template-columns: 1fr; }
+            .footer-logo { font-size: 1.8rem; }
+            .footer-quote { font-size: 1rem; }
+            .social-link { width: 40px; height: 40px; }
+            .social-link i { font-size: 1.2rem; }
+            .logo-circle { width: 140px; height: 140px; }
+            .logo-circle img { width: 90px; height: 90px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
+    <div class="animated-bg"></div>
+    <div class="diamond-effect" id="diamond-effect"></div>
+
+    <nav class="navbar">
+        <div class="navbar-logo">DOROSfamd 🌟</div>
+        <ul class="nav-links">
+            <li><a href="#home">Главная</a></li>
+            <li><a href="#about">О проекте</a></li>
+            <li><a href="#values">Ценности</a></li>
+            <li><a href="#mission">Миссия</a></li>
+            <li><a href="#timeline">История</a></li>
+            <li><a href="#contacts">Контакты</a></li>
+        </ul>
+        <div class="hamburger">☰</div>
+    </nav>
+
+    <section id="home" class="header">
+        <div class="header-content">
             <div class="logo-container">
                 <div class="logo-circle">
-                    <!-- Замените src на путь к вашему логотипу gerb.png -->
-                    <img src="gerb.png" alt="Герб DOROSfamd">
+                    <img src="gerb.png" alt="Логотип DOROSfamd" loading="lazy">
                 </div>
             </div>
             <h1>DOROSfamd</h1>
-            <p class="tagline">Соединяя традиции и инновации</p>
-        </header>
-        
-        <div class="about-content">
-            <p>DOROSfamd - это уникальный синтез лучших бизнес-практик мировых держав. Мы черпаем вдохновение в дисциплине Китая, масштабности США, наследии Российской империи и революционном духе СССР, создавая нечто поистине выдающееся.</p>
-            
-            <p>Наша компания - это не просто бизнес, это философия, объединяющая лучшие качества великих цивилизаций для достижения беспрецедентных результатов в современном мире.</p>
+            <p class="tagline">Фронтенд-сайты с душой 💻</p>
         </div>
-        
-        <div class="owner-card">
-            <div class="owner-avatar">
-                <i class="fas fa-crown"></i>
+    </section>
+
+    <div class="container">
+        <section id="about" class="about-content">
+            <p><span class="glowing-text">DOROSfamd</span>, созданный Х. Дориушем, — это проект из 20 фронтенд-сайтов, начавшийся с «Словаря» в 2020 году. Каждый сайт, сделанный на HTML, CSS и JavaScript, показывает <span class="glowing-text">творчество</span> и <span class="glowing-text">усилие</span>. 🌟</p>
+            <p>Все сайты были запущены в Google 18 апреля 2025 года, вдохновляя на новые идеи в веб-разработке. 🚀</p>
+        </section>
+
+        <section id="contacts">
+            <h2 class="contacts-title">Свяжитесь с нами <i class="fas fa-envelope fa-beat"></i></h2>
+            <div class="contacts-grid">
+                <a href="tel:+992876619999" class="contact-btn">
+                    <i class="fas fa-phone"></i> Позвонить
+                </a>
+                <a href="https://wa.me/992406507575" target="_blank" class="contact-btn">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+                <a href="https://t.me/Dor1ush" target="_blank" class="contact-btn">
+                    <i class="fab fa-telegram-plane"></i> Telegram
+                </a>
+                <a href="https://www.instagram.com/dorosfamd" target="_blank" class="contact-btn">
+                    <i class="fab fa-instagram"></i> Instagram
+                </a>
+                <a href="mailto:dorosfamd@gmail.com" class="contact-btn">
+                    <i class="fas fa-envelope-open-text"></i> Написать
+                </a>
             </div>
-            <div class="owner-info">
-                <div class="owner-name">Холмирзоев Дориуш</div>
-                <div class="owner-title">Основатель и владелец бизнес-империи DOROSfamd</div>
-                <p class="owner-quote">Моя миссия - создать наследие, которое превзойдет границы и время. DOROSfamd - это символ того, как традиции и инновации могут вместе создавать величие. Мы не просто строим компанию - мы создаем историю.</p>
-            </div>
-        </div>
-        
-        <h2 class="contacts-title">Контакты</h2>
-        
-        <div class="contacts-grid">
-            <a href="tel:+992876619999" class="contact-btn phone-btn">
-                <i class="fas fa-phone-alt btn-icon"></i>
-                +992 876 61 9999
-            </a>
-            
-            <a href="https://wa.me/992406507575" target="_blank" class="contact-btn whatsapp-btn">
-                <i class="fab fa-whatsapp btn-icon"></i>
-                WhatsApp
-            </a>
-            
-            <a href="https://t.me/Dor1ush" target="_blank" class="contact-btn telegram-btn">
-                <i class="fab fa-telegram-plane btn-icon"></i>
-                Telegram
-            </a>
-            
-            <a href="https://www.instagram.com/dorosfamd?igsh=dDA1ZjRobjQxdHYw" target="_blank" class="contact-btn instagram-btn">
-                <i class="fab fa-instagram btn-icon"></i>
-                Instagram
-            </a>
-        </div>
-        
-        <div class="cultural-section">
-            <h3 class="cultural-title">Философия нашего успеха</h3>
-            <div class="cultural-grid">
-                <div class="cultural-card soviet">
-                    <div class="cultural-icon"><i class="fas fa-hammer"></i></div>
-                    <h4 class="cultural-name">Дух СССР</h4>
-                    <p class="cultural-desc">Революционный подход к инновациям и коллективная ответственность за результат</p>
+        </section>
+
+        <section id="values" class="values-section">
+            <h2 class="values-title">Ценности <i class="fas fa-star fa-beat"></i></h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <i class="fas fa-lightbulb value-icon"></i>
+                    <h3 class="value-name">Творчество</h3>
+                    <p class="value-desc">Каждый сайт — новая идея, оживающая в коде. 🎨</p>
                 </div>
-                
-                <div class="cultural-card russian">
-                    <div class="cultural-icon"><i class="fas fa-crown"></i></div>
-                    <h4 class="cultural-name">Наследие Империи</h4>
-                    <p class="cultural-desc">Незыблемая надежность и уважение к традициям качества</p>
+                <div class="value-card">
+                    <i class="fas fa-code value-icon"></i>
+                    <h3 class="value-name">Умение</h3>
+                    <p class="value-desc">Чистый код создаёт удобный опыт. 💻</p>
                 </div>
-                
-                <div class="cultural-card usa">
-                    <div class="cultural-icon"><i class="fas fa-star"></i></div>
-                    <h4 class="cultural-name">Масштаб США</h4>
-                    <p class="cultural-desc">Глобальное мышление и предпринимательская смелость</p>
+                <div class="value-card">
+                    <i class="fas fa-rocket value-icon"></i>
+                    <h3 class="value-name">Упорство</h3>
+                    <p class="value-desc">Ошибки — шаги к новым идеям. 🚀</p>
                 </div>
-                
-                <div class="cultural-card china">
-                    <div class="cultural-icon"><i class="fas fa-dragon"></i></div>
-                    <h4 class="cultural-name">Дисциплина Китая</h4>
-                    <p class="cultural-desc">Терпение, стратегическое планирование и трудолюбие</p>
+                <div class="value-card">
+                    <i class="fas fa-heart value-icon"></i>
+                    <h3 class="value-name">Интерес</h3>
+                    <p class="value-desc">Любовь к делу движет проектами. ❤️</p>
                 </div>
             </div>
-        </div>
-        
-        <footer>
-            <div class="footer-logo">DOROSfamd</div>
-            <p>© 2025 Бизнес-империя Холмирзоева Дориуша. Все права защищены.</p>
-            <p>Таджикистан | Международные проекты</p>
-        </footer>
+        </section>
+
+        <section id="mission" class="mission-section">
+            <h2 class="mission-title">Миссия <i class="fas fa-compass fa-beat"></i></h2>
+            <div class="mission-content">
+                <p>DOROSfamd создаёт фронтенд-сайты, которые радуют и вдохновляют. От «Словаря» в 2020 году до 20 сайтов в 2025 году, проект живёт <span class="glowing-text">интересом</span> к веб-разработке. 🌟</p>
+                <p>Каждый сайт — это попытка сделать что-то новое и полезное. Присоединяйтесь! 💡</p>
+            </div>
+        </section>
+
+        <section id="timeline" class="timeline-section">
+            <h2 class="timeline-title">История <i class="fas fa-history fa-beat"></i></h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>2011 — Начало пути</h3>
+                        <p>Год, когда началась история создателя DOROSfamd. 👶</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>2017 — Первые шаги</h3>
+                        <p>Начало изучения программирования: Scratch, AppInventor. 📚</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>2020 — Рождение DOROSfamd</h3>
+                        <p>Создан первый сайт «Словарь», начало проекта. 🌱</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>2024 — Новый «Словарь»</h3>
+                        <p>Обновление «Словаря» с новым дизайном. 🔧</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>2025 — 20 сайтов</h3>
+                        <p>18 апреля 2025 года 20 сайтов запущены в Google. 🎉</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
+
+    <footer>
+        <div class="footer-logo">DOROSfamd</div>
+        <p class="footer-quote">«Семь раз упасть — восемь раз подняться.»</p>
+        <div class="social-links">
+            <a href="https://wa.me/992406507575" target="_blank" class="social-link">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="https://t.me/Dor1ush" target="_blank" class="social-link">
+                <i class="fab fa-telegram-plane"></i>
+            </a>
+            <a href="https://www.instagram.com/dorosfamd" target="_blank" class="social-link">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+        <p style="font-size: 0.9rem; opacity: 0.7;"><span id="years">5</span> лет веб-разработки (2020–2025)</p>
+    </footer>
+
+    <div class="back-to-top" onclick="scrollToTop()">↑</div>
+
+    <script>
+        // Hamburger Menu
+        document.querySelector('.hamburger').addEventListener('click', () => {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('.nav-links a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                document.querySelector('.nav-links').classList.remove('active');
+            });
+        });
+
+        // Back to Top
+        window.onscroll = function() {
+            document.querySelector('.back-to-top').style.display = window.scrollY > 300 ? 'block' : 'none';
+        };
+
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        // Diamond Effect
+        const diamondEffect = document.getElementById('diamond-effect');
+        for (let i = 0; i < 15; i++) {
+            const diamond = document.createElement('div');
+            diamond.className = 'diamond';
+            diamond.style.left = Math.random() * 100 + 'vw';
+            diamond.style.animationDuration = Math.random() * 4 + 4 + 's';
+            diamond.style.animationDelay = Math.random() * 4 + 's';
+            diamondEffect.appendChild(diamond);
+        }
+
+        // Dynamic Years
+        const startYear = 2020;
+        const currentYear = new Date().getFullYear();
+        document.getElementById('years').textContent = currentYear - startYear;
+    </script>
 </body>
-</html>
+            </html>
