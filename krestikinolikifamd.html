@@ -3,114 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Крестики-нолики</title>
+    <title>DOROS Крестики-нолики</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap');
+        
+        :root {
+            --primary: #FFD700;
+            --secondary: #004d00;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #004d00, #8B7500);
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            overflow: hidden;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--secondary), #006600);
+            font-family: 'Roboto', sans-serif;
+            color: var(--dark);
+            overflow-x: hidden;
+            padding: 20px;
         }
+        
         .game-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
             border-radius: 20px;
             text-align: center;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-            border: 8px solid gold;
-            max-width: 420px;
+            box-shadow: var(--shadow);
+            border: 5px solid var(--primary);
+            max-width: 500px;
+            width: 100%;
             position: relative;
+            overflow: hidden;
+            transition: var(--transition);
         }
-        h2 {
-            color: gold;
-            font-size: 36px;
+        
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0) 70%);
+            z-index: 0;
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            color: var(--dark);
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
         }
+        
+        .game-modes {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .mode-btn {
+            background: var(--light);
+            border: 2px solid var(--primary);
+            color: var(--dark);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            flex: 1;
+            max-width: 150px;
+        }
+        
+        .mode-btn.active {
+            background: var(--primary);
+            color: var(--dark);
+            font-weight: bold;
+        }
+        
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .player-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: rgba(255, 215, 0, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .player {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .player.active {
+            background: var(--primary);
+            font-weight: bold;
+        }
+        
         .grid {
             display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 12px;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
             margin: 0 auto 20px auto;
+            position: relative;
+            z-index: 1;
         }
+        
         .cell {
+            aspect-ratio: 1/1;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #fff;
-            font-size: 60px;
+            background: var(--light);
+            font-size: 3.5rem;
             font-weight: bold;
-            border: 4px solid gold;
+            border: 3px solid var(--primary);
             cursor: pointer;
-            height: 100px;
-            width: 100px;
-            border-radius: 12px;
-            transition: 0.3s;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
-        .cell:hover {
-            background: rgba(255, 215, 0, 0.5);
-            transform: scale(1.1);
+        
+        .cell.x::before, .cell.x::after {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 10px;
+            background: var(--primary);
+            top: 50%;
+            left: 10%;
         }
+        
+        .cell.x::before {
+            transform: translateY(-50%) rotate(45deg);
+        }
+        
+        .cell.x::after {
+            transform: translateY(-50%) rotate(-45deg);
+        }
+        
+        .cell.o::before {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            border: 10px solid var(--primary);
+            border-radius: 50%;
+        }
+        
+        .cell:hover:not(.x):not(.o) {
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .cell.win {
+            animation: pulse 1s infinite;
+            background: rgba(255, 215, 0, 0.3);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 50px;
+            transition: var(--transition);
+            font-weight: bold;
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .btn:hover {
+            background: #e6c200;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--dark);
+            opacity: 0.8;
+        }
+        
         .winner-message {
             display: none;
-            background: #ffffff;
-            padding: 25px;
+            background: var(--light);
+            padding: 30px;
             border-radius: 15px;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow);
             text-align: center;
-            border: 8px solid gold;
-            z-index: 999;
+            border: 5px solid var(--primary);
+            z-index: 1000;
+            max-width: 90%;
+            width: 400px;
         }
+        
         .winner-message h3 {
-            color: gold;
-            font-size: 28px;
+            color: var(--primary);
+            font-size: 1.8rem;
             margin-bottom: 20px;
-            font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
         }
-        .winner-message button {
-            background: gold;
-            color: black;
-            border: none;
-            padding: 15px 25px;
-            cursor: pointer;
-            font-size: 18px;
-            margin-top: 10px;
-            border-radius: 12px;
-            transition: 0.3s;
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            opacity: 0;
         }
-        .winner-message button:hover {
-            background: #8B7500;
-            transform: scale(1.05);
-        }
-        #restart-btn {
-            background-color: gold;
-            color: black;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        #restart-btn:hover {
-            background-color: #8B7500;
-            transform: scale(1.05);
+        
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .cell {
+                font-size: 2.5rem;
+            }
+            
+            .game-modes {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .mode-btn {
+                max-width: 100%;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h2>Крестики-нолики</h2>
+        <h1>DOROS Крестики-нолики</h1>
+        <p class="subtitle">Сыграйте против друга или против умного бота</p>
+        
+        <div class="game-modes">
+            <button class="mode-btn active" id="vs-friend">Друг vs Друг</button>
+            <button class="mode-btn" id="vs-bot">Друг vs Бот</button>
+        </div>
+        
+        <div class="player-info">
+            <div class="player active" id="player-x">Игрок X</div>
+            <div class="player" id="player-o">Игрок O</div>
+        </div>
+        
         <div class="grid">
             <div class="cell" data-index="0"></div>
             <div class="cell" data-index="1"></div>
@@ -122,92 +349,283 @@
             <div class="cell" data-index="7"></div>
             <div class="cell" data-index="8"></div>
         </div>
-        <button id="restart-btn">Начать заново</button>
+        
+        <div class="controls">
+            <button class="btn" id="restart-btn">Новая игра</button>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="x-wins">0</div>
+                <div class="stat-label">Побед X</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="draws">0</div>
+                <div class="stat-label">Ничьих</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="o-wins">0</div>
+                <div class="stat-label">Побед O</div>
+            </div>
+        </div>
     </div>
 
     <div class="winner-message" id="winner-message">
         <h3 id="winner-text"></h3>
-        <button onclick="restartGame()">Начать заново</button>
+        <button class="btn" onclick="restartGame()">Новая игра</button>
     </div>
 
+    <audio id="click-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" preload="auto"></audio>
+    <audio id="win-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+    <audio id="draw-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-lose-2027.mp3" preload="auto"></audio>
+
     <script>
+        // Элементы DOM
         const cells = document.querySelectorAll('.cell');
         const restartBtn = document.getElementById('restart-btn');
         const winnerMessage = document.getElementById('winner-message');
         const winnerText = document.getElementById('winner-text');
-
+        const playerX = document.getElementById('player-x');
+        const playerO = document.getElementById('player-o');
+        const vsFriendBtn = document.getElementById('vs-friend');
+        const vsBotBtn = document.getElementById('vs-bot');
+        const xWinsEl = document.getElementById('x-wins');
+        const oWinsEl = document.getElementById('o-wins');
+        const drawsEl = document.getElementById('draws');
+        
+        // Звуки
+        const clickSound = document.getElementById('click-sound');
+        const winSound = document.getElementById('win-sound');
+        const drawSound = document.getElementById('draw-sound');
+        
+        // Состояние игры
         let board = Array(9).fill("");
         let currentPlayer = "X";
         let gameOver = false;
-        let playerTurn = true;
-
-        function handleClick(event) {
-            if (!playerTurn || gameOver) return;
-            
-            const index = event.target.getAttribute("data-index");
-            if (board[index]) return;
-
-            board[index] = "X";
-            event.target.textContent = "X";
-            playerTurn = false;
-
-            if (checkWinner("X")) {
-                showWinner("X выиграл!");
-                return;
-            }
-
-            if (!board.includes("")) {
-                showWinner("Ничья!");
-                return;
-            }
-
-            setTimeout(computerMove, 500);
-        }
-
-        function checkWinner(player) {
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8],
-                [0, 3, 6], [1, 4, 7], [2, 5, 8],
-                [0, 4, 8], [2, 4, 6]
-            ];
-            return winPatterns.some(pattern => pattern.every(index => board[index] === player));
-        }
-
-        function showWinner(message) {
-            gameOver = true;
-            winnerText.textContent = message;
-            winnerMessage.style.display = "block";
-        }
-
-        function restartGame() {
+        let gameMode = "friend"; // 'friend' или 'bot'
+        let stats = { xWins: 0, oWins: 0, draws: 0 };
+        
+        // Инициализация игры
+        function initGame() {
             board = Array(9).fill("");
             gameOver = false;
             currentPlayer = "X";
-            playerTurn = true;
-            cells.forEach(cell => cell.textContent = "");
+            updatePlayerTurn();
+            cells.forEach(cell => {
+                cell.classList.remove('x', 'o', 'win');
+                cell.textContent = "";
+            });
             winnerMessage.style.display = "none";
         }
-
-        function computerMove() {
-            if (gameOver) return;
-
-            let availableCells = board.map((val, i) => val === "" ? i : null).filter(v => v !== null);
-            let randomMove = availableCells[Math.floor(Math.random() * availableCells.length)];
-
-            board[randomMove] = "O";
-            cells[randomMove].textContent = "O";
-
-            if (checkWinner("O")) {
-                showWinner("O выиграл!");
-            } else if (!board.includes("")) {
-                showWinner("Ничья!");
-            }
-
-            playerTurn = true;
+        
+        // Обновление отображения текущего игрока
+        function updatePlayerTurn() {
+            playerX.classList.toggle('active', currentPlayer === "X");
+            playerO.classList.toggle('active', currentPlayer === "O");
         }
-
-        cells.forEach(cell => cell.addEventListener("click", handleClick));
-        restartBtn.addEventListener("click", restartGame);
+        
+        // Обработка хода игрока
+        function handleClick(event) {
+            if (gameOver) return;
+            
+            const index = event.target.getAttribute("data-index");
+            
+            // Проверка на возможность хода
+            if (board[index] !== "" || (gameMode === "bot" && currentPlayer === "O")) return;
+            
+            // Выполнение хода
+            makeMove(index, currentPlayer);
+            
+            // Проверка на победу или ничью
+            if (checkWinner(currentPlayer)) {
+                endGame(currentPlayer);
+                return;
+            }
+            
+            if (isBoardFull()) {
+                endGame("draw");
+                return;
+            }
+            
+            // Переход хода
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            updatePlayerTurn();
+            
+            // Ход бота, если это режим игры с ботом
+            if (gameMode === "bot" && currentPlayer === "O" && !gameOver) {
+                setTimeout(() => {
+                    const botMove = findBestMove();
+                    makeMove(botMove, "O");
+                    
+                    if (checkWinner("O")) {
+                        endGame("O");
+                    } else if (isBoardFull()) {
+                        endGame("draw");
+                    } else {
+                        currentPlayer = "X";
+                        updatePlayerTurn();
+                    }
+                }, 500);
+            }
+        }
+        
+        // Выполнение хода
+        function makeMove(index, player) {
+            board[index] = player;
+            const cell = cells[index];
+            
+            if (player === "X") {
+                cell.classList.add('x');
+            } else {
+                cell.classList.add('o');
+            }
+            
+            // Воспроизведение звука
+            clickSound.currentTime = 0;
+            clickSound.play();
+        }
+        
+        // Проверка на победу
+        function checkWinner(player) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // строки
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // столбцы
+                [0, 4, 8], [2, 4, 6]              // диагонали
+            ];
+            
+            for (const pattern of winPatterns) {
+                if (pattern.every(index => board[index] === player)) {
+                    // Подсветка выигрышной комбинации
+                    pattern.forEach(index => cells[index].classList.add('win'));
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        // Проверка на ничью
+        function isBoardFull() {
+            return board.every(cell => cell !== "");
+        }
+        
+        // Завершение игры
+        function endGame(result) {
+            gameOver = true;
+            
+            // Обновление статистики
+            if (result === "X") {
+                stats.xWins++;
+                xWinsEl.textContent = stats.xWins;
+                winnerText.textContent = "Игрок X победил!";
+                winSound.play();
+                createConfetti();
+            } else if (result === "O") {
+                stats.oWins++;
+                oWinsEl.textContent = stats.oWins;
+                winnerText.textContent = gameMode === "bot" ? "Бот победил!" : "Игрок O победил!";
+                if (gameMode === "bot") {
+                    drawSound.play();
+                } else {
+                    winSound.play();
+                    createConfetti();
+                }
+            } else {
+                stats.draws++;
+                drawsEl.textContent = stats.draws;
+                winnerText.textContent = "Ничья!";
+                drawSound.play();
+            }
+            
+            winnerMessage.style.display = "block";
+        }
+        
+        // Алгоритм минимакс для "умного" бота
+        function findBestMove() {
+            // Сначала проверяем, может ли бот выиграть следующим ходом
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === "") {
+                    board[i] = "O";
+                    if (checkWinner("O")) {
+                        board[i] = "";
+                        return i;
+                    }
+                    board[i] = "";
+                }
+            }
+            
+            // Затем проверяем, может ли игрок выиграть следующим ходом, и блокируем его
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === "") {
+                    board[i] = "X";
+                    if (checkWinner("X")) {
+                        board[i] = "";
+                        return i;
+                    }
+                    board[i] = "";
+                }
+            }
+            
+            // Пробуем занять центр, если он свободен
+            if (board[4] === "") return 4;
+            
+            // Пробуем занять углы
+            const corners = [0, 2, 6, 8];
+            const availableCorners = corners.filter(i => board[i] === "");
+            if (availableCorners.length > 0) {
+                return availableCorners[Math.floor(Math.random() * availableCorners.length)];
+            }
+            
+            // Если ничего из вышеперечисленного, выбираем случайную доступную клетку
+            const availableCells = board.map((val, i) => val === "" ? i : null).filter(v => v !== null);
+            return availableCells[Math.floor(Math.random() * availableCells.length)];
+        }
+        
+        // Перезапуск игры
+        function restartGame() {
+            initGame();
+        }
+        
+        // Смена режима игры
+        function setGameMode(mode) {
+            gameMode = mode;
+            vsFriendBtn.classList.toggle('active', mode === "friend");
+            vsBotBtn.classList.toggle('active', mode === "bot");
+            initGame();
+        }
+        
+        // Создание конфетти для празднования победы
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 60 + 30}, 100%, 50%)`;
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                document.body.appendChild(confetti);
+                
+                // Анимация
+                const animation = confetti.animate([
+                    { transform: `translateY(-20vh) rotate(0deg)`, opacity: 1 },
+                    { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+        
+        // Обработчики событий
+        cells.forEach(cell => cell.addEventListener('click', handleClick));
+        restartBtn.addEventListener('click', restartGame);
+        vsFriendBtn.addEventListener('click', () => setGameMode("friend"));
+        vsBotBtn.addEventListener('click', () => setGameMode("bot"));
+        
+        // Инициализация при загрузке
+        initGame();
     </script>
 </body>
 </html>
