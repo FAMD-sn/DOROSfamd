@@ -3,79 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Чёт-Нечёт FAMD</title>
+    <title>DOROS Чёт-Нечёт | DOROSfamd</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+        
+        :root {
+            --main-red: #E50914;
+            --main-pink: #FF5A5F;
+            --main-yellow: #FFD700;
+            --main-dark: #221F1F;
+            --main-light: #F5F5F1;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #d4af37;
+            font-family: 'Black Han Sans', sans-serif;
+            background-color: var(--main-dark);
+            color: var(--main-light);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(229, 9, 20, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(255, 90, 95, 0.1) 0%, transparent 20%);
         }
 
         .game-container {
-            background: linear-gradient(135deg, #0f2d0f, #1e4d1e);
+            background-color: rgba(34, 31, 31, 0.9);
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
+            box-shadow: 0 0 30px rgba(229, 9, 20, 0.5);
             text-align: center;
-            width: 350px;
+            width: 400px;
+            max-width: 90%;
+            border: 3px solid var(--main-red);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px dashed var(--main-yellow);
+            border-radius: 20px;
+            animation: rotate 60s linear infinite;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         h1 {
-            color: #d4af37;
+            color: var(--main-yellow);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0 var(--main-red);
+            letter-spacing: 2px;
+        }
+
+        .timer-container {
+            background-color: var(--main-dark);
+            border: 3px solid var(--main-red);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+        }
+
+        .timer {
+            font-size: 2rem;
+            color: var(--main-yellow);
+            font-weight: bold;
+        }
+
+        .timer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 5px solid transparent;
+            border-top-color: var(--main-red);
+            border-radius: 50%;
+            animation: spin 60s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         button {
-            background-color: #d4af37;
-            color: black;
-            padding: 12px 25px;
+            background-color: var(--main-red);
+            color: var(--main-light);
+            padding: 15px 30px;
             margin: 10px;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 18px;
-            transition: 0.3s;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            font-family: 'Black Han Sans', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
         }
 
         button:hover {
-            background-color: #b9972e;
+            background-color: var(--main-pink);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 90, 95, 0.6);
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .choices {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .choice-btn {
+            flex: 1;
+            max-width: 150px;
         }
 
         #play-again {
             display: none;
+            background-color: var(--main-yellow);
+            color: var(--main-dark);
+            margin-top: 20px;
         }
 
-        .timer {
-            font-size: 18px;
-            margin-top: 15px;
-            color: #ffffff;
+        .game-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border-left: 3px solid var(--main-yellow);
+        }
+
+        .game-info p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        #remaining-marbles {
+            font-size: 1.3rem;
+            color: var(--main-yellow);
+            margin: 20px 0;
+        }
+
+        #result-message {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            min-height: 50px;
+            color: var(--main-yellow);
+            text-shadow: 2px 2px 0 var(--main-red);
+        }
+
+        .pulse {
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--main-yellow);
+            opacity: 0;
+        }
+
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            .timer-container {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .timer {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1>Чёт-Нечёт FAMD</h1>
-        <p>Выберите чёт или нечёт.</p>
-
-        <p class="timer">Осталось времени: <span id="time">03:00</span></p>
-
-        <button id="play">Играть</button>
-        <div class="choices" style="display: none;">
-            <button class="choice" id="even">Чёт</button>
-            <button class="choice" id="odd">Нечёт</button>
+        <h1>DOROS ЧЁТ-НЕЧЁТ</h1>
+        
+        <div class="timer-container">
+            <div class="timer" id="time">01:00</div>
         </div>
-
-        <p id="your-choice"></p>
-        <p id="computer-choice"></p>
+        
+        <button id="play">Начать игру</button>
+        
+        <div class="choices" style="display: none;">
+            <button class="choice-btn" id="even">ЧЁТ</button>
+            <button class="choice-btn" id="odd">НЕЧЁТ</button>
+        </div>
+        
+        <div class="game-info">
+            <p id="your-choice"></p>
+            <p id="computer-choice"></p>
+        </div>
+        
         <p id="result-message"></p>
         <p id="remaining-marbles">Осталось шариков: 10</p>
-
-        <button id="play-again" style="display: none;">Играть снова</button>
+        
+        <button id="play-again">Играть снова</button>
     </div>
 
     <script>
@@ -88,59 +272,114 @@
         const resultMessage = document.getElementById('result-message');
         const remainingMarblesText = document.getElementById('remaining-marbles');
         const timerText = document.getElementById('time');
+        const choicesDiv = document.querySelector('.choices');
 
         let userMarbles = 10;
         let timeLeft;
         let timer;
+        let gameActive = false;
+
+        // Звуковые эффекты
+        const sounds = {
+            click: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3'),
+            win: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'),
+            lose: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-lose-2027.mp3'),
+            timer: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3')
+        };
 
         function getRandomNumber() {
-            return Math.floor(Math.random() * 21);
+            return Math.floor(Math.random() * 21); // Числа от 0 до 20
         }
 
         function startTimer() {
             clearInterval(timer);
-            timeLeft = 180;
+            timeLeft = 60; // 1 минута = 60 секунд
+            updateTimerDisplay();
+            
             timer = setInterval(() => {
-                if (timeLeft <= 0 || userMarbles === 0 || userMarbles >= 20) {
-                    clearInterval(timer);
-                    alert(userMarbles >= 20 ? "Вы выиграли!" : "Время вышло. Вы проиграли!");
-                    resetGame();
-                    return;
-                }
                 timeLeft--;
-                let minutes = Math.floor(timeLeft / 60);
-                let seconds = timeLeft % 60;
-                timerText.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                updateTimerDisplay();
+                
+                // Звуковое предупреждение при 10 секундах
+                if (timeLeft === 10) {
+                    sounds.timer.currentTime = 0;
+                    sounds.timer.play();
+                }
+                
+                if (timeLeft <= 0 || userMarbles <= 0 || userMarbles >= 20) {
+                    endGame();
+                }
             }, 1000);
         }
 
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerText.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            
+            // Изменение цвета при малом времени
+            if (timeLeft <= 10) {
+                timerText.style.color = 'var(--main-red)';
+                timerText.classList.add('pulse');
+            } else {
+                timerText.style.color = 'var(--main-yellow)';
+                timerText.classList.remove('pulse');
+            }
+        }
+
         function playGame(userChoice) {
+            if (!gameActive) return;
+            
+            sounds.click.currentTime = 0;
+            sounds.click.play();
+            
             const computerNumber = getRandomNumber();
             const isEven = computerNumber % 2 === 0;
-            const computerChoice = isEven ? 'Чёт' : 'Нечёт';
-            const result = (userChoice === computerChoice) ? 'Вы выиграли раунд!' : 'Вы проиграли раунд!';
+            const computerChoice = isEven ? 'ЧЁТ' : 'НЕЧЁТ';
+            const result = (userChoice === computerChoice) ? 'win' : 'lose';
             const points = computerNumber;
 
-            userMarbles = (userChoice === computerChoice) ? userMarbles + points : userMarbles - points;
-
-            if (userMarbles <= 0) {
-                alert("Вы проиграли!");
-                resetGame();
-                return;
+            if (result === 'win') {
+                userMarbles += points;
+                resultMessage.textContent = `ВЫ ВЫИГРАЛИ +${points}!`;
+                resultMessage.style.color = 'var(--main-yellow)';
+                sounds.win.currentTime = 0;
+                sounds.win.play();
+                createConfetti();
+            } else {
+                userMarbles -= points;
+                resultMessage.textContent = `ВЫ ПРОИГРАЛИ -${points}!`;
+                resultMessage.style.color = 'var(--main-red)';
+                sounds.lose.currentTime = 0;
+                sounds.lose.play();
             }
 
-            if (userMarbles >= 20) {
-                alert("Вы выиграли!");
-                resetGame();
-                return;
+            yourChoiceText.textContent = `ВАШ ВЫБОР: ${userChoice}`;
+            computerChoiceText.textContent = `КОМПЬЮТЕР: ${computerChoice} (${computerNumber})`;
+            remainingMarblesText.textContent = `ОСТАЛОСЬ ШАРИКОВ: ${userMarbles}`;
+
+            if (userMarbles <= 0 || userMarbles >= 20) {
+                endGame();
             }
+        }
 
-            yourChoiceText.textContent = `Ваш выбор: ${userChoice}`;
-            computerChoiceText.textContent = `Выбор компьютера: ${computerChoice} (Число: ${computerNumber})`;
-            resultMessage.textContent = result;
-            remainingMarblesText.textContent = `Осталось шариков: ${userMarbles}`;
-
+        function endGame() {
+            clearInterval(timer);
+            gameActive = false;
+            choicesDiv.style.display = 'none';
             playAgainButton.style.display = 'block';
+            
+            if (userMarbles <= 0) {
+                resultMessage.textContent = 'ИГРА ОКОНЧЕНА! ВЫ ПРОИГРАЛИ!';
+                sounds.lose.play();
+            } else if (userMarbles >= 20) {
+                resultMessage.textContent = 'ПОБЕДА! ВЫ ВЫИГРАЛИ!';
+                sounds.win.play();
+                createConfetti(50);
+            } else {
+                resultMessage.textContent = 'ВРЕМЯ ВЫШЛО!';
+                sounds.timer.play();
+            }
         }
 
         function resetGame() {
@@ -148,22 +387,49 @@
             yourChoiceText.textContent = '';
             computerChoiceText.textContent = '';
             resultMessage.textContent = '';
-            remainingMarblesText.textContent = 'Осталось шариков: 10';
+            remainingMarblesText.textContent = 'ОСТАЛОСЬ ШАРИКОВ: 10';
             playAgainButton.style.display = 'none';
             playButton.style.display = 'block';
-            document.querySelector('.choices').style.display = 'none';
-            timerText.textContent = "03:00";
+            choicesDiv.style.display = 'none';
+            timerText.textContent = "01:00";
+            timerText.style.color = 'var(--main-yellow)';
+            timerText.classList.remove('pulse');
             clearInterval(timer);
         }
 
-        playButton.addEventListener('click', () => {
+        function startGame() {
+            gameActive = true;
             playButton.style.display = 'none';
-            document.querySelector('.choices').style.display = 'block';
+            choicesDiv.style.display = 'flex';
             startTimer();
-        });
+        }
 
-        evenButton.addEventListener('click', () => playGame('Чёт'));
-        oddButton.addEventListener('click', () => playGame('Нечёт'));
+        function createConfetti(count = 30) {
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 60 + 30}, 100%, 50%)`;
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                document.body.appendChild(confetti);
+                
+                const animation = confetti.animate([
+                    { transform: `translateY(-20vh) rotate(0deg)`, opacity: 1 },
+                    { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        // Обработчики событий
+        playButton.addEventListener('click', startGame);
+        evenButton.addEventListener('click', () => playGame('ЧЁТ'));
+        oddButton.addEventListener('click', () => playGame('НЕЧЁТ'));
         playAgainButton.addEventListener('click', resetGame);
     </script>
 </body>
