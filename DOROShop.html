@@ -7,11 +7,6 @@
   <title>DORO-shop - Инновационный маркетплейс</title>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
   <style>
     :root {
       --primary: #00695C;
@@ -360,6 +355,25 @@
       background: var(--primary-light);
     }
 
+    .btn-call {
+      background: var(--success);
+      color: white;
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+      text-align: center;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-call:hover {
+      background: #3d8b40;
+    }
+
     .admin-controls {
       display: flex;
       gap: 0.5rem;
@@ -493,12 +507,14 @@
 
     .contact-methods {
       display: flex;
+      flex-wrap: wrap;
       gap: 1rem;
       margin-top: 1.5rem;
     }
 
     .contact-btn {
       flex: 1;
+      min-width: 120px;
       padding: 0.75rem;
       border-radius: var(--radius-sm);
       display: flex;
@@ -514,6 +530,10 @@
     .contact-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .phone {
+      background: #34B7F1;
     }
 
     .whatsapp {
@@ -774,6 +794,24 @@
       background: var(--primary-light);
     }
 
+    .file-options {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .admin-badge {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      background: var(--danger);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+      z-index: 1;
+    }
+
     @media (max-width: 768px) {
       header {
         flex-direction: column;
@@ -807,89 +845,9 @@
         flex-direction: column;
       }
     }
-
-    :root {
-      --primary: #00695C;
-      --primary-light: #439889;
-      --primary-dark: #003D33;
-      --secondary: #FF5722;
-      --background: #F5F7FA;
-      --card-bg: #FFFFFF;
-      --text: #263238;
-      --text-light: #546E7A;
-      --border: #E0E0E0;
-      --shadow: 0 4px 12px rgba(0, 61, 51, 0.1);
-      --radius: 12px;
-      --radius-sm: 8px;
-      --success: #4CAF50;
-      --warning: #FFC107;
-      --danger: #F44336;
-      --electronics: #2196F3;
-      --clothing: #FF9800;
-      --home: #4CAF50;
-      --beauty: #E91E63;
-      --sports: #3F51B5;
-      --books: #795548;
-      --toys: #9C27B0;
-      --food: #8BC34A;
-      --cars: #607D8B;
-      --health: #00BCD4;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Rubik', sans-serif;
-      background: var(--background);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    /* ... (остальные стили остаются без изменений) ... */
-
-    .image-preview {
-      max-width: 100%;
-      max-height: 200px;
-      margin-top: 1rem;
-      display: none;
-      border-radius: var(--radius-sm);
-    }
-    
-    .upload-btn {
-      background: var(--primary);
-      color: white;
-      padding: 0.75rem 1rem;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      text-align: center;
-      margin-top: 0.5rem;
-      transition: all 0.3s ease;
-    }
-    
-    .upload-btn:hover {
-      background: var(--primary-light);
-    }
-
-    .admin-badge {
-      position: absolute;
-      top: 0.5rem;
-      left: 0.5rem;
-      background: var(--danger);
-      color: white;
-      padding: 0.25rem 0.5rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.75rem;
-      font-weight: 600;
-      z-index: 1;
-    }
   </style>
 </head>
 <body>
-  <!-- HTML-структура остается прежней -->
   <header>
     <div class="logo">
       <i class="fas fa-store"></i>
@@ -909,7 +867,7 @@
 
   <!-- Секция авторизации -->
   <div class="auth-section" id="auth-section">
-    <h2 class="auth-title">Добро пожаловать в DORO-shop</h2>
+    <h2 class="auth-title">Добро пожаловать в DORO-shop в Таджикистане</h2>
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchTab('login')">Вход</div>
       <div class="auth-tab" onclick="switchTab('register')">Регистрация</div>
@@ -930,7 +888,7 @@
     <div class="auth-content" id="register-content">
       <div class="form-group">
         <label class="form-label" for="register-email">Email</label>
-        <input type="email" class="form-control" id="register-email" placeholder="Ваш email">
+        <input type="email" class="form-control" id="register-email" placeholder="Придумайте email: a@doroshop.com">
       </div>
       <div class="form-group">
         <label class="form-label" for="register-password">Пароль</label>
@@ -940,12 +898,16 @@
         <label class="form-label" for="register-username">Имя пользователя</label>
         <input type="text" class="form-control" id="register-username" placeholder="Как вас зовут?">
       </div>
+      <div class="form-group">
+        <label class="form-label" for="register-phone">Номер телефона</label>
+        <input type="tel" class="form-control" id="register-phone" placeholder="+992 XXX XXX XXX">
+      </div>
       <button class="btn btn-primary" onclick="register()" style="width: 100%; padding: 1rem;">
         <i class="fas fa-user-plus"></i> Зарегистрироваться
       </button>
     </div>
     <div class="auth-footer">
-      Продолжая, вы соглашаетесь с нашими <a href="#" class="auth-link">Условиями использования</a>
+      Продолжая, вы соглашаетесь с нашими Условиями использования указанными на главной странице</a>
     </div>
   </div>
 
@@ -981,24 +943,7 @@
   </div>
 
   <!-- Статистика для админа -->
-  <div class="stats-container" id="stats-container" style="display: none;">
-    <div class="stat-card">
-      <div class="stat-value" id="total-products">0</div>
-      <div class="stat-label">Всего товаров</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="total-users">0</div>
-      <div class="stat-label">Пользователей</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="electronics-count">0</div>
-      <div class="stat-label">Электроника</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="clothing-count">0</div>
-      <div class="stat-label">Одежда</div>
-    </div>
-  </div>
+  
 
   <!-- Список товаров -->
   <div id="product-list">
@@ -1068,33 +1013,39 @@
           <label class="form-label">Контакты для связи</label>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div>
+              <input type="tel" class="form-control" id="product-phone" placeholder="Номер телефона">
+            </div>
+            <div>
               <input type="text" class="form-control" id="product-whatsapp" placeholder="WhatsApp номер">
             </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
             <div>
               <input type="text" class="form-control" id="product-telegram" placeholder="Telegram @username">
             </div>
+            <div>
+              <input type="text" class="form-control" id="product-instagram" placeholder="Instagram (ссылка)">
+            </div>
           </div>
-          <input type="text" class="form-control" id="product-instagram" placeholder="Instagram (ссылка)" style="margin-top: 1rem;">
         </div>
         
-        
         <div class="form-group">
-  <label class="form-label">Изображение товара</label>
-  <input type="file" id="file-input" accept="image/*" capture="camera" style="display: none;">
-  <div class="upload-btn" onclick="openFileDialog()">
-    <i class="fas fa-camera"></i> Выберите файл
-  </div>
-  <div class="file-options" id="file-options" style="display: none; margin-top: 1rem;">
-    <button class="btn btn-outline" onclick="takePhoto()" style="width: 100%; margin-bottom: 0.5rem;">
-      <i class="fas fa-camera"></i> Снять фото
-    </button>
-    <button class="btn btn-outline" onclick="chooseFromGallery()" style="width: 100%;">
-      <i class="fas fa-images"></i> Выбрать из галереи
-    </button>
-  </div>
-  <img id="image-preview" class="image-preview" alt="Превью изображения">
-  <input type="hidden" class="form-control" id="product-image">
-</div>
+          <label class="form-label">Изображение товара</label>
+          <input type="file" id="file-input" accept="image/*" capture="camera" style="display: none;">
+          <div class="upload-btn" onclick="openFileDialog()">
+            <i class="fas fa-camera"></i> Выберите файл
+          </div>
+          <div class="file-options" id="file-options" style="display: none; margin-top: 1rem;">
+            <button class="btn btn-outline" onclick="takePhoto()" style="width: 100%; margin-bottom: 0.5rem;">
+              <i class="fas fa-camera"></i> Снять фото
+            </button>
+            <button class="btn btn-outline" onclick="chooseFromGallery()" style="width: 100%;">
+              <i class="fas fa-images"></i> Выбрать из галереи
+            </button>
+          </div>
+          <img id="image-preview" class="image-preview" alt="Превью изображения">
+          <input type="hidden" class="form-control" id="product-image">
+        </div>
         <button class="btn btn-primary" onclick="addProduct()" style="width: 100%; padding: 1rem;">
           <i class="fas fa-plus"></i> Добавить товар
         </button>
@@ -1115,6 +1066,9 @@
     </div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script>
     // Инициализация Firebase
     const firebaseConfig = {
@@ -1130,45 +1084,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const auth = firebase.auth();
-
-    // Cloudinary конфигурация
-    const cloudinaryConfig = {
-      cloudName: 'dckjqc4os',
-      uploadPreset: 'doroshop',
-      sources: ['local', 'url', 'camera'],
-      multiple: false,
-      clientAllowedFormats: ['jpg', 'png', 'jpeg', 'gif'],
-      maxFileSize: 5000000, // 5MB
-      showAdvancedOptions: false,
-      cropping: false,
-      defaultSource: 'local',
-      styles: {
-        palette: {
-          window: "#FFFFFF",
-          sourceBg: "#F5F7FA",
-          windowBorder: "#00695C",
-          tabIcon: "#00695C",
-          inactiveTabIcon: "#546E7A",
-          menuIcons: "#00695C",
-          link: "#00695C",
-          action: "#FF5722",
-          inProgress: "#00695C",
-          complete: "#4CAF50",
-          error: "#F44336",
-          textDark: "#263238",
-          textLight: "#FFFFFF"
-        },
-        fonts: {
-          default: null,
-          "'Rubik', sans-serif": {
-            url: "https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap",
-            active: true
-          }
-        }
-      }
-    };
-
-    let currentImageUrl = '';
 
     // DOM элементы
     const authSection = document.getElementById('auth-section');
@@ -1241,44 +1156,19 @@
       });
     });
 
-    // Функция для открытия Cloudinary Upload Widget
-    function openCloudinaryWidget() {
-      const widget = cloudinary.createUploadWidget(
-        cloudinaryConfig, 
-        (error, result) => {
-          if (!error && result && result.event === "success") {
-            currentImageUrl = result.info.secure_url;
-            document.getElementById('image-preview').src = currentImageUrl;
-            document.getElementById('image-preview').style.display = 'block';
-            document.getElementById('product-image').value = currentImageUrl;
-          }
-        }
-      );
-      
-      // Открываем виджет с настройкой для выбора из галереи
-      widget.open({
-        folder: "doroshop",
-        tags: ["products"],
-        resourceType: "image",
-        uploadSignatureTimestamp: Math.floor(Date.now() / 1000),
-        uploadSignature: generateSignature,
-        apiKey: "YOUR_API_KEY"
-      });
-    }
-
-    // Функция для генерации подписи (заглушка)
-    function generateSignature(callback, paramsToSign) {
-      callback("YOUR_UPLOAD_SIGNATURE");
-    }
-
     // Работа с пользователями
     async function getUsername(uid) {
       const snapshot = await db.ref(`users/${uid}/username`).once('value');
       return snapshot.val() || 'Пользователь';
     }
 
-    async function saveUsername(uid, username) {
-      await db.ref(`users/${uid}`).set({ username });
+    async function getPhone(uid) {
+      const snapshot = await db.ref(`users/${uid}/phone`).once('value');
+      return snapshot.val() || '';
+    }
+
+    async function saveUserData(uid, username, phone) {
+      await db.ref(`users/${uid}`).set({ username, phone });
     }
 
     function updateAuthUI(username) {
@@ -1416,7 +1306,12 @@
               <button class="btn-detail" onclick='showDetail("${product.id}")'>
                 <i class="fas fa-info-circle"></i> Подробнее
               </button>
-              ${(isAdmin || isAuthor) ? `
+              ${product.phone ? `
+              <button class="btn-call" onclick="callSeller('${product.phone}')">
+                <i class="fas fa-phone"></i> Позвонить
+              </button>
+              ` : ''}
+              ${showControls ? `
               <div class="admin-controls">
                 ${isAuthor ? `
                 <button class="btn btn-outline" onclick="editProduct('${product.id}', event)">
@@ -1472,8 +1367,12 @@
           </div>
         </div>
         
-        ${(product.whatsapp || product.telegram || product.instagram) ? `
         <div class="contact-methods">
+          ${product.phone ? `
+            <a href="tel:${product.phone}" class="contact-btn phone">
+              <i class="fas fa-phone"></i> Позвонить
+            </a>
+          ` : ''}
           ${product.whatsapp ? `
             <a href="https://wa.me/${product.whatsapp}" target="_blank" class="contact-btn whatsapp">
               <i class="fab fa-whatsapp"></i> WhatsApp
@@ -1490,7 +1389,6 @@
             </a>
           ` : ''}
         </div>
-        ` : ''}
         
         ${showControls ? `
         <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
@@ -1507,6 +1405,13 @@
       `;
       
       openModal('detail-modal');
+    }
+
+    function callSeller(phoneNumber) {
+      // Очищаем номер от всех нецифровых символов, кроме +
+      const cleanedNumber = phoneNumber.replace(/[^\d+]/g, '');
+      // Открываем приложение телефона с номером
+      window.open(`tel:${cleanedNumber}`);
     }
 
     function openModal(modalId) {
@@ -1536,15 +1441,16 @@
       const email = document.getElementById('register-email').value;
       const password = document.getElementById('register-password').value;
       const username = document.getElementById('register-username').value;
+      const phone = document.getElementById('register-phone').value;
 
       if (!email || !password || !username) {
-        alert('Пожалуйста, заполните все поля');
+        alert('Пожалуйста, заполните все обязательные поля');
         return;
       }
 
       try {
         const { user } = await auth.createUserWithEmailAndPassword(email, password);
-        await saveUsername(user.uid, username);
+        await saveUserData(user.uid, username, phone);
         updateAuthUI(username);
       } catch (error) {
         alert('Ошибка регистрации: ' + error.message);
@@ -1583,6 +1489,7 @@
       const price = parseFloat(document.getElementById('product-price').value);
       const description = document.getElementById('product-description').value;
       const category = document.getElementById('product-category').value;
+      const phone = document.getElementById('product-phone').value;
       const whatsapp = document.getElementById('product-whatsapp').value;
       const telegram = document.getElementById('product-telegram').value;
       const instagram = document.getElementById('product-instagram').value;
@@ -1604,6 +1511,7 @@
           price,
           description: description || '',
           category,
+          phone: phone || '',
           whatsapp: whatsapp || '',
           telegram: telegram || '',
           instagram: instagram || '',
@@ -1671,19 +1579,35 @@
           <label class="form-label">Контакты для связи</label>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div>
+              <input type="tel" class="form-control" id="edit-product-phone" value="${product.phone || ''}" placeholder="Номер телефона">
+            </div>
+            <div>
               <input type="text" class="form-control" id="edit-product-whatsapp" value="${product.whatsapp || ''}" placeholder="WhatsApp номер">
             </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
             <div>
               <input type="text" class="form-control" id="edit-product-telegram" value="${product.telegram || ''}" placeholder="Telegram @username">
             </div>
+            <div>
+              <input type="text" class="form-control" id="edit-product-instagram" value="${product.instagram || ''}" placeholder="Instagram (ссылка)">
+            </div>
           </div>
-          <input type="text" class="form-control" id="edit-product-instagram" value="${product.instagram || ''}" placeholder="Instagram (ссылка)" style="margin-top: 1rem;">
         </div>
         <div class="form-group">
           <label class="form-label">Текущее изображение</label>
           <img src="${product.image || 'https://via.placeholder.com/600x400?text=No+Image'}" style="width: 100%; border-radius: var(--radius-sm); margin-bottom: 1rem;">
-          <div class="upload-btn" onclick="openCloudinaryWidgetForEdit('${product.id}')">
-            <i class="fas fa-cloud-upload-alt"></i> Заменить изображение
+          <input type="file" id="edit-file-input" accept="image/*" capture="camera" style="display: none;">
+          <div class="upload-btn" onclick="openEditFileDialog()">
+            <i class="fas fa-camera"></i> Заменить изображение
+          </div>
+          <div class="file-options" id="edit-file-options" style="display: none; margin-top: 1rem;">
+            <button class="btn btn-outline" onclick="takeEditPhoto()" style="width: 100%; margin-bottom: 0.5rem;">
+              <i class="fas fa-camera"></i> Снять фото
+            </button>
+            <button class="btn btn-outline" onclick="chooseEditFromGallery()" style="width: 100%;">
+              <i class="fas fa-images"></i> Выбрать из галереи
+            </button>
           </div>
           <img id="edit-image-preview" class="image-preview" style="display: none;">
           <input type="hidden" class="form-control" id="edit-product-image">
@@ -1696,27 +1620,13 @@
       openEditModal();
     }
 
-    function openCloudinaryWidgetForEdit(productId) {
-      const widget = cloudinary.createUploadWidget(
-        cloudinaryConfig, 
-        (error, result) => {
-          if (!error && result && result.event === "success") {
-            currentImageUrl = result.info.secure_url;
-            document.getElementById('edit-image-preview').src = currentImageUrl;
-            document.getElementById('edit-image-preview').style.display = 'block';
-            document.getElementById('edit-product-image').value = currentImageUrl;
-          }
-        }
-      );
-      widget.open();
-    }
-
     async function updateProduct(productId) {
       const name = document.getElementById('edit-product-name').value;
       const price = parseFloat(document.getElementById('edit-product-price').value);
       const originalPrice = parseFloat(document.getElementById('edit-product-original-price').value) || null;
       const description = document.getElementById('edit-product-description').value;
       const category = document.getElementById('edit-product-category').value;
+      const phone = document.getElementById('edit-product-phone').value;
       const whatsapp = document.getElementById('edit-product-whatsapp').value;
       const telegram = document.getElementById('edit-product-telegram').value;
       const instagram = document.getElementById('edit-product-instagram').value;
@@ -1734,6 +1644,7 @@
           originalPrice,
           description: description || '',
           category,
+          phone: phone || '',
           whatsapp: whatsapp || '',
           telegram: telegram || '',
           instagram: instagram || '',
@@ -1772,7 +1683,7 @@
       document.getElementById('clothing-count').textContent = 
         allProducts.filter(p => p.category === 'clothing').length;
       
-      // Количество пользователей
+       // Количество пользователей
       const usersSnapshot = await db.ref('users').once('value');
       document.getElementById('total-users').textContent = 
         usersSnapshot.exists() ? Object.keys(usersSnapshot.val()).length : 0;
@@ -1787,65 +1698,66 @@
         }
       });
     });
-  function openFileDialog() {
-  document.getElementById('file-options').style.display = 'block';
-}
 
-function openEditFileDialog() {
-  document.getElementById('edit-file-options').style.display = 'block';
-}
+    // Функции для работы с изображениями
+    function openFileDialog() {
+      document.getElementById('file-options').style.display = 'block';
+    }
 
-function takePhoto() {
-  document.getElementById('file-input').setAttribute('capture', 'camera');
-  document.getElementById('file-input').click();
-  document.getElementById('file-options').style.display = 'none';
-}
+    function openEditFileDialog() {
+      document.getElementById('edit-file-options').style.display = 'block';
+    }
 
-function takeEditPhoto() {
-  document.getElementById('edit-file-input').setAttribute('capture', 'camera');
-  document.getElementById('edit-file-input').click();
-  document.getElementById('edit-file-options').style.display = 'none';
-}
+    function takePhoto() {
+      document.getElementById('file-input').setAttribute('capture', 'camera');
+      document.getElementById('file-input').click();
+      document.getElementById('file-options').style.display = 'none';
+    }
 
-function chooseFromGallery() {
-  document.getElementById('file-input').removeAttribute('capture');
-  document.getElementById('file-input').click();
-  document.getElementById('file-options').style.display = 'none';
-}
+    function takeEditPhoto() {
+      document.getElementById('edit-file-input').setAttribute('capture', 'camera');
+      document.getElementById('edit-file-input').click();
+      document.getElementById('edit-file-options').style.display = 'none';
+    }
 
-function chooseEditFromGallery() {
-  document.getElementById('edit-file-input').removeAttribute('capture');
-  document.getElementById('edit-file-input').click();
-  document.getElementById('edit-file-options').style.display = 'none';
-}
+    function chooseFromGallery() {
+      document.getElementById('file-input').removeAttribute('capture');
+      document.getElementById('file-input').click();
+      document.getElementById('file-options').style.display = 'none';
+    }
 
-// Обработчики изменения файлов
-document.getElementById('file-input').addEventListener('change', function(e) {
-  if (e.target.files && e.target.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      currentImageUrl = event.target.result;
-      document.getElementById('image-preview').src = currentImageUrl;
-      document.getElementById('image-preview').style.display = 'block';
-      document.getElementById('product-image').value = currentImageUrl;
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  }
-});
+    function chooseEditFromGallery() {
+      document.getElementById('edit-file-input').removeAttribute('capture');
+      document.getElementById('edit-file-input').click();
+      document.getElementById('edit-file-options').style.display = 'none';
+    }
 
-document.getElementById('edit-file-input').addEventListener('change', function(e) {
-  if (e.target.files && e.target.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      currentImageUrl = event.target.result;
-      document.getElementById('edit-image-preview').src = currentImageUrl;
-      document.getElementById('edit-image-preview').style.display = 'block';
-      document.getElementById('edit-product-image').value = currentImageUrl;
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  }
-});
+    // Обработчики изменения файлов
+    document.getElementById('file-input').addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          currentImageUrl = event.target.result;
+          document.getElementById('image-preview').src = currentImageUrl;
+          document.getElementById('image-preview').style.display = 'block';
+          document.getElementById('product-image').value = currentImageUrl;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    document.getElementById('edit-file-input').addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          currentImageUrl = event.target.result;
+          document.getElementById('edit-image-preview').src = currentImageUrl;
+          document.getElementById('edit-image-preview').style.display = 'block';
+          document.getElementById('edit-product-image').value = currentImageUrl;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
   </script>
 </body>
-</html>
-  
+  </html>
