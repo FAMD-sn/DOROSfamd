@@ -3,214 +3,1222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бегущий медведь</title>
+    <title>DOROSfamd | Тест на тип личности</title>
     <style>
-        body {
+        :root {
+            --dark-bg: #121826;
+            --primary: #1e293b;
+            --accent: #6366f1;
+            --text: #e2e8f0;
+            --card-bg: #1e293b;
+            --highlight: #4f46e5;
+            --soft-purple: #a78bfa;
+            --light-bg: #2e3748;
+        }
+        
+        * {
+            box-sizing: border-box;
             margin: 0;
-            overflow: hidden;
-            background-color: #87CEEB;
-            touch-action: manipulation;
+            padding: 0;
         }
-
-        #game {
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(167, 139, 250, 0.1) 0%, transparent 50%);
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
             position: relative;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(#87CEEB, #4CAF50);
+            padding-bottom: 20px;
         }
-
-        #sun {
-            position: absolute;
-            top: 5%;
-            left: 10%;
-            width: 80px;
-            height: 80px;
-            background: yellow;
-            border-radius: 50%;
-            box-shadow: 0 0 20px yellow;
-        }
-
-        #cloud, #cloud2 {
-            position: absolute;
-            width: 100px;
-            height: 50px;
-            background: white;
-            border-radius: 50px;
-            top: 10%;
-        }
-
-        #cloud2 {
-            left: 70%;
-            top: 15%;
-        }
-
-        /* Медведь */
-        #bear {
-            position: absolute;
-            bottom: 50px;
-            left: 50px;
-            width: 50px;
-            height: 80px;
-            background-image: url('medved.png'); /* Замените на ваше изображение медведя */
-            background-size: cover;
-        }
-
-        #ground {
+        
+        header::after {
+            content: '';
             position: absolute;
             bottom: 0;
+            left: 30%;
+            width: 40%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--accent), transparent);
+            border-radius: 3px;
+        }
+        
+        h1 {
+            color: var(--text);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent), var(--soft-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--soft-purple);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .progress-container {
             width: 100%;
-            height: 50px;
-            background: #654321;
-            z-index: 1;
-        }
-
-        .spike {
-            position: absolute;
-            bottom: 50px;
-            width: 40px;
-            height: 40px;
-            background-color: transparent;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 30px solid red;
-        }
-
-        #score {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            font-size: 30px;
-            font-weight: bold;
-            color: white;
-            z-index: 10;
-        }
-
-        #resetButton {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 50px;
-            font-size: 18px;
-            text-align: center;
-            background: orange;
-            border: none;
+            background-color: var(--light-bg);
             border-radius: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: linear-gradient(to right, var(--accent), var(--soft-purple));
+            width: 0%;
+            transition: width 0.4s ease;
+            position: relative;
+            border-radius: 10px;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.3) 50%, 
+                transparent 100%);
+            animation: shine 2s infinite;
+            border-radius: 10px;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .question-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .question-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .question-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent), var(--soft-purple));
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: var(--text);
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .option {
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 18px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.05rem;
+        }
+        
+        .option:hover {
+            background-color: rgba(79, 70, 229, 0.2);
+            transform: translateX(5px);
+            border-color: var(--accent);
+        }
+        
+        .option.selected {
+            background-color: rgba(79, 70, 229, 0.3);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+        
+        .option.selected::after {
+            content: '✓';
+            position: absolute;
+            right: 15px;
+            color: var(--soft-purple);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, var(--accent), var(--soft-purple));
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto 0;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        #result {
             display: none;
+            animation: fadeIn 1s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .type-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        
+        .type-title {
+            flex: 1;
+        }
+        
+        .type-name {
+            background: linear-gradient(to right, var(--accent), var(--soft-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .type-code {
+            background-color: rgba(79, 70, 229, 0.2);
+            color: var(--soft-purple);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            display: inline-block;
+            font-weight: 600;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        
+        .type-description {
+            margin-bottom: 30px;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: rgba(30, 41, 59, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-title {
+            color: var(--soft-purple);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        
+        ul {
+            list-style-type: none;
+        }
+        
+        li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        li::before {
+            content: '•';
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+        
+        .celebrities-section {
+            margin-top: 40px;
+        }
+        
+        .celebrities-title {
+            color: var(--soft-purple);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .celebrities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .celebrity-card {
+            background-color: rgba(30, 41, 59, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .celebrity-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+            border-color: var(--accent);
+        }
+        
+        .celebrity-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .celebrity-name {
+            padding: 15px 10px;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .matrix-code {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            opacity: 0.03;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .code-line {
+            color: var(--accent);
+            font-family: monospace;
+            white-space: nowrap;
+            animation: scrollCode 20s linear infinite;
+            margin-bottom: 15px;
+            display: block;
+            font-size: 0.9rem;
+        }
+        
+        @keyframes scrollCode {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100%); }
+        }
+        
+        .type-percentage {
+            margin-top: 20px;
+            background: rgba(30, 41, 59, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .percentage-bar {
+            height: 8px;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .percentage-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent), var(--soft-purple));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 1s ease;
+        }
+        
+        .percentage-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: var(--soft-purple);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .question-container {
+                padding: 20px;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+            
+            .option {
+                padding: 15px;
+                font-size: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .celebrities-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 15px;
+            }
+            
+            .celebrity-image {
+                height: 150px;
+            }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="game">
-        <div id="sun"></div>
-        <div id="cloud"></div>
-        <div id="cloud2"></div>
-        <div id="bear"></div>
-        <div id="ground"></div>
+    <div class="matrix-code" id="matrix-code"></div>
+    
+    <div class="container">
+        <header>
+            <h1>DOROSfamd | Тест на тип личности</h1>
+            <p class="subtitle">Откройте тайны своего психологического профиля через призму типологии MBTI</p>
+        </header>
+        
+        <div id="quiz">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+            
+            <div class="question-container">
+                <div class="question-text" id="question-text"></div>
+                <div class="options" id="options"></div>
+            </div>
+            
+            <button class="btn" id="next-btn">СЛЕДУЮЩИЙ ВОПРОС</button>
+        </div>
+        
+        <div id="result">
+            <div class="result-card">
+                <div class="type-header">
+                    <div class="type-title">
+                        <h2 class="type-name" id="type-name"></h2>
+                        <span class="type-code" id="type-code"></span>
+                    </div>
+                </div>
+                
+                <div class="type-description" id="type-description"></div>
+                
+                <div class="type-percentage">
+                    <div>Совпадение с типом: <span id="percentage-value">0</span>%</div>
+                    <div class="percentage-bar">
+                        <div class="percentage-fill" id="percentage-fill"></div>
+                    </div>
+                    <div class="percentage-text">
+                        <span>Низкое</span>
+                        <span>Высокое</span>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 class="stat-title">СИЛЬНЫЕ СТОРОНЫ</h3>
+                        <ul id="strengths"></ul>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3 class="stat-title">СЛАБЫЕ СТОРОНЫ</h3>
+                        <ul id="weaknesses"></ul>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3 class="stat-title">РЕКОМЕНДУЕМЫЕ ПРОФЕССИИ</h3>
+                        <ul id="careers"></ul>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3 class="stat-title">СОВЕТЫ ПО РАЗВИТИЮ</h3>
+                    <ul id="advices"></ul>
+                </div>
+                
+                <div class="celebrities-section">
+                    <h3 class="celebrities-title">ИЗВЕСТНЫЕ ЛЮДИ С ТАКИМ ТИПОМ ЛИЧНОСТИ</h3>
+                    <div class="celebrities-grid" id="celebrities"></div>
+                </div>
+            </div>
+            
+            <button class="btn" id="restart-btn">ПРОЙТИ ТЕСТ СНОВА</button>
+        </div>
     </div>
-    <div id="score">Очки: 0</div>
-    <button id="resetButton">Начать заново</button>
 
     <script>
-        let bear = document.getElementById("bear");
-        let scoreDisplay = document.getElementById("score");
-        let resetButton = document.getElementById("resetButton");
-        let jumping = false;
-        let gameOver = false;
-        let score = 0;
-
-        function jump() {
-            if (!jumping && !gameOver) {
-                jumping = true;
-                let jumpHeight = 180;
-                let jumpSpeed = 6;
-                let bottom = parseInt(window.getComputedStyle(bear).bottom);
-
-                let jumpInterval = setInterval(() => {
-                    if (bottom >= jumpHeight) {
-                        clearInterval(jumpInterval);
-                        let fallInterval = setInterval(() => {
-                            bottom -= jumpSpeed;
-                            bear.style.bottom = bottom + "px";
-                            if (bottom <= 50) {
-                                clearInterval(fallInterval);
-                                jumping = false;
-                            }
-                        }, 20);
-                    } else {
-                        bottom += jumpSpeed;
-                        bear.style.bottom = bottom + "px";
-                    }
-                }, 20);
+        // Matrix code animation
+        const matrixCode = document.getElementById('matrix-code');
+        const characters = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+        
+        for (let i = 0; i < 50; i++) {
+            let code = '';
+            for (let j = 0; j < 50; j++) {
+                code += characters.charAt(Math.floor(Math.random() * characters.length));
             }
+            const codeLine = document.createElement('div');
+            codeLine.className = 'code-line';
+            codeLine.textContent = code;
+            codeLine.style.animationDelay = `${Math.random() * 20}s`;
+            matrixCode.appendChild(codeLine);
         }
 
-        document.addEventListener("keydown", function(event) {
-            if (event.code === "Space") {
-                jump();
+        // Questions data
+        const questions = [
+            {
+                question: "Как вы предпочитаете проводить свободное время?",
+                options: [
+                    { text: "В одиночестве, занимаясь любимым делом", value: "I" },
+                    { text: "В компании друзей или на мероприятиях", value: "E" }
+                ]
+            },
+            {
+                question: "Как вы реагируете на новые знакомства?",
+                options: [
+                    { text: "Сдержанно, мне нужно время, чтобы открыться", value: "I" },
+                    { text: "С энтузиазмом, люблю общаться", value: "E" }
+                ]
+            },
+            {
+                question: "После долгого рабочего дня вы предпочитаете:",
+                options: [
+                    { text: "Побыть одному, чтобы восстановить силы", value: "I" },
+                    { text: "Встретиться с друзьями, чтобы развеяться", value: "E" }
+                ]
+            },
+            {
+                question: "Как вы собираете информацию?",
+                options: [
+                    { text: "Доверяю интуиции и вижу общую картину", value: "N" },
+                    { text: "Обращаю внимание на факты и детали", value: "S" }
+                ]
+            },
+            {
+                question: "Как вы оцениваете новую идею?",
+                options: [
+                    { text: "Думаю о возможностях и потенциале", value: "N" },
+                    { text: "Смотрю на практичность и реальность", value: "S" }
+                ]
+            },
+            {
+                question: "Когда вам рассказывают историю, вы:",
+                options: [
+                    { text: "Фокусируетесь на скрытом смысле и аналогиях", value: "N" },
+                    { text: "Запоминаете конкретные факты и детали", value: "S" }
+                ]
+            },
+            {
+                question: "Как вы принимаете решения?",
+                options: [
+                    { text: "Анализирую логически, опираясь на факты", value: "T" },
+                    { text: "Прислушиваюсь к чувствам и ценностям", value: "F" }
+                ]
+            },
+            {
+                question: "Как вы разрешаете конфликты?",
+                options: [
+                    { text: "Стремлюсь к объективности и справедливости", value: "T" },
+                    { text: "Учитываю эмоции и стараюсь сохранить гармонию", value: "F" }
+                ]
+            },
+            {
+                question: "Когда нужно сделать выбор, вы:",
+                options: [
+                    { text: "Взвешиваете все 'за' и 'против'", value: "T" },
+                    { text: "Прислушиваетесь к сердцу", value: "F" }
+                ]
+            },
+            {
+                question: "Как вы организовываете свою жизнь?",
+                options: [
+                    { text: "Планирую заранее и следую расписанию", value: "J" },
+                    { text: "Предпочитаю спонтанность и гибкость", value: "P" }
+                ]
+            },
+            {
+                question: "В незнакомой ситуации вы:",
+                options: [
+                    { text: "Действуете по плану и следуете правилам", value: "J" },
+                    { text: "Импровизируете и адаптируетесь", value: "P" }
+                ]
+            },
+            {
+                question: "Как вы относитесь к срокам?",
+                options: [
+                    { text: "Стараюсь выполнять работу заранее", value: "J" },
+                    { text: "Часто работаю в последний момент", value: "P" }
+                ]
             }
-        });
+        ];
 
-        document.addEventListener("touchstart", function() {
-            jump();
-        });
-
-        function spawnSpike() {
-            if (!gameOver) {
-                let spike = document.createElement("div");
-                spike.classList.add("spike");
-                document.getElementById("game").appendChild(spike);
-
-                // Случайное расстояние
-                let distance = Math.random() * 150 + 200; // минимальное расстояние 200px, максимальное 350px
-                spike.style.left = `100vw`;
-
-                let moveInterval = setInterval(() => {
-                    if (gameOver) {
-                        clearInterval(moveInterval);
-                        spike.remove();
-                        return;
-                    }
-
-                    let left = parseInt(window.getComputedStyle(spike).left);
-                    if (left <= -40) {
-                        clearInterval(moveInterval);
-                        spike.remove();
-                        score++;
-                        scoreDisplay.innerHTML = "Очки: " + score;
-                    } else {
-                        spike.style.left = (left - 5) + "px";
-                    }
-
-                    let bearBottom = parseInt(window.getComputedStyle(bear).bottom);
-                    let bearLeft = parseInt(window.getComputedStyle(bear).left);
-                    let spikeLeft = parseInt(window.getComputedStyle(spike).left);
-
-                    if (spikeLeft <= bearLeft + 50 && spikeLeft >= bearLeft && bearBottom <= 80) {
-                        gameOver = true;
-                        alert("Игра окончена! Очки: " + score);
-                        resetButton.style.display = "block";
-                        clearInterval(moveInterval);
-                        spike.remove();
-                    }
-                }, 20);
+        // All 16 MBTI personality types with detailed information
+        const personalityTypes = {
+            INFP: {
+                name: "Идеалист-Мечтатель",
+                code: "INFP",
+                description: "Вы - чувствительный, творческий идеалист с богатым внутренним миром. Ваше кредо - быть верным себе и своим ценностям. Вы обладаете редкой способностью видеть потенциал в людях и ситуациях. Ваша жизнь - это постоянный поиск смысла и глубины. Вы ненавидите лицемерие и поверхностность, цените искренность и аутентичность. Ваше творческое начало позволяет вам находить нестандартные решения и видеть красоту в неожиданных местах.",
+                strengths: ["Эмпатия и понимание других", "Креативность и оригинальность", "Гибкость и адаптивность", "Глубокие моральные принципы", "Искренность и аутентичность"],
+                weaknesses: ["Чрезмерная чувствительность к критике", "Склонность к прокрастинации", "Идеализм, который может привести к разочарованиям", "Трудности с принятием решений", "Избегание конфликтов"],
+                careers: ["Писатель/поэт", "Психолог/консультант", "Графический дизайнер", "Социальный работник", "Музыкант/художник", "Арт-терапевт", "Библиотекарь", "Ландшафтный дизайнер"],
+                advices: [
+                    "Учитесь выражать свои потребности прямо, а не надеяться, что другие догадаются",
+                    "Развивайте дисциплину - ставьте небольшие достижимые цели",
+                    "Практикуйтесь в принятии решений, начиная с малого",
+                    "Находите баланс между идеалами и реальностью",
+                    "Не бойтесь конфликтов - иногда они необходимы для роста"
+                ],
+                celebrities: [
+                    { name: "Джон Леннон", image: "https://upload.wikimedia.org/wikipedia/commons/8/85/John_Lennon_1969_%28cropped%29.jpg" },
+                    { name: "Уильям Шекспир", image: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Shakespeare.jpg" },
+                    { name: "Принцесса Диана", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Diana_-_Roosevelt_Monument_%28cropped%29.jpg/800px-Diana_-_Roosevelt_Monument_%28cropped%29.jpg" },
+                    { name: "Дж.Р.Р. Толкин", image: "https://upload.wikimedia.org/wikipedia/commons/d/d4/J._R._R._Tolkien%2C_ca._1925.jpg" },
+                    { name: "Фродо Бэггинс", image: "https://static.wikia.nocookie.net/lotr/images/e/e7/Frodo_%28FotR%29.png" },
+                    { name: "Амели Пулен", image: "https://static.wikia.nocookie.net/amelie/images/4/4d/Amelie_poulain.jpg" }
+                ]
+            },
+            INFJ: {
+                name: "Советник-Провидец",
+                code: "INFJ",
+                description: "Вы - редкий и загадочный тип, сочетающий проницательность и сострадание. Ваша интуиция позволяет вам видеть скрытые мотивы и закономерности. Вы обладаете уникальной способностью предвидеть развитие событий и понимать глубинные потребности людей. Ваша жизнь - это миссия, направленная на помощь другим в их развитии. Вы стремитесь к глубоким, осмысленным отношениям и ненавидите поверхностные связи. Ваши идеалы высоки, и вы постоянно работаете над тем, чтобы сделать мир лучше.",
+                strengths: ["Проницательность и интуиция", "Творческий подход к проблемам", "Преданность своим ценностям", "Способность вдохновлять других", "Глубина по��имания"],
+                weaknesses: ["Перфекционизм и завышенные ожидания", "Склонность к эмоциональному выгоранию", "Трудности с установлением границ", "Чрезмерная серьезность", "Чувство изоляции"],
+                careers: ["Психолог/терапевт", "Писатель", "Священник/духовный наставник", "HR-специалист", "Учитель/профессор", "Социальный работник", "Архитектор", "Дипломат"],
+                advices: [
+                    "Учитесь говорить 'нет' и устанавливать здоровые границы",
+                    "Позволяйте себе ошибаться - перфекционизм парализует",
+                    "Находите время для отдыха и восстановления",
+                    "Развивайте практические навыки, чтобы воплощать свои идеи",
+                    "Ищите единомышленников, чтобы не чувствовать себя одиноким"
+                ],
+                celebrities: [
+                    { name: "Карл Юнг", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Carl_Gustav_Jung.jpg/800px-Carl_Gustav_Jung.jpg" },
+                    { name: "Нельсон Мандела", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Nelson_Mandela-2008_%28edit%29.jpg/800px-Nelson_Mandela-2008_%28edit%29.jpg" },
+                    { name: "Мать Тереза", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Mother_Teresa_1.jpg/800px-Mother_Teresa_1.jpg" },
+                    { name: "Лев Толстой", image: "https://upload.wikimedia.org/wikipedia/commons/c/c6/L.N.Tolstoy_Prokudin-Gorsky.jpg" },
+                    { name: "Гэндальф", image: "https://static.wikia.nocookie.net/lotr/images/e/e7/Gandalf_the_Grey.jpg" },
+                    { name: "Дейенерис Таргариен", image: "https://static.wikia.nocookie.net/gameofthrones/images/e/ee/QueenDaenerysTargaryenIronThrone.PNG" }
+                ]
+            },
+            INTP: {
+                name: "Логик-Изобретатель",
+                code: "INTP",
+                description: "Вы - независимый мыслитель с ненасытной жаждой знаний. Ваш ум постоянно анализи��ует, разбирает идеи на части и ищет новые связи. Вы цените логику и точность выше всего, часто подвергая сомнению общепринятые мнения. Ваша жизнь - это бесконечное исследование возможностей и поиск истины. Вы наслаждаетесь сложными интеллектуальными вызовами и можете полностью погружаться в интересующие вас темы. Ваше мышление оригинально и нестандартно.",
+                strengths: ["Аналитическое мышление", "Креативность в решении проблем", "Объективность и беспристрастность", "Любознательность", "Независимость мышления"],
+                weaknesses: ["Прокрастинация", "Социальная неловкость", "Чрезмерный скептицизм", "Пренебрежение эмоциями", "Трудности с завершением проектов"],
+                careers: ["Программист", "Ученый/исследователь", "Философ", "Инженер", "Математик", "Архитектор", "Криминалист", "Системный аналитик"],
+                advices: [
+                    "Развивайте эмоциональный интеллект - это дополнит ваш аналитический ум",
+                    "Учитесь доводить начатое до конца, разбивая задачи на этапы",
+                    "Практикуйтесь в объяснении своих идей простым языком",
+                    "Находите баланс между анализом и действием",
+                    "Не избегайте социальных контактов - они могут быть полезны"
+                ],
+                celebrities: [
+                    { name: "Альберт Эйнштейн", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Einstein_1921_by_F_Schmutzer_-_restoration.jpg/800px-Einstein_1921_by_F_Schmutzer_-_restoration.jpg" },
+                    { name: "Билл Гейтс", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Bill_Gates_2017_%28cropped%29.jpg/800px-Bill_Gates_2017_%28cropped%29.jpg" },
+                    { name: "Исаак Ньютон", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/GodfreyKneller-IsaacNewton-1689.jpg/800px-GodfreyKneller-IsaacNewton-1689.jpg" },
+                    { name: "Рене Декарт", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Frans_Hals_-_Portret_van_Ren%C3%A9_Descartes.jpg/800px-Frans_Hals_-_Portret_van_Ren%C3%A9_Descartes.jpg" },
+                    { name: "Шерлок Холмс", image: "https://static.wikia.nocookie.net/sherlock/images/5/5f/Sherlock_Holmes_-_Jeremy_Brett.jpg" },
+                    { name: "Доктор Хаус", image: "https://static.wikia.nocookie.net/house/images/d/dc/House_season_8.jpg" }
+                ]
+            },
+            INTJ: {
+                name: "Стратег-Архитектор",
+                code: "INTJ",
+                description: "Вы - независимый и решительный стратег с уникальной способностью превращать теории в эффективные планы. Ваше мышление системно, вы видите долгосрочные последствия и умеете предвидеть развитие событий. Ваша уверенность в своих идеях - результат тщательного анализа, а не слепого упрямства. Вы цените компетентность, эффективность и ненавидите нелогичность. Ваша жизнь - это постоянное стремление к совершенствованию себя и окружающего мира через инновации и рациональные решения.",
+                strengths: ["Стратегическое мышление", "Самостоятельность", "Решительность", "Инновационность", "Целеустремленность"],
+                weaknesses: ["Нетерпимость к некомпетентности", "Эмоциональная отстраненность", "Чрезмерная критичность", "Упрямство", "Трудности в выражении эмоций"],
+                careers: ["Бизнес-стратег", "Ученый/исследователь", "Судья", "Архитектор", "Инженер", "Системный администратор", "Финансовый аналитик", "Предприниматель"],
+                advices: [
+                    "Развивайте эмоциональный интеллект - это усилит ваше влияние",
+                    "Учитесь терпению и толерантности к другим стилям мышления",
+                    "Практикуйтесь в объяснении своих идей простым языком",
+                    "Не забывайте о чувствах других людей, даже если они кажутся вам нелогичными",
+                    "Находите время для отдыха - даже стратеги нуждаются в перезагрузке"
+                ],
+                celebrities: [
+                    { name: "Илон Маск", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Elon_Musk_Royal_Society_%28crop2%29.jpg/800px-Elon_Musk_Royal_Society_%28crop2%29.jpg" },
+                    { name: "Фридрих Ницше", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Nietzsche187a.jpg/800px-Nietzsche187a.jpg" },
+                    { name: "Маргарет Тэтчер", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Margaret_Thatcher_cropped.jpg/800px-Margaret_Thatcher_cropped.jpg" },
+                    { name: "Стив Джобс", image: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Steve_Jobs_Headshot_2010-CROP.jpg" },
+                    { name: "Тайвин Ланнистер", image: "https://static.wikia.nocookie.net/gameofthrones/images/2/2f/Charles_Dance_as_Tywin_Lannister.png" },
+                    { name: "Бэтмен", image: "https://static.wikia.nocookie.net/batman/images/a/a2/Batman_%28DCEU%29_-_Justice_League_%28Movie%29_Promotional_Photo.png" }
+                ]
+            },
+            ENFP: {
+                name: "Вдохновитель-Изобретатель",
+                code: "ENFP",
+                description: "Вы - энергичный, творческий и свободолюбивый человек с неиссякаемым энтузиазмом. Ваша жизнь - это калейдоскоп возможностей, идей и новых знакомств. Вы обладаете уникальной способностью видеть потенциал в людях и вдохновлять их на изменения. Ваше обаяние и искренность притягивают к вам людей. Вы ненавидите рутину и ограничения, постоянно ищете новые впечатления и смыслы. Ваш ум полон творческих идей, а сердце открыто миру.",
+                strengths: ["Креативность и оригинальность", "Коммуникабельность", "Энтузиазм и энергия", "Гибкость и адаптивность", "Эмпатия и понимание других"],
+                weaknesses: ["Трудности с фокусировкой", "Импульсивность", "Прокрастинация", "Чувствительность к критике", "Склонность переоценивать свои силы"],
+                careers: ["Психолог/коуч", "Актер/режиссер", "Журналист", "Маркетолог", "Дизайнер", "Учитель", "Предприниматель", "HR-специалист"],
+                advices: [
+                    "Развивайте дисциплину и навык завершения проектов",
+                    "Учитесь расставлять приоритеты - не все возможности одинаково важны",
+                    "Находите баланс между спонтанностью и ответственностью",
+                    "Практикуйте глубокую работу - фокусируйтесь на одной задаче",
+                    "Не забывайте отдыхать - ваша энергия не бесконечна"
+                ],
+                celebrities: [
+                    { name: "Робин Уильямс", image: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Robin_Williams_2011.jpg" },
+                    { name: "Уолт Дисней", image: "https://upload.wikimedia.org/wikipedia/commons/d/df/Walt_Disney_1946.JPG" },
+                    { name: "Марк Твен", image: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Mark_Twain_by_AF_Bradley.jpg" },
+                    { name: "Опра Уинфри", image: "https://upload.wikimedia.org/wikipedia/commons/8/88/Oprah_in_2014.jpg" },
+                    { name: "Доктор Браун", image: "https://static.wikia.nocookie.net/bttf/images/0/09/Docbrown1985.jpg" },
+                    { name: "Дэдпул", image: "https://static.wikia.nocookie.net/marveldatabase/images/1/1b/Wade_Wilson_%28Earth-616%29_from_Deadpool_Vol_4_1_001.jpg" }
+                ]
+            },
+            ENFJ: {
+                name: "Наставник-Лидер",
+                code: "ENFJ",
+                description: "Вы - харизматичный и проницательный лидер с природной способностью вдохновлять людей. Ваша жизнь посвящена помощи другим в раскрытии их потенциала. Вы обладаете редким сочетанием эмоционального интеллекта и организаторских способностей. Ваше обаяние и искренняя забота о людях делают вас естественным лидером. Вы умеете создавать гармонию в коллективе и мотивировать людей на достижение общих целей. Ваша интуиция помогает вам понимать потребности других, порой даже лучше, чем они сами.",
+                strengths: ["Лидерские качества", "Коммуникабельность", "Эмпатия и понимание других", "Организаторские способности", "Оптимизм и вдохновение"],
+                weaknesses: ["Чрезмерная идеализация людей", "Склонность к контролю", "Трудности с принятием критики", "Эмоциональное выгорание", "Пренебрежение собственными потребностями"],
+                careers: ["Психолог/коуч", "Учитель/преподаватель", "HR-директор", "Политик", "Священник", "Менеджер проектов", "Социальный работник", "Тренер"],
+                advices: [
+                    "Учитесь делегировать и доверять другим",
+                    "Не забывайте о своих собственных потребностях",
+                    "Развивайте устойчивость к критике - она может быть полезной",
+                    "Позволяйте людям совершать ошибки - это часть роста",
+                    "Находите время для отдыха и восстановления"
+                ],
+                celebrities: [
+                    { name: "Барак Обама", image: "https://upload.wikimedia.org/wikipedia/commons/8/8d/President_Barack_Obama.jpg" },
+                    { name: "Опра Уинфри", image: "https://upload.wikimedia.org/wikipedia/commons/8/88/Oprah_in_2014.jpg" },
+                    { name: "Мартин Лютер Кинг", image: "https://upload.wikimedia.org/wikipedia/commons/0/05/Martin_Luther_King%2C_Jr..jpg" },
+                    { name: "Мария Кюри", image: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Marie_Curie_c._1920s.jpg" },
+                    { name: "Гендальф Белый", image: "https://static.wikia.nocookie.net/lotr/images/e/eb/GandalfWhite-Helm'sDeep.png" },
+                    { name: "Стив Роджерс (Капитан Америка)", image: "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/7/7b/Captain_America_%28Steve_Rogers%29_Endgame_Textless_Poster.jpg" }
+                ]
+            },
+            ENTP: {
+                name: "Дебатер-Новатор",
+                code: "ENTP",
+                description: "Вы - изобретательный, остроумный и предприимчивый человек с нестандартным мышлением. Ваш ум постоянно генерирует новые идеи и ищет интеллектуальные вызовы. Вы мастер аргументации и любите исследовать разные точки зрения. Ваша жизнь - это бесконечный поиск возможностей и новых проектов. Вы ненавидите рутину и ограничения, предпочитая свободу и разнообразие. Ваша харизма и чувство юмора делают вас душой компании, а аналитический ум помогает находить неожиданные решения сложных проблем.",
+                strengths: ["Креативность и оригинальность", "Быстрота мышления", "Гибкость и адаптивность", "Коммуникабельность", "Предприимчивость"],
+                weaknesses: ["Нетерпение к рутине", "Склонность к спорам", "Прокрастинация", "Импульсивность", "Трудности с завершением проектов"],
+                careers: ["Предприниматель", "Изобретатель", "Адвокат", "Маркетолог", "Политолог", "Консультант", "Журналист", "Актер/комик"],
+                advices: [
+                    "Развивайте дисциплину и навык завершения начатого",
+                    "Учитесь выбирать наиболее перспективные идеи из множества",
+                    "Практикуйте активное слушание - не только говорить, но и слышать",
+                    "Находите баланс между риском и расчетом",
+                    "Не забывайте о чувствах других людей в пылу дебатов"
+                ],
+                celebrities: [
+                    { name: "Томас Эдисон", image: "https://upload.wikimedia.org/wikipedia/commons/9/9d/Thomas_Edison2.jpg" },
+                    { name: "Марк Твен", image: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Mark_Twain_by_AF_Bradley.jpg" },
+                    { name: "Ричард Фейнман", image: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Richard_Feynman_Nobel.jpg" },
+                    { name: "Стив Джобс", image: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Steve_Jobs_Headshot_2010-CROP.jpg" },
+                    { name: "Тони Старк (Железный человек)", image: "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/4/4f/Iron_Man_%28Tony_Stark%29_AIW_Textless_Poster.jpg" },
+                    { name: "Доктор Хаус", image: "https://static.wikia.nocookie.net/house/images/d/dc/House_season_8.jpg" }
+                ]
+            },
+            ENTJ: {
+                name: "Командир-Стратег",
+                code: "ENTJ",
+                description: "Вы - решительный, уверенный в себе лидер с ярко выраженными стратегическими способностями. Ваша жизнь - это непрерывное движение к целям и совершенствование систем вокруг вас. Вы обладаете редким сочетанием логики, решительности и харизмы, что делает вас эффективным руководителем. Вы быстро анализируете ситуации, принимаете решения и мобилизуете людей на их выполнение. Ваше видение будущего и организаторские способности помогают вам реализовывать амбициозные проекты. Вы цените компетентность, эффективность и ненав��дите нерешительность.",
+                strengths: ["Лидерские качества", "Стратегическое мышление", "Решительность", "Организаторские способно��ти", "Эффективность"],
+                weaknesses: ["Нетерпимость к некомпетентности", "Чрезмерная прямолинейность", "Склонность к доминированию", "Нетерпение", "Трудности в выражении эмоций"],
+                careers: ["Бизнес-руководитель", "Политик", "Судья", "Военный", "Финансовый директор", "Предприниматель", "Консультант по управлению", "Юрист"],
+                advices: [
+                    "Развивайте эмоциональный интеллект - это усилит ваше лидерство",
+                    "Учитесь терпению и такту в общении с менее решительными людьми",
+                    "Практикуйте активное слушание - не только давать указания",
+                    "Находите время для отдыха - даже лидеры нуждаются в перезагрузке",
+                    "Признавайте вклад других - это мотивирует команду"
+                ],
+                celebrities: [
+                    { name: "Маргарет Тэтчер", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Margaret_Thatcher_cropped.jpg/800px-Margaret_Thatcher_cropped.jpg" },
+                    { name: "Стив Джобс", image: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Steve_Jobs_Headshot_2010-CROP.jpg" },
+                    { name: "Наполеон Бонапарт", image: "https://upload.wikimedia.org/wikipedia/commons/5/50/Jacques-Louis_David_-_The_Emperor_Napoleon_in_His_Study_at_the_Tuileries_-_Google_Art_Project.jpg" },
+                    { name: "Франклин Рузвельт", image: "https://upload.wikimedia.org/wikipedia/commons/4/42/FDR_1944_Color_Portrait.jpg" },
+                    { name: "Гордон Гекко", image: "https://static.wikia.nocookie.net/villains/images/3/3f/Gordon_gekko_wall_street.jpg" },
+                    { name: "Тайвин Ланнистер", image: "https://static.wikia.nocookie.net/gameofthrones/images/2/2f/Charles_Dance_as_Tywin_Lannister.png" }
+                ]
+            },
+            ISFP: {
+                name: "Артист-Композитор",
+                code: "ISFP",
+                description: "Вы - чуткий, творческий и свободолюбивый человек, живущий в гармонии с настоящим моментом. Ваша жизнь - это выражение себя через действия и творчество. Вы обладаете уникальной способностью видеть красоту в окружающем мире и создавать ее своими руками. Вы цените свободу, искренность и ненавидите ограничения и лицемерие. Ваше обаяние и естественность притягивают людей, хотя вы часто предпочитаете уединение. Вы действуете в соответствии со своими ценностями, а не социальными ожиданиями.",
+                strengths: ["Креативность", "Чувствительность к красоте", "Гибкость и адаптивность", "Практичность", "Эмпатия"],
+                weaknesses: ["Избегание конфликтов", "Нелюбовь к планированию", "Чувствительность к критике", "Склонность к прокрастинации", "Трудности с долгосрочными целями"],
+                careers: ["Художник/дизайнер", "Музыкант", "Фотограф", "Повар", "Ландшафтный дизайнер", "Флорист", "Социальный работник", "Физиотерапевт"],
+                advices: [
+                    "Учитесь выражать свои потребности и границы",
+                    "Развивайте навыки планирования, начиная с малого",
+                    "Не избегайте конфликтов - иногда они необходимы",
+                    "Находите баланс между спонтанностью и ответственностью",
+                    "Верьте в ценность своего творчества - делитесь им с миром"
+                ],
+                celebrities: [
+                    { name: "Фредерик Шопен", image: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Frederic_Chopin_photo.jpeg" },
+                    { name: "Михаил Врубель", image: "https://upload.wikimedia.org/wikipedia/commons/1/1f/Vrubel_Self-portrait_1885.jpg" },
+                    { name: "Одри Хепберн", image: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Audrey_Hepburn_1956.jpg" },
+                    { name: "Людвиг ван Бетховен", image: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Beethoven.jpg" },
+                    { name: "Арагорн", image: "https://static.wikia.nocookie.net/lotr/images/b/b6/Aragorn_profile.jpg" },
+                    { name: "Китнисс Эвердин", image: "https://static.wikia.nocookie.net/thehungergames/images/1/1b/KatnissEverdeen.jpg" }
+                ]
+            },
+            ISFJ: {
+                name: "Защитник-Опекун",
+                code: "ISFJ",
+                description: "Вы - заботливый, ответственный и преданный человек с развитым чувством долга. Ваша жизнь посвящена служению другим и созданию гармонии в своем окружении. Вы обладаете уникальной способностью замечать потребности людей и предугадывать их желания. Ваша память на детали и практический подход делают вас надежным исполнителем. Вы цените традиции, стабильность и искренние отношения. Ваша скромность часто скрывает ваши многочисленные достоинства, но те, кто вас знает, ценят вашу преданность и трудолюбие.",
+                strengths: ["Преданность", "Практичность", "Чувство ответственности", "Внимание к деталям", "Эмпатия"],
+                weaknesses: ["Избегание конфликтов", "Склонность к самопожертвованию", "Сопротивление изменениям", "Трудности с делегированием", "Чувствительность к критике"],
+                careers: ["Медсестра/врач", "Учитель", "Социальный работник", "Библиотекарь", "Администратор", "Бухгалтер", "Психолог", "Диетолог"],
+                advices: [
+                    "Учитесь говорить 'нет' и заботиться о своих потребностях",
+                    "Принимайте изменения как возможность роста",
+                    "Развивайте уверенность в себе - ваша работа ценна",
+                    "Не бойтесь делегировать - вы не обязаны делать все сами",
+                    "Находите время для отдыха и восстановления"
+                ],
+                celebrities: [
+                    { name: "Мать Тереза", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Mother_Teresa_1.jpg/800px-Mother_Teresa_1.jpg" },
+                    { name: "Джордж Вашингтон", image: "https://upload.wikimedia.org/wikipedia/commons/b/b6/Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg" },
+                    { name: "Клара Бартон", image: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Clara_Barton.jpg" },
+                    { name: "Льюис Кэрролл", image: "https://upload.wikimedia.org/wikipedia/commons/7/73/Lewis_Carroll_by_OS_1863.jpg" },
+                    { name: "Сэмвайз Гэмджи", image: "https://static.wikia.nocookie.net/lotr/images/3/3d/Samwise_gamgee.jpg" },
+                    { name: "Бильбо Бэггинс", image: "https://static.wikia.nocookie.net/lotr/images/d/dc/Bilbo_baggins.jpg" }
+                ]
+            },
+            ISTP: {
+                name: "Мастер-Виртуоз",
+                code: "ISTP",
+                description: "Вы - практичный, спонтанный и технически одаренный человек с острым чувством реальности. Ваша жизнь - это исследование мира через действие и эксперимент. Вы обладаете уникальной способностью понимать, как работают механизмы - как технические, так и социальные. Ваше хладнокровие в кризисных ситуациях и быстрая реакция делают вас незаменимым в чрезвычайных обстоятельствах. Вы цените свободу, компетентность и ненавидите ограничения и пустые разговоры. Ваш девиз - 'Лучше один раз увидеть, чем сто раз услышать'.",
+                strengths: ["Практическое мышление", "Способность решать проблемы", "Хладнокровие в кризисах", "Гибкость и адаптивность", "Технические способности"],
+                weaknesses: ["Нелюбовь к планированию", "Импульсивность", "Склонность к риску", "Трудности с выражением эмоций", "Нетерпение к рутине"],
+                careers: ["Инженер", "Механик", "Пилот", "Полицейский", "Пожарный", "Хирург", "Программист", "Спортсмен"],
+                advices: [
+                    "Развивайте навыки планирования, начиная с малого",
+                    "Учитесь выражать свои эмоции и потребности",
+                    "Находите баланс между риском и безопасностью",
+                    "Практикуйтесь в долгосрочном мышлении",
+                    "Не избегайте глубоких отношений - они обогащают жизнь"
+                ],
+                celebrities: [
+                    { name: "Михаил Калашников", image: "https://upload.wikimedia.org/wikipedia/commons/6/6e/M.T.Kalashnikov.jpg" },
+                    { name: "Брюс Ли", image: "https://upload.wikimedia.org/wikipedia/commons/c/ca/Bruce_Lee_1973.jpg" },
+                    { name: "Амелия Эрхарт", image: "https://upload.wikimedia.org/wikipedia/commons/8/86/Amelia_Earhart_1937.jpg" },
+                    { name: "Клинт Иствуд", image: "https://upload.wikimedia.org/wikipedia/commons/9/9e/Clint_Eastwood_-_1960s.JPG" },
+                    { name: "Ариа Старк", image: "https://static.wikia.nocookie.net/gameofthrones/images/3/39/Arya_Season_8.jpg" },
+                    { name: "Индиана Джонс", image: "https://static.wikia.nocookie.net/indianajones/images/1/12/Raiders_Indy.jpg" }
+                ]
+            },
+            ISTJ: {
+                name: "Инспектор-Логист",
+                code: "ISTJ",
+                description: "Вы - ответственный, практичный и надежный человек с сильным чувством долга. Ваша жизнь построена на принципах порядка, честности и трудолюбия. Вы обладаете уникальной способностью систематизировать информацию и выполнять работу с исключительной точностью. Ваша память на факты и детали, а также ваша надежность делают вас незаменимым сотрудником и другом. Вы цените традиции, стабильность и ясные правила. Ваше слово - это закон, и вы ожидаете того же от других.",
+                strengths: ["Надежность", "Чувство ответственности", "Практичность", "Внимание к деталям", "Организованность"],
+                weaknesses: ["Сопротивление изменениям", "Чрезмерный консерватизм", "Трудности с импровизацией", "Черно-белое мышление", "Склонность к критике"],
+                careers: ["Бухгалтер", "Аудитор", "Юрист", "Военный", "Полицейский", "Администратор", "Инженер", "Программист"],
+                advices: [
+                    "Учитесь принимать изменения как неизбежную часть жизни",
+                    "Развивайте гибкость в мышлении - не все ситуации черно-белые",
+                    "Практикуйте эмпатию - попробуйте понять чувства других",
+                    "Находите баланс между работой и отдыхом",
+                    "Не бойтесь иногда выходить из зоны комфорта"
+                ],
+                celebrities: [
+                    { name: "Джордж Вашингтон", image: "https://upload.wikimedia.org/wikipedia/commons/b/b6/Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg" },
+                    { name: "Ангела Меркель", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Angela_Merkel_Juli_2010_-_3zu4.jpg/800px-Angela_Merkel_Juli_2010_-_3zu4.jpg" },
+                    { name: "Уоррен Баффет", image: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Warren_Buffett_at_University_of_Nebraska_May_6%2C_2005.jpg" },
+                    { name: "Королева Елизавета II", image: "https://upload.wikimedia.org/wikipedia/commons/5/50/Queen_Elizabeth_II_March_2015.jpg" },
+                    { name: "Неду Старый", image: "https://static.wikia.nocookie.net/lotr/images/8/8d/Ned_Stark-Mark_Maddox.jpg" },
+                    { name: "Гермиона Грейнджер", image: "https://static.wikia.nocookie.net/harrypotter/images/d/d3/Hermione_Granger_poster.jpg" }
+                ]
+            },
+            ESFP: {
+                name: "Развлекатель-Исполнитель",
+                code: "ESFP",
+                description: "Вы - энергичный, обаятельный и жизнерадостный человек, который умеет наслаждаться моментом. Ваша жизнь - это калейдоскоп ярких впечатлений, новых знакомств и веселья. Вы обладаете уникальной способностью создавать праздник вокруг себя и заряжать других своей энергией. Ваше обаяние и естественность притягивают людей, а практический ум помогает быстро находить решения в сложных ситуациях. Вы цените свободу, разнообразие и ненавидите рутину и ограничения. Ваш оптимизм и способность видеть хорошее в любой ситуации вдохновляют окружающих.",
+                strengths: ["Коммуникабельность", "Практичность", "Оптимизм", "Гибкость и адаптивность", "Энергичность"],
+                weaknesses: ["Нелюбовь к планированию", "Импульсивность", "Склонность к прокрастинации", "Чувствительность к критике", "Трудности с долгосрочными целями"],
+                careers: ["Актер/артист", "Маркетолог", "Тренер", "Турагент", "Организатор мероприятий", "Флорист", "Дизайнер", "Повар"],
+                advices: [
+                    "Развивайте навыки планирования, начиная с малого",
+                    "Учитесь расставлять приоритеты - не все возможности одинаково важны",
+                    "Находите баланс между весельем и ответственностью",
+                    "Практикуйте глубокие разговоры - не только поверхностное общение",
+                    "Не забывайте о долгосрочных целях - они могут принести больше радости"
+                ],
+                celebrities: [
+                    { name: "Элвис Пресли", image: "https://upload.wikimedia.org/wikipedia/commons/9/99/Elvis_Presley_promoting_Jailhouse_Rock.jpg" },
+                    { name: "Мэрилин Монро", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Marilyn_Monroe_in_1952.jpg/800px-Marilyn_Monroe_in_1952.jpg" },
+                    { name: "Джейми Оливер", image: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Jamie_Oliver_2015.jpg" },
+                    { name: "Билл Клинтон", image: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Bill_Clinton.jpg" },
+                    { name: "Мерлин Монро", image: "https://static.wikia.nocookie.net/kingsman/images/4/4b/Merlin_%28Kingsman%29.jpg" },
+                    { name: "Питер Паркер (Человек-паук)", image: "https://static.wikia.nocookie.net/marveldatabase/images/4/4e/Peter_Parker_%28Earth-616%29_from_Amazing_Spider-Man_Vol_5_54_001.jpg" }
+                ]
+            },
+            ESFJ: {
+                name: "Помощник-Заботник",
+                code: "ESFJ",
+                description: "Вы - общительный, заботливый и ответственный человек с развитым чувством долга. Ваша жизнь посвящена созданию гармонии в своем окружении и заботе о других. Вы обладаете уникальной способностью замечать потребности людей и организовывать их жизнь. Ваше обаяние и практический подход делают вас душой компании и надежным другом. Вы цените традиции, стабильность и искренние отношения. Ваша потребность быть полезным иногда может привести к тому, что вы будете пренебрегать своими собственными потребностями, но ваша искренняя забота о других не остается незамеченной.",
+                strengths: ["Коммуникабельность", "Заботливость", "Практичность", "Организаторские способности", "Ответственность"],
+                weaknesses: ["Чрезмерная потребность в одобрении", "Сопротивление изменениям", "Склонность к самопожертвованию", "Чувствительность к критике", "Черно-белое мышление"],
+                careers: ["Медсестра/врач", "Учитель", "Социальный работник", "HR-специалист", "Организатор мероприятий", "Администратор", "Психолог", "Диетолог"],
+                advices: [
+                    "Учитесь заботиться о своих собственных потребностях",
+                    "Развивайте гибкость в мышлении - не все ситуации черно-белые",
+                    "Практикуйте принятие изменений как возможности для роста",
+                    "Не бойтесь иногда говорить 'нет' - вы не обязаны всем помогать",
+                    "Находите время для себя и своих увлечений"
+                ],
+                celebrities: [
+                    { name: "Билл Клинтон", image: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Bill_Clinton.jpg" },
+                    { name: "Долли Партон", image: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Dolly_Parton_2019_by_Glenn_Francis.jpg" },
+                    { name: "Стив Харви", image: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Steve_Harvey_2013.jpg" },
+                    { name: "Тейлор Свифт", image: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Taylor_Swift_%2849774200972%29_%28cropped%29.jpg" },
+                    { name: "Сэмвелл Тарли", image: "https://static.wikia.nocookie.net/gameofthrones/images/8/8f/Samwell_Tarly_Season_8.jpg" },
+                    { name: "Падме Амидала", image: "https://static.wikia.nocookie.net/starwars/images/4/4c/Padme_blue_dress.jpg" }
+                ]
+            },
+            ESTP: {
+                name: "Предприниматель-Динамик",
+                code: "ESTP",
+                description: "Вы - энергичный, предприимчивый и находчивый человек с отличными навыками решения проблем. Ваша жизнь - это постоянное движение, действие и новые впечатления. Вы обладаете уникальной способностью быстро анализировать ситуацию и находить практические решения. Ваше обаяние и чувство юмора делают вас душой компании, а смелость и решительность помогают преодолевать препятствия. Вы цените свободу, действие и ненавидите рутину и ограничения. Ваш девиз - 'Лучше сделать и пожалеть, чем не сделать и жалеть'.",
+                strengths: ["Практическое мышление", "Способность решать проблемы", "Коммуникабельность", "Гибкость и адаптивность", "Энергичность"],
+                weaknesses: ["Импульсивность", "Склонность к риску", "Нелюбовь к планированию", "Нетерпение к рутине", "Трудности с долгосрочными целями"],
+                careers: ["Предприниматель", "Полицейский", "Пожарный", "Спортсмен", "Маркетолог", "Продавец", "Военный", "Каскадер"],
+                advices: [
+                    "Развивайте навыки планирования, начиная с малого",
+                    "Учитесь оценивать риски более тщательно",
+                    "Практикуйте долгосрочное мышление - ставьте стратегические цели",
+                    "Находите баланс между спонтанностью и ответственностью",
+                    "Не избегайте глубоких отношений - они обогащают жизнь"
+                ],
+                celebrities: [
+                    { name: "Эрнест Хемингуэй", image: "https://upload.wikimedia.org/wikipedia/commons/2/28/ErnestHemingway.jpg" },
+                    { name: "Дональд Трамп", image: "https://upload.wikimedia.org/wikipedia/commons/5/56/Donald_Trump_official_portrait.jpg" },
+                    { name: "Джеки Чан", image: "https://upload.wikimedia.org/wikipedia/commons/f/f4/Jackie_Chan_2012.jpg" },
+                    { name: "Мадонна", image: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Madonna_Rebel_Heart_Tour_2015_-_Stockholm_%2823051472299%29_%28cropped%29.jpg" },
+                    { name: "Тирион Ланнистер", image: "https://static.wikia.nocookie.net/gameofthrones/images/5/5f/Tyrion_main_s8.jpg" },
+                    { name: "Тони Старк (Железный человек)", image: "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/4/4f/Iron_Man_%28Tony_Stark%29_AIW_Textless_Poster.jpg" }
+                ]
+            },
+            ESTJ: {
+                name: "Администратор-Надзиратель",
+                code: "ESTJ",
+                description: "Вы - практичный, ответственный и организованный человек с четкими принципами. Ваша жизнь построена на логике, порядке и традиционных ценностях. Вы обладаете уникальной способностью организовывать людей и процессы, добиваясь эффективных результатов. Ваша надежность и трудолюбие делают вас ценным сотрудником и другом. Вы цените честность, дисциплину и ясные правила. Ваше слово - это закон, и вы ожидаете того же от других. Вы не боитесь брать на себя ответственность и принимать трудные решения.",
+                strengths: ["Организаторские способности", "Чувство ответственности", "Практичность", "Надежность", "Решительность"],
+                weaknesses: ["Черно-белое мышление", "Нетерпимость к некомпетентности", "Сопротивление изменениям", "Чрезмерная прямолинейность", "Трудности с выражением эмоций"],
+                careers: ["Менеджер", "Военный", "Полицейский", "Судья", "Администратор", "Бухгалтер", "Инженер", "Учитель"],
+                advices: [
+                    "Развивайте гибкость в мышлении - не все ситуации черно-белые",
+                    "Учитесь терпению и толерантности к другим стилям работы",
+                    "Практикуйте эмпатию - попробуйте понять чувства других",
+                    "Принимайте изменения как неизбежную часть жизни",
+                    "Находите время для отдыха и личных отношений"
+                ],
+                celebrities: [
+                    { name: "Джордж Буш-младший", image: "https://upload.wikimedia.org/wikipedia/commons/d/d4/George-W-Bush.jpeg" },
+                    { name: "Люсиль Болл", image: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Lucille_Ball_1940s.jpg" },
+                    { name: "Джеймс Мэттис", image: "https://upload.wikimedia.org/wikipedia/commons/4/4e/James_Mattis_2017.jpg" },
+                    { name: "Мишель Обама", image: "https://upload.wikimedia.org/wikipedia/commons/4/4b/Michelle_Obama_2013_official_portrait.jpg" },
+                    { name: "Серсея Ланнистер", image: "https://static.wikia.nocookie.net/gameofthrones/images/9/9a/Cersei-Lannister-S7.jpg" },
+                    { name: "Гермиона Грейнджер", image: "https://static.wikia.nocookie.net/harrypotter/images/d/d3/Hermione_Granger_poster.jpg" }
+                ]
             }
+        };
+
+        let currentQuestion = 0;
+        let answers = [];
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options');
+        const nextBtn = document.getElementById('next-btn');
+        const quizContainer = document.getElementById('quiz');
+        const resultContainer = document.getElementById('result');
+        const progressBar = document.getElementById('progress');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Result elements
+        const typeNameEl = document.getElementById('type-name');
+        const typeCodeEl = document.getElementById('type-code');
+        const typeDescriptionEl = document.getElementById('type-description');
+        const strengthsEl = document.getElementById('strengths');
+        const weaknessesEl = document.getElementById('weaknesses');
+        const careersEl = document.getElementById('careers');
+        const advicesEl = document.getElementById('advices');
+        const celebritiesEl = document.getElementById('celebrities');
+        const percentageValue = document.getElementById('percentage-value');
+        const percentageFill = document.getElementById('percentage-fill');
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            questionText.textContent = q.question;
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach(option => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.textContent = option.text;
+                div.addEventListener('click', () => selectOption(option.value, div));
+                optionsContainer.appendChild(div);
+            });
+            
+            updateProgress();
         }
 
-        setInterval(spawnSpike, 2000); // каждый 2 секунды создаётся новый шип
+        function selectOption(value, div) {
+            answers[currentQuestion] = value;
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            div.classList.add('selected');
+        }
 
-        resetButton.addEventListener("click", function() {
-            score = 0;
-            scoreDisplay.innerHTML = "Очки: " + score;
-            resetButton.style.display = "none";
-            bear.style.left = "50px";
-            bear.style.bottom = "50px";
-            gameOver = false;
-            document.querySelectorAll(".spike").forEach(spike => spike.remove());
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function calculateType() {
+            const counts = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            answers.forEach(answer => counts[answer]++);
+            
+            return (
+                (counts.E >= counts.I ? 'E' : 'I') +
+                (counts.N >= counts.S ? 'N' : 'S') +
+                (counts.T >= counts.F ? 'T' : 'F') +
+                (counts.J >= counts.P ? 'J' : 'P')
+            );
+        }
+
+        function calculateTypePercentage(type) {
+            // This is a simplified calculation - in a real test, it would be more complex
+            const typeComponents = {
+                'I': ['I', 'E'],
+                'N': ['N', 'S'],
+                'F': ['F', 'T'],
+                'P': ['P', 'J']
+            };
+            
+            let matchCount = 0;
+            const counts = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            answers.forEach(answer => counts[answer]++);
+            
+            for (let i = 0; i < 4; i++) {
+                const dimension = type[i];
+                const opposite = typeComponents[dimension] ? typeComponents[dimension][1] : 
+                                 (dimension === 'E' ? 'I' : 
+                                  dimension === 'S' ? 'N' : 
+                                  dimension === 'T' ? 'F' : 'J');
+                
+                if (counts[dimension] > counts[opposite]) {
+                    matchCount++;
+                }
+            }
+            
+            // Base percentage based on how many dimensions match
+            let percentage = (matchCount / 4) * 100;
+            
+            // Add some randomness to make it more interesting (between -5% and +5%)
+            percentage += (Math.random() * 10) - 5;
+            
+            // Ensure percentage is between 70% and 100%
+            percentage = Math.max(70, Math.min(100, Math.round(percentage)));
+            
+            return percentage;
+        }
+
+        function showResult() {
+            const type = calculateType();
+            const percentage = calculateTypePercentage(type);
+            const typeInfo = personalityTypes[type];
+            
+            // Set type info
+            typeNameEl.textContent = typeInfo.name;
+            typeCodeEl.textContent = typeInfo.code;
+            typeDescriptionEl.textContent = typeInfo.description;
+            
+            // Set percentage
+            percentageValue.textContent = percentage;
+            percentageFill.style.width = `${percentage}%`;
+            
+            // Set strengths
+            strengthsEl.innerHTML = '';
+            typeInfo.strengths.forEach(strength => {
+                const li = document.createElement('li');
+                li.textContent = strength;
+                strengthsEl.appendChild(li);
+            });
+            
+            // Set weaknesses
+            weaknessesEl.innerHTML = '';
+            typeInfo.weaknesses.forEach(weakness => {
+                const li = document.createElement('li');
+                li.textContent = weakness;
+                weaknessesEl.appendChild(li);
+            });
+            
+            // Set careers
+            careersEl.innerHTML = '';
+            typeInfo.careers.forEach(career => {
+                const li = document.createElement('li');
+                li.textContent = career;
+                careersEl.appendChild(li);
+            });
+            
+            // Set advices
+            advicesEl.innerHTML = '';
+            typeInfo.advices.forEach(advice => {
+                const li = document.createElement('li');
+                li.textContent = advice;
+                advicesEl.appendChild(li);
+            });
+            
+            // Set celebrities
+            celebritiesEl.innerHTML = '';
+            typeInfo.celebrities.forEach(celebrity => {
+                const card = document.createElement('div');
+                card.className = 'celebrity-card';
+                
+                const img = document.createElement('img');
+                img.className = 'celebrity-image';
+                img.src = celebrity.image;
+                img.alt = celebrity.name;
+                img.loading = 'lazy';
+                
+                const name = document.createElement('div');
+                name.className = 'celebrity-name';
+                name.textContent = celebrity.name;
+                
+                card.appendChild(img);
+                card.appendChild(name);
+                celebritiesEl.appendChild(card);
+            });
+            
+            // Show result and hide quiz
+            quizContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            
+            // Animate percentage fill
+            setTimeout(() => {
+                percentageFill.style.width = `${percentage}%`;
+            }, 100);
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            answers = [];
+            quizContainer.style.display = 'block';
+            resultContainer.style.display = 'none';
+            loadQuestion();
+        }
+
+        // Event listeners
+        nextBtn.addEventListener('click', () => {
+            if (answers[currentQuestion] === undefined) {
+                alert('Пожалуйста, выберите вариант ответа');
+                return;
+            }
+            
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
         });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+
+        // Initialize quiz
+        loadQuestion();
     </script>
 </body>
-</html>
+    </html>
