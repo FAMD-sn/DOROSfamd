@@ -667,6 +667,9 @@
     });
   });
 </script>
+<div id="iosInstall" style="display:none; text-align:center; padding: 15px; background:#223322; color: #d4ffb0;">
+  Установи как приложение: нажми <b>Поделиться</b> и выбери <b>«На экран Домой»</b>
+</div>
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Поиск DOROSfamd сервисов..." id="searchInput">
             <i class="fas fa-search search-icon"></i>
@@ -1023,6 +1026,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.body.style.opacity = '1';
         });
+    
+  // Проверка: iPhone + Safari
+  const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+
+  if (isIOS && isSafari && !isInStandaloneMode) {
+    document.getElementById('iosInstall').style.display = 'block';
+  }
+
     </script>
 </body>
 </html>
