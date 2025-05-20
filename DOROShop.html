@@ -548,6 +548,29 @@
       background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
     }
 
+    .dc-btn {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .dc-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .dc-logo {
+      width: 20px;
+      height: 20px;
+    }
+
     .modal-footer {
       padding: 1.5rem;
       border-top: 1px solid var(--border);
@@ -943,7 +966,24 @@
   </div>
 
   <!-- Статистика для админа -->
-  
+  <div class="stats-container" id="stats-container" style="display: none;">
+    <div class="stat-card">
+      <div class="stat-value" id="total-products">0</div>
+      <div class="stat-label">Всего товаров</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="electronics-count">0</div>
+      <div class="stat-label">Электроника</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="clothing-count">0</div>
+      <div class="stat-label">Одежда</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="total-users">0</div>
+      <div class="stat-label">Пользователей</div>
+    </div>
+  </div>
 
   <!-- Список товаров -->
   <div id="product-list">
@@ -1028,7 +1068,11 @@
             </div>
           </div>
         </div>
-        
+        <div class="form-group">
+          <label class="form-label" for="product-dc-card">Номер карты DC для оплаты</label>
+          <input type="text" class="form-control" id="product-dc-card" placeholder="Номер карты DC (без 992)">
+          <small class="text-muted">Этот номер будет использован для создания ссылки оплаты через Душанбе Сити</small>
+        </div>
         <div class="form-group">
           <label class="form-label">Изображение товара</label>
           <input type="file" id="file-input" accept="image/*" capture="camera" style="display: none;">
@@ -1104,6 +1148,7 @@
     let isAdmin = false;
     let selectedCategories = [];
     let searchTimeout = null;
+    let currentImageUrl = '';
 
     // Инициализация приложения
     document.addEventListener('DOMContentLoaded', () => {
@@ -1390,6 +1435,15 @@
           ` : ''}
         </div>
         
+        ${product.dcCard ? `
+        <div style="margin-top: 1.5rem;">
+          <a href="http://pay.dc.tj/?a=992${product.dcCard}&s=${product.price}&c=оплата через DOROSfamd&f1=124&f2=&f3=" target="_blank" class="dc-btn">
+            <img src="DC.png" class="dc-logo" alt="DC">
+            Оплатить через DC
+          </a>
+        </div>
+        ` : ''}
+        
         ${showControls ? `
         <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
           ${isAuthor ? `
@@ -1408,9 +1462,7 @@
     }
 
     function callSeller(phoneNumber) {
-      // Очищаем номер от всех нецифровых символов, кроме +
       const cleanedNumber = phoneNumber.replace(/[^\d+]/g, '');
-      // Открываем приложение телефона с номером
       window.open(`tel:${cleanedNumber}`);
     }
 
@@ -1467,7 +1519,6 @@
       }
 
       try {
-        // Автоматический вход для админа
         if (email === 'doriush@example.com' && password === 'doriushsozdateletogosaita20112025its') {
           const { user } = await auth.signInWithEmailAndPassword(email, password);
           const username = await getUsername(user.uid);
@@ -1493,6 +1544,7 @@
       const whatsapp = document.getElementById('product-whatsapp').value;
       const telegram = document.getElementById('product-telegram').value;
       const instagram = document.getElementById('product-instagram').value;
+      const dcCard = document.getElementById('product-dc-card').value;
       const username = await getUsername(currentUser.uid);
 
       if (!name || !price || !category) {
@@ -1515,6 +1567,7 @@
           whatsapp: whatsapp || '',
           telegram: telegram || '',
           instagram: instagram || '',
+          dcCard: dcCard || '',
           image: currentImageUrl,
           username,
           userId: currentUser.uid,
@@ -1595,6 +1648,10 @@
           </div>
         </div>
         <div class="form-group">
+          <label class="form-label" for="edit-product-dc-card">Номер карты DC для оплаты</label>
+          <input type="text" class="form-control" id="edit-product-dc-card" value="${product.dcCard || ''}" placeholder="Номер карты DC (без 992)">
+        </div>
+        <div class="form-group">
           <label class="form-label">Текущее изображение</label>
           <img src="${product.image || 'https://via.placeholder.com/600x400?text=No+Image'}" style="width: 100%; border-radius: var(--radius-sm); margin-bottom: 1rem;">
           <input type="file" id="edit-file-input" accept="image/*" capture="camera" style="display: none;">
@@ -1630,6 +1687,7 @@
       const whatsapp = document.getElementById('edit-product-whatsapp').value;
       const telegram = document.getElementById('edit-product-telegram').value;
       const instagram = document.getElementById('edit-product-instagram').value;
+      const dcCard = document.getElementById('edit-product-dc-card').value;
       const image = document.getElementById('edit-product-image').value || currentImageUrl;
 
       if (!name || !price || !category) {
@@ -1648,6 +1706,7 @@
           whatsapp: whatsapp || '',
           telegram: telegram || '',
           instagram: instagram || '',
+          dcCard: dcCard || '',
           updatedAt: firebase.database.ServerValue.TIMESTAMP
         };
 
@@ -1760,4 +1819,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
