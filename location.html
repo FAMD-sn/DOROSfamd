@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Амид - Локации</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --secondary-color: #f8f8f8;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --gray: #e0e0e0;
+            --dark-gray: #616161;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Шапка */
+        .top-bar {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        header {
+            background-color: var(--white);
+            padding: 0.5rem 1rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--white);
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: 1px;
+        }
+        
+        /* Основное содержимое */
+        main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .content-section {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-title i {
+            color: var(--primary-color);
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .contact-card {
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .contact-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .contact-value {
+            color: var(--dark-gray);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        }
+        
+        /* Подвал */
+        footer {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-link {
+            color: var(--white);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-link:hover {
+            color: var(--light-gray);
+        }
+        
+        .copyright {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .page-subtitle {
+                font-size: 1rem;
+            }
+            
+            .content-section {
+                padding: 1.5rem;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя панель -->
+    <div class="top-bar">
+        <div class="container">
+            <span>Амид - Супермаркет в Худжанде</span>
+        </div>
+    </div>
+    
+    <!-- Шапка -->
+    <header>
+        <div class="header-container">
+            <a href="DOROSfamd.com" class="logo">
+                <i class="fas fa-store logo-icon"></i>
+                <span class="logo-text">АМИД</span>
+            </a>
+        </div>
+    </header>
+    
+    <!-- Основное содержимое -->
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Добро пожаловать в супермаркет "Амид"</h1>
+                <p class="page-subtitle">Мы стараемся расширятся по всему Таджикистану! Но пока что у нас всего несколько Супермаркетов</p>
+            </div>
+            
+            <div class="content-section">
+                <h2 class="section-title">
+                    <i class="fas fa-info-circle"></i> Локации
+                </h2>
+                <p>Амид - 13 микрорайон, Амид - Абрешим молл, Амид - ул. Сирдарьинская 30, Амид - Камрли Худжанди Ави 83
+                </p>
+                
+                <a href="amid.html" class="btn">
+                    <i class="fas fa-home"></i> На главную
+                </a>
+            </div>
+            
+            <div class="content-section">
+                <h2 class="section-title">
+                    <i class="fas fa-map-marker-alt"></i> Наши контакты
+                </h2>
+                
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <h3 class="contact-title">
+                            <i class="fas fa-phone"></i> Телефон
+                        </h3>
+                        <p class="contact-value">+992 123 456 789</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <h3 class="contact-title">
+                            <i class="fas fa-envelope"></i> Email
+                        </h3>
+                        <p class="contact-value">info@amid.tj</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <h3 class="contact-title">
+                            <i class="fas fa-clock"></i> Часы работы
+                        </h3>
+                        <p class="contact-value">Ежедневно с 24/7 мы заботимся о вас круглосуточно</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <h3 class="contact-title">
+                            <i class="fas fa-map-marked-alt"></i> Главный офис
+                        </h3>
+                        <p class="contact-value">г. Худжанд, 31мкр. сзади Амида.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Подвал -->
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="amidshop1.html" class="footer-link"> <i class="fas fa-shop"></i> Приступить к заказу</a>
+                <a href="dostavka.html" class="footer-link"> <i class="fas fa-car"></i> О доставке</a>
+                
+                <a href="contacts.html" class="footer-link"> <i class="fas fa-mobile"></i> Контакты</a>
+            </div>
+            <div class="copyright">
+                © 2025 Супермаркет "Амид". Все права защищены.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
