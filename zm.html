@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zet-Mobile - Мобильная связь в Таджикистане</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FF6D00; /* Оранжевый */
+            --primary-light: #FF9E40; /* Светло-оранжевый */
+            --primary-dark: #E65100; /* Темно-оранжевый */
+            --accent-color: #212121; /* Черный */
+            --secondary-color: #f5f5f5;
+            --text-color: #333333;
+            --light-gray: #f5f5f5;
+            --gray: #e0e0e0;
+            --dark-gray: #616161;
+            --white: #ffffff;
+            --black: #121212;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --card-shadow: 0 8px 24px rgba(255, 109, 0, 0.1);
+            --success-color: #4CAF50;
+            --error-color: #F44336;
+            --warning-color: #FF9800;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            padding-bottom: 80px;
+            line-height: 1.6;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--accent-color);
+        }
+        
+        /* Верхняя панель */
+        .top-header {
+            background-color: var(--white);
+            padding: 0.8rem 1.5rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+        
+        .menu-btn:hover {
+            background-color: rgba(255, 109, 0, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+        
+        .logo:hover .logo-icon {
+            transform: rotate(15deg);
+            color: var(--primary-dark);
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 600px;
+            margin: 0 1.5rem;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            border: 2px solid var(--gray);
+            border-radius: 30px;
+            font-size: 1rem;
+            outline: none;
+            background-color: var(--light-gray);
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .search-box:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 12px rgba(255, 109, 0, 0.2);
+            background-color: var(--white);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dark-gray);
+        }
+        
+        .profile-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+        
+        .profile-btn:hover {
+            background-color: rgba(255, 109, 0, 0.1);
+            transform: scale(1.1);
+        }
+        
+        /* Главный баннер */
+        .hero-banner {
+            position: relative;
+            height: 50vh;
+            min-height: 350px;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                        url('https://i.ibb.co/Gf9xW6Rm/zm.jpg') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 0 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            font-weight: 400;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .hero-btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 2px solid white;
+        }
+        
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+        }
+        
+        /* Баннер акций */
+        .promo-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(255, 109, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .promo-banner::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.3) 48%,
+                rgba(255, 255, 255, 0) 52%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        /* Категории */
+        .categories-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            scrollbar-width: none;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+        
+        .categories-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 90px;
+            text-decoration: none;
+            color: var(--text-color);
+            padding: 0.8rem 0.5rem;
+            border-radius: 12px;
+            transition: var(--transition);
+            background-color: var(--light-gray);
+        }
+        
+        .category-item.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(255, 109, 0, 0.3);
+        }
+        
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+        
+        .category-item.active .category-icon {
+            background-color: var(--white);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        .category-name {
+            font-size: 0.7rem;
+            text-align: center;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        /* Секция с тарифами */
+        .tariffs-section {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            border-radius: 3px;
+        }
+        
+        .view-all {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+        }
+        
+        .view-all:hover {
+            color: var(--primary-dark);
+            transform: translateX(5px);
+        }
+        
+        /* Карточки тарифов */
+        .tariffs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .tariff-card {
+            background-color: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .tariff-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(255, 109, 0, 0.15);
+        }
+        
+        .tariff-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1.2rem;
+            text-align: center;
+        }
+        
+        .tariff-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        
+        .tariff-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tariff-period {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .tariff-features {
+            padding: 1.2rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .feature-icon {
+            color: var(--primary-color);
+            margin-right: 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .select-tariff {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(255, 109, 0, 0.2);
+        }
+        
+        .select-tariff:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: translateY(-2px);
+        }
+        
+        /* Секция преимуществ */
+        .benefits-section {
+            padding: 2rem 1.5rem;
+            background-color: var(--white);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .benefit-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 1.2rem;
+            border-radius: 12px;
+            transition: var(--transition);
+            background-color: var(--light-gray);
+        }
+        
+        .benefit-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(255, 109, 0, 0.2);
+        }
+        
+        .benefit-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+        
+        .benefit-text {
+            color: var(--dark-gray);
+            font-size: 0.85rem;
+        }
+        
+        /* Нижнее навигационное меню */
+        .bottom-nav {
+            
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.8rem 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-size: 0.7rem;
+            gap: 0.3rem;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+            background-color: rgba(255, 109, 0, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        .nav-icon {
+            font-size: 1.3rem;
+        }
+        
+        /* Боковое меню */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%;
+            background-color: var(--white);
+            z-index: 1100;
+            transform: translateX(-100%);
+            transition: var(--transition);
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .side-menu.open {
+            transform: translateX(0);
+        }
+        
+        .menu-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .menu-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .menu-close:hover {
+            transform: rotate(90deg);
+        }
+        
+        .menu-logo {
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .menu-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 109, 0, 0.1);
+            color: var(--primary-dark);
+            border-left-color: var(--primary-color);
+        }
+        
+        .menu-item i {
+            margin-right: 1rem;
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+        }
+        
+        .menu-item:hover i {
+            color: var(--primary-color);
+        }
+        
+        .menu-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .menu-footer-btn {
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+        
+        .menu-footer-btn:hover {
+            background-color: var(--light-gray);
+            color: var(--primary-color);
+        }
+        
+        /* Оверлей для меню */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1050;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+        
+        .overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        /* Кнопка вверх */
+        .scroll-top-button {
+            position: fixed;
+            bottom: 5rem;
+            right: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 109, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: var(--transition);
+        }
+        
+        .scroll-top-button:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 6px 25px rgba(255, 109, 0, 0.4);
+        }
+        
+        /* Кнопка смены тарифа */
+        .change-tariff-button {
+            position: fixed;
+            bottom: 1rem;
+            right: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 109, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: var(--transition);
+        }
+        
+        .change-tariff-button:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 6px 25px rgba(255, 109, 0, 0.4);
+        }
+        
+        .tariff-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--white);
+            color: var(--primary-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid var(--primary-color);
+        }
+        
+        /* Модальное окно смены тарифа */
+        .tariff-modal {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background-color: var(--white);
+            box-shadow: -2px 0 20px rgba(0,0,0,0.1);
+            z-index: 200;
+            transform: translateX(100%);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tariff-modal.open {
+            transform: translateX(0);
+        }
+        
+        .tariff-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+        }
+        
+        .tariff-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .close-tariff {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--white);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .close-tariff:hover {
+            transform: rotate(90deg);
+        }
+        
+        .tariff-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .empty-tariff {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--dark-gray);
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .empty-tariff-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--gray);
+        }
+        
+        .empty-tariff-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-tariff-btn {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .empty-tariff-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 109, 0, 0.3);
+        }
+        
+        .selected-tariff {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .selected-tariff-info {
+            margin-bottom: 1rem;
+        }
+        
+        .selected-tariff-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .selected-tariff-price {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .remove-tariff {
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+            cursor: pointer;
+            margin-left: auto;
+            align-self: flex-start;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+        
+        .remove-tariff:hover {
+            background-color: var(--light-gray);
+            color: var(--primary-color);
+        }
+        
+        .tariff-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray);
+            background-color: var(--light-gray);
+        }
+        
+        .change-tariff-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            box-shadow: 0 2px 8px rgba(255, 109, 0, 0.2);
+        }
+        
+        .change-tariff-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 109, 0, 0.3);
+        }
+        
+        /* Модальное окно оформления смены тарифа */
+        .change-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+        
+        .change-modal.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .change-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+        
+        .change-modal.open .change-content {
+            transform: translateY(0);
+        }
+        
+        .change-title {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--accent-color);
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+            color: var(--dark-gray);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid var(--gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 12px rgba(255, 109, 0, 0.2);
+            outline: none;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .confirm-btn, .cancel-btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .confirm-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+        }
+        
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 109, 0, 0.3);
+        }
+        
+        .cancel-btn {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--gray);
+        }
+        
+        /* Модальное окно офисов */
+        .offices-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+        
+        .offices-modal.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .offices-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .offices-modal.open .offices-content {
+            transform: translateY(0);
+        }
+        
+        .offices-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--accent-color);
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .office-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .office-title {
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+        }
+        
+        .office-address {
+            color: var(--dark-gray);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .office-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .office-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        .close-offices {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.2rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-gray);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+        
+        .close-offices:hover {
+            background-color: var(--light-gray);
+            color: var(--primary-color);
+        }
+        
+        /* Сообщения */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 3rem;
+            color: var(--error-color);
+            font-weight: 600;
+        }
+        
+        /* Футер */
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 2.5rem 1.5rem;
+            margin-top: 3rem;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            text-decoration: none;
+        }
+        
+        .footer-logo-icon {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+        
+        .footer-logo-text {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .footer-about {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-link {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        
+        .social-link:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+        
+        .footer-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary-color);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-link-item {
+            margin-bottom: 0.7rem;
+        }
+        
+        .footer-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .footer-link:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .footer-contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .footer-contact-icon {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin-top: 0.2rem;
+        }
+        
+        .footer-contact-text {
+            line-height: 1.5;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* Анимации */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(10px); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes shine {
+            to {
+                transform: translateX(100%) rotate(30deg);
+            }
+        }
+        
+        /* Анимация для карточек тарифов */
+        .tariff-card {
+            animation: slideInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .tariff-card:nth-child(1) { animation-delay: 0.1s; }
+        .tariff-card:nth-child(2) { animation-delay: 0.2s; }
+        .tariff-card:nth-child(3) { animation-delay: 0.3s; }
+        .tariff-card:nth-child(4) { animation-delay: 0.4s; }
+        .tariff-card:nth-child(5) { animation-delay: 0.5s; }
+        .tariff-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--light-gray);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя панель -->
+    <div class="top-header">
+        <button class="menu-btn" id="menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <a href="#" class="logo">
+            <i class="fas fa-signal logo-icon"></i>
+            <span class="logo-text">Zet-Mobile</span>
+        </a>
+        
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-box" placeholder="Поиск тарифов...">
+        </div>
+        
+        <button class="profile-btn">
+            <i class="fas fa-user"></i>
+        </button>
+    </div>
+    
+    <!-- Главный баннер -->
+    <section class="hero-banner">
+        <div class="hero-content">
+            <h1 class="hero-title">Zet-Mobile - Связь нового поколения</h1>
+            <p class="hero-subtitle">Лучшие тарифы и качественная связь по всему Таджикистану</p>
+            <a href="#tariffs" class="hero-btn">Выбрать тариф</a>
+        </div>
+    </section>
+    
+    <!-- Баннер акций -->
+    <div class="promo-banner">
+        <i class="fas fa-percentage"></i> СПЕЦИАЛЬНОЕ ПРЕДЛОЖЕНИЕ: В честь сотрудничества DOROSfamd и Zet-mobile мы предлагаем тариф где доступ на сайт DOROSfamd бесплатный! ЗА ПЕРВЫЕ 3 МЕСЯЦА 20% СКИДКА!
+    </div>
+    
+    <!-- Категории -->
+    <div class="categories-container" id="categories-container">
+        <!-- Категории будут добавлены динамически -->
+    </div>
+    
+    <!-- Секция с тарифами -->
+    <section class="tariffs-section" id="tariffs">
+        <div class="section-header">
+            <h2 class="section-title">Популярные тарифы</h2>
+            <a href="#tariffs" class="view-all">
+                Все тарифы <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        
+        <div class="tariffs-grid" id="tariffs-container">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Загрузка тарифов...
+            </div>
+        </div>
+    </section>
+    
+    <!-- Секция преимуществ -->
+    <section class="benefits-section">
+        <h2 class="section-title" style="text-align: center; justify-content: center;">Наши преимущества</h2>
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <h3 class="benefit-title">Высокая скорость</h3>
+                <p class="benefit-text">4G/LTE покрытие по всему Таджикистану с высокой скоростью интернета</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <h3 class="benefit-title">Доступные цены</h3>
+                <p class="benefit-text">Лучшее соотношение цены и качества среди операторов связи</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <h3 class="benefit-title">Качество связи</h3>
+                <p class="benefit-text">Стабильное соединение и чистый звук в любом регионе страны</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="benefit-title">Поддержка 24/7</h3>
+                <p class="benefit-text">Круглосуточная поддержка клиентов по любым вопросам</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <a href="#" class="footer-logo">
+                    <i class="fas fa-signal footer-logo-icon"></i>
+                    <span class="footer-logo-text">Zet-Mobile</span>
+                </a>
+                <p class="footer-about">
+                    Лидер мобильной связи в Таджикистане. Мы предоставляем качественные услуги связи и интернета по доступным ценам.
+                </p>
+                <div class="footer-social">
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-telegram-plane"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h3 class="footer-title">Меню</h3>
+                <ul class="footer-links">
+                    <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Тарифы</a></li>
+                    <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Услуги</a></li>
+                    <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Роуминг</a></li>
+                    <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> О компании</a></li>
+                    <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Контакты</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3 class="footer-title">Контакты</h3>
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt footer-contact-icon"></i>
+                    <div class="footer-contact-text">
+                        г. Душанбе, ул. Рудаки 42<br>
+                        г. Худжанд, пр. И. Сомони 15
+                    </div>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone-alt footer-contact-icon"></i>
+                    <div class="footer-contact-text">
+                        +992 37 123-45-67<br>
+                        +992 93 123-45-67
+                    </div>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope footer-contact-icon"></i>
+                    <div class="footer-contact-text">
+                        info@zet-mobile.tj<br>
+                        support@zet-mobile.tj
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h3 class="footer-title">Часы работы</h3>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock footer-contact-icon"></i>
+                    <div class="footer-contact-text">
+                        Пн-Пт: 08:00 - 20:00<br>
+                        Сб-Вс: 09:00 - 18:00
+                    </div>
+                </div>
+                <h3 class="footer-title" style="margin-top: 1.5rem;">Оплата</h3>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                    <i class="fab fa-cc-visa" style="font-size: 1.5rem; color: rgba(255,255,255,0.7);"></i>
+                    <i class="fab fa-cc-mastercard" style="font-size: 1.5rem; color: rgba(255,255,255,0.7);"></i>
+                    <i class="fas fa-money-bill-wave" style="font-size: 1.5rem; color: rgba(255,255,255,0.7);"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            © 2025 Zet-Mobile. Все права защищены. Лицензия Минсвязи РТ №12345
+        </div>
+    </footer>
+    
+    <!-- Кнопка смены тарифа -->
+    <button class="change-tariff-button">
+        <i class="fas fa-sim-card"></i>
+        <span class="tariff-count">0</span>
+    </button>
+    
+    <!-- Кнопка вверх -->
+    <button class="scroll-top-button">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <!-- Модальное окно смены тарифа -->
+    <div class="tariff-modal">
+        <div class="tariff-header">
+            <div class="tariff-title">Смена тарифа</div>
+            <button class="close-tariff">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="tariff-items" id="tariff-items">
+            <div class="empty-tariff">
+                <i class="fas fa-sim-card empty-tariff-icon"></i>
+                <div class="empty-tariff-text">Вы не выбрали тариф</div>
+                <a href="#tariffs" class="empty-tariff-btn">
+                    <i class="fas fa-list"></i> Выбрать тариф
+                </a>
+            </div>
+        </div>
+        <div class="tariff-footer">
+            <button class="change-tariff-btn">
+                <i class="fas fa-sync-alt"></i> Сменить тариф
+            </button>
+        </div>
+    </div>
+    
+    <!-- Модальное окно оформления смены тарифа -->
+    <div class="change-modal">
+        <div class="change-content">
+            <div class="change-title">Смена тарифного плана</div>
+            
+            <div class="form-group">
+                <label for="phone-input" class="form-label">Ваш номер телефона</label>
+                <input type="tel" id="phone-input" class="form-input" placeholder="+992 XX XXX XX XX" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="current-tariff" class="form-label">Текущий тариф</label>
+                <input type="text" id="current-tariff" class="form-input" placeholder="Определяется автоматически" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label for="new-tariff" class="form-label">Новый тариф</label>
+                <input type="text" id="new-tariff" class="form-input" placeholder="Выбранный тариф" readonly>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="confirm-btn">
+                    <i class="fas fa-check"></i> Подтвердить
+                </button>
+                <button class="cancel-btn">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно офисов -->
+    <div class="offices-modal">
+        <div class="offices-content">
+            <button class="close-offices">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="offices-title">Наши офисы и салоны связи</div>
+            
+            <div class="office-item">
+                <div class="office-title">Центральный офис в Душанбе</div>
+                <div class="office-address">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>г. Душанбе, ул. Рудаки 42, 2 этаж</span>
+                </div>
+                <a href="https://yandex.ru/maps/" target="_blank" class="office-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Посмотреть на карте</span>
+                </a>
+            </div>
+            
+            <div class="office-item">
+                <div class="office-title">Салон связи в Худжанде</div>
+                <div class="office-address">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>г. Худжанд, пр. Исмоила Сомони 15</span>
+                </div>
+                <a href="https://yandex.ru/maps/" target="_blank" class="office-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Посмотреть на карте</span>
+                </a>
+            </div>
+            
+            <div class="office-item">
+                <div class="office-title">Салон связи в Кулябе</div>
+                <div class="office-address">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>г. Куляб, ул. Ленина 78</span>
+                </div>
+                <div class="office-link">
+                    <i class="fas fa-phone"></i>
+                    <span>+992 93 765-43-21</span>
+                </div>
+            </div>
+            
+            <div class="office-item">
+                <div class="office-title">Салон связи в Хороге</div>
+                <div class="office-address">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>г. Хорог, ул. Шотемур 12</span>
+                </div>
+                <div class="office-link">
+                    <i class="fas fa-clock"></i>
+                    <span>Пн-Сб: 09:00 - 18:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Боковое меню -->
+    <div class="side-menu" id="side-menu">
+        <div class="menu-header">
+            <button class="menu-close" id="menu-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="menu-logo">Zet-Mobile</div>
+        </div>
+        
+        <div class="menu-items">
+            <a href="#" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </a>
+            <a href="#tariffs" class="menu-item">
+                <i class="fas fa-sim-card"></i>
+                <span>Тарифы</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-wifi"></i>
+                <span>Интернет</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-phone"></i>
+                <span>Услуги</span>
+            </a>
+            <a href="#" class="menu-item" id="menu-offices-btn">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Офисы и салоны</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-globe"></i>
+                <span>Роуминг</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-info-circle"></i>
+                <span>О компании</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-headset"></i>
+                <span>Поддержка</span>
+            </a>
+        </div>
+        
+        <div class="menu-footer">
+            <button class="menu-footer-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="menu-footer-btn">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Оверлей для меню -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Нижнее навигационное меню -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <i class="fas fa-home nav-icon"></i>
+            <span>Главная</span>
+        </a>
+        <a href="#tariffs" class="nav-item">
+            <i class="fas fa-sim-card nav-icon"></i>
+            <span>Тарифы</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-wifi nav-icon"></i>
+            <span>Интернет</span>
+        </a>
+        <a href="#" class="nav-item" id="bottom-tariff-btn">
+            <i class="fas fa-sync-alt nav-icon"></i>
+            <span>Сменить тариф</span>
+        </a>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы DOM
+            const menuBtn = document.getElementById('menu-btn');
+            const menuClose = document.getElementById('menu-close');
+            const sideMenu = document.getElementById('side-menu');
+            const overlay = document.getElementById('overlay');
+            const tariffsContainer = document.getElementById('tariffs-container');
+            const searchBox = document.querySelector('.search-box');
+            const categoriesContainer = document.getElementById('categories-container');
+            const changeTariffButton = document.querySelector('.change-tariff-button');
+            const bottomTariffBtn = document.getElementById('bottom-tariff-btn');
+            const tariffModal = document.querySelector('.tariff-modal');
+            const closeTariffButton = document.querySelector('.close-tariff');
+            const tariffItemsContainer = document.getElementById('tariff-items');
+            const tariffCountElement = document.querySelector('.tariff-count');
+            const changeTariffBtn = document.querySelector('.change-tariff-btn');
+            const changeModal = document.querySelector('.change-modal');
+            const confirmButton = document.querySelector('.confirm-btn');
+            const cancelButton = document.querySelector('.cancel-btn');
+            const phoneInput = document.getElementById('phone-input');
+            const currentTariffInput = document.getElementById('current-tariff');
+            const newTariffInput = document.getElementById('new-tariff');
+            const officesBtn = document.querySelector('.profile-btn');
+            const menuOfficesBtn = document.getElementById('menu-offices-btn');
+            const officesModal = document.querySelector('.offices-modal');
+            const closeOfficesBtn = document.querySelector('.close-offices');
+            const scrollTopButton = document.querySelector('.scroll-top-button');
+            
+            // Переменные состояния
+            let tariffs = [];
+            let filteredTariffs = [];
+            let selectedTariff = null;
+            let selectedCategory = '';
+            
+            // Категории тарифов
+            const categories = {
+                '': {name: 'Все тарифы', icon: 'fa-list'},
+                'internet': {name: 'Интернет', icon: 'fa-wifi'},
+                'calls': {name: 'Звонки', icon: 'fa-phone'},
+                'unlim': {name: 'Безлимит', icon: 'fa-infinity'},
+                'family': {name: 'Семейные', icon: 'fa-users'},
+                'student': {name: 'Студенческие', icon: 'fa-graduation-cap'},
+                'business': {name: 'Бизнес', icon: 'fa-briefcase'}
+            };
+                  
+            
+            // Инициализация приложения
+            init();
+            
+            function init() {
+                loadTariffs();
+                setupEventListeners();
+                renderCategories();
+                
+                // Прокрутка вверх
+                scrollTopButton.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+                
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 300) {
+                        scrollTopButton.style.display = 'flex';
+                    } else {
+                        scrollTopButton.style.display = 'none';
+                    }
+                });
+            }
+            
+            function setupEventListeners() {
+                // Боковое меню
+                menuBtn.addEventListener('click', function() {
+                    sideMenu.classList.add('open');
+                    overlay.classList.add('open');
+                });
+                
+                menuClose.addEventListener('click', function() {
+                    sideMenu.classList.remove('open');
+                    overlay.classList.remove('open');
+                });
+                
+                overlay.addEventListener('click', function() {
+                    sideMenu.classList.remove('open');
+                    overlay.classList.remove('open');
+                });
+                
+                // Поиск
+                searchBox.addEventListener('input', filterTariffs);
+                
+                // Смена тарифа
+                changeTariffButton.addEventListener('click', toggleTariffModal);
+                bottomTariffBtn.addEventListener('click', toggleTariffModal);
+                closeTariffButton.addEventListener('click', toggleTariffModal);
+                changeTariffBtn.addEventListener('click', openChangeModal);
+                
+                // Оформление смены тарифа
+                confirmButton.addEventListener('click', confirmTariffChange);
+                cancelButton.addEventListener('click', closeChangeModal);
+                
+                // Офисы
+                officesBtn.addEventListener('click', toggleOfficesModal);
+                menuOfficesBtn.addEventListener('click', toggleOfficesModal);
+                closeOfficesBtn.addEventListener('click', toggleOfficesModal);
+            }
+            
+            // Загрузка тарифов из Google Sheets API
+            function loadTariffs() {
+                const spreadsheetId = '17e2-DdD9rTanXc8QHh3iMa0b-Fy3oCz2xmRhw8V_OWc';
+                const apiKey = 'AIzaSyBdn6QAbR2KYutlRftysWvbMkVp8hXfa4o';
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Лист1?key=${apiKey}`;
+             
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Ошибка загрузки данных');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const rows = data.values;
+                        if (!rows || rows.length < 2) {
+                            throw new Error('Нет данных в таблице');
+                        }
+                        
+                        // Пропускаем заголовки (первую строку)
+                        tariffs = rows.slice(1).map(row => {
+                            return {
+                                name: row[0] || 'Без названия',
+                                price: parseFloat(row[1]) || 0,
+                                period: row[2] || 'месяц',
+                                internet: row[3] || '0 ГБ',
+                                calls: row[4] || '0 минут',
+                                sms: row[5] || '0 SMS',
+                                features: row[6] ? row[6].split(',') : [],
+                                category: row[7] || '',
+                                description: row[8] || ''
+                            };
+                        });
+                        
+                        filteredTariffs = [...tariffs];
+                        renderTariffs();
+                    })
+                    .catch(error => {
+                        console.error('Error loading tariffs:', error);
+                        tariffsContainer.innerHTML = `
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-triangle"></i> Не удалось загрузить тарифы. Пожалуйста, попробуйте позже.<br>
+                                ${error.message}
+                            </div>
+                        `;
+                    });
+            }
+            
+            // Отображение категорий
+            function renderCategories() {
+                for (const [key, category] of Object.entries(categories)) {
+                    const categoryItem = document.createElement('a');
+                    categoryItem.href = '#';
+                    categoryItem.className = `category-item ${key === selectedCategory ? 'active' : ''}`;
+                    categoryItem.dataset.category = key;
+                    
+                    categoryItem.innerHTML = `
+                        <div class="category-icon">
+                            <i class="fas ${category.icon}"></i>
+                        </div>
+                        <div class="category-name">${category.name}</div>
+                    `;
+                    
+                    categoryItem.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        document.querySelectorAll('.category-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        categoryItem.classList.add('active');
+                        selectedCategory = key;
+                        filterTariffs();
+                    });
+                    
+                    categoriesContainer.appendChild(categoryItem);
+                }
+            }
+            
+            // Фильтрация тарифов
+            function filterTariffs() {
+                const searchTerm = searchBox.value.toLowerCase();
+                
+                filteredTariffs = tariffs.filter(tariff => {
+                    const matchesSearch = tariff.name.toLowerCase().includes(searchTerm) || 
+                                         tariff.description.toLowerCase().includes(searchTerm);
+                    const matchesCategory = !selectedCategory || tariff.category === selectedCategory;
+                    return matchesSearch && matchesCategory;
+                });
+                
+                renderTariffs();
+            }
+            
+            // Отображение тарифов
+            function renderTariffs() {
+                if (filteredTariffs.length === 0) {
+                    tariffsContainer.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-search"></i> Тарифы не найдены
+                        </div>
+                    `;
+                    return;
+                }
+                
+                tariffsContainer.innerHTML = '';
+                
+                filteredTariffs.forEach((tariff, index) => {
+                    const tariffCard = document.createElement('div');
+                    tariffCard.className = 'tariff-card';
+                    tariffCard.style.animationDelay = `${index * 0.1}s`;
+                    
+                    // Формируем список особенностей
+                    let featuresHTML = '';
+                    tariff.features.forEach(feature => {
+                        featuresHTML += `<div class="feature-item"><i class="fas fa-check-circle feature-icon"></i> ${feature.trim()}</div>`;
+                    });
+                    
+                    tariffCard.innerHTML = `
+                        <div class="tariff-header">
+                            <div class="tariff-name">${tariff.name}</div>
+                            <div class="tariff-price">${tariff.price} сомони</div>
+                            <div class="tariff-period">за ${tariff.period}</div>
+                        </div>
+                        <div class="tariff-features">
+                            <div class="feature-item"><i class="fas fa-wifi feature-icon"></i> Интернет: ${tariff.internet}</div>
+                            <div class="feature-item"><i class="fas fa-phone feature-icon"></i> Звонки: ${tariff.calls}</div>
+                            ${tariff.sms ? `<div class="feature-item"><i class="fas fa-sms feature-icon"></i> SMS: ${tariff.sms}</div>` : ''}
+                            ${featuresHTML}
+                            <button class="select-tariff" data-id="${tariff.name}">
+                                <i class="fas fa-sim-card"></i> Выбрать тариф
+                            </button>
+                        </div>
+                    `;
+                    
+                    tariffsContainer.appendChild(tariffCard);
+                    
+                    // Добавление обработчика для кнопки "Выбрать тариф"
+                    tariffCard.querySelector('.select-tariff').addEventListener('click', () => {
+                        selectTariff(tariff);
+                    });
+                });
+            }
+            
+            // Выбор тарифа
+            function selectTariff(tariff) {
+                selectedTariff = tariff;
+                updateTariffUI();
+                toggleTariffModal();
+                showAlert(`Тариф "${tariff.name}" выбран для смены`);
+            }
+            
+            // Обновление UI выбранного тарифа
+            function updateTariffUI() {
+                if (selectedTariff) {
+                    tariffItemsContainer.innerHTML = `
+                        <div class="selected-tariff">
+                            <div class="selected-tariff-info">
+                                <div class="selected-tariff-name">${selectedTariff.name}</div>
+                                <div class="selected-tariff-price">${selectedTariff.price} сомони за ${selectedTariff.period}</div>
+                                <div class="feature-item"><i class="fas fa-wifi feature-icon"></i> Интернет: ${selectedTariff.internet}</div>
+                                <div class="feature-item"><i class="fas fa-phone feature-icon"></i> Звонки: ${selectedTariff.calls}</div>
+                            </div>
+                            <button class="remove-tariff">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Обработчик для кнопки удаления тарифа
+                    tariffItemsContainer.querySelector('.remove-tariff').addEventListener('click', () => {
+                        selectedTariff = null;
+                        updateTariffUI();
+                    });
+                    
+                    tariffCountElement.textContent = '1';
+                    newTariffInput.value = selectedTariff.name;
+                } else {
+                    tariffItemsContainer.innerHTML = `
+                        <div class="empty-tariff">
+                            <i class="fas fa-sim-card empty-tariff-icon"></i>
+                            <div class="empty-tariff-text">Вы не выбрали тариф</div>
+                            <a href="#tariffs" class="empty-tariff-btn">
+                                <i class="fas fa-list"></i> Выбрать тариф
+                            </a>
+                        </div>
+                    `;
+                    tariffCountElement.textContent = '0';
+                    newTariffInput.value = '';
+                }
+            }
+            
+            function toggleTariffModal() {
+                tariffModal.classList.toggle('open');
+            }
+            
+            function openChangeModal() {
+                if (!selectedTariff) {
+                    showAlert('Вы не выбрали тариф', 'error');
+                    return;
+                }
+                
+                // Здесь можно добавить проверку текущего тарифа пользователя
+                currentTariffInput.value = 'Ваш тариф';
+                changeModal.classList.add('open');
+            }
+            
+            function closeChangeModal() {
+                changeModal.classList.remove('open');
+                phoneInput.value = '';
+            }
+            
+            function toggleOfficesModal() {
+                officesModal.classList.toggle('open');
+            }
+            
+            // Подтверждение смены тарифа
+            function confirmTariffChange() {
+                const phone = phoneInput.value.trim();
+                
+                if (!phone) {
+                    showAlert('Пожалуйста, введите номер телефона', 'error');
+                    return;
+                }
+                
+                // Формирование сообщения для Telegram
+                let message = `Запрос на смену тарифа Zet-Mobile:\n\n`;
+                message += `📱 Номер телефона: ${phone}\n`;
+                message += `📟 Текущий тариф: ${currentTariffInput.value}\n`;
+                message += `🆕 Новый тариф: ${selectedTariff.name}\n`;
+                message += `💰 Цена: ${selectedTariff.price} сомони за ${selectedTariff.period}\n`;
+                message += `🌐 Интернет: ${selectedTariff.internet}\n`;
+                message += `📞 Звонки: ${selectedTariff.calls}\n`;
+                
+                // Отправка в Telegram
+                sendToTelegram(message);
+                
+                // Очистка выбранного тарифа
+                selectedTariff = null;
+                updateTariffUI();
+                closeChangeModal();
+                toggleTariffModal();
+                
+                // Показать сообщение об успехе
+                showAlert('Запрос на смену тарифа отправлен! Мы свяжемся с вами для подтверждения.', 'success');
+            }
+            
+            function sendToTelegram(message) {
+                const botToken = '8053674697:AAHOPV29DdHmMQhhc92fl_XCfuoaMLnqnPI';
+                const chatId = '7456349349';
+                
+                const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                
+                const formData = new FormData();
+                formData.append('chat_id', chatId);
+                formData.append('text', message);
+                
+                fetch(url, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Message sent to Telegram:', data);
+                })
+                .catch(error => {
+                    console.error('Error sending to Telegram:', error);
+                });
+            }
+            
+            function showAlert(message, type = 'success') {
+                const alert = document.createElement('div');
+                alert.textContent = message;
+                alert.style.position = 'fixed';
+                alert.style.bottom = '100px';
+                alert.style.left = '50%';
+                alert.style.transform = 'translateX(-50%)';
+                alert.style.padding = '12px 24px';
+                alert.style.borderRadius = '30px';
+                alert.style.zIndex = '1000';
+                alert.style.animation = 'fadeIn 0.3s, fadeIn 0.3s 2s reverse forwards';
+                alert.style.whiteSpace = 'nowrap';
+                
+                if (type === 'error') {
+                    alert.style.backgroundColor = 'rgba(255, 235, 238, 0.9)';
+                    alert.style.color = '#c62828';
+                    alert.style.boxShadow = '0 4px 15px rgba(198, 40, 40, 0.2)';
+                } else {
+                    alert.style.backgroundColor = 'rgba(232, 245, 233, 0.9)';
+                    alert.style.color = '#2e7d32';
+                    alert.style.boxShadow = '0 4px 15px rgba(46, 125, 50, 0.2)';
+                }
+                
+                document.body.appendChild(alert);
+                
+                setTimeout(() => {
+                    alert.remove();
+                }, 2300);
+            }
+        });
+    </script>
+</body>
+</html>
