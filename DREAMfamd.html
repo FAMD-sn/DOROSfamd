@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DREAMfamd - Помощь нуждающимся</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --secondary: #f1c40f;
+            --dark: #1a1a1a;
+            --darker: #111;
+            --light: #f5f5f5;
+            --gray: #333;
+            --lighter-gray: #444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--darker);
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .add-wish-btn {
+            background-color: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-wish-btn:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--darker);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--light);
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--primary);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--gray);
+            border: 1px solid var(--lighter-gray);
+            border-radius: 5px;
+            color: var(--light);
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: var(--dark);
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .filters {
+            background-color: var(--darker);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--gray);
+            border: 1px solid var(--lighter-gray);
+            border-radius: 5px;
+            color: var(--light);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 2;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 10px 10px 40px;
+            background-color: var(--gray);
+            border: 1px solid var(--lighter-gray);
+            border-radius: 5px;
+            color: var(--light);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light);
+        }
+
+        .apply-filters {
+            background-color: var(--secondary);
+            color: var(--dark);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .apply-filters:hover {
+            background-color: #f39c12;
+        }
+
+        .wishes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 768px) {
+            .wishes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .wish-card {
+            background-color: var(--darker);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .wish-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .wish-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray);
+            position: relative;
+        }
+
+        .wish-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .wish-category {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--gray);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--light);
+        }
+
+        .wish-body {
+            padding: 20px;
+        }
+
+        .wish-description {
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .wish-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .wish-bank {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+
+        .wish-bank i {
+            color: var(--primary);
+        }
+
+        .wish-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-card-btn {
+            background-color: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .copy-card-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary);
+            color: var(--dark);
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #aaa;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--lighter-gray);
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        footer {
+            background-color: var(--darker);
+            padding: 30px 0;
+            margin-top: 50px;
+            text-align: center;
+            color: #aaa;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 50px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--lighter-gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-hands-helping"></i>
+                    <h1>DREAMfamd</h1>
+                </div>
+                <button class="add-wish-btn" id="openModalBtn">
+                    <i class="fas fa-plus"></i>
+                    Добавить желание
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="modal" id="wishModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModalBtn">&times;</span>
+            <h2><i class="fas fa-star"></i> Добавить желание</h2>
+            <form id="wishForm">
+                <div class="form-group">
+                    <label for="name">Ваше имя</label>
+                    <input type="text" id="name" required placeholder="Как к вам обращаться?">
+                </div>
+                <div class="form-group">
+                    <label for="wish">Ваше желание</label>
+                    <textarea id="wish" required placeholder="Опишите, что вам нужно"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="price">Стоимость (в рублях)</label>
+                    <input type="number" id="price" required placeholder="Сколько это стоит?">
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Номер карты</label>
+                    <input type="text" id="cardNumber" required placeholder="На какую карту переводить?">
+                </div>
+                <div class="form-group">
+                    <label for="bank">Банк</label>
+                    <select id="bank" required>
+                        <option value="">Выберите банк</option>
+                        <option value="Сбербанк">Сбербанк</option>
+                        <option value="Тинькофф">Тинькофф</option>
+                        <option value="Kaspi">Kaspi</option>
+                        <option value="Альфа-Банк">Альфа-Банк</option>
+                        <option value="ВТБ">ВТБ</option>
+                        <option value="Газпромбанк">Газпромбанк</option>
+                        <option value="Райффайзенбанк">Райффайзенбанк</option>
+                        <option value="other">Другой банк</option>
+                    </select>
+                </div>
+                <div class="form-group" id="otherBankGroup" style="display: none;">
+                    <label for="otherBank">Укажите ваш банк</label>
+                    <input type="text" id="otherBank" placeholder="Название вашего банка">
+                </div>
+                <div class="form-group">
+                    <label for="category">Категория</label>
+                    <select id="category" required>
+                        <option value="">Выберите категорию</option>
+                        <option value="Машина">Машина</option>
+                        <option value="Дом/Квартира">Дом/Квартира</option>
+                        <option value="Бытовая техника">Бытовая техника</option>
+                        <option value="Одежда">Одежда</option>
+                        <option value="Еда">Еда</option>
+                        <option value="Мелочь">Мелочь</option>
+                        <option value="Лечение">Лечение</option>
+                        <option value="Образование">Образование</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Отправить желание
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="filters">
+            <div class="filter-row">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск по желаниям...">
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="bankFilter">Банк</label>
+                    <select id="bankFilter">
+                        <option value="">Все банки</option>
+                        <option value="Сбербанк">Сбербанк</option>
+                        <option value="Тинькофф">Тинькофф</option>
+                        <option value="Kaspi">Kaspi</option>
+                        <option value="Альфа-Банк">Альфа-Банк</option>
+                        <option value="ВТБ">ВТБ</option>
+                        <option value="Газпромбанк">Газпромбанк</option>
+                        <option value="Райффайзенбанк">Райффайзенбанк</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="categoryFilter">Категория</label>
+                    <select id="categoryFilter">
+                        <option value="">Все категории</option>
+                        <option value="Машина">Машина</option>
+                        <option value="Дом/Квартира">Дом/Квартира</option>
+                        <option value="Бытовая техника">Бытовая техника</option>
+                        <option value="Одежда">Одежда</option>
+                        <option value="Еда">Еда</option>
+                        <option value="Мелочь">Мелочь</option>
+                        <option value="Лечение">Лечение</option>
+                        <option value="Образование">Образование</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="minPrice">Цена от</label>
+                    <input type="number" id="minPrice" placeholder="Минимальная цена">
+                </div>
+                <div class="filter-group">
+                    <label for="maxPrice">Цена до</label>
+                    <input type="number" id="maxPrice" placeholder="Максимальная цена">
+                </div>
+            </div>
+            <div class="filter-row">
+                <button class="apply-filters" id="applyFiltersBtn">
+                    <i class="fas fa-filter"></i> Применить фильтры
+                </button>
+            </div>
+        </div>
+
+        <div class="wishes-grid" id="wishesContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Номер карты скопирован</div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <i class="fas fa-hands-helping"></i>
+                    <h1>DREAMfamd</h1>
+                </div>
+                <div class="footer-links">
+                    <a href="DOROSfamd.com">DOROSfamd</a>
+                    <a href="#">Правила: имейте человечность!</a>
+                    <a href="#">Контакты: +992 876-61-9999</a>
+                    <a href="#">Помощь: по вопросам пищите в тг: @DOROSfamd</a>
+                </div>
+                <p>© 2025 DREAMfamd. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAE4zNwMJynqso1XTS1612Kri5RMgVCGmw",
+            authDomain: "dreamfamd.firebaseapp.com",
+            projectId: "dreamfamd",
+            storageBucket: "dreamfamd.appspot.com",
+            messagingSenderId: "15878889443",
+            appId: "1:15878889443:web:62abeaebbf7220ccd14ad6",
+            measurementId: "G-62CR00NZSW",
+            databaseURL: "https://dreamfamd-default-rtdb.firebaseio.com/"
+        };
+
+        // Инициализация Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // DOM элементы
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const wishModal = document.getElementById('wishModal');
+        const wishForm = document.getElementById('wishForm');
+        const bankSelect = document.getElementById('bank');
+        const otherBankGroup = document.getElementById('otherBankGroup');
+        const otherBankInput = document.getElementById('otherBank');
+        const wishesContainer = document.getElementById('wishesContainer');
+        const toast = document.getElementById('toast');
+        const searchInput = document.getElementById('searchInput');
+        const bankFilter = document.getElementById('bankFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+
+        // Переменные состояния
+        let wishes = [];
+        let filteredWishes = [];
+
+        // Открытие модального окна
+        openModalBtn.addEventListener('click', () => {
+            wishModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Закрытие модального окна
+        closeModalBtn.addEventListener('click', () => {
+            wishModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // Закрытие модального окна при клике вне его
+        window.addEventListener('click', (e) => {
+            if (e.target === wishModal) {
+                wishModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Обработка выбора банка
+        bankSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'other') {
+                otherBankGroup.style.display = 'block';
+            } else {
+                otherBankGroup.style.display = 'none';
+            }
+        });
+
+        // Отправка формы
+        wishForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const wishText = document.getElementById('wish').value;
+            const price = document.getElementById('price').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            const bank = bankSelect.value === 'other' ? otherBankInput.value : bankSelect.value;
+            const category = document.getElementById('category').value;
+
+            // Проверка заполнения полей
+            if (!name || !wishText || !price || !cardNumber || !bank || !category) {
+                showToast('Пожалуйста, заполните все поля');
+                return;
+            }
+
+            // Создание нового желания
+            const newWish = {
+                name,
+                wish: wishText,
+                price: parseInt(price),
+                cardNumber,
+                bank,
+                category,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            // Сохранение в Firebase
+            database.ref('wishes').push(newWish)
+                .then(() => {
+                    showToast('Желание успешно добавлено!');
+                    wishForm.reset();
+                    wishModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                })
+                .catch((error) => {
+                    console.error('Ошибка при сохранении:', error);
+                    showToast('Произошла ошибка при сохранении');
+                });
+        });
+
+        // Показать уведомление
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Загрузка желаний из Firebase
+        function loadWishes() {
+            database.ref('wishes').on('value', (snapshot) => {
+                wishes = [];
+                snapshot.forEach((childSnapshot) => {
+                    const wish = childSnapshot.val();
+                    wish.id = childSnapshot.key;
+                    wishes.push(wish);
+                });
+
+                // Сортировка по дате (новые сначала)
+                wishes.sort((a, b) => b.createdAt - a.createdAt);
+                
+                // Первоначальное отображение
+                filteredWishes = [...wishes];
+                renderWishes(filteredWishes);
+            });
+        }
+
+        // Отрисовка желаний
+        function renderWishes(wishesToRender) {
+            if (wishesToRender.length === 0) {
+                wishesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-heart"></i>
+                        <p>Пока нет желаний, соответствующих вашим фильтрам. Попробуйте изменить параметры поиска.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            wishesContainer.innerHTML = '';
+            wishesToRender.forEach(wish => {
+                const wishCard = document.createElement('div');
+                wishCard.className = 'wish-card';
+                wishCard.innerHTML = `
+                    <div class="wish-header">
+                        <h3 class="wish-name">${wish.name}</h3>
+                        <span class="wish-category">${wish.category}</span>
+                    </div>
+                    <div class="wish-body">
+                        <p class="wish-description">${wish.wish}</p>
+                        <div class="wish-price">${formatPrice(wish.price)} ₽</div>
+                        <div class="wish-bank">
+                            <i class="fas fa-university"></i>
+                            <span>${wish.bank}</span>
+                        </div>
+                        <div class="wish-actions">
+                            <button class="copy-card-btn" data-card="${wish.cardNumber}">
+                                <i class="far fa-copy"></i>
+                                Скопировать номер карты
+                            </button>
+                        </div>
+                    </div>
+                `;
+                wishesContainer.appendChild(wishCard);
+            });
+
+            // Добавление обработчиков кнопок копирования
+            document.querySelectorAll('.copy-card-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cardNumber = btn.getAttribute('data-card');
+                    navigator.clipboard.writeText(cardNumber).then(() => {
+                        showToast('Номер карты скопирован');
+                    });
+                });
+            });
+        }
+
+        // Форматирование цены
+        function formatPrice(price) {
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        // Применение фильтров
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedBank = bankFilter.value;
+            const selectedCategory = categoryFilter.value;
+            const minPriceValue = minPrice.value ? parseInt(minPrice.value) : 0;
+            const maxPriceValue = maxPrice.value ? parseInt(maxPrice.value) : Infinity;
+
+            filteredWishes = wishes.filter(wish => {
+                const matchesSearch = wish.name.toLowerCase().includes(searchTerm) || 
+                                    wish.wish.toLowerCase().includes(searchTerm);
+                const matchesBank = !selectedBank || wish.bank === selectedBank;
+                const matchesCategory = !selectedCategory || wish.category === selectedCategory;
+                const matchesPrice = wish.price >= minPriceValue && wish.price <= maxPriceValue;
+
+                return matchesSearch && matchesBank && matchesCategory && matchesPrice;
+            });
+
+            renderWishes(filteredWishes);
+        }
+
+        // Обработчики событий для фильтров
+        searchInput.addEventListener('input', applyFilters);
+        bankFilter.addEventListener('change', applyFilters);
+        categoryFilter.addEventListener('change', applyFilters);
+        minPrice.addEventListener('input', applyFilters);
+        maxPrice.addEventListener('input', applyFilters);
+        applyFiltersBtn.addEventListener('click', applyFilters);
+
+        // Загрузка данных при загрузке страницы
+        window.addEventListener('DOMContentLoaded', loadWishes);
+    </script>
+</body>
+</html>
