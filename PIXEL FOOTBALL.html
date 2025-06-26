@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PIXEL FOOTBALL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #gameCanvas {
+            display: block;
+            background: #4a8c3a;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            font-weight: bold;
+        }
+        
+        #timer {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 20px;
+            color: white;
+            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            font-weight: bold;
+        }
+        
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        #logo {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        #startButton {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            pointer-events: auto;
+        }
+        
+        #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        #gameOverText {
+            font-size: 36px;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        #restartButton {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            pointer-events: auto;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            pointer-events: none;
+        }
+        
+        #joystickArea {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            position: relative;
+            pointer-events: auto;
+        }
+        
+        #joystick {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            position: absolute;
+            top: 35px;
+            left: 35px;
+        }
+        
+        #actionButtons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .actionButton {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-weight: bold;
+            font-size: 14px;
+            pointer-events: auto;
+            border: 2px solid #000;
+        }
+        
+        @media (max-width: 500px) {
+            #logo {
+                font-size: 36px;
+            }
+            
+            .actionButton {
+                width: 60px;
+                height: 60px;
+                font-size: 12px;
+            }
+            
+            #joystickArea {
+                width: 100px;
+                height: 100px;
+            }
+            
+            #joystick {
+                width: 40px;
+                height: 40px;
+                top: 30px;
+                left: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="ui">
+        <div id="score">Башня Ош: 0 — Нурзаман: 0</div>
+        <div id="timer">03:00</div>
+        <div id="controls">
+            <div id="joystickArea">
+                <div id="joystick"></div>
+            </div>
+            <div id="actionButtons">
+                <div class="actionButton" id="passButton">Пас</div>
+                <div class="actionButton" id="shootButton">Удар</div>
+                <div class="actionButton" id="tackleButton">Отбор</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="startScreen">
+        <div id="logo">PIXEL FOOTBALL</div>
+        <button id="startButton">НАЧАТЬ МАТЧ</button>
+    </div>
+    
+    <div id="gameOverScreen">
+        <div id="gameOverText">Матч завершен!</div>
+        <button id="restartButton">🔄 Начать заново</button>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <!-- В реальной игре здесь должен быть аудиофайл -->
+    </audio>
+    <audio id="kickSound"></audio>
+    <audio id="whistleSound"></audio>
+    <audio id="goalSound"></audio>
+
+    <script>
+        // Константы игры
+        const CANVAS_WIDTH = window.innerWidth;
+        const CANVAS_HEIGHT = window.innerHeight;
+        const FIELD_WIDTH = 2000;
+        const FIELD_HEIGHT = 1200;
+        const GOAL_WIDTH = 100;
+        const GOAL_HEIGHT = 200;
+        const PLAYER_RADIUS = 25;
+        const BALL_RADIUS = 12;
+        const GAME_DURATION = 180; // 3 минуты в секундах
+// Добавьте в раздел констант (в начале скрипта)
+        const BALL_SPEED_PASS = 500;     // Скорость мяча при пасе
+        const BALL_SPEED_SHOT = 850;    // Скорость мяча при ударе
+        const BALL_SPEED_TACKLE = 680;   // Скорость мяча при отборе
+        
+        // Состояние игры
+        let gameState = {
+            players: [],
+            ball: { x: FIELD_WIDTH / 2, y: FIELD_HEIGHT / 2, vx: 0, vy: 0 },
+            camera: { x: 0, y: 0 },
+            score: { home: 0, away: 0 },
+            time: GAME_DURATION,
+            gameStarted: false,
+            gameOver: false,
+            playerWithBall: null,
+            joystick: { active: false, x: 0, y: 0, dx: 0, dy: 0 },
+            controlledPlayer: null,
+            lastTimestamp: 0,
+            goalAnimation: 0
+        };
+        
+        // Инициализация Canvas
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = CANVAS_HEIGHT;
+        
+        // Элементы UI
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const joystickArea = document.getElementById('joystickArea');
+        const joystick = document.getElementById('joystick');
+        const passButton = document.getElementById('passButton');
+        const shootButton = document.getElementById('shootButton');
+        const tackleButton = document.getElementById('tackleButton');
+        
+        // Аудио элементы
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const kickSound = document.getElementById('kickSound');
+        const whistleSound = document.getElementById('whistleSound');
+        const goalSound = document.getElementById('goalSound');
+        
+        // Инициализация игроков
+        function initPlayers() {
+            gameState.players = [
+                // Команда игрока (Башня Ош)
+                { 
+                    id: 1, 
+                    name: 'Байдоолот', 
+                    team: 'home', 
+                    x: FIELD_WIDTH * 0.3, 
+                    y: FIELD_HEIGHT * 0.5, 
+                    vx: 0, 
+                    vy: 0, 
+                    speed: 100, 
+                    radius: PLAYER_RADIUS, 
+                    skin: 'white',
+                    controlled: true
+                },
+                { 
+                    id: 2, 
+                    name: 'Махди', 
+                    team: 'home', 
+                    x: FIELD_WIDTH * 0.2, 
+                    y: FIELD_HEIGHT * 0.3, 
+                    vx: 0, 
+                    vy: 0, 
+                    speed: 80, 
+                    radius: PLAYER_RADIUS, 
+                    skin: 'white',
+                    controlled: false
+                },
+                { 
+                    id: 3, 
+                    name: 'Абдуллох', 
+                    team: 'home', 
+                    x: FIELD_WIDTH * 0.2, 
+                    y: FIELD_HEIGHT * 0.7, 
+                    vx: 0, 
+                    vy: 0, 
+                    speed: 80, 
+                    radius: PLAYER_RADIUS, 
+                    skin: 'dark',
+                    controlled: false
+                },
+                
+                // Команда противника (Нурзаман)
+                { 
+                    id: 4, 
+                    name: 'Хамза', 
+                    team: 'away', 
+                    x: FIELD_WIDTH * 0.7, 
+                    y: FIELD_HEIGHT * 0.5, 
+                    vx: 0, 
+                    vy: 0, 
+                    speed: 90, 
+                    radius: PLAYER_RADIUS, 
+                    skin: 'white',
+                    controlled: false
+                },
+                { 
+                    id: 5, 
+                    name: 'Мухаммад', 
+                    team: 'away', 
+                    x: FIELD_WIDTH * 0.8, 
+                    y: FIELD_HEIGHT * 0.3, 
+                    vx: 0, 
+                    vy: 0, 
+                    speed: 80, 
+                    radius: PLAYER_RADIUS, 
+                    skin: 'white',
+                    controlled: false
+                },
+                { 
+                    id: 6, 
+                    name: 'DOROSfamd', 
+                    team: 'away', 
+                    x: FIELD_WIDTH * 0.8, 
+                    y: FIELD_HEIGHT * 0.7, 
+                    vx: 0, 
+                    vy: 0, 
+                    speed: 90, 
+                    radius: PLAYER_RADIUS, 
+                    skin: 'white',
+                    controlled: false
+                }
+            ];
+            
+            gameState.controlledPlayer = gameState.players[0];
+        }
+        
+        // Сброс игры
+        function resetGame() {
+            gameState.ball = { x: FIELD_WIDTH / 2, y: FIELD_HEIGHT / 2, vx: 0, vy: 0 };
+            gameState.score = { home: 0, away: 0 };
+            gameState.time = GAME_DURATION;
+            gameState.gameStarted = true;
+            gameState.gameOver = false;
+            gameState.playerWithBall = null;
+            gameState.goalAnimation = 0;
+            initPlayers();
+            updateScore();
+            updateTimer();
+            gameOverScreen.style.display = 'none';
+            
+            // Свисток начала игры
+            playWhistle();
+        }
+        
+        // Обновление счета
+        function updateScore() {
+            scoreElement.textContent = `Башня Ош: ${gameState.score.home} — Нурзаман: ${gameState.score.away}`;
+        }
+        
+        // Обновление таймера
+        function updateTimer() {
+            const minutes = Math.floor(gameState.time / 60).toString().padStart(2, '0');
+            const seconds = (gameState.time % 60).toString().padStart(2, '0');
+            timerElement.textContent = `${minutes}:${seconds}`;
+        }
+        
+        // Воспроизведение звуков
+        function playKick() {
+            kickSound.src = 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'; // Базовый звук удара
+            kickSound.play();
+        }
+        
+        function playWhistle() {
+            whistleSound.src = 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'; // Базовый звук свистка
+            whistleSound.play();
+        }
+        
+        function playGoal() {
+            goalSound.src = 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'; // Базовый звук гола
+            goalSound.play();
+        }
+        
+        // Обработка управления джойстиком
+        joystickArea.addEventListener('touchstart', handleJoystickStart);
+        joystickArea.addEventListener('touchmove', handleJoystickMove);
+        joystickArea.addEventListener('touchend', handleJoystickEnd);
+        
+        function handleJoystickStart(e) {
+            gameState.joystick.active = true;
+            updateJoystickPosition(e);
+            e.preventDefault();
+        }
+        
+        function handleJoystickMove(e) {
+            if (gameState.joystick.active) {
+                updateJoystickPosition(e);
+            }
+            e.preventDefault();
+        }
+        
+        function handleJoystickEnd(e) {
+            gameState.joystick.active = false;
+            joystick.style.transform = 'translate(0, 0)';
+            gameState.joystick.dx = 0;
+            gameState.joystick.dy = 0;
+            e.preventDefault();
+        }
+        
+        function updateJoystickPosition(e) {
+            const rect = joystickArea.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const touch = e.touches[0];
+            const touchX = touch.clientX;
+            const touchY = touch.clientY;
+            
+            const dx = touchX - centerX;
+            const dy = touchY - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const maxDistance = rect.width / 2;
+            
+            if (distance > maxDistance) {
+                const angle = Math.atan2(dy, dx);
+                gameState.joystick.dx = Math.cos(angle) * maxDistance;
+                gameState.joystick.dy = Math.sin(angle) * maxDistance;
+            } else {
+                gameState.joystick.dx = dx;
+                gameState.joystick.dy = dy;
+            }
+            
+            joystick.style.transform = `translate(${gameState.joystick.dx}px, ${gameState.joystick.dy}px)`;
+        }
+        
+        // Обработка кнопок действий
+        passButton.addEventListener('touchstart', () => handleActionButton('pass'));
+        shootButton.addEventListener('touchstart', () => handleActionButton('shoot'));
+        tackleButton.addEventListener('touchstart', () => handleActionButton('tackle'));
+        
+        function handleActionButton(action) {
+            if (!gameState.gameStarted || gameState.gameOver) return;
+            
+            const player = gameState.controlledPlayer;
+            if (!player) return;
+            
+            const ball = gameState.ball;
+            const distanceToBall = Math.sqrt((player.x - ball.x) ** 2 + (player.y - ball.y) ** 2);
+            
+            if (distanceToBall < PLAYER_RADIUS + BALL_RADIUS + 10) {
+                playKick();
+                
+                if (action === 'pass') {
+                    // Поиск ближайшего партнера по команде
+                    let closestTeammate = null;
+                    let minDistance = Infinity;
+                    
+                    for (const p of gameState.players) {
+                        if (p.team === player.team && p.id !== player.id) {
+                            const dist = Math.sqrt((p.x - player.x) ** 2 + (p.y - player.y) ** 2);
+                            if (dist < minDistance) {
+                                minDistance = dist;
+                                closestTeammate = p;
+                            }
+                        }
+                    }
+                    
+                    if (closestTeammate) {
+                        const angle = Math.atan2(closestTeammate.y - player.y, closestTeammate.x - player.x);
+                        
+
+// Замените на:
+ball.vx = Math.cos(angle) * BALL_SPEED_PASS;
+ball.vy = Math.sin(angle) * BALL_SPEED_PASS;
+                    }
+                } else if (action === 'shoot') {
+                    // Удар по воротам
+                    const goalY = player.team === 'home' ? FIELD_HEIGHT * 0.5 : FIELD_HEIGHT * 0.5;
+                    const goalX = player.team === 'home' ? FIELD_WIDTH : 0;
+                    
+                    const angle = Math.atan2(goalY - player.y, goalX - player.x);
+                    
+
+// Замените на:
+ball.vx = Math.cos(angle) * BALL_SPEED_SHOT;
+ball.vy = Math.sin(angle) * BALL_SPEED_SHOT;
+                    
+                } else if (action === 'tackle') {
+                    // Отбор мяча (если мяч у противника)
+                    if (gameState.playerWithBall && gameState.playerWithBall.team !== player.team) {
+                        const opponent = gameState.playerWithBall;
+                        const distance = Math.sqrt((player.x - opponent.x) ** 2 + (player.y - opponent.y) ** 2);
+                        
+                        if (distance < PLAYER_RADIUS * 2) {
+                            // Успешный отбор
+                            const angle = Math.atan2(player.y - opponent.y, player.x - opponent.x);
+                            
+
+// Замените на:
+ball.vx = Math.cos(angle) * BALL_SPEED_TACKLE;
+ball.vy = Math.sin(angle) * BALL_SPEED_TACKLE;
+                            gameState.playerWithBall = null;
+                        }
+                    }
+                }
+                
+                gameState.playerWithBall = null;
+            }
+        }
+        
+        // ИИ ботов
+        function updateBotAI(player) {
+            if (!gameState.gameStarted || gameState.gameOver) return;
+            
+            const ball = gameState.ball;
+            
+            // Если игрок контролирует мяч
+            if (gameState.playerWithBall === player) {
+                // Если близко к воротам - удар
+                const goalX = player.team === 'home' ? FIELD_WIDTH : 0;
+                const distanceToGoal = Math.abs(player.x - goalX);
+                
+                if (distanceToGoal < FIELD_WIDTH * 0.3) {
+                    const goalY = FIELD_HEIGHT * 0.5;
+                    const angle = Math.atan2(goalY - player.y, goalX - player.x);
+                    // Для удара ботов:
+ball.vx = Math.cos(angle) * BALL_SPEED_SHOT;
+ball.vy = Math.sin(angle) * BALL_SPEED_SHOT;
+
+                    gameState.playerWithBall = null;
+                    playKick();
+                } else {
+                    // Поиск партнера для паса
+                    let closestTeammate = null;
+                    let minDistance = Infinity;
+                    
+                    for (const p of gameState.players) {
+                        if (p.team === player.team && p.id !== player.id) {
+                            const dist = Math.sqrt((p.x - player.x) ** 2 + (p.y - player.y) ** 2);
+                            if (dist < minDistance) {
+                                minDistance = dist;
+                                closestTeammate = p;
+                            }
+                        }
+                    }
+                    
+                    // Пасуем если партнер не слишком далеко и не слишком близко
+                    if (closestTeammate && minDistance > 100 && minDistance < 300) {
+                        const angle = Math.atan2(closestTeammate.y - player.y, closestTeammate.x - player.x);
+                        // Для паса ботов:
+ball.vx = Math.cos(angle) * BALL_SPEED_PASS;
+ball.vy = Math.sin(angle) * BALL_SPEED_PASS;
+
+                        gameState.playerWithBall = null;
+                        playKick();
+                    }
+                }
+            } else {
+                // Движение к мячу или к своей позиции
+                const target = { x: 0, y: 0 };
+                
+                if (player.team === 'home') {
+                    // Базовая позиция для своей команды
+                    if (player.id === 2) target.x = FIELD_WIDTH * 0.2, target.y = FIELD_HEIGHT * 0.3;
+                    if (player.id === 3) target.x = FIELD_WIDTH * 0.2, target.y = FIELD_HEIGHT * 0.7;
+                } else {
+                    // Базовая позиция для команды противника
+                    if (player.id === 5) target.x = FIELD_WIDTH * 0.8, target.y = FIELD_HEIGHT * 0.3;
+                    if (player.id === 6) target.x = FIELD_WIDTH * 0.8, target.y = FIELD_HEIGHT * 0.7;
+                }
+                
+                // Если мяч свободен или у соперника - идем к мячу
+                if (!gameState.playerWithBall || 
+                    (gameState.playerWithBall && gameState.playerWithBall.team !== player.team)) {
+                    target.x = ball.x;
+                    target.y = ball.y;
+                }
+                
+                // Движение к цели
+                const dx = target.x - player.x;
+                const dy = target.y - player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 10) {
+                    player.vx = (dx / distance) * player.speed;
+                    player.vy = (dy / distance) * player.speed;
+                } else {
+                    player.vx = 0;
+                    player.vy = 0;
+                }
+            }
+        }
+        
+        // Обновление физики
+        function updatePhysics(deltaTime) {
+            // Обновление позиции мяча
+            gameState.ball.x += gameState.ball.vx * deltaTime;
+            gameState.ball.y += gameState.ball.vy * deltaTime;
+            
+            // Трение мяча
+            gameState.ball.vx *= 0.98;
+            gameState.ball.vy *= 0.98;
+            
+            // Проверка столкновений мяча с границами поля
+            if (gameState.ball.x - BALL_RADIUS < 0) {
+                gameState.ball.x = BALL_RADIUS;
+                gameState.ball.vx *= -0.9;
+                playKick();
+            }
+if (gameState.ball.x - BALL_RADIUS > FIELD_WIDTH && 
+    gameState.ball.y > (FIELD_HEIGHT - GOAL_HEIGHT)/2 && 
+    gameState.ball.y < (FIELD_HEIGHT + GOAL_HEIGHT)/2) {
+    // Гол в левые ворота
+    gameState.score.away++;
+    updateScore();
+    resetRound();
+    playGoal();
+    playWhistle();
+}
+
+if (gameState.ball.x + BALL_RADIUS > FIELD_WIDTH && 
+    gameState.ball.y > (FIELD_HEIGHT - GOAL_HEIGHT)/2 && 
+    gameState.ball.y < (FIELD_HEIGHT + GOAL_HEIGHT)/2) {
+    // Гол в правые ворота
+    gameState.score.home++;
+    updateScore();
+    resetRound();
+    playGoal();
+    playWhistle();
+}
+
+function resetRound() {
+    // Сброс позиций игроков
+    gameState.players[0].x = FIELD_WIDTH * 0.3; // Ваш игрок
+    gameState.players[0].y = FIELD_HEIGHT * 0.5;
+    gameState.players[1].x = FIELD_WIDTH * 0.2; // Ваш teammate 1
+    gameState.players[1].y = FIELD_HEIGHT * 0.3;
+    gameState.players[2].x = FIELD_WIDTH * 0.2; // Ваш teammate 2
+    gameState.players[2].y = FIELD_HEIGHT * 0.7;
+    
+    // Противники
+    gameState.players[3].x = FIELD_WIDTH * 0.7;
+    gameState.players[3].y = FIELD_HEIGHT * 0.5;
+    gameState.players[4].x = FIELD_WIDTH * 0.8;
+    gameState.players[4].y = FIELD_HEIGHT * 0.3;
+    gameState.players[5].x = FIELD_WIDTH * 0.8;
+    gameState.players[5].y = FIELD_HEIGHT * 0.7;
+    
+    // Сброс мяча
+    gameState.ball = { 
+        x: FIELD_WIDTH/2, 
+        y: FIELD_HEIGHT/2, 
+        vx: 0, 
+        vy: 0 
+    };
+    
+    gameState.playerWithBall = null;
+    gameState.goalAnimation = 30; // Анимация гола
+}
+            if (gameState.ball.x + BALL_RADIUS > FIELD_WIDTH) {
+                gameState.ball.x = FIELD_WIDTH - BALL_RADIUS;
+                gameState.ball.vx *= -0.9;
+                playKick();
+            }
+            
+            if (gameState.ball.y - BALL_RADIUS < 0) {
+                gameState.ball.y = BALL_RADIUS;
+                gameState.ball.vy *= -0.8;
+                playKick();
+            }
+            
+            if (gameState.ball.y + BALL_RADIUS > FIELD_HEIGHT) {
+                gameState.ball.y = FIELD_HEIGHT - BALL_RADIUS;
+                gameState.ball.vy *= -0.8;
+                playKick();
+            }
+            
+            // Проверка голов
+            
+            
+            // Обновление позиций игроков
+            for (const player of gameState.players) {
+                // Управление игроком
+                if (player.controlled) {
+                    if (gameState.joystick.active) {
+                        const joystick = gameState.joystick;
+                        const distance = Math.sqrt(joystick.dx * joystick.dx + joystick.dy * joystick.dy);
+                        const maxDistance = joystickArea.offsetWidth / 2;
+                        const speedFactor = Math.min(1, distance / (maxDistance / 2));
+                        
+                        if (distance > 10) {
+                            const angle = Math.atan2(joystick.dy, joystick.dx);
+                            player.vx = Math.cos(angle) * player.speed * speedFactor;
+                            player.vy = Math.sin(angle) * player.speed * speedFactor;
+                        } else {
+                            player.vx = 0;
+                            player.vy = 0;
+                        }
+                    } else {
+                        player.vx = 0;
+                        player.vy = 0;
+                    }
+                } else {
+                    // ИИ для ботов
+                    updateBotAI(player);
+                }
+                
+                // Обновление позиции игрока
+                player.x += player.vx * deltaTime;
+                player.y += player.vy * deltaTime;
+                
+                // Ограничение игрока в пределах поля
+                player.x = Math.max(PLAYER_RADIUS, Math.min(FIELD_WIDTH - PLAYER_RADIUS, player.x));
+                player.y = Math.max(PLAYER_RADIUS, Math.min(FIELD_HEIGHT - PLAYER_RADIUS, player.y));
+                
+                // Проверка столкновения игрока с мячом
+                const distanceToBall = Math.sqrt((player.x - gameState.ball.x) ** 2 + (player.y - gameState.ball.y) ** 2);
+                
+                if (distanceToBall < PLAYER_RADIUS + BALL_RADIUS) {
+                    if (!gameState.playerWithBall || gameState.playerWithBall === player) {
+                        gameState.playerWithBall = player;
+                        
+                        // Мяч прилипает к игроку
+                        const angle = Math.atan2(player.y - gameState.ball.y, player.x - gameState.ball.x);
+                        const targetX = player.x - Math.cos(angle) * (PLAYER_RADIUS + BALL_RADIUS);
+                        const targetY = player.y - Math.sin(angle) * (PLAYER_RADIUS + BALL_RADIUS);
+                        
+                        gameState.ball.x = targetX;
+                        gameState.ball.y = targetY;
+                        gameState.ball.vx = player.vx * 0.8;
+                        gameState.ball.vy = player.vy * 0.8;
+                    }
+                }
+            }
+            
+            // Проверка на конец матча
+            if (gameState.time <= 0 && !gameState.gameOver) {
+                gameState.gameOver = true;
+                gameOverScreen.style.display = 'flex';
+                document.getElementById('gameOverText').textContent = 
+                    gameState.score.home > gameState.score.away ? 'Победа!' : 
+                    gameState.score.home < gameState.score.away ? 'Поражение!' : 'Ничья!';
+                playWhistle();
+            }
+        }
+        
+        // Рендеринг игры
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Определение позиции камеры (следит за мячом и управляемым игроком)
+            const targetX = gameState.controlledPlayer ? gameState.controlledPlayer.x : gameState.ball.x;
+            const targetY = gameState.controlledPlayer ? gameState.controlledPlayer.y : gameState.ball.y;
+            
+            gameState.camera.x = targetX - CANVAS_WIDTH / 2;
+            gameState.camera.y = targetY - CANVAS_HEIGHT / 2;
+            
+            // Ограничение камеры в пределах поля
+            gameState.camera.x = Math.max(0, Math.min(FIELD_WIDTH - CANVAS_WIDTH, gameState.camera.x));
+            gameState.camera.y = Math.max(0, Math.min(FIELD_HEIGHT - CANVAS_HEIGHT, gameState.camera.y));
+            
+            // Рендеринг поля с перспективой
+            drawField();
+            
+            // Рендеринг игроков
+            for (const player of gameState.players) {
+                drawPlayer(player);
+            }
+            
+            // Рендеринг мяча
+            drawBall();
+            
+            // Анимация гола
+            if (gameState.goalAnimation > 0) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                gameState.goalAnimation--;
+            }
+        }
+        
+        // Рендеринг поля с перспективой 2.5D
+        function drawField() {
+            // Трава с перспективой
+            const horizon = 100;
+            const vanishingPoint = { x: CANVAS_WIDTH / 2, y: horizon };
+            
+            // Основной цвет поля
+            ctx.fillStyle = '#4a8c3a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Линии поля с перспективой
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            
+            // Центральная линия
+            drawPerspectiveLine(
+                FIELD_WIDTH / 2, 0, 
+                FIELD_WIDTH / 2, FIELD_HEIGHT,
+                vanishingPoint
+            );
+            
+            // Центральный круг
+            const centerCircleX = FIELD_WIDTH / 2 - gameState.camera.x;
+            const centerCircleY = FIELD_HEIGHT / 2 - gameState.camera.y;
+            const centerCircleSize = 50 * (1 + (centerCircleY / canvas.height) * 0.5);
+            
+            ctx.beginPath();
+            ctx.ellipse(
+                centerCircleX, 
+                centerCircleY + (centerCircleY / canvas.height) * 50, 
+                centerCircleSize, 
+                centerCircleSize * 0.5, 
+                0, 0, Math.PI * 2
+            );
+            ctx.stroke();
+            
+            // Ворота
+            ctx.fillStyle = '#ffffff';
+            
+            // Левые ворота
+            const leftGoalX = 0 - gameState.camera.x;
+            const leftGoalY1 = (FIELD_HEIGHT - GOAL_HEIGHT) / 2 - gameState.camera.y;
+            const leftGoalY2 = (FIELD_HEIGHT + GOAL_HEIGHT) / 2 - gameState.camera.y;
+            
+            ctx.beginPath();
+            ctx.moveTo(leftGoalX, leftGoalY1);
+            ctx.lineTo(leftGoalX + 20, leftGoalY1 + 20);
+            ctx.lineTo(leftGoalX + 20, leftGoalY2 - 20);
+            ctx.lineTo(leftGoalX, leftGoalY2);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Правые ворота
+            const rightGoalX = FIELD_WIDTH - gameState.camera.x;
+            const rightGoalY1 = (FIELD_HEIGHT - GOAL_HEIGHT) / 2 - gameState.camera.y;
+            const rightGoalY2 = (FIELD_HEIGHT + GOAL_HEIGHT) / 2 - gameState.camera.y;
+            
+            ctx.beginPath();
+            ctx.moveTo(rightGoalX, rightGoalY1);
+            ctx.lineTo(rightGoalX - 20, rightGoalY1 + 20);
+            ctx.lineTo(rightGoalX - 20, rightGoalY2 - 20);
+            ctx.lineTo(rightGoalX, rightGoalY2);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Трибуны (условно)
+            ctx.fillStyle = '#555555';
+            ctx.fillRect(0, 0, canvas.width, 30);
+            ctx.fillStyle = '#333333';
+            for (let i = 0; i < canvas.width; i += 20) {
+                ctx.fillRect(i, 0, 10, 30);
+            }
+        }
+        
+        // Рисование линии с перспективой
+        function drawPerspectiveLine(x1, y1, x2, y2, vanishingPoint) {
+            const screenX1 = x1 - gameState.camera.x;
+            const screenY1 = y1 - gameState.camera.y;
+            const screenX2 = x2 - gameState.camera.x;
+            const screenY2 = y2 - gameState.camera.y;
+            
+            // Коррекция перспективы для Y координат
+            const perspectiveY1 = vanishingPoint.y + (screenY1 - vanishingPoint.y) * 0.8;
+            const perspectiveY2 = vanishingPoint.y + (screenY2 - vanishingPoint.y) * 0.8;
+            
+            ctx.beginPath();
+            ctx.moveTo(screenX1, perspectiveY1);
+            ctx.lineTo(screenX2, perspectiveY2);
+            ctx.stroke();
+        }
+        
+        // Рисование игрока в пиксельном стиле
+        function drawPlayer(player) {
+            const screenX = player.x - gameState.camera.x;
+            const screenY = player.y - gameState.camera.y;
+            
+            // Коррекция перспективы
+            const perspectiveScale = 0.5 + 0.5 * (1 - (screenY / canvas.height));
+            const scaledRadius = PLAYER_RADIUS * perspectiveScale;
+            const shadowY = 5 * perspectiveScale;
+            
+            // Тень
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(screenX, screenY + shadowY, scaledRadius * 0.8, scaledRadius * 0.3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Тело игрока
+            const jerseyColor = player.team === 'home' ? '#ff0000' : '#0000ff';
+            const shortsColor = player.team === 'home' ? '#ff0000' : '#0000ff';
+            
+            // Ноги
+            
+            // Шорты
+            ctx.fillStyle = shortsColor;
+            ctx.fillRect(screenX - scaledRadius * 0.6, screenY - scaledRadius * 0.8, scaledRadius * 1.2, scaledRadius * 0.6);
+            
+            // Тело
+               
+            
+            
+            // Выделение управляемого игрока
+            if (player.controlled) {
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY - scaledRadius * 1.8, scaledRadius * 0.7, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Имя игрока
+            if (screenY > 50) {
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `${Math.floor(10 * perspectiveScale)}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.fillText(player.name, screenX, screenY - scaledRadius * 2.2);
+            }
+        
+    
+    // ... предыдущий код позиционирования ...
+    
+    // Новый дизайн игрока
+    ctx.fillStyle = player.team === 'home' ? '#FF3333' : '#3333FF';
+    
+    // Ноги (в движении)
+    const legOffset = Math.sin(Date.now()/100) * 5 * (player.vx !== 0 || player.vy !== 0 ? 1 : 0);
+    ctx.fillRect(screenX-10, screenY-10, 7, 20);
+    ctx.fillRect(screenX+3, screenY-10-legOffset, 7, 20+legOffset);
+    
+    // Тело
+    ctx.fillRect(screenX-12, screenY-30, 24, 20);
+    
+    // Голова
+    ctx.fillStyle = player.skin === 'dark' ? '#8B4513' : '#FFD39B';
+    ctx.beginPath();
+    ctx.arc(screenX, screenY-35, 10, 0, Math.PI*2);
+    ctx.fill();
+    
+    // Глаза
+    ctx.fillStyle = '#000';
+    ctx.fillRect(screenX-5, screenY-38, 3, 3);
+    ctx.fillRect(screenX+2, screenY-38, 3, 3);
+}
+        
+        // Рисование мяча
+        function drawBall() {
+            const screenX = gameState.ball.x - gameState.camera.x;
+            const screenY = gameState.ball.y - gameState.camera.y;
+            
+            // Коррекция перспективы
+            const perspectiveScale = 0.5 + 0.5 * (1 - (screenY / canvas.height));
+            const scaledRadius = BALL_RADIUS * perspectiveScale;
+            const shadowY = 3 * perspectiveScale;
+            
+            // Тень
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(screenX, screenY + shadowY, scaledRadius * 0.8, scaledRadius * 0.3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Мяч
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, scaledRadius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Швы мяча
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, scaledRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(screenX - scaledRadius, screenY);
+            ctx.lineTo(screenX + scaledRadius, screenY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.ellipse(screenX, screenY, scaledRadius, scaledRadius * 0.3, Math.PI / 2, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        // Главный игровой цикл
+        function gameLoop(timestamp) {
+            if (!gameState.lastTimestamp) {
+                gameState.lastTimestamp = timestamp;
+            }
+            
+            const deltaTime = (timestamp - gameState.lastTimestamp) / 1000;
+            gameState.lastTimestamp = timestamp;
+            
+            if (gameState.gameStarted && !gameState.gameOver) {
+                gameState.time -= deltaTime;
+                if (gameState.time < 0) gameState.time = 0;
+                updateTimer();
+                
+                updatePhysics(deltaTime);
+            }
+            
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Обработчики событий
+        startButton.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            resetGame();
+        });
+        
+        restartButton.addEventListener('click', () => {
+            resetGame();
+        });
+        
+        // Запуск игры
+        initPlayers();
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
