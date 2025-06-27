@@ -1,1042 +1,214 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en" >
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOROSfamd — сервисы, переводчик, игры, магазин, тесты и видео от FAMD</title>
-    <meta name="description" content="Официальный сайт DOROSfamd и FAMD: сервисы, тест на личность, переводчик, маркетплейс DOROShop, видеоплатформа DOROSvideo, игры, словари и обучение.">
-    <meta name="keywords" content="DOROSfamd, FAMD, DOROS, DOROShop, DOROSvideo, тест на тип личности, переводчик, игры, ислам, сервисы, DOROS service, словарь, чат, marketplace, FAMD-сервисы, ФЭМД">
-    <meta name="robots" content="index, follow">    
-    <meta name="author" content="FAMD-sn">
-    <meta name="yandex-verification" content="a25f8d28d16c91eb" />
-   
-    <title>DOROSfamd Сервисы</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" href="icon-192.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="manifest" href="manifest.json">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
-  }
-</script>
-    <style>
-        :root {
-            --background: #0A0A0A; /* Тёмный фон */
-            --surface: #121212; /* Поверхности */
-            --on-surface: #FFFFFF; /* Белый текст */
-            --on-background: #B3B3B3; /* Светло-серый текст */
-            --primary: #2E7D32; /* Зелёный основной */
-            --primary-light: #4CAF50; /* Светло-зелёный */
-            --gold: #FFD700; /* Золотой акцент */
-            --gold-dark: #D4AF37; /* Тёмное золото */
-            --border: #333333; /* Границы */
-            --shadow: rgba(0, 0, 0, 0.5);
-            --radius: 10px;
-            --transition: all 0.3s ease;
-        }
+  <meta charset="UTF-8">
+  <title>DOROShome | DOROSfamd</title>
+  <link rel="stylesheet" href="./style.css">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0A0A0A, #121212);
-            color: var(--on-surface);
-            line-height: 1.6;
-            min-height: 100vh;
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        .container {
-            max-width: 1280px;
-            padding: 32px;
-            margin: 0 auto;
-        }
-
-        .support-btn-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 16px;
-        }
-
-        .support-btn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: var(--radius);
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-
-        .support-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
-            opacity: 0;
-            transition: var(--transition);
-            z-index: -1;
-        }
-
-        .support-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(46, 125, 50, 0.4);
-        }
-
-        .support-btn:hover::before {
-            opacity: 1;
-        }
-
-        .support-btn i {
-            color: var(--gold);
-            transition: var(--transition);
-        }
-
-        .support-btn:hover i {
-            transform: scale(1.1);
-        }
-
-        header {
-            text-align: center;
-            padding: 24px 0;
-            position: relative;
-        }
-
-        header::after {
-            content: '';
-            display: block;
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--gold));
-            margin: 16px auto;
-            border-radius: 3px;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--on-surface);
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            position: relative;
-            display: inline-block;
-        }
-
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--gold);
-            transform: scaleX(0);
-            transition: var(--transition);
-        }
-
-        h1:hover::after {
-            transform: scaleX(1);
-        }
-
-        .search-container {
-            margin: 32px 0;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 14px 44px 14px 20px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 1rem;
-            background: var(--surface);
-            color: var(--on-surface);
-            transition: var(--transition);
-            box-shadow: 0 2px 8px var(--shadow);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--on-background);
-            font-size: 1.1rem;
-            transition: var(--transition);
-        }
-
-        .search-input:focus + .search-icon {
-            color: var(--gold);
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 24px;
-            margin-bottom: 48px;
-        }
-
-        .service-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: 0 4px 12px var(--shadow);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            opacity: 0;
-            animation: fadeIn 0.4s ease forwards;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(to bottom, var(--primary), var(--gold));
-            transition: var(--transition);
-        }
-
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            border-color: var(--gold);
-        }
-
-        .service-card:hover::before {
-            width: 6px;
-        }
-
-        .service-icon {
-            font-size: 2rem;
-            color: var(--gold);
-            margin-bottom: 12px;
-            transition: var(--transition);
-        }
-
-        .service-card:hover .service-icon {
-            transform: scale(1.1) rotate(5deg);
-            color: var(--primary-light);
-        }
-
-        .service-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--on-surface);
-            transition: var(--transition);
-        }
-
-        .service-card:hover .service-title {
-            color: var(--gold);
-        }
-
-        .service-desc {
-            font-size: 0.9rem;
-            color: var(--on-background);
-            margin-bottom: 12px;
-            flex-grow: 1;
-        }
-
-        .service-link {
-            color: var(--on-background);
-            font-size: 0.85rem;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: var(--transition);
-        }
-
-        .service-link:hover {
-            color: var(--gold);
-        }
-
-        .service-link i {
-            transition: transform 0.3s ease;
-        }
-
-        .service-link:hover i {
-            transform: translateX(3px);
-            color: var(--gold);
-        }
-
-        /* Модальное окно поддержки */
-        .support-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .support-modal.show {
-            display: flex;
-        }
-
-        .support-content {
-            background: linear-gradient(145deg, #121212, #0A0A0A);
-            border: 1px solid var(--gold);
-            border-radius: var(--radius);
-            padding: 32px;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .support-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--gold));
-        }
-
-        .support-content h3 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        .support-content p {
-            margin-bottom: 24px;
-            color: var(--on-background);
-            line-height: 1.6;
-        }
-
-        .support-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--gold);
-            margin: 20px 0;
-            padding: 12px;
-            background: rgba(46, 125, 50, 0.1);
-            border-radius: var(--radius);
-            border: 1px dashed var(--gold);
-            display: inline-block;
-        }
-
-        .support-methods {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-top: 24px;
-        }
-
-        .support-method {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: var(--radius);
-            background: rgba(255, 255, 255, 0.05);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .support-method:hover {
-            background: rgba(46, 125, 50, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .support-method i {
-            font-size: 1.5rem;
-            color: var(--gold);
-        }
-
-        .method-info {
-            text-align: left;
-        }
-
-        .method-info h4 {
-            color: var(--on-surface);
-            margin-bottom: 4px;
-        }
-
-        .method-info p {
-            margin: 0;
-            font-size: 0.85rem;
-            color: var(--on-background);
-        }
-
-        .close-support {
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--on-surface);
-            padding: 10px 24px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            margin-top: 24px;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .close-support:hover {
-            background: rgba(255, 215, 0, 0.1);
-            transform: scale(1.05);
-        }
-
-        .privacy-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            animation: zoomIn 0.3s ease;
-        }
-
-        .privacy-modal.show {
-            display: flex;
-        }
-
-        .privacy-content {
-            background: linear-gradient(145deg, #121212, #0A0A0A);
-            border: 1px solid var(--gold);
-            border-radius: var(--radius);
-            padding: 24px;
-            max-width: 700px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            color: var(--on-background);
-            font-size: 0.9rem;
-            position: relative;
-        }
-
-        .privacy-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--gold));
-        }
-
-        .privacy-content h3 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--gold);
-            margin-bottom: 16px;
-        }
-
-        .privacy-content h4 {
-            margin: 16px 0 10px;
-            color: var(--on-surface);
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        .privacy-content ul {
-            padding-left: 20px;
-            margin-bottom: 12px;
-        }
-
-        .privacy-content li {
-            margin-bottom: 6px;
-        }
-
-        .close-privacy {
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--on-surface);
-            padding: 10px 24px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            margin-top: 12px;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .close-privacy:hover {
-            background: rgba(255, 215, 0, 0.1);
-            transform: scale(1.05);
-        }
-
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24px 0;
-            border-top: 1px solid var(--border);
-            font-size: 0.9rem;
-            color: var(--on-background);
-        }
-
-        .footer-brand {
-            font-weight: 500;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 24px;
-        }
-
-        .footer-links a, .footer-links button {
-            color: var(--on-background);
-            text-decoration: none;
-            font-weight: 500;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .footer-links a::after, .footer-links button::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: var(--gold);
-            transition: var(--transition);
-        }
-
-        .footer-links a:hover, .footer-links button:hover {
-            color: var(--gold);
-        }
-
-        .footer-links a:hover::after, .footer-links button:hover::after {
-            width: 100%;
-        }
-
-        .watermark {
-            position: fixed;
-            bottom: 16px;
-            right: 16px;
-            font-size: 0.8rem;
-            color: var(--on-background);
-            opacity: 0.4;
-        }
-
-        .highlight {
-            background: rgba(255, 215, 0, 0.2);
-            padding: 2px 4px;
-            border-radius: 4px;
-            color: var(--gold);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes zoomIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 24px;
-            }
-
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .search-container {
-                margin: 24px 0;
-            }
-
-            .support-content, .privacy-content {
-                max-width: 90%;
-                padding: 20px;
-            }
-
-            .support-number {
-                font-size: 1.5rem;
-            }
-
-            .footer {
-                flex-direction: column;
-                gap: 16px;
-                text-align: center;
-            }
-        }
-        
-  #installBtn {
-    background: linear-gradient(135deg, #4b5f1b, #9abf23);
-    color: #4b5f1b;
-    justify-content: center;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 12px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-    transition: 0.3s ease;
-  }
-
-  #installBtn:hover {
-    background: linear-gradient(135deg, #3a4c15, #7ea514);
-    transform: scale(1.05);
-  }
-
-  #installBtn:active {
-    transform: scale(0.97);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-  }
-
-    </style>
 </head>
 <body>
-        <div class="container">
-        <!-- Кнопка поддержки -->
-   <!--     <div class="support-btn-container">
-            <button class="support-btn" onclick="openSupportModal()">
-                <i class="fas fa-heart"></i> Получить VIP
-            </button>
-        </div> -->
-        <header>
-            <h1>DOROSfamd</h1>
-        </header>
-<button id="installBtn">Скачать приложение</button>
+<!-- partial:index.partial.html -->
+<input type="checkbox" id="gfxmenu" />
+<input type="radio" name="gfx" id="good" checked />
+<input type="radio" name="gfx" id="poor" />
+<x id="graphics">
+  <label class="gfx" for="gfxmenu">Графика</label>
+  <label class="gfx" for="good">Высокая графика</label>
+  <label class="gfx" for="poor">Умеренная графика</label>
+</x>
 
-<script>
-  let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
-  installBtn.style.display = 'none';
+<sky><time>
+    <sun></sun>
+  </time></sky>
+<stars><i></i></stars>
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'block';
+<sunset></sunset>
+<colour>
 
-    installBtn.addEventListener('click', () => {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('Установлено');
-        }
-        deferredPrompt = null;
-      });
-    });
-  });
-</script>
-<div id="iosInstall" style="display:none; text-align:center; padding: 15px; background:#223322; color: #d4ffb0;">
-  Установи как приложение: нажми <b>Поделиться</b> и выбери <b>«На экран Домой»</b>
-</div>
-        <div class="search-container">
-            <input type="text" class="search-input" placeholder="Поиск DOROSfamd сервисов..." id="searchInput">
-            <i class="fas fa-search search-icon"></i>
-        </div>
+  <input type="radio" name="r23" id="cb23" class="hs house row4 col1" />
+  <input type="radio" name="r23" id="cb23s" class="hs shed row4 col1" />
+  <input type="radio" name="r24" id="cb24" class="hs house row4 col2" />
+  <input type="radio" name="r24" id="cb24s" class="hs shed row4 col2" />
+  <input type="radio" name="r25" id="cb25" class="hs house row4 col3" />
+  <input type="radio" name="r23" id="cb25s" class="hs shed row4 col3" />
+  <input type="radio" name="r26" id="cb26" class="hs house row4 col4" />
+  <input type="radio" name="r26" id="cb26s" class="hs shed row4 col4" />
+  <br />
+  <input type="radio" name="r19" id="cb19" class="hs house row3 col1" />
+  <input type="radio" name="r19" id="cb19s" class="hs shed row3 col1" />
+  <input type="radio" name="r20" id="cb20" class="hs house row3 col2" />
+  <input type="radio" name="r20" id="cb20s" class="hs shed row3 col2" />
+  <input type="radio" name="r21" id="cb21" class="hs house row3 col3" />
+  <input type="radio" name="r21" id="cb21s" class="hs shed row3 col3" />
+  <input type="radio" name="r22" id="cb22" class="hs house row3 col4" />
+  <input type="radio" name="r22" id="cb22s" class="hs shed row3 col4" />
+  <br />
+  <input type="radio" name="r15" id="cb15" class="hs house row2 col1" />
+  <input type="radio" name="r15" id="cb15s" class="hs shed row2 col1" />
+  <input type="radio" name="r16" id="cb16" class="hs house row2 col2" />
+  <input type="radio" name="r16" id="cb16s" class="hs shed row2 col2" />
+  <input type="radio" name="r17" id="cb17" class="hs house row2 col3" />
+  <input type="radio" name="r17" id="cb17s" class="hs shed row2 col3" checked />
+  <input type="radio" name="r18" id="cb18" class="hs house row2 col4" />
+  <input type="radio" name="r18" id="cb18s" class="hs shed row2 col4" />
+  <br />
+  <input type="radio" name="r11" id="cb11" class="hs house row1 col1" />
+  <input type="radio" name="r11" id="cb11s" class="hs shed row1 col1" />
+  <input type="radio" name="r12" id="cb12" class="hs house row1 col2" />
+  <input type="radio" name="r12" id="cb12s" class="hs shed row1 col2" />
+  <input type="radio" name="r13" id="cb13" class="hs house row1 col3" />
+  <input type="radio" name="r13" id="cb13s" class="hs shed row1 col3" />
+  <input type="radio" name="r14" id="cb14" class="hs house row1 col4" />
+  <input type="radio" name="r14" id="cb14s" class="hs shed row1 col4" />
+  <br />
 
-        <div class="services-grid" id="servicesGrid">
-            <!-- Словарь -->
-            <div class="service-card" onclick="navigateTo('словарь.html')">
-                <div class="service-icon"><i class="fas fa-book"></i></div>
-                <h3 class="service-title">DOROSfamd Словарь</h3>
-                <p class="service-desc">DOROSfamd Словарь — точные определения терминов для профессионалов.</p>
-                <a class="service-link">Открыть <i class="fas fa-arrow-right"></i></a>
-            </div>
+  <input type="radio" name="r23" id="ncb23" class="row4 col1" title="ncb23" />
+  <input type="radio" name="r24" id="ncb24" class="row4 col2" title="ncb24" />
+  <input type="radio" name="r25" id="ncb25" class="row4 col3" title="ncb25" />
+  <input type="radio" name="r26" id="ncb26" class="row4 col4" title="ncb26" />
+  <br />
+  <input type="radio" name="r19" id="ncb19" class="row3 col1" title="ncb19" />
+  <input type="radio" name="r20" id="ncb20" class="row3 col2" title="ncb20" />
+  <input type="radio" name="r21" id="ncb21" class="row3 col3" title="ncb21" />
+  <input type="radio" name="r22" id="ncb22" class="row3 col4" title="ncb22" />
+  <br />
+  <input type="radio" name="r15" id="ncb15" class="row2 col1" title="ncb15" />
+  <input type="radio" name="r16" id="ncb16" class="row2 col2" title="ncb16" />
+  <input type="radio" name="r17" id="ncb17" class="row2 col3" title="ncb17" />
+  <input type="radio" name="r18" id="ncb18" class="row2 col4" title="ncb18" />
+  <br />
+  <input type="radio" name="r11" id="ncb11" class="row1 col1" title="ncb11" />
+  <input type="radio" name="r12" id="ncb12" class="row1 col2" title="ncb12" />
+  <input type="radio" name="r13" id="ncb13" class="row1 col3" title="ncb13" />
+  <input type="radio" name="r14" id="ncb14" class="row1 col4" title="ncb14" />
+  <br />
+  <input type="radio" id="done" />
 
-            <!-- Пробежка -->
-            <div class="service-card" onclick="navigateTo('dinofamd.html')">
-                <div class="service-icon"><i class="fas fa-user-astronaut"></i></div>
-                <h3 class="service-title">DOROSfamd | Тест на тип личности</h3>
-                <p class="service-desc">DOROSfamd | Тест на тип личности — это лёгкий и простой тест что бы узнать ваш тип личности и на какцю знаменитость ваш характер похож.</p>
-                <a class="service-link">Пройти <i class="fas fa-arrow-right"></i></a>
-            </div>
+  <div class="lh">
+    <light></light>
+  </div>
+  <div>
+    <div class="main">
+      <island></island>
 
-            <!-- Глобальный Чат -->
-            <div class="service-card" onclick="navigateTo('DOROSchat.html')">
-                <div class="service-icon"><i class="fas fa-comments"></i></div>
-                <h3 class="service-title">DOROSfamd Глобальный Чат</h3>
-                <p class="service-desc">DOROSfamd Глобальный Чат — безопасное общение по всему миру.</p>
-                <a class="service-link">Подключиться <i class="fas fa-arrow-right"></i></a>
-            </div>
+      <tree><i></i><i></i></tree>
+      <tree><i></i><i></i></tree>
 
-            <!-- Приватный Чат -->
-            <div class="service-card" onclick="navigateTo('DOROSchatv4.html')">
-                <div class="service-icon"><i class="fas fa-mobile-alt"></i></div>
-                <h3 class="service-title">DOROSfamd Приватный Чат</h3>
-                <p class="service-desc">DOROSfamd Приватный Чат — шифрованные сообщения для конфиденциальности.</p>
-                <a class="service-link">Начать <i class="fas fa-arrow-right"></i></a>
-            </div>
+      <shed>
+        <label class="row1 col1 shedlabel" for="ncb11" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row1 col2 shedlabel" for="ncb12" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row1 col3 shedlabel" for="ncb13" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row1 col4 shedlabel" for="ncb14" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
 
-            <!-- Голосовой Словарь -->
-            <div class="service-card" onclick="navigateTo('Dr.Zulfon.html')">
-                <div class="service-icon"><i class="fas fa-microphone"></i></div>
-                <h3 class="service-title">DOROSfamd Голосовой Словарь</h3>
-                <p class="service-desc">DOROSfamd Голосовой Словарь — корректное произношение терминов.</p>
-                <a class="service-link">Использовать <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row2 col1 shedlabel" for="ncb15" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row2 col2 shedlabel" for="ncb16" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row2 col3 shedlabel" for="ncb17" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row2 col4 shedlabel" for="ncb18" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
 
-            <!-- Переводчик -->
-            <div class="service-card" onclick="navigateTo('FAMDai.html')">
-                <div class="service-icon"><i class="fas fa-language"></i></div>
-                <h3 class="service-title">DOROSfamd Переводчик</h3>
-                <p class="service-desc">DOROSfamd Переводчик — точный перевод на любой язык.</p>
-                <a class="service-link">Перевести <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row3 col1 shedlabel" for="ncb19" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row3 col2 shedlabel" for="ncb20" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row3 col3 shedlabel" for="ncb21" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row3 col4 shedlabel" for="ncb22" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+      </shed>
 
-            <!-- Викторина -->
-            <div class="service-card" onclick="navigateTo('FAMDquiz.html')">
-                <div class="service-icon"><i class="fas fa-question-circle"></i></div>
-                <h3 class="service-title">DOROSfamd Викторина</h3>
-                <p class="service-desc">DOROSfamd Викторина — тесты для развития знаний.</p>
-                <a class="service-link">Пройти <i class="fas fa-arrow-right"></i></a>
-            </div>
+      <house>
 
-            <!-- Энциклопедия -->
-            <div class="service-card" onclick="navigateTo('incoklopedia.html')">
-                <div class="service-icon"><i class="fas fa-info-circle"></i></div>
-                <h3 class="service-title">DOROSfamd Энциклопедия</h3>
-                <p class="service-desc">DOROSfamd Энциклопедия — надежный источник информации.</p>
-                <a class="service-link">Исследовать <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row1 col1 houselabel" for="ncb11" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row1 col2 houselabel" for="ncb12" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row1 col3 houselabel" for="ncb13" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row1 col4 houselabel" for="ncb14" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
 
-            <!-- Чёт/Нечёт -->
-            <div class="service-card" onclick="navigateTo('index2.html')">
-                <div class="service-icon"><i class="fas fa-dice"></i></div>
-                <h3 class="service-title">DOROSfamd Чёт/Нечёт</h3>
-                <p class="service-desc">DOROSfamd Чёт/Нечёт — стратегическая игра для логики.</p>
-                <a class="service-link">Играть <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row2 col1 houselabel" for="ncb15" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row2 col2 houselabel" for="ncb16" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row2 col3 houselabel" for="ncb17" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row2 col4 houselabel" for="ncb18" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
 
-            <!-- Новости -->
-            <div class="service-card" onclick="navigateTo('index5.html')">
-                <div class="service-icon"><i class="fas fa-newspaper"></i></div>
-                <h3 class="service-title">DOROSfamd Новости</h3>
-                <p class="service-desc">DOROSfamd Новости — актуальные события из проверенных источников.</p>
-                <a class="service-link">Читать <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row3 col1 houselabel" for="ncb19" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row3 col2 houselabel" for="ncb20" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row3 col3 houselabel" for="ncb21" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
+        <label class="row3 col4 houselabel" for="ncb22" title="Tap to build"><i></i><i></i><i></i><i></i><i></i></label>
 
-            <!-- Карта -->
-            <div class="service-card" onclick="navigateTo('index3.html')">
-                <div class="service-icon"><i class="fas fa-map-marked-alt"></i></div>
-                <h3 class="service-title">DOROSfamd Карта</h3>
-                <p class="service-desc">DOROSfamd Карта — интерактивная навигация и поиск.</p>
-                <a class="service-link">Открыть <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row4 col1 houselabel" for="ncb23" title="Tap to build"><i></i><i></i><i></i><i></i></label>
+        <label class="row4 col2 houselabel" for="ncb24" title="Tap to build"><i></i><i></i><i></i><i></i></label>
+        <label class="row4 col3 houselabel" for="ncb25" title="Tap to build"><i></i><i></i><i></i><i></i></label>
+        <label class="row4 col4 houselabel" for="ncb26" title="Tap to build"><i></i><i></i><i></i><i></i></label>
+      </house>
 
-            <!-- Галерея -->
-            <div class="service-card" onclick="navigateTo('index8.html')">
-                <div class="service-icon"><i class="fas fa-images"></i></div>
-                <h3 class="service-title">DOROSfamd Галерея</h3>
-                <p class="service-desc">DOROSfamd Галерея — управление изображениями.</p>
-                <a class="service-link">Просмотреть <i class="fas fa-arrow-right"></i></a>
-            </div>
+      <hbtn>
 
-            <!-- Shop -->
-            <div class="service-card" onclick="navigateTo('DOROShop.html')">
-                <div class="service-icon"><i class="fas fa-shopping-cart"></i></div>
-                <h3 class="service-title">DOROSfamd Shop</h3>
-                <p class="service-desc">DOROSfamd Shop — маркетплейс для профессиональной торговли.</p>
-                <a class="service-link">Перейти <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row1 col1 buttons" for="cb11" title="Tap to build"></label>
+        <label class="row1 col2 buttons" for="cb12" title="Tap to build"></label>
+        <label class="row1 col3 buttons" for="cb13" title="Tap to build"></label>
+        <label class="row1 col4 buttons" for="cb14" title="Tap to build"></label>
 
-            <!-- Прогноз Погоды -->
-            <div class="service-card" onclick="navigateTo('FAMDweather.html')">
-                <div class="service-icon"><i class="fas fa-cloud-sun"></i></div>
-                <h3 class="service-title">DOROSfamd Прогноз Погоды</h3>
-                <p class="service-desc">DOROSfamd Прогноз Погоды — точные данные для планирования.</p>
-                <a class="service-link">Проверить <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row2 col1 buttons" for="cb15" title="Tap to build"></label>
+        <label class="row2 col2 buttons" for="cb16" title="Tap to build"></label>
+        <label class="row2 col3 buttons" for="cb17" title="Tap to build"></label>
+        <label class="row2 col4 buttons" for="cb18" title="Tap to build"></label>
 
-            <!-- Видео -->
-            <div class="service-card" onclick="navigateTo('DOROSvid.html')">
-                <div class="service-icon"><i class="fas fa-video"></i></div>
-                <h3 class="service-title">DOROSfamd Видео</h3>
-                <p class="service-desc">DOROSfamd Видео — платформа для видеоконтента.</p>
-                <a class="service-link">Смотреть <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row3 col1 buttons" for="cb19" title="Tap to build"></label>
+        <label class="row3 col2 buttons" for="cb20" title="Tap to build"></label>
+        <label class="row3 col3 buttons" for="cb21" title="Tap to build"></label>
+        <label class="row3 col4 buttons" for="cb22" title="Tap to build"></label>
 
-            <!-- Конвертер Валют -->
-            <div class="service-card" onclick="navigateTo('FAMDvaluta.html')">
-                <div class="service-icon"><i class="fas fa-exchange-alt"></i></div>
-                <h3 class="service-title">DOROSfamd Конвертер Валют</h3>
-                <p class="service-desc">DOROSfamd Конвертер Валют — актуальные курсы валют.</p>
-                <a class="service-link">Конвертировать <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <label class="row4 col1 buttons" for="cb23" title="Tap to build"></label>
+        <label class="row4 col2 buttons" for="cb24" title="Tap to build"></label>
+        <label class="row4 col3 buttons" for="cb25" title="Tap to build"></label>
+        <label class="row4 col4 buttons" for="cb26" title="Tap to build"></label>
+      </hbtn>
 
-            <!-- Крестики-Нолики -->
-            <div class="service-card" onclick="navigateTo('krestikinolikifamd.html')">
-                <div class="service-icon"><i class="fas fa-th"></i></div>
-                <h3 class="service-title">DOROSfamd Крестики-Нолики</h3>
-                <p class="service-desc">DOROSfamd Крестики-Нолики — классическая игра с ИИ.</p>
-                <a class="service-link">Играть <i class="fas fa-arrow-right"></i></a>
-            </div>
+      <sbtn>
 
-<!-- DREAMfamd -->
-            <div class="service-card" onclick="navigateTo('DREAMfamd.html')">
-                <div class="service-icon"><i class="fas fa-dream"></i></div>
-                <h3 class="service-title">DREAMfamd Мечты</h3>
-                <p class="service-desc">DOROSfamd Мечты — это платформа, где люди делятся своими мечтами, а те, кто хочет помочь, могут исполнить их, отправив поддержку напрямую.</p>
-                <a class="service-link">Исполнить мечту <i class="fas fa-dream"></i></a>
-            </div>
-        
+        <label class="row1 col1 buttons" for="cb11s" title="Tap to build"></label>
+        <label class="row1 col2 buttons" for="cb12s" title="Tap to build"></label>
+        <label class="row1 col3 buttons" for="cb13s" title="Tap to build"></label>
+        <label class="row1 col4 buttons" for="cb14s" title="Tap to build"></label>
 
-            <!-- Графический Редактор -->
-            <div class="service-card" onclick="navigateTo('paint.html')">
-                <div class="service-icon"><i class="fas fa-paint-brush"></i></div>
-                <h3 class="service-title">DOROSfamd Графический Редактор</h3>
-                <p class="service-desc">DOROSfamd Графический Редактор — создание цифровых изображений.</p>
-                <a class="service-link">Создать <i class="fas fa-arrow-right"></i></a>
-            </div>
-        </div>
+        <label class="row2 col1 buttons" for="cb15s" title="Tap to build"></label>
+        <label class="row2 col2 buttons" for="cb16s" title="Tap to build"></label>
+        <label class="row2 col3 buttons" for="cb17s" title="Tap to build"></label>
+        <label class="row2 col4 buttons" for="cb18s" title="Tap to build"></label>
 
-        <!-- Модальное окно поддержки -->
-        <div class="support-modal" id="supportModal">
-            <div class="support-content">
-                <h3>Получите VIP и улучшайте проект DOROSfamd</h3>
-                <p>Ваша покупка помогает нам развивать и улучшать сервисы DOROSfamd. Спасибо, что вы с нами!</p>
-                
-                <div class="support-number">928 92 78 79</div>
-                
-                <p>Вы можете оплатить VIP через следующие сервисы:</p>
-                
-                <div class="support-methods">
-                    <div class="support-method" onclick="copyNumber()">
-                        <i class="fas fa-copy"></i>
-                        <div class="method-info">
-                            <h4>Скопировать номер</h4>
-                            <p>Нажмите, чтобы скопировать номер для перевода</p>
-                        </div>
-                    </div>
-                    
-                    <div class="support-method" onclick="openDushanbeCity()">
-                        <i class="fas fa-mobile-alt"></i>
-                        <div class="method-info">
-                            <h4>Душанбе Сити</h4>
-                            <p>Открыть приложение для быстрого перевода</p>
-                        </div>
-                    </div>
-                    
-                        <div class="support-method" onclick="openPayPal()">
-                        <i class="fab fa-paypal"></i>
-                        <div class="method-info">
-                            <h4>PayPal</h4>
-                            <p>Международные переводы через PayPal</p>
-                        </div>
-                    </div>
-                </div>
-             
-                <button class="close-support" onclick="closeSupportModal()">Закрыть</button>
-            </div>
-        </div>
-
-        <!-- Модальное окно политики конфиденциальности -->
-        <div class="privacy-modal" id="privacyModal">
-            <div class="privacy-content">
-                <h3>Политика конфиденциальности DOROSfamd</h3>
-                <h4>1. Общие положения</h4>
-                <p>DOROSfamd Technologies привержена защите данных пользователей:</p>
-                <ul>
-                    <li>Обеспечение конфиденциальности с использованием шифрования AES-256.</li>
-                    <li>Непередача данных третьим лицам без согласия.</li>
-                    <li>Соответствие стандартам GDPR и ISO 27001.</li>
-                </ul>
-
-                <h4>2. Сбор данных</h4>
-                <p>DOROSfamd Technologies собирает:</p>
-                <ul>
-                    <li>Данные учетных записей для персонализации сервисов.</li>
-                    <li>Анонимизированную аналитику для улучшения платформы.</li>
-                    <li>Контент, созданный в сервисах DOROSfamd.</li>
-                </ul>
-
-                <h4>3. Права пользователей</h4>
-                <p>Пользователи DOROSfamd имеют право:</p>
-                <ul>
-                    <li>Запрашивать доступ, исправление или удаление данных.</li>
-                    <li>Получать уведомления об изменениях в политике.</li>
-                    <li>Отказаться от аналитики через настройки.</li>
-                </ul>
-
-                <h4>4. Обязательства пользователей</h4>
-                <p>Используя DOROSfamd, вы соглашаетесь:</p>
-                <ul>
-                    <li>Соблюдать законодательство и права других.</li>
-                    <li>Не загружать запрещенный контент.</li>
-                    <li>Не пытаться получить несанкционированный доступ.</li>
-                </ul>
-
-                <h4>5. Безопасность</h4>
-                <p>DOROSfamd Technologies применяет:</p>
-                <ul>
-                    <li>Шифрование данных в транзите и хранении.</li>
-                    <li>Ежегодные аудиты безопасности сертифицированными партнерами.</li>
-                    <li>Многофакторную аутентификацию.</li>
-                </ul>
-
-                <h4>6. Контакты</h4>
-                <p>Вопросы по конфиденциальности: <a href="mailto:dorosfamd@gmail.com">dorosfamd@gmail.com</a>.</p>
-
-                <p><em>Обновлено: апрель 2025</em></p>
-                <button class="close-privacy" onclick="closePrivacy()">Закрыть</button>
-            </div>
-        </div>
-
-        <footer class="footer">
-            <div class="footer-brand">© 2025 DOROSfamd Technologies</div>
-            <div class="footer-links">
-                <a href="onas.html">О нас</a>
-                <button onclick="openPrivacy()">Конфиденциальность</button>
-            </div>
-        </footer>
-
-        <div class="watermark">K.Doriush</div>
+        <label class="row3 col1 buttons" for="cb19s" title="Tap to build"></label>
+        <label class="row3 col2 buttons" for="cb20s" title="Tap to build"></label>
+        <label class="row3 col3 buttons" for="cb21s" title="Tap to build"></label>
+        <label class="row3 col4 buttons" for="cb22s" title="Tap to build"></label>
+      </sbtn>
+      <grass></grass>
     </div>
+  </div>
+  <water><i></i></water>
 
-    <script>
-        // Функции для модального окна поддержки
-        function openSupportModal() {
-            document.getElementById('supportModal').classList.add('show');
-        }
+  <div class="lh">
+    <lens></lens>
+  </div>
 
-        function closeSupportModal() {
-            document.getElementById('supportModal').classList.remove('show');
-        }
+  <text>
+    <welldone>
+      <label for="done">✕</label>
+      <p>NICE ONE!</p>
+      <p>You built a lighthouse before nightfall!</p>
+      <p>The ships and islanders are safe!</p>
+    </welldone>
+  </text>
+  <text>
+    <gameover>
+      <label for="done">✕</label>
+      <p>Игра окончена!</p>
+      <p>I'm afraid I have some very bad news...</p>
+      <p>A ship has crashed into your beautiful island.</p>
+      <p>Everybody is dead!</p>
+      <p>Soz! You should build a lighthouse.</p>
+      <a href="" title="Try Again">Try Again</a>
+    </gameover>
+  </text>
+</colour>
+<div class="ss">
+  <lens></lens>
+</div>
+<sig><i></i></sig>
+<!-- partial -->
+  <script  src="./script.js"></script>
 
-        function copyNumber() {
-            navigator.clipboard.writeText('928927879');
-            alert('Номер 928 92 78 79 скопирован в буфер обмена!');
-        }
-
-        function openDushanbeCity() {
-            // Пытаемся открыть приложение Душанбе сити с deep link
-            window.location.href = 'dushanbecity://transfer?phone=928927879';
-            
-            // Если приложение не установлено, через 500 мс открываем страницу в магазине приложений
-            setTimeout(function() {
-                if (document.hidden) {
-                    // Если приложение открылось, то ничего не делаем
-                    return;
-                }
-                // Иначе открываем страницу приложения в магазине
-                window.location.href = 'https://play.google.com/store/apps/details?id=com.dushanbecity';
-            }, 500);
-        }
-
-        function openPayPal() {
-            alert('Для поддержки через PayPal напишите нам на dorosfamd@gmail.com');
-        }
-
-        // Плавный переход по ссылкам
-        function navigateTo(url) {
-            document.body.style.transition = 'opacity 0.3s ease';
-            document.body.style.opacity = '0';
-            setTimeout(() => {
-                window.location.href = url;
-            }, 300);
-        }
-
-        // Открытие/закрытие политики конфиденциальности
-        function openPrivacy() {
-            document.getElementById('privacyModal').classList.add('show');
-        }
-
-        function closePrivacy() {
-            document.getElementById('privacyModal').classList.remove('show');
-        }
-
-        // Поиск с подсветкой
-        const searchInput = document.getElementById('searchInput');
-        const serviceCards = document.querySelectorAll('.service-card');
-        let searchTimeout;
-
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const searchTerm = searchInput.value.toLowerCase();
-                serviceCards.forEach(card => {
-                    const title = card.querySelector('.service-title').textContent.toLowerCase();
-                    const desc = card.querySelector('.service-desc').textContent.toLowerCase();
-                    const isMatch = title.includes(searchTerm) || desc.includes(searchTerm);
-                    card.style.display = isMatch ? 'flex' : 'none';
-                    if (isMatch && searchTerm) {
-                        const titleEl = card.querySelector('.service-title');
-                        const descEl = card.querySelector('.service-desc');
-                        titleEl.innerHTML = titleEl.textContent.replace(
-                            new RegExp(searchTerm, 'gi'),
-                            match => `<span class="highlight">${match}</span>`
-                        );
-                        descEl.innerHTML = descEl.textContent.replace(
-                            new RegExp(searchTerm, 'gi'),
-                            match => `<span class="highlight">${match}</span>`
-                        );
-                    } else {
-                        card.querySelector('.service-title').innerHTML = card.querySelector('.service-title').textContent;
-                        card.querySelector('.service-desc').innerHTML = card.querySelector('.service-desc').textContent;
-                    }
-                });
-            }, 300);
-        });
-
-        // Оптимизация анимаций
-        document.querySelectorAll('.service-card').forEach(card => {
-            card.style.willChange = 'opacity';
-        });
-
-        // Анимация при загрузке
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.style.opacity = '1';
-        });
-    
-  // Проверка: iPhone + Safari
-  const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
-
-  if (isIOS && isSafari && !isInStandaloneMode) {
-    document.getElementById('iosInstall').style.display = 'block';
-  }
-
-    </script>
 </body>
 </html>
