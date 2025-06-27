@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>SheenyGun</title>
+    <meta name="description" content="SheenyGun - a retro-futuristic arcade shooter game with Sheeny and Konk characters. Blast your way through waves of enemies!" />
+    <meta name="keywords" content="DOROSfamd, SheenyGun, Gun, Sheeny, Sheenyystar, arcade game, shooter, retro game, mobile game" />
+    <meta name="author" content="Your Name/DOROSfamd" />
+    <meta property="og:title" content="SheenyGun" />
+    <meta property="og:description" content="SheenyGun - a retro-futuristic arcade shooter game with Sheeny and Konk characters. Blast your way through waves of enemies!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="YOUR_GAME_URL_HERE" />
+    <meta property="og:image" content="https://i.ibb.co/JR61PVqg/Blog.png" /> <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #1a1a1a;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            touch-action: none; /* Prevent default touch behaviors */
+        }
+
+        .container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .title-overlay {
+            position: absolute;
+            top: 2vh;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00f6ff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px #00f6ff, 0 0 20px #ff00ff;
+            z-index: 100;
+        }
+
+        .health-bar {
+            position: absolute;
+            top: 7vh;
+            left: 2vw;
+            width: 20vw;
+            height: 2vh;
+            background: #333;
+            border: 2px solid #00f6ff;
+            border-radius: 5px;
+            z-index: 100;
+        }
+
+        .health-fill {
+            width: 100%;
+            height: 100%;
+            background: #ff00ff;
+            transition: width 0.3s ease;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0000;
+            font-size: 3rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px #ff0000;
+            z-index: 200;
+            display: none;
+            text-align: center;
+        }
+
+        .txt {
+            transform: translate(-15px, -60px);
+            z-index: 999;
+            font-size: 1.4rem;
+            font-weight: 700;
+            pointer-events: none;
+            color: #ff00ff;
+            width: 20rem;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .txt.show {
+            opacity: 1;
+            transform: translate(-15px, -80px);
+        }
+
+        .bite-txt {
+            position: absolute;
+            color: #ff0000;
+            font-size: 1.2rem;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            z-index: 999;
+        }
+
+        .bite-txt.show {
+            opacity: 1;
+            transform: translateY(-20px);
+        }
+
+        .player {
+            position: absolute;
+            top: 50vh;
+            left: 50vw;
+            transform: translateX(-50%) translateY(-50%);
+            width: 45px; /* Base width for player body */
+            height: 55px; /* Base height for player body */
+            background: #2c2c2c;
+            border-radius: 10px;
+            z-index: 5;
+            border: 2px solid #00f6ff;
+            transition: background 0.2s;
+        }
+
+        .player.hurt {
+            background: #ff0000;
+        }
+
+        .player .head-image {
+            position: absolute;
+            width: 70px; /* Adjust size of head image */
+            height: 70px; /* Adjust size of head image */
+            top: -30px; /* Position above the body */
+            left: 50%;
+            transform: translateX(-50%);
+            background-image: url('https://i.ibb.co/JR61PVqg/Blog.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%; /* Make it round if the image allows */
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 246, 255, 0.5); /* Glow effect */
+        }
+
+        .player .shirt {
+            position: absolute;
+            bottom: -1px;
+            width: 105%;
+            height: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3a3a3a;
+            border-radius: 10px;
+            border-top-right-radius: 0px;
+            border-top-left-radius: 0px;
+            overflow: hidden;
+        }
+
+        .player .shirt .tie {
+            background: #ff00ff;
+            width: 10%;
+            height: 70%;
+            position: absolute;
+            top: 0;
+            left: 55%;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 55px;
+        }
+
+        .player .shirt .under {
+            position: absolute;
+            left: 60%;
+            top: 0px;
+            width: 40%;
+            height: 99%;
+            transform: translateX(-50%);
+            background: #2c2c2c;
+        }
+
+        .player .arm {
+            position: absolute;
+            width: 25%;
+            height: 40%;
+            background: #2c2c2c;
+            border-radius: 10px;
+            top: 60%;
+            transform-origin: 50% 5%;
+        }
+
+        .player .arm.right {
+            right: -10%;
+            transform: rotate(-1.5rad);
+            z-index: 0;
+        }
+
+        .player .arm.right .gun {
+            position: absolute;
+            top: 80%;
+            left: 100%;
+            width: 100%;
+            height: 150%;
+            background: #00f6ff;
+            transform-origin: -100% 0%;
+        }
+
+        .player .arm.right .gun::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 250%;
+            height: 40%;
+            background: #00f6ff;
+        }
+
+        .player .arm.right .gun .barrel {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 1px;
+            height: 1px;
+            transform: translateX(-50%) translateY(-50%);
+        }
+
+        .player .arm.left { left: -5%; }
+
+        .player .arm .sleeve {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 10px;
+            background: #ff00ff;
+            width: 100%;
+            height: 50%;
+            border-bottom-right-radius: 0px;
+            border-bottom-left-radius: 0px;
+        }
+
+        .player .leg {
+            position: absolute;
+            top: 80%;
+            width: 25%;
+            height: 45%;
+            background: #2c2c2c;
+            border-radius: 10px;
+            z-index: -1;
+            transform-origin: 50% 5%;
+            transform: translateX(-50%);
+        }
+
+        .player .leg.right { right: -5%; }
+        .player .leg.left { left: 20%; }
+
+        .player .leg .pant {
+            position: absolute;
+            width: 100%;
+            height: 80%;
+            top: 0;
+            left: 0;
+            background: #3a3a3a;
+        }
+
+        .player::after {
+            content: '';
+            position: absolute;
+            top: 115%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 246, 255, 0.2);
+            z-index: -2;
+            width: 100%;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .bullet {
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            background: #00f6ff;
+            transform: translateX(-50%) translateY(-50%);
+            z-index: 10;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #00f6ff;
+            transition: transform 0.1s;
+        }
+
+        .bullet.spawn {
+            transform: translateX(-50%) translateY(-50%) scale(1.5);
+        }
+
+        .flash {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #ff00ff;
+            transform: translateX(-50%) translateY(-50%);
+            box-shadow: 0 0 15px #ff00ff;
+            animation: flash 0.2s ease-out;
+        }
+
+        @keyframes flash {
+            0% { transform: translateX(-50%) translateY(-50%) scale(1); }
+            100% { transform: translateX(-50%) translateY(-50%) scale(1.5); opacity: 0; }
+        }
+
+        .cloud {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            opacity: 0.6;
+            box-shadow: 0 0 10px #ffffff;
+            animation: cloud 0.5s ease-out;
+        }
+
+        @keyframes cloud {
+            0% { transform: translateX(-50%) translateY(-50%) scale(0.5); opacity: 0.6; }
+            100% { transform: translateX(-50%) translateY(-50%) scale(1); opacity: 0; }
+        }
+
+        .enemy {
+            position: absolute;
+            transform: translateX(-50%) translateY(-50%);
+            transition: transform 0.3s ease, left 0.1s linear, top 0.1s linear; /* Added for smoother movement */
+            width: 60px; /* Base width for enemy image */
+            height: 60px; /* Base height for enemy image */
+            background-image: url('https://i.ibb.co/v4HL093W/konkblog.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            border: 2px solid #00f6ff;
+            box-shadow: 0 0 10px #ff4d4d;
+        }
+
+        .enemy.bite {
+            transform: translateX(-50%) translateY(-50%) scale(1.2);
+            box-shadow: 0 0 20px #ff0000;
+        }
+
+        .joystick {
+            position: fixed;
+            bottom: 10vh;
+            left: 5vw;
+            width: 150px; /* Fixed size for better touch control */
+            height: 150px;
+            background: rgba(0, 246, 255, 0.2);
+            border-radius: 50%;
+            z-index: 100;
+            display: none; /* Hidden by default, shown on mobile */
+            touch-action: none;
+        }
+
+        .joystick-inner {
+            position: absolute;
+            width: 70px; /* Fixed size for better touch control */
+            height: 70px;
+            background: #00f6ff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .title-overlay { font-size: 1.8rem; top: 3vh; }
+            .health-bar { width: 40vw; height: 2.5vh; top: 8vh;}
+            .player { width: 40px; height: 50px; }
+            .player .head-image { width: 60px; height: 60px; top: -25px; }
+            .enemy { width: 50px; height: 50px; }
+            .joystick { display: block; } /* Show joystick on smaller screens */
+            .bullet { width: 15px; height: 8px; }
+            .flash { width: 25px; height: 25px; }
+        }
+
+        @media (max-width: 480px) {
+            .title-overlay { font-size: 1.5rem; top: 4vh; }
+            .health-bar { width: 50vw; height: 2vh; top: 8vh; }
+            .player { width: 35px; height: 45px; }
+            .player .head-image { width: 50px; height: 50px; top: -20px; }
+            .enemy { width: 45px; height: 45px; }
+            .joystick { width: 120px; height: 120px; bottom: 8vh; left: 4vw; }
+            .joystick-inner { width: 60px; height: 60px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-overlay">SheenyGun</div>
+        <div class="health-bar"><div class="health-fill"></div></div>
+        <div class="game-over">Game Over!</div>
+    </div>
+    <div class="joystick"><div class="joystick-inner"></div></div>
+
+    <script>
+        // Prevent default browser touch actions like scrolling
+        document.addEventListener('touchmove', function(event) {
+            event.preventDefault();
+        }, { passive: false });
+
+        document.body.addEventListener('click', () => {
+            const text = document.querySelector('.txt');
+            if (text) { // Check if element exists before accessing classList
+                text.classList.add('show');
+                setTimeout(() => text.classList.remove('show'), 500);
+            }
+        });
+
+        var SHOOT_KNOCKBACK = 5;
+        var SHOOT_KNOCKBACKRESET = 0.25;
+
+        var mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+        // Handle mouse movement for desktop aiming
+        $(window).on('mousemove', function (e) {
+            mouse.x = e.pageX;
+            mouse.y = e.pageY;
+        });
+
+        class Player {
+            constructor(options) {
+                this.controls = options.controls;
+                this.createBullet = options.createBullet;
+                this.createSmoke = options.createSmoke;
+                this.parentContainer = options.parentContainer;
+                this.createElement(options.parentContainer);
+                this.x = window.innerWidth / 2;
+                this.y = window.innerHeight / 2;
+                this.xvel = 0;
+                this.yvel = 0;
+                this.friction = 0.8;
+                this.speed = 0.8;
+                this.scaleX = 1;
+                this.width = this.el.outerWidth(); // Get actual width after creation
+                this.height = this.el.outerHeight(); // Get actual height after creation
+                this.health = 5;
+                this.maxHealth = 5;
+                this.isHurt = false;
+                this.anim = {
+                    counter: 0,
+                    inc: Math.PI / 10,
+                    rightArm: { rot: 0, offsetX: 0, offsetY: 0 },
+                    leftArm: { rot: 0 },
+                    leftLeg: { rot: 0 },
+                    rightLeg: { rot: 0 },
+                    gun: { rot: 0 },
+                    lift: 0,
+                    knockback: 0,
+                };
+                this.shoot();
+                options.startUpdating(this.aim.bind(this));
+                options.startUpdating(this.turn.bind(this));
+                options.startUpdating(this.move.bind(this));
+                options.startUpdating(this.animate.bind(this));
+                options.startUpdating(this.boundaries.bind(this));
+                options.startUpdating(this.updateStyles.bind(this));
+                options.startUpdating(this.updateHealth.bind(this));
+            }
+
+            createElement(parentContainer) {
+                this.el = $(`
+                    <div class="player">
+                        <div class="head-image"></div>
+                        <p class="txt">Bang!💥</p>
+                        <div class='shirt'>
+                            <div class='under'></div>
+                        </div>
+                        <div class='arm right'>
+                            <div class='sleeve'></div>
+                            <div class='gun'>
+                                <div class='grey'></div>
+                                <div class='barrel'></div>
+                            </div>
+                        </div>
+                        <div class='arm left'>
+                            <div class='sleeve'></div>
+                        </div>
+                        <div class='leg right'>
+                            <div class='pant'></div>
+                        </div>
+                        <div class='leg left'>
+                            <div class='pant'></div>
+                        </div>
+                    </div>
+                `);
+                parentContainer.append(this.el);
+                // Re-calculate width/height after appending
+                this.width = this.el.outerWidth();
+                this.height = this.el.outerHeight();
+            }
+
+            animate() {
+                var isMoving = this.controls.isDown('right') || this.controls.isDown('left') || 
+                               this.controls.isDown('up') || this.controls.isDown('down');
+                if (isMoving) {
+                    this.anim.leftArm.rot = Math.sin(this.anim.counter) / 2;
+                    this.anim.rightLeg.rot = Math.sin(this.anim.counter * 0.9) * 0.5;
+                    this.anim.leftLeg.rot = Math.sin(-this.anim.counter * 0.9) * 0.5;
+                    this.anim.lift = Math.sin(this.anim.counter) * 5;
+                    this.anim.counter += this.anim.inc;
+                } else {
+                    var resetSpeed = 0.1;
+                    this.anim.leftArm.rot -= this.anim.leftArm.rot * resetSpeed;
+                    this.anim.rightLeg.rot -= this.anim.rightLeg.rot * resetSpeed;
+                    this.anim.leftLeg.rot -= this.anim.leftLeg.rot * resetSpeed;
+                    this.anim.lift -= this.anim.lift * resetSpeed;
+                }
+                var rightArmRot = this.anim.rightArm.rot;
+                this.anim.rightArm.offsetX = Math.cos(rightArmRot - Math.PI / 2) * this.anim.knockback;
+                this.anim.rightArm.offsetY = Math.sin(rightArmRot - Math.PI / 2) * this.anim.knockback;
+                this.anim.gun.rot = -this.anim.knockback * 0.1;
+                this.anim.knockback -= this.anim.knockback * SHOOT_KNOCKBACKRESET;
+            }
+
+            aim() {
+                var rightArm = this.el.find('.arm.right'); // Use this.el to find children
+                if (rightArm.length === 0) return; // Prevent error if element removed
+
+                var armOffset = rightArm.offset();
+                if (!armOffset) return; // Prevent error if offset is undefined
+
+                var armX = armOffset.left + rightArm.outerWidth() / 2;
+                var armY = armOffset.top + rightArm.outerHeight() / 2;
+                
+                var angle = Math.atan2(mouse.y - armY, mouse.x - armX);
+                this.anim.rightArm.rot = (angle - Math.PI / 2) * this.scaleX;
+            }
+
+            turn() {
+                this.scaleX = mouse.x < this.x ? -1 : 1;
+            }
+
+            move() {
+                this.x += this.xvel;
+                this.y += this.yvel;
+                this.xvel *= this.friction;
+                this.yvel *= this.friction;
+                if (this.controls.isDown('right')) this.xvel += this.speed;
+                else if (this.controls.isDown('left')) this.xvel -= this.speed;
+                if (this.controls.isDown('up')) this.yvel -= this.speed;
+                else if (this.controls.isDown('down')) this.yvel += this.speed;
+            }
+
+            boundaries() {
+                const playerWidth = this.el.outerWidth();
+                const playerHeight = this.el.outerHeight();
+
+                if (this.x - playerWidth / 2 < 0) {
+                    this.x = playerWidth / 2 + 1;
+                    this.xvel = 0;
+                } else if (this.x + playerWidth / 2 > window.innerWidth) {
+                    this.x = window.innerWidth - playerWidth / 2 - 1;
+                    this.xvel = 0;
+                }
+                if (this.y - playerHeight / 2 < 0) {
+                    this.y = playerHeight / 2 + 1;
+                    this.yvel = 0;
+                } else if (this.y + playerHeight / 2 > window.innerHeight) {
+                    this.y = window.innerHeight - playerHeight / 2 - 1;
+                    this.yvel = 0;
+                }
+            }
+
+            shoot() {
+                // Modified to use a dedicated shoot button for touch, or click for desktop
+                const shootButtonArea = window.innerWidth * 0.4; // Right 60% of the screen for shooting on touch
+                $(window).on('mousedown', (e) => {
+                    if (e.button === 0) { // Left click
+                        this.performShoot();
+                    }
+                });
+
+                $(window).on('touchstart', (e) => {
+                    // Check if the touch is not within the joystick area
+                    const touch = e.originalEvent.touches[0];
+                    if (touch.pageX > shootButtonArea) {
+                        this.performShoot();
+                    }
+                });
+            }
+
+            performShoot() {
+                var barrel = this.el.find('.barrel');
+                if (barrel.length === 0) return;
+
+                var barrelOffset = barrel.offset();
+                if (!barrelOffset) return;
+
+                var x = barrelOffset.left;
+                var y = barrelOffset.top;
+                var dir = this.anim.rightArm.rot * this.scaleX;
+                this.createBullet(x, y, dir);
+                this.anim.knockback = SHOOT_KNOCKBACK;
+                this.xvel += Math.cos(dir - Math.PI / 2) * 2.5;
+                this.yvel += Math.sin(dir - Math.PI / 2) * 2.5;
+                this.createSmoke(x, y, dir, 1);
+            }
+
+
+            updateHealth() {
+                $('.health-fill').css({ width: `${(this.health / this.maxHealth) * 100}%` });
+                if (this.health <= 0) {
+                    $('.game-over').show();
+                    this.el.remove();
+                    // Stop game updates more robustly
+                    this.updateQueue.length = 0; // Clear the update queue
+                }
+            }
+
+            takeDamage(amount) {
+                if (!this.isHurt) {
+                    this.health -= amount;
+                    this.isHurt = true;
+                    this.el.addClass('hurt');
+                    const biteTxt = $('<div class="bite-txt">Ouch!</div>').css({ left: this.x, top: this.y - 20 });
+                    this.parentContainer.append(biteTxt);
+                    biteTxt.addClass('show');
+                    setTimeout(() => {
+                        biteTxt.remove();
+                        this.el.removeClass('hurt');
+                        this.isHurt = false;
+                    }, 500);
+                }
+            }
+
+            updateStyles() {
+                this.el.css({
+                    left: this.x,
+                    top: this.y,
+                    transform: `translateX(-50%) translateY(-${50 + this.anim.lift}%) scaleX(${this.scaleX})`,
+                });
+                this.el.find('.arm.right').css({
+                    transform: `translateX(${this.anim.rightArm.offsetX}px) translateY(${this.anim.rightArm.offsetY}px) rotate(${this.anim.rightArm.rot}rad)`,
+                });
+                this.el.find('.arm.left').css({ transform: `rotate(${this.anim.leftArm.rot}rad)` });
+                this.el.find('.leg.right').css({ transform: `translateX(-50%) rotate(${this.anim.rightLeg.rot}rad)` });
+                this.el.find('.leg.left').css({ transform: `translateX(-50%) rotate(${this.anim.leftLeg.rot}rad)` });
+                this.el.find('.gun').css({ transform: `rotate(${this.anim.gun.rot}rad)` });
+            }
+        }
+
+        class Bullet {
+            constructor(options) {
+                this.createElement(options.parentContainer);
+                this.createFlash(options.parentContainer, options.x, options.y);
+                this.x = options.x;
+                this.y = options.y;
+                this.speed = 25;
+                this.dir = options.dir;
+                this.flashTimer = 0;
+                this.width = parseInt(this.el.css('width'));
+                this.height = parseInt(this.el.css('height'));
+                this.el.addClass('spawn');
+                setTimeout(() => this.el.removeClass('spawn'), 100);
+            }
+
+            createElement(parentContainer) {
+                this.el = $('<div class="bullet"></div>');
+                parentContainer.append(this.el);
+            }
+
+            createFlash(parentContainer, x, y) {
+                this.flashEl = $('<div class="flash"></div>').css({ left: x, top: y });
+                parentContainer.append(this.flashEl);
+            }
+
+            update() {
+                this.x += Math.cos(this.dir + Math.PI / 2) * this.speed;
+                this.y += Math.sin(this.dir + Math.PI / 2) * this.speed;
+                if (this.x < -50 || this.y < -50 || this.x > window.innerWidth + 50 || this.y > window.innerHeight + 50) {
+                    this.delete = true;
+                }
+                this.el.css({
+                    left: this.x,
+                    top: this.y,
+                    transform: `translateX(-50%) translateY(-50%) rotate(${this.dir + Math.PI / 2}rad)`,
+                });
+                this.flashTimer++;
+                if (this.flashTimer > 1) this.flashEl.remove();
+            }
+        }
+
+        class BulletHandler {
+            constructor(options) {
+                this.parentContainer = options.parentContainer;
+                this.bullets = [];
+                this.enemies = options.enemies;
+                options.startUpdating(this.updateBullets.bind(this));
+                this.createBullet = this.createBullet.bind(this);
+            }
+
+            updateBullets() {
+                for (var i = this.bullets.length - 1; i >= 0; i--) {
+                    var bullet = this.bullets[i];
+                    bullet.update();
+                    if (bullet.delete) {
+                        bullet.el.remove();
+                        if (bullet.flashEl) bullet.flashEl.remove();
+                        this.bullets.splice(i, 1);
+                        continue;
+                    }
+
+                    for (var j = this.enemies.length - 1; j >= 0; j--) {
+                        var enemy = this.enemies[j];
+                        var dx = bullet.x - enemy.x;
+                        var dy = bullet.y - enemy.y;
+                        var distance = Math.sqrt(dx * dx + dy * dy);
+                        // Using a more accurate collision detection for images
+                        if (distance < ((bullet.width / 2) + (enemy.width / 2))) {
+                            enemy.health -= 1;
+                            bullet.delete = true;
+                            if (enemy.health <= 0) {
+                                enemy.el.remove();
+                                this.enemies.splice(j, 1);
+                            }
+                            // Only break from inner loop if bullet is deleted
+                            if (bullet.delete) break;
+                        }
+                    }
+                }
+            }
+
+            createBullet(x, y, dir) {
+                this.bullets.push(new Bullet({
+                    x: x,
+                    y: y,
+                    dir: dir,
+                    parentContainer: this.parentContainer,
+                }));
+            }
+        }
+
+        class Controls {
+            constructor() {
+                this.keys = [
+                    { name: 'right', keyCode: 68, isDown: false }, // D
+                    { name: 'left', keyCode: 65, isDown: false },  // A
+                    { name: 'up', keyCode: 87, isDown: false },    // W
+                    { name: 'down', keyCode: 83, isDown: false },  // S
+                ];
+                this.joystick = { x: 0, y: 0, active: false, touchId: null };
+                this.createListeners();
+                this.isDown = this.isDown.bind(this);
+            }
+
+            getKey(keyCode) {
+                return this.keys.find(key => key.keyCode === keyCode);
+            }
+
+            isDown(key) {
+                if (key === 'right') return this.keys.find(k => k.name === 'right')?.isDown || this.joystick.x > 0.3;
+                if (key === 'left') return this.keys.find(k => k.name === 'left')?.isDown || this.joystick.x < -0.3;
+                if (key === 'up') return this.keys.find(k => k.name === 'up')?.isDown || this.joystick.y < -0.3;
+                if (key === 'down') return this.keys.find(k => k.name === 'down')?.isDown || this.joystick.y > 0.3;
+                return false;
+            }
+
+            createListeners() {
+                $(window).on('keydown', (e) => {
+                    var pressedKey = this.getKey(e.which);
+                    if (pressedKey) pressedKey.isDown = true;
+                });
+                $(window).on('keyup', (e) => {
+                    var pressedKey = this.getKey(e.which);
+                    if (pressedKey) pressedKey.isDown = false;
+                });
+
+                const joystick = $('.joystick');
+                const joystickInner = $('.joystick-inner');
+
+                $(window).on('touchstart', (e) => {
+                    for (let touch of e.originalEvent.touches) {
+                        const rect = joystick[0].getBoundingClientRect();
+                        const dist = Math.sqrt(
+                            Math.pow(touch.pageX - (rect.left + rect.width / 2), 2) +
+                            Math.pow(touch.pageY - (rect.top + rect.height / 2), 2)
+                        );
+                        if (dist < rect.width / 2 && !this.joystick.active) { // Only activate if touch is within joystick area and not already active
+                            this.joystick.active = true;
+                            this.joystick.touchId = touch.identifier;
+                            joystick.css({ left: touch.pageX - rect.width / 2, top: touch.pageY - rect.height / 2 }).show(); // Reposition joystick
+                            this.updateJoystick(touch.pageX, touch.pageY);
+                            return; // Stop after finding the first touch for joystick
+                        }
+                    }
+
+                    // For aiming on the right side if not a joystick touch
+                    const touch = e.originalEvent.touches[0];
+                    const shootButtonArea = window.innerWidth * 0.4;
+                    if (touch.pageX > shootButtonArea) {
+                        mouse.x = touch.pageX;
+                        mouse.y = touch.pageY;
+                    }
+                });
+
+                $(window).on('touchmove', (e) => {
+                    e.preventDefault(); // Prevent scrolling
+                    for (let touch of e.originalEvent.touches) {
+                        if (touch.identifier === this.joystick.touchId && this.joystick.active) {
+                            this.updateJoystick(touch.pageX, touch.pageY);
+                        } else { // Handle aiming for other touches (right side of screen)
+                            const shootButtonArea = window.innerWidth * 0.4;
+                            if (touch.pageX > shootButtonArea) {
+                                mouse.x = touch.pageX;
+                                mouse.y = touch.pageY;
+                            }
+                        }
+                    }
+                });
+
+                $(window).on('touchend', (e) => {
+                    for (let touch of e.originalEvent.changedTouches) {
+                        if (touch.identifier === this.joystick.touchId) {
+                            this.joystick.active = false;
+                            this.joystick.x = 0;
+                            this.joystick.y = 0;
+                            joystickInner.css({ transform: 'translate(-50%, -50%)' });
+                            joystick.hide();
+                            this.joystick.touchId = null;
+                            break;
+                        }
+                    }
+                });
+            }
+
+            updateJoystick(x, y) {
+                const joystick = $('.joystick');
+                const joystickInner = $('.joystick-inner');
+                const rect = joystick[0].getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const maxDist = rect.width / 2;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx);
+                const clampedDist = Math.min(dist, maxDist);
+
+                this.joystick.x = clampedDist * Math.cos(angle) / maxDist;
+                this.joystick.y = clampedDist * Math.sin(angle) / maxDist;
+
+                joystickInner.css({
+                    transform: `translate(-50%, -50%) translate(${clampedDist * Math.cos(angle)}px, ${clampedDist * Math.sin(angle)}px)`,
+                });
+            }
+        }
+
+        var SMOKE_COUNT = [2, 4];
+        var SMOKE_SPEED = [5, 10];
+        var SMOKE_SIZE = [5, 10];
+        var SMOKE_FRICTION = 0.85;
+        var SMOKE_FADESPEED = 0.035;
+        var SMOKE_SPREAD = 0.5;
+        class Smoke {
+            constructor(options) {
+                this.parentContainer = options.parentContainer;
+                this.clouds = [];
+                options.startUpdating(this.update.bind(this));
+                this.create = this.create.bind(this);
+            }
+
+            create(x, y, dir, intensity) {
+                var createCloud = (x, y, dir, intensity) => {
+                    var el = $('<div class="cloud"></div>');
+                    var size = getRandom(SMOKE_SIZE[0], SMOKE_SIZE[1]) * intensity;
+                    el.css({ left: x, top: y, width: size, height: size });
+                    dir += getRandom(-SMOKE_SPREAD * 100, SMOKE_SPREAD * 100) / 100;
+                    var speed = getRandom(SMOKE_SPEED[0], SMOKE_SPEED[1]) * intensity;
+                    var xvel = Math.cos(dir + Math.PI / 2) * speed;
+                    var yvel = Math.sin(dir + Math.PI / 2) * speed;
+                    return { el: el, x: x, y: y, dir: dir, xvel: xvel, yvel: yvel, opacity: 1 };
+                };
+                var count = getRandom(SMOKE_COUNT[0], SMOKE_COUNT[1]);
+                for (var i = 0; i < count; i++) {
+                    var newCloud = createCloud(x, y, dir, intensity);
+                    this.clouds.push(newCloud);
+                    this.parentContainer.append(newCloud.el);
+                }
+            }
+
+            update() {
+                for (var i = this.clouds.length - 1; i >= 0; i--) {
+                    var cloud = this.clouds[i];
+                    cloud.x += cloud.xvel;
+                    cloud.y += cloud.yvel;
+                    cloud.xvel *= SMOKE_FRICTION;
+                    cloud.yvel *= SMOKE_FRICTION;
+                    cloud.opacity -= SMOKE_FADESPEED;
+                    cloud.el.css({ left: cloud.x, top: cloud.y, opacity: cloud.opacity });
+                    if (cloud.opacity <= 0) {
+                        cloud.el.remove();
+                        this.clouds.splice(i, 1);
+                    }
+                }
+            }
+        }
+
+        class EnemyHandler {
+            constructor(options) {
+                this.parentContainer = options.parentContainer;
+                this.enemies = [];
+                this.player = options.player;
+                this.spawnTimer = 0;
+                this.spawnInterval = 180; // Spawn every 3 seconds (60 FPS * 3)
+                this.maxEnemies = 10;
+                options.startUpdating(this.updateEnemies.bind(this));
+                this.createEnemy = this.createEnemy.bind(this);
+            }
+
+            updateEnemies() {
+                // Spawn new enemies
+                this.spawnTimer++;
+                if (this.spawnTimer >= this.spawnInterval && this.enemies.length < this.maxEnemies) {
+                    this.spawnTimer = 0;
+                    const side = Math.floor(getRandom(0, 4));
+                    let x, y;
+                    // Spawn slightly off-screen
+                    const spawnOffset = 50;
+                    if (side === 0) { x = getRandom(0, window.innerWidth); y = -spawnOffset; } // Top
+                    else if (side === 1) { x = getRandom(0, window.innerWidth); y = window.innerHeight + spawnOffset; } // Bottom
+                    else if (side === 2) { x = -spawnOffset; y = getRandom(0, window.innerHeight); } // Left
+                    else { x = window.innerWidth + spawnOffset; y = getRandom(0, window.innerHeight); } // Right
+                    this.createEnemy(x, y);
+                }
+
+                // Update enemies
+                for (var i = this.enemies.length - 1; i >= 0; i--) {
+                    var enemy = this.enemies[i];
+                    if (!this.player || !this.player.el.parent().length) { // Check if player exists and is in DOM
+                         // If player is gone, stop enemy movement and eventually remove them or end game.
+                         // For now, let's just make them stop moving towards player.
+                        continue;
+                    }
+                    var dx = this.player.x - enemy.x;
+                    var dy = this.player.y - enemy.y;
+                    var distance = Math.sqrt(dx * dx + dy * dy);
+                    var speed = 1.0; // Increased enemy speed slightly
+
+                    if (distance > (enemy.width / 2 + this.player.width / 2) * 0.8) { // Only move if not very close
+                        enemy.x += (dx / distance) * speed;
+                        enemy.y += (dy / distance) * speed;
+                    }
+                    
+                    // Bite player if close
+                    // Ensure player has a 'takeDamage' method
+                    if (distance < (enemy.width / 2 + this.player.width / 2) * 0.8 && !enemy.isBiting) {
+                        enemy.isBiting = true;
+                        enemy.el.addClass('bite');
+                        if (this.player && typeof this.player.takeDamage === 'function') {
+                            this.player.takeDamage(0.5); // Damage amount
+                        }
+                        setTimeout(() => {
+                            if (enemy && enemy.el) { // Check if enemy still exists before removing class
+                                enemy.el.removeClass('bite');
+                            }
+                            enemy.isBiting = false;
+                        }, 500);
+                    }
+                    enemy.el.css({ left: enemy.x, top: enemy.y });
+                    enemy.update();
+                }
+            }
+
+            createEnemy(x, y) {
+                var newEnemy = {
+                    x: x,
+                    y: y,
+                    el: $(`<div class="enemy"></div>`), // Use generic enemy class for image
+                    update: function () {}, // Empty update function for now, visual only
+                    health: 2, // Enemies take 2 hits
+                    width: 60, // Match CSS width
+                    height: 60, // Match CSS height
+                    isBiting: false,
+                };
+                this.parentContainer.append(newEnemy.el);
+                newEnemy.el.css({ left: x, top: y });
+                this.enemies.push(newEnemy);
+            }
+        }
+
+        class RoomHandler {
+            constructor(options) {
+                this.parentContainer = options.parentContainer;
+                this.createEnemy = options.createEnemy;
+                // this.newRoom(); // Initial room generation handled by Game class
+            }
+
+            newRoom() {
+                // Not strictly needed if enemies are just spawned periodically.
+                // If you want predefined waves per "room", implement here.
+                // For now, it's more of a continuous spawn.
+            }
+        }
+
+        class Game {
+            constructor() {
+                this.container = $('.container');
+                this.updateQueue = [];
+                this.update = this.update.bind(this); // Bind update for requestAnimationFrame
+                this.update(); // Start the game loop
+
+                this.enemyHandler = new EnemyHandler({
+                    parentContainer: this.container,
+                    startUpdating: this.startUpdating.bind(this),
+                    player: null, // Player will be set after its creation
+                });
+                this.roomHandler = new RoomHandler({ // RoomHandler is largely conceptual with continuous spawning
+                    parentContainer: this.container,
+                    createEnemy: this.enemyHandler.createEnemy,
+                });
+                this.controls = new Controls();
+                this.smoke = new Smoke({
+                    parentContainer: this.container,
+                    startUpdating: this.startUpdating.bind(this),
+                });
+                this.bulletHandler = new BulletHandler({
+                    parentContainer: this.container,
+                    startUpdating: this.startUpdating.bind(this),
+                    enemies: this.enemyHandler.enemies,
+                });
+                this.player = new Player({
+                    parentContainer: this.container,
+                    startUpdating: this.startUpdating.bind(this),
+                    controls: this.controls,
+                    createBullet: this.bulletHandler.createBullet,
+                    createSmoke: this.smoke.create,
+                });
+                this.enemyHandler.player = this.player; // Link player to enemy handler
+            }
+
+            startUpdating(func) {
+                this.updateQueue.push(func);
+            }
+
+            update() {
+                // Filter out any functions that might have been removed (e.g., player when game over)
+                this.updateQueue = this.updateQueue.filter(func => func); 
+                for (var i = 0; i < this.updateQueue.length; i++) {
+                    this.updateQueue[i]();
+                }
+                window.requestAnimationFrame(this.update); // Use bound update
+            }
+        }
+
+        function getRandom(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // Removed predefined rooms as enemies are continuously spawned
+        // You can re-introduce this if you want distinct levels.
+        var rooms = [
+            // { type: 'enemy', x: 20, y: 20 },
+            // ...
+        ];
+
+        // Enemy types is simplified since we're using a single image for enemies
+        var enemyTypes = [
+            {
+                markup: `<div class="enemy"></div>`, // Simplified markup to use the background image
+                update: function () { /* No specific per-enemy animation needed with static image */ },
+            }
+        ];
+
+        new Game();
+    </script>
+</body>
+</html>
