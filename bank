@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniBank - Виртуальный банк</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #f8fafc;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --white: #ffffff;
+            --gray: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: var(--white);
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: #e0e7ff;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--white);
+            color: var(--white);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .bank-card {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .bank-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        }
+
+        .bank-card .card-number {
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .bank-card .card-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .bank-card .card-name {
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .bank-card .card-balance {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .balance {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            color: var(--gray);
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--dark);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        #qrCode {
+            margin: 20px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .scanner-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #scanner {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 16px;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover {
+            color: var(--dark);
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: var(--white);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .transaction-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .transaction-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .transaction-type {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .transaction-type.sent {
+            color: var(--danger);
+        }
+
+        .transaction-type.received {
+            color: var(--success);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .quick-action-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            color: var(--dark);
+        }
+
+        .quick-action-btn:hover {
+            background-color: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .quick-action-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .quick-action-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .bank-card .card-number {
+                font-size: 18px;
+            }
+            
+            .bank-card .card-balance {
+                font-size: 24px;
+            }
+            
+            header .container {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .auth-buttons {
+                width: 100%;
+            }
+            
+            .btn {
+                flex: 1;
+                padding: 10px;
+            }
+            
+            .tab-container {
+                overflow-x: auto;
+                padding-bottom: 8px;
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 14px;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">M</div>
+                <span>MiniBank</span>
+            </div>
+            <div class="auth-buttons">
+                <button id="loginBtn" class="btn btn-outline">Войти</button>
+                <button id="registerBtn" class="btn btn-outline">Регистрация</button>
+                <button id="logoutBtn" class="btn btn-outline hidden">Выйти</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="authContainer">
+            <div class="card" id="loginContainer">
+                <h2 class="card-title">Вход в MiniBank</h2>
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="Ваш email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Ваш пароль">
+                </div>
+                <button id="doLoginBtn" class="btn btn-primary">Войти</button>
+                <div id="loginError" class="alert alert-danger hidden"></div>
+            </div>
+
+            <div class="card hidden" id="registerContainer">
+                <h2 class="card-title">Регистрация в MiniBank</h2>
+                <div class="form-group">
+                    <label for="registerName">ФИО</label>
+                    <input type="text" id="registerName" class="form-control" placeholder="Ваше полное имя">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" class="form-control" placeholder="Ваш email">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" class="form-control" placeholder="Придумайте пароль">
+                </div>
+                <div class="form-group">
+                    <label for="registerPin">PIN-код карты (4 цифры)</label>
+                    <input type="password" id="registerPin" class="form-control" placeholder="Введите 4-значный PIN" maxlength="4" pattern="\d{4}">
+                </div>
+                <button id="doRegisterBtn" class="btn btn-primary">Зарегистрироваться</button>
+                <div id="registerError" class="alert alert-danger hidden"></div>
+            </div>
+        </div>
+
+        <div id="bankContainer" class="hidden">
+            <div class="tab-container">
+                <div class="tab active" data-tab="dashboard">Главная</div>
+                <div class="tab" data-tab="transfer">Перевод</div>
+                <div class="tab" data-tab="history">История</div>
+                <div class="tab" data-tab="qr">QR-код</div>
+            </div>
+
+            <div class="tab-content active" id="dashboardTab">
+                <div class="bank-card">
+                    <div class="card-number" id="displayCardNumber">•••• •••• •••• ••••</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-name" id="displayUserName">Имя Фамилия</div>
+                            <div>MiniBank</div>
+                        </div>
+                        <div class="card-balance" id="displayBalance">0 ₸</div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-action-btn" id="quickTransferBtn">
+                        <div class="quick-action-icon">⇄</div>
+                        <div class="quick-action-label">Перевод</div>
+                    </button>
+                    <button class="quick-action-btn" id="quickQRBtn">
+                        <div class="quick-action-icon">⌖</div>
+                        <div class="quick-action-label">QR-код</div>
+                    </button>
+                    <button class="quick-action-btn" id="quickHistoryBtn">
+                        <div class="quick-action-icon">🕒</div>
+                        <div class="quick-action-label">История</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="transferTab">
+                <div class="card">
+                    <h2 class="card-title">Перевод средств</h2>
+                    <div class="form-group">
+                        <label for="transferMethod">Способ перевода</label>
+                        <select id="transferMethod" class="form-control">
+                            <option value="card">По номеру карты</option>
+                            <option value="qr">По QR-коду</option>
+                        </select>
+                    </div>
+
+                    <div id="cardTransferForm">
+                        <div class="form-group">
+                            <label for="recipientCard">Номер карты получателя</label>
+                            <input type="text" id="recipientCard" class="form-control" placeholder="Введите номер карты (16 цифр)" maxlength="19">
+                        </div>
+                    </div>
+
+                    <div id="qrTransferForm" class="hidden">
+                        <div class="scanner-container">
+                            <video id="scanner" playsinline></video>
+                            <div class="scanner-overlay hidden" id="scannerOverlay">
+                                <div>Наведите камеру на QR-код</div>
+                            </div>
+                        </div>
+                        <div id="qrScanResult" class="alert alert-success hidden"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transferAmount">Сумма перевода</label>
+                        <input type="number" id="transferAmount" class="form-control" placeholder="Введите сумму">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transferPin">Ваш PIN-код</label>
+                        <input type="password" id="transferPin" class="form-control" placeholder="Введите ваш 4-значный PIN" maxlength="4">
+                    </div>
+
+                    <button id="doTransferBtn" class="btn btn-primary">Перевести</button>
+                    <div id="transferError" class="alert alert-danger hidden"></div>
+                    <div id="transferSuccess" class="alert alert-success hidden"></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="historyTab">
+                <div class="card">
+                    <h2 class="card-title">История операций</h2>
+                    <div class="transaction-list" id="historyBody">
+                        <!-- Транзакции будут загружены здесь -->
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-type received">
+                                    <span>↓</span>
+                                    <span>Получение</span>
+                                </div>
+                                <div class="transaction-date">23.07.2023, 14:30</div>
+                            </div>
+                            <div class="transaction-amount">+1000 ₸</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="qrTab">
+                <div class="card">
+                    <h2 class="card-title">Ваш QR-код</h2>
+                    <div class="qr-container">
+                        <div id="qrCode"></div>
+                        <p>Отсканируйте этот QR-код для перевода денег</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pinModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Подтверждение PIN-кода</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="modalPin">Введите ваш 4-значный PIN-код для подтверждения</label>
+                <input type="password" id="modalPin" class="form-control" placeholder="Введите PIN" maxlength="4">
+            </div>
+            <button id="confirmPinBtn" class="btn btn-primary">Подтвердить</button>
+            <div id="pinError" class="alert alert-danger hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7DP0EZfTQE78CUj8N-_aPyfEf5MvAc5g",
+            authDomain: "doroscoin.firebaseapp.com",
+            databaseURL: "https://doroscoin-default-rtdb.firebaseio.com",
+            projectId: "doroscoin",
+            storageBucket: "doroscoin.firebasestorage.app",
+            messagingSenderId: "372256789289",
+            appId: "1:372256789289:web:48d518bd16c0c5fa6e5d38",
+            measurementId: "G-H5VJFTVF08"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM elements
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginContainer = document.getElementById('loginContainer');
+        const registerContainer = document.getElementById('registerContainer');
+        const authContainer = document.getElementById('authContainer');
+        const bankContainer = document.getElementById('bankContainer');
+        const doLoginBtn = document.getElementById('doLoginBtn');
+        const doRegisterBtn = document.getElementById('doRegisterBtn');
+        const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError');
+        const displayUserName = document.getElementById('displayUserName');
+        const displayCardNumber = document.getElementById('displayCardNumber');
+        const displayBalance = document.getElementById('displayBalance');
+        const transferMethod = document.getElementById('transferMethod');
+        const cardTransferForm = document.getElementById('cardTransferForm');
+        const qrTransferForm = document.getElementById('qrTransferForm');
+        const doTransferBtn = document.getElementById('doTransferBtn');
+        const transferError = document.getElementById('transferError');
+        const transferSuccess = document.getElementById('transferSuccess');
+        const historyBody = document.getElementById('historyBody');
+        const qrCodeElement = document.getElementById('qrCode');
+        const scanner = document.getElementById('scanner');
+        const scannerOverlay = document.getElementById('scannerOverlay');
+        const qrScanResult = document.getElementById('qrScanResult');
+        const quickTransferBtn = document.getElementById('quickTransferBtn');
+        const quickQRBtn = document.getElementById('quickQRBtn');
+        const quickHistoryBtn = document.getElementById('quickHistoryBtn');
+        const pinModal = document.getElementById('pinModal');
+        const modalClose = document.querySelector('.modal-close');
+        const confirmPinBtn = document.getElementById('confirmPinBtn');
+        const pinError = document.getElementById('pinError');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Global variables
+        let currentUser = null;
+        let userData = null;
+        let qrScanner = null;
+
+        // Format card number with spaces
+        function formatCardNumber(number) {
+            if (!number) return '•••• •••• •••• ••••';
+            return number.replace(/(\d{4})(?=\d)/g, '$1 ');
+        }
+
+        // Generate a random 16-digit card number
+        function generateCardNumber() {
+            let cardNumber = '';
+            for (let i = 0; i < 16; i++) {
+                cardNumber += Math.floor(Math.random() * 10);
+            }
+            return cardNumber;
+        }
+
+        // Hash PIN using CryptoJS
+        function hashPin(pin) {
+            return CryptoJS.SHA256(pin).toString();
+        }
+
+        // Check if PIN is correct
+        function verifyPin(pin, hashedPin) {
+            return hashPin(pin) === hashedPin;
+        }
+
+        // Format date
+        function formatDate(timestamp) {
+            if (!timestamp) return '';
+            const date = timestamp.toDate();
+            return date.toLocaleString('ru-RU');
+        }
+
+        // Format amount with currency
+        function formatAmount(amount) {
+            if (amount === undefined || amount === null) return '0 ₸';
+            return `${amount.toLocaleString('ru-RU')} ₸`;
+        }
+
+        // Show error message
+        function showError(element, message) {
+            element.textContent = message;
+            element.classList.remove('hidden');
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Show success message
+        function showSuccess(element, message) {
+            element.textContent = message;
+            element.classList.remove('hidden');
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Switch between tabs
+        function switchTab(tabId) {
+            tabs.forEach(tab => {
+                if (tab.dataset.tab === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            tabContents.forEach(content => {
+                if (content.id === `${tabId}Tab`) {
+                    content.classList.add('active');
+                    
+                    // Initialize scanner when QR tab is opened
+                    if (tabId === 'transfer' && transferMethod.value === 'qr') {
+                        initQRScanner();
+                        if (qrScanner) {
+                            scannerOverlay.classList.remove('hidden');
+                            qrScanner.start();
+                        }
+                    }
+                } else {
+                    content.classList.remove('active');
+                    
+                    // Stop scanner when leaving transfer tab
+                    if (content.id === 'transferTab' && qrScanner) {
+                        qrScanner.stop();
+                        scannerOverlay.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        // Load user data from Firestore
+        async function loadUserData(user) {
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists) {
+                    userData = doc.data();
+                    displayUserName.textContent = userData.name || 'Пользователь';
+                    displayCardNumber.textContent = formatCardNumber(userData.cardNumber);
+                    displayBalance.textContent = formatAmount(userData.balance || 0);
+                    
+                    // Generate QR code
+                    if (userData.cardNumber) {
+                        QRCode.toCanvas(qrCodeElement, userData.cardNumber, { 
+                            width: 200,
+                            color: {
+                                dark: '#2563eb',
+                                light: '#ffffff'
+                            }
+                        }, (error) => {
+                            if (error) console.error('Ошибка генерации QR-кода:', error);
+                        });
+                    }
+
+                    // Load transaction history
+                    await loadTransactionHistory(user.uid);
+                } else {
+                    console.error('Данные пользователя не найдены');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки данных пользователя:', error);
+            }
+        }
+
+        // Load transaction history
+        async function loadTransactionHistory(userId) {
+            try {
+                const sentQuery = await db.collection('transactions')
+                    .where('fromUserId', '==', userId)
+                    .orderBy('date', 'desc')
+                    .limit(20)
+                    .get();
+
+                const receivedQuery = await db.collection('transactions')
+                    .where('toUserId', '==', userId)
+                    .orderBy('date', 'desc')
+                    .limit(20)
+                    .get();
+
+                // Combine transactions
+                let transactions = [];
+                
+                sentQuery.forEach(doc => {
+                    const data = doc.data();
+                    transactions.push({
+                        id: doc.id,
+                        ...data,
+                        type: 'sent',
+                        displayAmount: -data.totalDebited,
+                        displayType: 'Отправка'
+                    });
+                });
+
+                receivedQuery.forEach(doc => {
+                    const data = doc.data();
+                    transactions.push({
+                        id: doc.id,
+                        ...data,
+                        type: 'received',
+                        displayAmount: data.amount,
+                        displayType: 'Получение'
+                    });
+                });
+
+                // Sort by date (newest first)
+                transactions.sort((a, b) => b.date - a.date);
+
+                // Display transactions
+                historyBody.innerHTML = '';
+                
+                if (transactions.length === 0) {
+                    historyBody.innerHTML = '<div class="alert alert-info">Нет операций</div>';
+                    return;
+                }
+                
+                transactions.forEach(transaction => {
+                    const transactionEl = document.createElement('div');
+                    transactionEl.className = 'transaction-item';
+                    
+                    transactionEl.innerHTML = `
+                        <div class="transaction-info">
+                            <div class="transaction-type ${transaction.type}">
+                                <span>${transaction.type === 'sent' ? '↑' : '↓'}</span>
+                                <span>${transaction.displayType}</span>
+                            </div>
+                            <div class="transaction-date">${formatDate(transaction.date)}</div>
+                        </div>
+                        <div class="transaction-amount" style="color: ${transaction.type === 'sent' ? 'var(--danger)' : 'var(--success)'}">
+                            ${transaction.type === 'sent' ? '-' : '+'}${formatAmount(transaction.displayAmount)}
+                        </div>
+                    `;
+                    
+                    historyBody.appendChild(transactionEl);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки истории операций:', error);
+                historyBody.innerHTML = '<div class="alert alert-danger">Ошибка загрузки истории</div>';
+            }
+        }
+
+        // Transfer money
+        async function transferMoney(recipientCardNumber, amount, pin) {
+            try {
+                // Validate inputs
+                recipientCardNumber = recipientCardNumber.replace(/\s/g, '');
+                
+                if (!recipientCardNumber || recipientCardNumber.length !== 16) {
+                    throw new Error('Неверный номер карты получателя');
+                }
+
+                if (!amount || isNaN(amount)) {
+                    throw new Error('Неверная сумма перевода');
+                }
+
+                amount = parseFloat(amount);
+                if (amount <= 0) {
+                    throw new Error('Сумма должна быть положительной');
+                }
+
+                if (!pin || pin.length !== 4) {
+                    throw new Error('PIN-код должен содержать 4 цифры');
+                }
+
+                // Verify PIN
+                if (!verifyPin(pin, userData.pinHash)) {
+                    throw new Error('Неверный PIN-код');
+                }
+
+                // Check if recipient is the same as sender
+                if (recipientCardNumber === userData.cardNumber) {
+                    throw new Error('Нельзя перевести деньги себе');
+                }
+
+                // Calculate commission (1%)
+                const commission = amount * 0.01;
+                const totalDebited = amount + commission;
+
+                // Check balance
+                if (userData.balance < totalDebited) {
+                    throw new Error('Недостаточно средств');
+                }
+
+                // Find recipient user
+                const recipientQuery = await db.collection('users')
+                    .where('cardNumber', '==', recipientCardNumber)
+                    .limit(1)
+                    .get();
+
+                if (recipientQuery.empty) {
+                    throw new Error('Получатель не найден');
+                }
+
+                const recipientDoc = recipientQuery.docs[0];
+                const recipientData = recipientDoc.data();
+
+                // Find admin user (for commission)
+                const adminQuery = await db.collection('users')
+                    .where('email', '==', 'dorosfamd@dorosfamd.com')
+                    .limit(1)
+                    .get();
+
+                let adminDoc = null;
+                let adminData = null;
+                
+                if (!adminQuery.empty) {
+                    adminDoc = adminQuery.docs[0];
+                    adminData = adminDoc.data();
+                } else {
+                    // Create admin account if not exists
+                    const adminCardNumber = generateCardNumber();
+                    const adminHashedPin = hashPin('0000');
+                    
+                    try {
+                        // Create auth account
+                        const adminCredential = await auth.createUserWithEmailAndPassword(
+                            'dorosfamd@dorosfamd.com', 
+                            'admin123'
+                        );
+                        
+                        // Create firestore document
+                        await db.collection('users').doc(adminCredential.user.uid).set({
+                            name: 'Администратор',
+                            email: 'dorosfamd@dorosfamd.com',
+                            cardNumber: adminCardNumber,
+                            pinHash: adminHashedPin,
+                            balance: 0,
+                            role: 'admin',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        
+                        adminDoc = await db.collection('users').doc(adminCredential.user.uid).get();
+                        adminData = adminDoc.data();
+                    } catch (adminError) {
+                        console.error('Ошибка создания админ аккаунта:', adminError);
+                        throw new Error('Ошибка системы. Попробуйте позже.');
+                    }
+                }
+
+                // Start a batch write for the transaction
+                const batch = db.batch();
+
+                // Update sender balance
+                const senderRef = db.collection('users').doc(currentUser.uid);
+                batch.update(senderRef, {
+                    balance: firebase.firestore.FieldValue.increment(-totalDebited)
+                });
+
+                // Update recipient balance
+                const recipientRef = db.collection('users').doc(recipientDoc.id);
+                batch.update(recipientRef, {
+                    balance: firebase.firestore.FieldValue.increment(amount)
+                });
+
+                // Update admin balance (commission)
+                const adminRef = db.collection('users').doc(adminDoc.id);
+                batch.update(adminRef, {
+                    balance: firebase.firestore.FieldValue.increment(commission)
+                });
+
+                // Create transaction record
+                const transactionRef = db.collection('transactions').doc();
+                batch.set(transactionRef, {
+                    fromUserId: currentUser.uid,
+                    fromCardNumber: userData.cardNumber,
+                    toUserId: recipientDoc.id,
+                    toCardNumber: recipientData.cardNumber,
+                    amount: amount,
+                    commission: commission,
+                    totalDebited: totalDebited,
+                    date: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Commit the batch
+                await batch.commit();
+
+                // Update local user data
+                userData.balance -= totalDebited;
+                displayBalance.textContent = formatAmount(userData.balance);
+
+                // Show success message
+                showSuccess(transferSuccess, `Успешно переведено ${formatAmount(amount)} на карту ${formatCardNumber(recipientCardNumber)}`);
+
+                // Reload transaction history
+                await loadTransactionHistory(currentUser.uid);
+
+                // Clear form
+                document.getElementById('recipientCard').value = '';
+                document.getElementById('transferAmount').value = '';
+                document.getElementById('transferPin').value = '';
+
+                // Switch to history tab
+                switchTab('history');
+
+                return true;
+            } catch (error) {
+                console.error('Ошибка перевода:', error);
+                showError(transferError, error.message);
+                return false;
+            }
+        }
+
+        // Initialize QR code scanner
+        function initQRScanner() {
+            if (!qrScanner && window.QrScanner) {
+                qrScanner = new QrScanner(
+                    scanner,
+                    result => {
+                        document.getElementById('recipientCard').value = result;
+                        qrScanner.stop();
+                        scannerOverlay.classList.add('hidden');
+                        showSuccess(qrScanResult, `Отсканировано: ${result}`);
+                        
+                        // Switch to card transfer form
+                        transferMethod.value = 'card';
+                        cardTransferForm.classList.remove('hidden');
+                        qrTransferForm.classList.add('hidden');
+                    },
+                    {
+                        highlightScanRegion: true,
+                        highlightCodeOutline: true,
+                        maxScansPerSecond: 5,
+                    }
+                );
+            }
+        }
+
+        // Event listeners
+        loginBtn.addEventListener('click', () => {
+            loginContainer.classList.remove('hidden');
+            registerContainer.classList.add('hidden');
+        });
+
+        registerBtn.addEventListener('click', () => {
+            registerContainer.classList.remove('hidden');
+            loginContainer.classList.add('hidden');
+        });
+
+        doLoginBtn.addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                await loadUserData(currentUser);
+                authContainer.classList.add('hidden');
+                bankContainer.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+            } catch (error) {
+                console.error('Ошибка входа:', error);
+                showError(loginError, error.message);
+            }
+        });
+
+        doRegisterBtn.addEventListener('click', async () => {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const pin = document.getElementById('registerPin').value;
+
+            try {
+                // Validate inputs
+                if (!name || !email || !password || !pin) {
+                    throw new Error('Все поля обязательны для заполнения');
+                }
+
+                if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+                    throw new Error('PIN-код должен состоять из 4 цифр');
+                }
+
+                // Create user in Firebase Auth
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+
+                // Create user in Firestore
+                const cardNumber = generateCardNumber();
+                const hashedPin = hashPin(pin);
+
+                await db.collection('users').doc(currentUser.uid).set({
+                    name: name,
+                    email: email,
+                    cardNumber: cardNumber,
+                    pinHash: hashedPin,
+                    balance: 1000, // Начальный баланс
+                    role: 'user',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Load user data and show bank interface
+                await loadUserData(currentUser);
+                authContainer.classList.add('hidden');
+                bankContainer.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+                
+                // Show welcome message
+                showSuccess(registerError, 'Регистрация успешна! Вам начислено 1000 ₸');
+                registerError.classList.remove('alert-danger');
+                registerError.classList.add('alert-success');
+            } catch (error) {
+                console.error('Ошибка регистрации:', error);
+                showError(registerError, error.message);
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                currentUser = null;
+                userData = null;
+                bankContainer.classList.add('hidden');
+                authContainer.classList.remove('hidden');
+                loginContainer.classList.remove('hidden');
+                registerContainer.classList.add('hidden');
+                logoutBtn.classList.add('hidden');
+                
+                // Reset forms
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('registerName').value = '';
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('registerPin').value = '';
+            }).catch(error => {
+                console.error('Ошибка выхода:', error);
+            });
+        });
+
+        transferMethod.addEventListener('change', () => {
+            if (transferMethod.value === 'card') {
+                cardTransferForm.classList.remove('hidden');
+                qrTransferForm.classList.add('hidden');
+                if (qrScanner) qrScanner.stop();
+                scannerOverlay.classList.add('hidden');
+            } else {
+                cardTransferForm.classList.add('hidden');
+                qrTransferForm.classList.remove('hidden');
+                scannerOverlay.classList.remove('hidden');
+                qrScanResult.classList.add('hidden');
+                initQRScanner();
+                if (qrScanner) qrScanner.start();
+            }
+        });
+
+        doTransferBtn.addEventListener('click', async () => {
+            const recipientCard = document.getElementById('recipientCard').value;
+            const amount = document.getElementById('transferAmount').value;
+            const pin = document.getElementById('transferPin').value;
+
+            await transferMoney(recipientCard, amount, pin);
+        });
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchTab(tab.dataset.tab);
+            });
+        });
+
+        quickTransferBtn.addEventListener('click', () => {
+            switchTab('transfer');
+        });
+
+        quickQRBtn.addEventListener('click', () => {
+            switchTab('qr');
+        });
+
+        quickHistoryBtn.addEventListener('click', () => {
+            switchTab('history');
+        });
+
+        modalClose.addEventListener('click', () => {
+            pinModal.classList.add('hidden');
+        });
+
+        // Format card number input
+        document.getElementById('recipientCard').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            if (value.length > 16) value = value.substring(0, 16);
+            
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' ';
+                formatted += value[i];
+            }
+            
+            e.target.value = formatted;
+        });
+
+        // Auth state observer
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadUserData(user);
+                authContainer.classList.add('hidden');
+                bankContainer.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+            } else {
+                currentUser = null;
+                userData = null;
+                bankContainer.classList.add('hidden');
+                authContainer.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+            }
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if QrScanner is available
+            if (!window.QrScanner) {
+                console.warn('QR Scanner library not loaded');
+                document.getElementById('transferMethod').innerHTML = `
+                    <option value="card">По номеру карты</option>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
