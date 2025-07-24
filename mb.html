@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUZbank by DOROSfamd</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --success: #00b09b;
+            --danger: #ff416c;
+            --warning: #ffb347;
+            --light: #f8f9fa;
+            --dark: #1a1a2e;
+            --white: #ffffff;
+            --gray: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--white);
+            color: var(--primary);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--white);
+            color: var(--white);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 24px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .card-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        /* Bank Card Styles */
+        .bank-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            height: 240px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .bank-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
+        }
+
+        .bank-card .card-number {
+            font-size: 24px;
+            letter-spacing: 3px;
+            margin: 25px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .bank-card .card-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .bank-card .card-name {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bank-card .card-balance {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+            background-color: var(--white);
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Tab Styles */
+        .tab-container {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+
+        .tab-container::after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            height: 3px;
+            width: 0;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            transition: all 0.3s ease;
+        }
+
+        .tab-container.active-tab-0::after {
+            width: 25%;
+            left: 0;
+        }
+
+        .tab-container.active-tab-1::after {
+            width: 25%;
+            left: 25%;
+        }
+
+        .tab-container.active-tab-2::after {
+            width: 25%;
+            left: 50%;
+        }
+
+        .tab-container.active-tab-3::after {
+            width: 25%;
+            left: 75%;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.3s ease;
+            text-align: center;
+            flex: 1;
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--dark);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* QR Code Styles */
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 25px 0;
+        }
+
+        #qrCode {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Scanner Styles */
+        .scanner-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        #scanner {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 18px;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .scanner-overlay i {
+            font-size: 40px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gray);
+            background: none;
+            border: none;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background-color: #f0f0f0;
+            color: var(--dark);
+        }
+
+        /* Alert/Notification Styles */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+        }
+
+        .alert-success {
+            background-color: #e6f7ee;
+            color: #0a5c36;
+            border-left: 5px solid #00b09b;
+        }
+
+        .alert-danger {
+            background-color: #fde8e8;
+            color: #9b1c1c;
+            border-left: 5px solid #ff416c;
+        }
+
+        .alert-warning {
+            background-color: #fff4e6;
+            color: #8a5300;
+            border-left: 5px solid #ffb347;
+        }
+
+        .alert-info {
+            background-color: #e6f3ff;
+            color: #1a4b8c;
+            border-left: 5px solid #3b82f6;
+        }
+
+        .alert-icon {
+            font-size: 22px;
+        }
+
+        /* Transaction History Styles */
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px;
+            border-radius: 12px;
+            background-color: var(--white);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            align-items: center;
+        }
+
+        .transaction-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .transaction-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .transaction-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .transaction-type {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .transaction-type.received {
+            background-color: var(--success);
+        }
+
+        .transaction-type.sent {
+            background-color: var(--danger);
+        }
+
+        .transaction-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .transaction-date {
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 3px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .quick-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 10px;
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: var(--dark);
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        }
+
+        .quick-action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-bottom: 12px;
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+        }
+
+        .quick-action-label {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .auth-buttons {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                padding: 12px;
+            }
+
+            .bank-card {
+                height: 200px;
+                padding: 20px;
+            }
+
+            .bank-card .card-number {
+                font-size: 18px;
+                margin: 15px 0;
+            }
+
+            .bank-card .card-balance {
+                font-size: 24px;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .quick-action-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .tab {
+                padding: 12px 10px;
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .bank-card {
+                height: 180px;
+            }
+
+            .tab {
+                padding: 10px 5px;
+                font-size: 13px;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <div class="logo-icon">M</div>
+                <span>MUZbank by DOROSfamd</span>
+            </div>
+            <div class="auth-buttons">
+                <button id="loginBtn" class="btn btn-outline">
+                    <i>👤</i> Вход
+                </button>
+                <button id="registerBtn" class="btn btn-outline">
+                    <i>📝</i> Регистрация
+                </button>
+                <button id="logoutBtn" class="btn btn-outline hidden">
+                    <i>🚪</i> Выход
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Auth Container -->
+        <div id="authContainer">
+            <!-- Login Form -->
+            <div class="card" id="loginContainer">
+                <h2 class="card-title">Вход в MUZbank</h2>
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="Ваш email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Ваш пароль">
+                </div>
+                <button id="doLoginBtn" class="btn btn-primary">
+                    <span class="spinner hidden"></span>
+                    Войти
+                </button>
+                <div id="loginError" class="alert alert-danger hidden">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-message"></div>
+                </div>
+            </div>
+
+            <!-- Registration Form -->
+            <div class="card hidden" id="registerContainer">
+                <h2 class="card-title">Регистрация в MUZbank</h2>
+                <div class="form-group">
+                    <label for="registerName">ФИО</label>
+                    <input type="text" id="registerName" class="form-control" placeholder="Ваше полное имя">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" class="form-control" placeholder="Ваш email">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" class="form-control" placeholder="Придумайте пароль">
+                </div>
+                <div class="form-group">
+                    <label for="registerPin">PIN-код карты (4 цифры)</label>
+                    <input type="password" id="registerPin" class="form-control" placeholder="Введите 4-значный PIN" maxlength="4" inputmode="numeric">
+                    <small class="text-muted">Этот PIN будет использоваться для подтверждения операций</small>
+                </div>
+                <button id="doRegisterBtn" class="btn btn-primary">
+                    <span class="spinner hidden"></span>
+                    Зарегистрироваться
+                </button>
+                <div id="registerError" class="alert alert-danger hidden">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-message"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Container -->
+        <div id="bankContainer" class="hidden">
+            <!-- Tabs -->
+            <div class="tab-container active-tab-0">
+                <div class="tab active" data-tab="dashboard">Главная</div>
+                <div class="tab" data-tab="transfer">Перевод</div>
+                <div class="tab" data-tab="history">История</div>
+                <div class="tab" data-tab="qr">Мой QR</div>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div class="tab-content active" id="dashboardTab">
+                <div class="bank-card">
+                    <div class="card-number" id="displayCardNumber">•••• •••• •••• ••••</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-name" id="displayUserName">Имя Фамилия</div>
+                            <div>MUZbank</div>
+                        </div>
+                        <div class="card-balance" id="displayBalance">0 ₸</div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-action-btn" id="quickTransferBtn">
+                        <div class="quick-action-icon">⇄</div>
+                        <div class="quick-action-label">Перевод</div>
+                    </button>
+                    <button class="quick-action-btn" id="quickQRBtn">
+                        <div class="quick-action-icon">⌖</div>
+                        <div class="quick-action-label">Мой QR</div>
+                    </button>
+                    <button class="quick-action-btn" id="quickHistoryBtn">
+                        <div class="quick-action-icon">🕒</div>
+                        <div class="quick-action-label">История</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Transfer Tab -->
+            <div class="tab-content" id="transferTab">
+                <div class="card">
+                    <h2 class="card-title">Перевод средств</h2>
+                    <div class="form-group">
+                        <label for="transferMethod">Способ перевода</label>
+                        <select id="transferMethod" class="form-control">
+                            <option value="card">По номеру карты</option>
+                            <option value="qr">По QR-коду</option>
+                        </select>
+                    </div>
+
+                    <div id="cardTransferForm">
+                        <div class="form-group">
+                            <label for="recipientCard">Номер карты получателя</label>
+                            <input type="text" id="recipientCard" class="form-control" placeholder="Введите 16 цифр карты" maxlength="19" inputmode="numeric">
+                        </div>
+                    </div>
+
+                    <div id="qrTransferForm" class="hidden">
+                        <div class="scanner-container">
+                            <video id="scanner" playsinline></video>
+                            <div class="scanner-overlay hidden" id="scannerOverlay">
+                                <i>⌖</i>
+                                <div>Наведите камеру на QR-код</div>
+                            </div>
+                        </div>
+                        <div id="qrScanResult" class="alert alert-success hidden">
+                            <div class="alert-icon">✅</div>
+                            <div class="alert-message"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transferAmount">Сумма перевода (₸)</label>
+                        <input type="number" id="transferAmount" class="form-control" placeholder="Введите сумму" inputmode="decimal">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transferPin">Ваш PIN-код</label>
+                        <input type="password" id="transferPin" class="form-control" placeholder="Введите ваш 4-значный PIN" maxlength="4" inputmode="numeric">
+                    </div>
+
+                    <button id="doTransferBtn" class="btn btn-primary">
+                        <span class="spinner hidden"></span>
+                        Перевести
+                    </button>
+                    <div id="transferError" class="alert alert-danger hidden">
+                        <div class="alert-icon">⚠️</div>
+                        <div class="alert-message"></div>
+                    </div>
+                    <div id="transferSuccess" class="alert alert-success hidden">
+                        <div class="alert-icon">✅</div>
+                        <div class="alert-message"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-content" id="historyTab">
+                <div class="card">
+                    <h2 class="card-title">История операций</h2>
+                    <div class="transaction-list" id="historyBody">
+                        <!-- Transactions will be loaded here -->
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🕒</div>
+                            <h3>Нет операций</h3>
+                            <p>Здесь будут отображаться ваши транзакции</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Tab -->
+            <div class="tab-content" id="qrTab">
+                <div class="card">
+                    <h2 class="card-title">Мой QR-код для переводов</h2>
+                    <div class="qr-container">
+                        <div id="qrCode"></div>
+                        <p>Дайте отсканировать этот код для быстрого перевода</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 2000; width: 100%; max-width: 350px;"></div>
+
+    <!-- Firebase Initialization -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7DP0EZfTQE78CUj8N-_aPyfEf5MvAc5g",
+            authDomain: "doroscoin.firebaseapp.com",
+            databaseURL: "https://doroscoin-default-rtdb.firebaseio.com",
+            projectId: "doroscoin",
+            storageBucket: "doroscoin.firebasestorage.app",
+            messagingSenderId: "372256789289",
+            appId: "1:372256789289:web:48d518bd16c0c5fa6e5d38",
+            measurementId: "G-H5VJFTVF08"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM elements
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginContainer = document.getElementById('loginContainer');
+        const registerContainer = document.getElementById('registerContainer');
+        const authContainer = document.getElementById('authContainer');
+        const bankContainer = document.getElementById('bankContainer');
+        const doLoginBtn = document.getElementById('doLoginBtn');
+        const doRegisterBtn = document.getElementById('doRegisterBtn');
+        const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError');
+        const displayUserName = document.getElementById('displayUserName');
+        const displayCardNumber = document.getElementById('displayCardNumber');
+        const displayBalance = document.getElementById('displayBalance');
+        const transferMethod = document.getElementById('transferMethod');
+        const cardTransferForm = document.getElementById('cardTransferForm');
+        const qrTransferForm = document.getElementById('qrTransferForm');
+        const doTransferBtn = document.getElementById('doTransferBtn');
+        const transferError = document.getElementById('transferError');
+        const transferSuccess = document.getElementById('transferSuccess');
+        const historyBody = document.getElementById('historyBody');
+        const qrCodeElement = document.getElementById('qrCode');
+        const scanner = document.getElementById('scanner');
+        const scannerOverlay = document.getElementById('scannerOverlay');
+        const qrScanResult = document.getElementById('qrScanResult');
+        const quickTransferBtn = document.getElementById('quickTransferBtn');
+        const quickQRBtn = document.getElementById('quickQRBtn');
+        const quickHistoryBtn = document.getElementById('quickHistoryBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const tabContainer = document.querySelector('.tab-container');
+        const notificationContainer = document.getElementById('notificationContainer');
+
+        // Global variables
+        let currentUser = null;
+        let userData = null;
+        let qrScanner = null;
+        let activeTabIndex = 0;
+
+        // Utility functions
+        function formatCardNumber(number) {
+            if (!number) return '•••• •••• •••• ••••';
+            return number.replace(/(\d{4})(?=\d)/g, '$1 ');
+        }
+
+        function generateCardNumber() {
+            let cardNumber = '';
+            for (let i = 0; i < 16; i++) {
+                cardNumber += Math.floor(Math.random() * 10);
+            }
+            return cardNumber;
+        }
+
+        function hashPin(pin) {
+            return CryptoJS.SHA256(pin).toString();
+        }
+
+        function verifyPin(pin, hashedPin) {
+            return pin && pin.length === 4 && hashPin(pin) === hashedPin;
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return '';
+            const date = timestamp.toDate();
+            return date.toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatAmount(amount) {
+            if (amount === undefined || amount === null) return '0 ₸';
+            return `${amount.toLocaleString('ru-RU')} ₸`;
+        }
+
+        function showNotification(type, message, duration = 5000) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.innerHTML = `
+                <div class="alert-icon">${type === 'success' ? '✅' : '⚠️'}</div>
+                <div class="alert-message">${message}</div>
+            `;
+            notificationContainer.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.5s ease';
+                setTimeout(() => notification.remove(), 500);
+            }, duration);
+        }
+
+        function showError(element, message) {
+            if (!element) {
+                showNotification('danger', message);
+                return;
+            }
+            
+            const messageEl = element.querySelector('.alert-message');
+            if (messageEl) messageEl.textContent = message;
+            element.classList.remove('hidden');
+            
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
+        }
+
+        function showSuccess(element, message) {
+            if (!element) {
+                showNotification('success', message);
+                return;
+            }
+            
+            const messageEl = element.querySelector('.alert-message');
+            if (messageEl) messageEl.textContent = message;
+            element.classList.remove('hidden');
+            
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
+        }
+
+        function toggleLoading(button, isLoading) {
+            const spinner = button.querySelector('.spinner');
+            if (spinner) {
+                spinner.classList.toggle('hidden', !isLoading);
+            }
+            button.disabled = isLoading;
+        }
+
+        // Tab navigation
+        function switchTab(tabId) {
+            const tabIndex = Array.from(tabs).findIndex(tab => tab.dataset.tab === tabId);
+            if (tabIndex === -1) return;
+            
+            activeTabIndex = tabIndex;
+            tabContainer.className = `tab-container active-tab-${tabIndex}`;
+            
+            tabs.forEach((tab, index) => {
+                tab.classList.toggle('active', index === tabIndex);
+            });
+            
+            tabContents.forEach((content, index) => {
+                content.classList.toggle('active', index === tabIndex);
+            });
+            
+            // Initialize scanner if QR tab is opened
+            if (tabId === 'transfer' && transferMethod.value === 'qr') {
+                initQRScanner();
+                if (qrScanner) {
+                    scannerOverlay.classList.remove('hidden');
+                    qrScanner.start();
+                }
+            } else if (qrScanner) {
+                qrScanner.stop();
+                scannerOverlay.classList.add('hidden');
+            }
+        }
+
+        // User data management
+        async function loadUserData(user) {
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists) {
+                    userData = doc.data();
+                    
+                    // Update UI
+                    displayUserName.textContent = userData.name || 'Пользователь';
+                    displayCardNumber.textContent = formatCardNumber(userData.cardNumber);
+                    displayBalance.textContent = formatAmount(userData.balance || 0);
+                    
+                    // Generate QR code
+                    if (userData.cardNumber) {
+                        QRCode.toCanvas(qrCodeElement, userData.cardNumber, { 
+                            width: 200,
+                            color: {
+                                dark: '#6a11cb',
+                                light: '#ffffff'
+                            }
+                        }, (error) => {
+                            if (error) console.error('Ошибка генерации QR-кода:', error);
+                        });
+                    }
+                    
+                    // Load transaction history
+                    await loadTransactionHistory(user.uid);
+                    
+                    showNotification('success', 'Добро пожаловать в MUZbank!');
+                } else {
+                    console.error('Данные пользователя не найдены');
+                    showNotification('danger', 'Ошибка загрузки данных');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+                showNotification('danger', 'Ошибка загрузки данных');
+            }
+        }
+
+        // Transaction history
+        async function loadTransactionHistory(userId) {
+            try {
+                const [sentQuery, receivedQuery] = await Promise.all([
+                    db.collection('transactions')
+                        .where('fromUserId', '==', userId)
+                        .orderBy('date', 'desc')
+                        .limit(20)
+                        .get(),
+                    db.collection('transactions')
+                        .where('toUserId', '==', userId)
+                        .orderBy('date', 'desc')
+                        .limit(20)
+                        .get()
+                ]);
+
+                // Combine transactions
+                let transactions = [];
+                
+                sentQuery.forEach(doc => {
+                    const data = doc.data();
+                    transactions.push({
+                        ...data,
+                        type: 'sent',
+                        displayAmount: -data.totalDebited,
+                        displayType: 'Отправка'
+                    });
+                });
+
+                receivedQuery.forEach(doc => {
+                    const data = doc.data();
+                    transactions.push({
+                        ...data,
+                        type: 'received',
+                        displayAmount: data.amount,
+                        displayType: 'Получение'
+                    });
+                });
+
+                // Sort by date
+                transactions.sort((a, b) => b.date - a.date);
+                
+                // Display transactions
+                renderTransactionHistory(transactions);
+            } catch (error) {
+                console.error('Ошибка загрузки истории:', error);
+                showNotification('danger', 'Ошибка загрузки истории операций');
+                renderTransactionHistory([]);
+            }
+        }
+
+        function renderTransactionHistory(transactions) {
+            if (transactions.length === 0) {
+                historyBody.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🕒</div>
+                        <h3>Нет операций</h3>
+                        <p>Здесь будут отображаться ваши транзакции</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            historyBody.innerHTML = '';
+            
+            transactions.forEach(transaction => {
+                const transactionEl = document.createElement('div');
+                transactionEl.className = 'transaction-item';
+                
+                transactionEl.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-title">
+                            <div class="transaction-type ${transaction.type}">
+                                ${transaction.type === 'sent' ? '↑' : '↓'}
+                            </div>
+                            <div>${transaction.displayType}</div>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-date">${formatDate(transaction.date)}</div>
+                        </div>
+                    </div>
+                    <div class="transaction-amount" style="color: ${transaction.type === 'sent' ? 'var(--danger)' : 'var(--success)'}">
+                        ${transaction.type === 'sent' ? '-' : '+'}${formatAmount(Math.abs(transaction.displayAmount))}
+                    </div>
+                `;
+                
+                historyBody.appendChild(transactionEl);
+            });
+        }
+
+        // Money transfer
+        async function transferMoney(recipientCardNumber, amount, pin) {
+            try {
+                // Validate inputs
+                recipientCardNumber = recipientCardNumber.replace(/\s/g, '');
+                
+                if (!recipientCardNumber || recipientCardNumber.length !== 16) {
+                    throw new Error('Номер карты должен содержать 16 цифр');
+                }
+
+                if (!amount || isNaN(amount) || amount <= 0) {
+                    throw new Error('Введите корректную сумму');
+                }
+
+                amount = parseFloat(amount);
+                if (amount < 1) {
+                    throw new Error('Минимальная сумма перевода: 1 ₸');
+                }
+
+                if (!pin || pin.length !== 4 || !/^\d+$/.test(pin)) {
+                    throw new Error('PIN-код должен состоять из 4 цифр');
+                }
+
+                // Verify PIN
+                if (!verifyPin(pin, userData.pinHash)) {
+                    throw new Error('Неверный PIN-код');
+                }
+
+                // Check if recipient is the same as sender
+                if (recipientCardNumber === userData.cardNumber) {
+                    throw new Error('Нельзя перевести деньги себе');
+                }
+
+                // Calculate commission (1%)
+                const commission = amount * 0.01;
+                const totalDebited = amount + commission;
+
+                // Check balance
+                if (userData.balance < totalDebited) {
+                    throw new Error('Недостаточно средств');
+                }
+
+                // Find recipient
+                const recipientQuery = await db.collection('users')
+                    .where('cardNumber', '==', recipientCardNumber)
+                    .limit(1)
+                    .get();
+
+                if (recipientQuery.empty) {
+                    throw new Error('Получатель не найден');
+                }
+
+                const recipientDoc = recipientQuery.docs[0];
+                const recipientData = recipientDoc.data();
+
+                // Find or create admin account
+                let adminDoc;
+                const adminQuery = await db.collection('users')
+                    .where('email', '==', 'dorosfamd@dorosfamd.com')
+                    .limit(1)
+                    .get();
+
+                if (adminQuery.empty) {
+                    // Create admin account
+                    const adminCardNumber = generateCardNumber();
+                    const adminHashedPin = hashPin('0000');
+                    
+                    try {
+                        const adminCredential = await auth.createUserWithEmailAndPassword(
+                            'dorosfamd@dorosfamd.com', 
+                            'Admin@12345'
+                        );
+                        
+                        await db.collection('users').doc(adminCredential.user.uid).set({
+                            name: 'Администратор',
+                            email: 'dorosfamd@dorosfamd.com',
+                            cardNumber: adminCardNumber,
+                            pinHash: adminHashedPin,
+                            balance: 0,
+                            role: 'admin',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        
+                        adminDoc = await db.collection('users').doc(adminCredential.user.uid).get();
+                    } catch (adminError) {
+                        console.error('Ошибка создания админа:', adminError);
+                        throw new Error('Ошибка системы');
+                    }
+                } else {
+                    adminDoc = adminQuery.docs[0];
+                }
+
+                // Execute transaction
+                const batch = db.batch();
+                
+                // Update sender balance
+                const senderRef = db.collection('users').doc(currentUser.uid);
+                batch.update(senderRef, {
+                    balance: firebase.firestore.FieldValue.increment(-totalDebited)
+                });
+
+                // Update recipient balance
+                const recipientRef = db.collection('users').doc(recipientDoc.id);
+                batch.update(recipientRef, {
+                    balance: firebase.firestore.FieldValue.increment(amount)
+                });
+
+                // Update admin balance (commission)
+                const adminRef = db.collection('users').doc(adminDoc.id);
+                batch.update(adminRef, {
+                    balance: firebase.firestore.FieldValue.increment(commission)
+                });
+
+                // Create transaction record
+                const transactionRef = db.collection('transactions').doc();
+                batch.set(transactionRef, {
+                    fromUserId: currentUser.uid,
+                    fromCardNumber: userData.cardNumber,
+                    toUserId: recipientDoc.id,
+                    toCardNumber: recipientData.cardNumber,
+                    amount: amount,
+                    commission: commission,
+                    totalDebited: totalDebited,
+                    date: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Commit transaction
+                await batch.commit();
+
+                // Update local data
+                userData.balance -= totalDebited;
+                displayBalance.textContent = formatAmount(userData.balance);
+
+                // Show success
+                showSuccess(transferSuccess, `Успешно переведено ${formatAmount(amount)} на карту ${formatCardNumber(recipientCardNumber)}`);
+                showNotification('success', `Перевод выполнен! Комиссия: ${formatAmount(commission)}`);
+
+                // Reload history
+                await loadTransactionHistory(currentUser.uid);
+
+                // Clear form
+                document.getElementById('recipientCard').value = '';
+                document.getElementById('transferAmount').value = '';
+                document.getElementById('transferPin').value = '';
+
+                // Switch to history tab
+                switchTab('history');
+
+                return true;
+            } catch (error) {
+                console.error('Ошибка перевода:', error);
+                showError(transferError, error.message);
+                return false;
+            }
+        }
+
+        // QR Scanner
+        function initQRScanner() {
+            if (!qrScanner && window.QrScanner) {
+                qrScanner = new QrScanner(
+                    scanner,
+                    result => {
+                        document.getElementById('recipientCard').value = result;
+                        qrScanner.stop();
+                        scannerOverlay.classList.add('hidden');
+                        showSuccess(qrScanResult, `Отсканировано: ${result}`);
+                        
+                        // Switch to card input
+                        transferMethod.value = 'card';
+                        cardTransferForm.classList.remove('hidden');
+                        qrTransferForm.classList.add('hidden');
+                    },
+                    {
+                        highlightScanRegion: true,
+                        highlightCodeOutline: true,
+                        maxScansPerSecond: 5,
+                    }
+                );
+            }
+        }
+
+        // Event listeners
+        loginBtn.addEventListener('click', () => {
+            loginContainer.classList.remove('hidden');
+            registerContainer.classList.add('hidden');
+            showNotification('info', 'Введите ваши данные для входа');
+        });
+
+        registerBtn.addEventListener('click', () => {
+            registerContainer.classList.remove('hidden');
+            loginContainer.classList.add('hidden');
+            showNotification('info', 'Заполните форму регистрации');
+        });
+
+        doLoginBtn.addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showError(loginError, 'Заполните все поля');
+                return;
+            }
+
+            try {
+                toggleLoading(doLoginBtn, true);
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                await loadUserData(currentUser);
+                authContainer.classList.add('hidden');
+                bankContainer.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+            } catch (error) {
+                console.error('Ошибка входа:', error);
+                showError(loginError, error.message || 'Ошибка входа');
+            } finally {
+                toggleLoading(doLoginBtn, false);
+            }
+        });
+
+        doRegisterBtn.addEventListener('click', async () => {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const pin = document.getElementById('registerPin').value;
+
+            if (!name || !email || !password || !pin) {
+                showError(registerError, 'Заполните все поля');
+                return;
+            }
+
+            if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+                showError(registerError, 'PIN должен состоять из 4 цифр');
+                return;
+            }
+
+            try {
+                toggleLoading(doRegisterBtn, true);
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+
+                // Create user document
+                const cardNumber = generateCardNumber();
+                const hashedPin = hashPin(pin);
+
+                await db.collection('users').doc(currentUser.uid).set({
+                    name: name,
+                    email: email,
+                    cardNumber: cardNumber,
+                    pinHash: hashedPin,
+                    balance: 1000, // Starting balance
+                    role: 'user',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Load user data
+                await loadUserData(currentUser);
+                authContainer.classList.add('hidden');
+                bankContainer.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+                
+                // Show welcome message
+                showSuccess(registerError, 'Регистрация успешна! Вам начислено 1000 ₸');
+                registerError.classList.remove('alert-danger');
+                registerError.classList.add('alert-success');
+                showNotification('success', 'Добро пожаловать в MUZbank!');
+            } catch (error) {
+                console.error('Ошибка регистрации:', error);
+                showError(registerError, error.message || 'Ошибка регистрации');
+            } finally {
+                toggleLoading(doRegisterBtn, false);
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                currentUser = null;
+                userData = null;
+                bankContainer.classList.add('hidden');
+                authContainer.classList.remove('hidden');
+                loginContainer.classList.remove('hidden');
+                registerContainer.classList.add('hidden');
+                logoutBtn.classList.add('hidden');
+                
+                // Reset forms
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('registerName').value = '';
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('registerPin').value = '';
+                
+                showNotification('info', 'Вы успешно вышли из системы');
+            }).catch(error => {
+                console.error('Ошибка выхода:', error);
+                showNotification('danger', 'Ошибка при выходе');
+            });
+        });
+
+        transferMethod.addEventListener('change', () => {
+            if (transferMethod.value === 'card') {
+                cardTransferForm.classList.remove('hidden');
+                qrTransferForm.classList.add('hidden');
+                if (qrScanner) qrScanner.stop();
+                scannerOverlay.classList.add('hidden');
+            } else {
+                cardTransferForm.classList.add('hidden');
+                qrTransferForm.classList.remove('hidden');
+                scannerOverlay.classList.remove('hidden');
+                qrScanResult.classList.add('hidden');
+                initQRScanner();
+                if (qrScanner) qrScanner.start();
+            }
+        });
+
+        doTransferBtn.addEventListener('click', async () => {
+            const recipientCard = document.getElementById('recipientCard').value;
+            const amount = document.getElementById('transferAmount').value;
+            const pin = document.getElementById('transferPin').value;
+
+            if (!recipientCard || !amount || !pin) {
+                showError(transferError, 'Заполните все поля');
+                return;
+            }
+
+            toggleLoading(doTransferBtn, true);
+            await transferMoney(recipientCard, amount, pin);
+            toggleLoading(doTransferBtn, false);
+        });
+
+        // Quick action buttons
+        quickTransferBtn.addEventListener('click', () => switchTab('transfer'));
+        quickQRBtn.addEventListener('click', () => switchTab('qr'));
+        quickHistoryBtn.addEventListener('click', () => switchTab('history'));
+
+        // Format card number input
+        document.getElementById('recipientCard').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            if (value.length > 16) value = value.substring(0, 16);
+            
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' ';
+                formatted += value[i];
+            }
+            
+            e.target.value = formatted;
+        });
+
+        // Auth state observer
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadUserData(user);
+                authContainer.classList.add('hidden');
+                bankContainer.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+            } else {
+                currentUser = null;
+                userData = null;
+                bankContainer.classList.add('hidden');
+                authContainer.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if QrScanner is available
+            if (!window.QrScanner) {
+                console.warn('QR Scanner library not loaded');
+                const transferMethodSelect = document.getElementById('transferMethod');
+                transferMethodSelect.innerHTML = '<option value="card">По номеру карты</option>';
+                transferMethodSelect.disabled = true;
+            }
+            
+            // Set default tab
+            switchTab('dashboard');
+        });
+    </script>
+</body>
+  </html>
