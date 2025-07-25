@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khujand City Bank by DOROSfamd</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #7b2cbf;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --info: #17a2b8;
+            --card-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            --card-silver: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: var(--card-gradient);
+            color: white;
+            box-shadow: var(--shadow);
+            font-size: 16px;
+            min-width: 120px;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--card-silver);
+            color: var(--dark);
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            min-width: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+        }
+        
+        .bank-card {
+            position: relative;
+            height: 200px;
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            overflow: hidden;
+            box-shadow: var(--shadow-hover);
+            background: var(--card-gradient);
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .bank-card.silver {
+            background: var(--card-silver);
+            color: var(--dark);
+        }
+        
+        .bank-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .bank-card-logo {
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .bank-card-type {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .bank-card-number {
+            font-size: 20px;
+            letter-spacing: 3px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bank-card-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .bank-card-name {
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+        
+        .bank-card-expiry {
+            font-size: 16px;
+        }
+        
+        .balance-container {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .balance-label {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .balance {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary);
+            transition: all 0.5s ease;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .transaction-info {
+            flex-grow: 1;
+        }
+        
+        .transaction-date {
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .transaction-description {
+            font-weight: 500;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 90px;
+            text-align: right;
+        }
+        
+        .positive {
+            color: var(--success);
+        }
+        
+        .negative {
+            color: var(--danger);
+        }
+        
+        .neutral {
+            color: var(--info);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .language-switcher {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 5px;
+        }
+        
+        .language-btn {
+            background: none;
+            border: none;
+            color: var(--dark);
+            padding: 5px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .language-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            padding: 15px;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: var(--shadow-hover);
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+        }
+        
+        .close-modal:hover {
+            color: var(--danger);
+        }
+        
+        .modal-title {
+            margin-top: 0;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .qrcode-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .status-message {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .success {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .error {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Анимация баланса */
+        @keyframes balanceIncrease {
+            from { transform: scale(1); color: var(--success); }
+            50% { transform: scale(1.1); }
+            to { transform: scale(1); color: var(--primary); }
+        }
+        
+        @keyframes balanceDecrease {
+            from { transform: scale(1); color: var(--danger); }
+            50% { transform: scale(0.9); }
+            to { transform: scale(1); color: var(--primary); }
+        }
+        
+        .balance-increase {
+            animation: balanceIncrease 0.5s ease;
+        }
+        
+        .balance-decrease {
+            animation: balanceDecrease 0.5s ease;
+        }
+        
+        .icon {
+            font-size: 20px;
+        }
+        
+        .icon-small {
+            font-size: 16px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .bank-card {
+                height: 180px;
+                padding: 15px;
+            }
+            
+            .bank-card-number {
+                font-size: 18px;
+            }
+            
+            .balance {
+                font-size: 32px;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 14px;
+                min-width: auto;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .bank-card {
+                height: 160px;
+                padding: 15px;
+            }
+            
+            .bank-card-number {
+                font-size: 16px;
+                letter-spacing: 2px;
+            }
+            
+            .balance {
+                font-size: 28px;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .form-actions .btn {
+                width: 100%;
+            }
+            
+            .transaction {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .transaction-amount {
+                text-align: left;
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .bank-card {
+                height: 150px;
+                padding: 12px;
+            }
+            
+            .bank-card-number {
+                font-size: 15px;
+            }
+            
+            .bank-card-name, .bank-card-expiry {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Языковой переключатель -->
+        <div class="language-switcher">
+            <button class="language-btn active" data-lang="ru">
+                <span class="material-icons icon-small">language</span> RU
+            </button>
+            <button class="language-btn" data-lang="en">
+                <span class="material-icons icon-small">language</span> EN
+            </button>
+        </div>
+        
+        <!-- Экран авторизации -->
+        <div id="auth-screen" class="card">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h1 style="color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span class="material-icons icon">account_balance</span> KCbank
+                </h1>
+                <p style="color: #666;">by DOROSfamd</p>
+            </div>
+            
+            <h2 data-i18n="welcome">Добро пожаловать</h2>
+            <p data-i18n="auth_subtitle">Войдите или зарегистрируйтесь, чтобы начать</p>
+            
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span class="material-icons icon-small">email</span>
+                    <label for="email" data-i18n="email">Email</label>
+                </div>
+                <input type="email" id="email" class="form-control" placeholder="Введите email" data-i18n-placeholder="email_placeholder">
+            </div>
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span class="material-icons icon-small">lock</span>
+                    <label for="password" data-i18n="password">Пароль</label>
+                </div>
+                <input type="password" id="password" class="form-control" placeholder="Введите пароль" data-i18n-placeholder="password_placeholder">
+            </div>
+            
+            <div id="auth-message" class="status-message"></div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="login-btn" class="btn" data-i18n="login">
+                    <span class="material-icons icon-small">login</span> Войти
+                </button>
+                <button id="register-btn" class="btn btn-outline" data-i18n="register">
+                    <span class="material-icons icon-small">person_add</span> Регистрация
+                </button>
+            </div>
+        </div>
+        
+        <!-- Экран создания карты -->
+        <div id="create-card-screen" class="card hidden">
+            <h2 data-i18n="create_card_title">
+                <span class="material-icons icon-small">credit_card</span> Создание банковской карты
+            </h2>
+            <p data-i18n="create_card_subtitle">Придумайте PIN-код для вашей карты (4 цифры)</p>
+            
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span class="material-icons icon-small">vpn_key</span>
+                    <label for="pin" data-i18n="pin">PIN-код</label>
+                </div>
+                <input type="password" id="pin" class="form-control" placeholder="Введите PIN-код" maxlength="4" inputmode="numeric" pattern="\d{4}" data-i18n-placeholder="pin_placeholder">
+            </div>
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span class="material-icons icon-small">vpn_key</span>
+                    <label for="pin-confirm" data-i18n="pin_confirm">Подтвердите PIN</label>
+                </div>
+                <input type="password" id="pin-confirm" class="form-control" placeholder="Подтвердите PIN-код" maxlength="4" inputmode="numeric" pattern="\d{4}" data-i18n-placeholder="pin_confirm_placeholder">
+            </div>
+            
+            <div id="create-card-message" class="status-message"></div>
+            
+            <div class="form-actions">
+                <button id="create-card-btn" class="btn" data-i18n="create_card">
+                    <span class="material-icons icon-small">add_card</span> Создать карту
+                </button>
+            </div>
+        </div>
+        
+        <!-- Основной экран банка -->
+        <div id="bank-screen" class="hidden">
+            <!-- Карта банка -->
+            <div class="bank-card">
+                <div class="bank-card-logo">
+                    <div>MUZbank</div>
+                    <div class="bank-card-type">Virtual Card</div>
+                </div>
+                <div class="bank-card-number" id="card-number">•••• •••• •••• ••••</div>
+                <div class="bank-card-details">
+                    <div class="bank-card-name" id="card-name">USER NAME</div>
+                    <div class="bank-card-expiry">∞/∞</div>
+                </div>
+            </div>
+            
+            <!-- Баланс -->
+            <div class="balance-container">
+                <div class="balance-label">
+                    <span class="material-icons icon-small">account_balance_wallet</span>
+                    <span data-i18n="balance">Баланс</span>
+                </div>
+                <div class="balance" id="balance">0 ₽</div>
+            </div>
+            
+            <!-- Основные действия -->
+            <div class="card">
+                <h2 data-i18n="actions">
+                    <span class="material-icons icon-small">menu</span> Действия
+                </h2>
+                <div class="actions-grid">
+                    <button id="deposit-btn" class="btn" data-i18n="deposit">
+                        <span class="material-icons icon-small">attach_money</span> Пополнить
+                    </button>
+                    <button id="transfer-btn" class="btn" data-i18n="transfer">
+                        <span class="material-icons icon-small">send</span> Перевести
+                    </button>
+                    <button id="qr-btn" class="btn btn-secondary" data-i18n="show_qr">
+                        <span class="material-icons icon-small">qr_code</span> QR
+                    </button>
+                    <button id="logout-btn" class="btn btn-outline" data-i18n="logout">
+                        <span class="material-icons icon-small">logout</span> Выйти
+                    </button>
+                </div>
+            </div>
+            
+            <!-- История транзакций -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="margin: 0;" data-i18n="transaction_history">
+                        <span class="material-icons icon-small">history</span> История транзакций
+                    </h2>
+                    <button id="refresh-btn" style="background: none; border: none; cursor: pointer; font-size: 20px; display: flex; align-items: center;">
+                        <span class="material-icons icon-small">refresh</span>
+                    </button>
+                </div>
+                <div id="transactions">
+                    <p style="text-align: center; color: #666;" data-i18n="no_transactions">Нет транзакций</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно пополнения -->
+    <div id="deposit-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">
+                <span class="material-icons icon-small">attach_money</span>
+                <span data-i18n="deposit_title">Пополнение баланса</span>
+            </h2>
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span class="material-icons icon-small">payments</span>
+                    <label for="deposit-amount" data-i18n="amount">Сумма</label>
+                </div>
+                <input type="number" id="deposit-amount" class="form-control" placeholder="Введите сумму" min="1" data-i18n-placeholder="amount_placeholder">
+            </div>
+            <div id="deposit-message" class="status-message"></div>
+            <div class="form-actions">
+                <button class="btn btn-outline close-deposit-modal" data-i18n="cancel">
+                    <span class="material-icons icon-small">close</span> Отмена
+                </button>
+                <button id="confirm-deposit" class="btn" data-i18n="deposit">
+                    <span class="material-icons icon-small">check</span> Пополнить
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно перевода -->
+    <div id="transfer-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">
+                <span class="material-icons icon-small">send</span>
+                <span data-i18n="transfer_title">Перевод средств</span>
+            </h2>
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span class="material-icons icon-small">credit_card</span>
+                    <label for="recipient-card" data-i18n="recipient_card">Карта получателя</label>
+                </div>
+                <input type="text" id="recipient-card" class="form-control" placeholder="Введите номер карты" data-i18n-placeholder="recipient_card_placeholder">
+            </div>
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span class="material-icons icon-small">payments</span>
+                    <label for="transfer-amount" data-i18n="amount">Сумма</label>
+                </div>
+                <input type="number" id="transfer-amount" class="form-control" placeholder="Введите сумму" min="1" data-i18n-placeholder="amount_placeholder">
+            </div>
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span class="material-icons icon-small">lock</span>
+                    <label for="transfer-pin" data-i18n="your_pin">Ваш PIN</label>
+                </div>
+                <input type="password" id="transfer-pin" class="form-control" placeholder="Введите ваш PIN" maxlength="4" data-i18n-placeholder="your_pin_placeholder">
+            </div>
+            <p style="color: #666; display: flex; align-items: center; gap: 5px;">
+                <span class="material-icons icon-small">info</span>
+                <span data-i18n="transfer_fee">Комиссия за перевод: 1%</span>
+            </p>
+            <div id="transfer-message" class="status-message"></div>
+            <div class="form-actions">
+                <button class="btn btn-outline close-transfer-modal" data-i18n="cancel">
+                    <span class="material-icons icon-small">close</span> Отмена
+                </button>
+                <button id="confirm-transfer" class="btn" data-i18n="transfer">
+                    <span class="material-icons icon-small">check</span> Перевести
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно QR-кода -->
+    <div id="qr-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">
+                <span class="material-icons icon-small">qr_code</span>
+                <span data-i18n="qr_title">Ваш QR-код</span>
+            </h2>
+            <p style="text-align: center; color: #666; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <span class="material-icons icon-small">info</span>
+                <span data-i18n="qr_subtitle">Отсканируйте этот код для быстрого перевода</span>
+            </p>
+            <div class="qrcode-container" id="qrcode"></div>
+            <p id="qr-card-number" style="text-align: center; font-family: monospace; font-size: 16px; margin-top: 10px; word-break: break-all;"></p>
+        </div>
+    </div>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7DP0EZfTQE78CUj8N-_aPyfEf5MvAc5g",
+            authDomain: "doroscoin.firebaseapp.com",
+            databaseURL: "https://doroscoin-default-rtdb.firebaseio.com",
+            projectId: "doroscoin",
+            storageBucket: "doroscoin.appspot.com",
+            messagingSenderId: "372256789289",
+            appId: "1:372256789289:web:48d518bd16c0c5fa6e5d38",
+            measurementId: "G-H5VJFTVF08"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        // Элементы интерфейса
+        const authScreen = document.getElementById('auth-screen');
+        const createCardScreen = document.getElementById('create-card-screen');
+        const bankScreen = document.getElementById('bank-screen');
+        const depositModal = document.getElementById('deposit-modal');
+        const transferModal = document.getElementById('transfer-modal');
+        const qrModal = document.getElementById('qr-modal');
+        const closeButtons = document.querySelectorAll('.close-modal, .close-deposit-modal, .close-transfer-modal');
+        
+        // Кнопки
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const createCardBtn = document.getElementById('create-card-btn');
+        const depositBtn = document.getElementById('deposit-btn');
+        const transferBtn = document.getElementById('transfer-btn');
+        const qrBtn = document.getElementById('qr-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const confirmDeposit = document.getElementById('confirm-deposit');
+        const confirmTransfer = document.getElementById('confirm-transfer');
+        const refreshBtn = document.getElementById('refresh-btn');
+        
+        // Поля ввода
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const pinInput = document.getElementById('pin');
+        const pinConfirmInput = document.getElementById('pin-confirm');
+        const depositAmountInput = document.getElementById('deposit-amount');
+        const transferAmountInput = document.getElementById('transfer-amount');
+        const recipientCardInput = document.getElementById('recipient-card');
+        const transferPinInput = document.getElementById('transfer-pin');
+        
+        // Информационные поля
+        const cardNumberElement = document.getElementById('card-number');
+        const balanceElement = document.getElementById('balance');
+        const transactionsElement = document.getElementById('transactions');
+        const authMessage = document.getElementById('auth-message');
+        const createCardMessage = document.getElementById('create-card-message');
+        const depositMessage = document.getElementById('deposit-message');
+        const transferMessage = document.getElementById('transfer-message');
+        const qrCardNumberElement = document.getElementById('qr-card-number');
+        
+        // Локализация
+        const translations = {
+            ru: {
+                welcome: "Добро пожаловать",
+                auth_subtitle: "Войдите или зарегистрируйтесь, чтобы начать",
+                email: "Email",
+                email_placeholder: "Введите email",
+                password: "Пароль",
+                password_placeholder: "Введите пароль",
+                login: "Войти",
+                register: "Регистрация",
+                create_card_title: "Создание банковской карты",
+                create_card_subtitle: "Придумайте PIN-код для вашей карты (4 цифры)",
+                pin: "PIN-код",
+                pin_placeholder: "Введите PIN-код",
+                pin_confirm: "Подтвердите PIN",
+                pin_confirm_placeholder: "Подтвердите PIN-код",
+                create_card: "Создать карту",
+                balance: "Баланс",
+                actions: "Действия",
+                deposit: "Пополнить",
+                transfer: "Перевести",
+                show_qr: "QR",
+                logout: "Выйти",
+                transaction_history: "История транзакций",
+                no_transactions: "Нет транзакций",
+                deposit_title: "Пополнение баланса",
+                amount: "Сумма",
+                amount_placeholder: "Введите сумму",
+                transfer_title: "Перевод средств",
+                recipient_card: "Карта получателя",
+                recipient_card_placeholder: "Введите номер карты",
+                your_pin: "Ваш PIN",
+                your_pin_placeholder: "Введите ваш PIN",
+                transfer_fee: "Комиссия за перевод: 1%",
+                qr_title: "Ваш QR-код",
+                qr_subtitle: "Отсканируйте этот код для быстрого перевода",
+                invalid_pin: "PIN должен состоять из 4 цифр",
+                pins_not_match: "PIN-коды не совпадают",
+                deposit_success: "Баланс успешно пополнен",
+                transfer_success: "Перевод выполнен успешно",
+                transfer_error: "Ошибка перевода: ",
+                invalid_card: "Неверный номер карты",
+                invalid_pin_transfer: "Неверный PIN-код",
+                insufficient_funds: "Недостаточно средств",
+                loading: "Загрузка...",
+                received_from: "Получено от",
+                sent_to: "Отправлено",
+                fee: "Комиссия",
+                admin_fee: "Комиссия администратору",
+                cannot_send_to_yourself: "Нельзя отправить деньги самому себе",
+                cancel: "Отмена",
+                refresh: "Обновить"
+            },
+            en: {
+                welcome: "Welcome",
+                auth_subtitle: "Login or register to get started",
+                email: "Email",
+                email_placeholder: "Enter email",
+                password: "Password",
+                password_placeholder: "Enter password",
+                login: "Login",
+                register: "Register",
+                create_card_title: "Create bank card",
+                create_card_subtitle: "Create a PIN code for your card (4 digits)",
+                pin: "PIN code",
+                pin_placeholder: "Enter PIN code",
+                pin_confirm: "Confirm PIN",
+                pin_confirm_placeholder: "Confirm PIN code",
+                create_card: "Create card",
+                balance: "Balance",
+                actions: "Actions",
+                deposit: "Deposit",
+                transfer: "Transfer",
+                show_qr: "QR",
+                logout: "Logout",
+                transaction_history: "Transaction history",
+                no_transactions: "No transactions",
+                deposit_title: "Deposit funds",
+                amount: "Amount",
+                amount_placeholder: "Enter amount",
+                transfer_title: "Transfer funds",
+                recipient_card: "Recipient card",
+                recipient_card_placeholder: "Enter card number",
+                your_pin: "Your PIN",
+                your_pin_placeholder: "Enter your PIN",
+                transfer_fee: "Transfer fee: 1%",
+                qr_title: "Your QR code",
+                qr_subtitle: "Scan this code for quick transfer",
+                invalid_pin: "PIN must be 4 digits",
+                pins_not_match: "PIN codes don't match",
+                deposit_success: "Balance topped up successfully",
+                transfer_success: "Transfer completed successfully",
+                transfer_error: "Transfer error: ",
+                invalid_card: "Invalid card number",
+                invalid_pin_transfer: "Invalid PIN code",
+                insufficient_funds: "Insufficient funds",
+                loading: "Loading...",
+                received_from: "Received from",
+                sent_to: "Sent to",
+                fee: "Fee",
+                admin_fee: "Admin fee",
+                cannot_send_to_yourself: "You can't send money to yourself",
+                cancel: "Cancel",
+                refresh: "Refresh"
+            }
+        };
+        
+        let currentLanguage = 'ru';
+        let currentUser = null;
+        let userData = null;
+        let userDataRef = null;
+        
+        // Функция для перевода интерфейса
+        function translatePage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) {
+                    element.placeholder = translations[lang][key];
+                }
+            });
+        }
+        
+        // Показать сообщение
+        function showMessage(element, message, isSuccess = true) {
+            element.innerHTML = `<span class="material-icons icon-small">${isSuccess ? 'check_circle' : 'error'}</span> ${message}`;
+            element.classList.remove('success', 'error');
+            element.classList.add(isSuccess ? 'success' : 'error');
+            element.style.display = 'flex';
+            
+            if (isSuccess) {
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Скрыть сообщение
+        function hideMessage(element) {
+            element.style.display = 'none';
+        }
+        
+        // Генератор случайного номера карты
+        function generateCardNumber() {
+            let cardNumber = '';
+            for (let i = 0; i < 16; i++) {
+                cardNumber += Math.floor(Math.random() * 10);
+            }
+            // Форматирование с пробелами через каждые 4 цифры
+            return cardNumber.replace(/(\d{4})(?=\d)/g, '$1 ');
+        }
+        
+        // Форматирование суммы
+        function formatAmount(amount) {
+            return amount.toLocaleString(currentLanguage, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
+        }
+        
+        // Анимация изменения баланса
+        function animateBalanceChange(type) {
+            balanceElement.classList.remove('balance-increase', 'balance-decrease');
+            void balanceElement.offsetWidth; // Trigger reflow
+            balanceElement.classList.add(type === 'increase' ? 'balance-increase' : 'balance-decrease');
+        }
+        
+        // Отображение транзакции
+        function displayTransaction(transaction) {
+            const transactionElement = document.createElement('div');
+            transactionElement.className = 'transaction';
+            
+            const transactionInfo = document.createElement('div');
+            transactionInfo.className = 'transaction-info';
+            
+            const dateElement = document.createElement('div');
+            dateElement.className = 'transaction-date';
+            dateElement.innerHTML = `<span class="material-icons icon-small">schedule</span> ${new Date(transaction.date).toLocaleString(currentLanguage)}`;
+            
+            const descriptionElement = document.createElement('div');
+            descriptionElement.className = 'transaction-description';
+            let description = '';
+            let icon = '';
+            
+            if (transaction.type === 'deposit') {
+                description = translations[currentLanguage].deposit;
+                icon = 'attach_money';
+            } else if (transaction.type === 'transfer') {
+                if (transaction.direction === 'in') {
+                    description = `${translations[currentLanguage].received_from} ${transaction.fromCard}`;
+                    icon = 'call_received';
+                } else {
+                    description = `${translations[currentLanguage].sent_to} ${transaction.toCard}`;
+                    icon = 'call_made';
+                }
+            } else if (transaction.type === 'fee') {
+                description = translations[currentLanguage].fee;
+                icon = 'money_off';
+            } else if (transaction.type === 'admin_fee') {
+                description = translations[currentLanguage].admin_fee;
+                icon = 'admin_panel_settings';
+            }
+            
+            descriptionElement.innerHTML = `<span class="material-icons icon-small">${icon}</span> ${description}`;
+            
+            transactionInfo.appendChild(dateElement);
+            transactionInfo.appendChild(descriptionElement);
+            
+            const amountElement = document.createElement('div');
+            amountElement.className = 'transaction-amount';
+            
+            if (transaction.type === 'deposit' || (transaction.type === 'transfer' && transaction.direction === 'in')) {
+                amountElement.classList.add('positive');
+                amountElement.textContent = `+${formatAmount(transaction.amount)}`;
+            } else {
+                amountElement.classList.add('negative');
+                amountElement.textContent = `-${formatAmount(transaction.amount)}`;
+            }
+            
+            if (transaction.type === 'fee' || transaction.type === 'admin_fee') {
+                amountElement.classList.remove('positive', 'negative');
+                amountElement.classList.add('neutral');
+            }
+            
+            transactionElement.appendChild(transactionInfo);
+            transactionElement.appendChild(amountElement);
+            
+            transactionsElement.insertBefore(transactionElement, transactionsElement.firstChild);
+        }
+        
+        // Загрузка транзакций
+        function loadTransactions(userId) {
+            transactionsElement.innerHTML = `<p style="text-align: center; color: #666; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <span class="material-icons icon-small">hourglass_top</span> ${translations[currentLanguage].loading}
+            </p>`;
+            
+            database.ref(`users/${userId}/transactions`).orderByChild('date').once('value').then(snapshot => {
+                const transactions = snapshot.val();
+                
+                if (!transactions || Object.keys(transactions).length === 0) {
+                    transactionsElement.innerHTML = `<p style="text-align: center; color: #666;">${translations[currentLanguage].no_transactions}</p>`;
+                    return;
+                }
+                
+                transactionsElement.innerHTML = '';
+                
+                // Сортируем транзакции по дате (новые сначала)
+                const sortedTransactions = Object.values(transactions).sort((a, b) => b.date - a.date);
+                
+                sortedTransactions.forEach(transaction => {
+                    displayTransaction(transaction);
+                });
+            }).catch(error => {
+                transactionsElement.innerHTML = `<p style="text-align: center; color: #666;">${translations[currentLanguage].no_transactions}</p>`;
+                console.error("Error loading transactions:", error);
+            });
+        }
+        
+        // Обновление информации о пользователе
+        function updateUserInfo(snapshot) {
+            userData = snapshot.val();
+            
+            if (!userData) return;
+            
+            // Обновляем номер карты
+            if (userData.cardNumber) {
+                cardNumberElement.textContent = userData.cardNumber;
+            }
+            
+            // Обновляем баланс
+            if (userData.balance !== undefined) {
+                balanceElement.textContent = formatAmount(userData.balance);
+            } else {
+                balanceElement.textContent = formatAmount(0);
+            }
+            
+            // Загружаем транзакции
+            loadTransactions(currentUser.uid);
+        }
+        
+        // Проверка, есть ли у пользователя карта
+        function checkUserCard(user) {
+            currentUser = user;
+            
+            database.ref(`users/${user.uid}`).once('value').then(snapshot => {
+                userData = snapshot.val();
+                
+                if (!userData || !userData.cardNumber) {
+                    // У пользователя нет карты, показываем экран создания карты
+                    authScreen.classList.add('hidden');
+                    createCardScreen.classList.remove('hidden');
+                    bankScreen.classList.add('hidden');
+                } else {
+                    // У пользователя есть карта, показываем основной экран
+                    authScreen.classList.add('hidden');
+                    createCardScreen.classList.add('hidden');
+                    bankScreen.classList.remove('hidden');
+                    
+                    // Настраиваем слушатель изменений данных
+                    if (userDataRef) {
+                        userDataRef.off();
+                    }
+                    userDataRef = database.ref(`users/${user.uid}`);
+                    userDataRef.on('value', updateUserInfo);
+                    
+                    // Обновляем информацию
+                    updateUserInfo(snapshot);
+                }
+            }).catch(error => {
+                console.error("Error checking user card:", error);
+            });
+        }
+        
+        // Инициализация приложения
+        function initApp() {
+            // Проверяем авторизацию при загрузке
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // Пользователь авторизован
+                    checkUserCard(user);
+                } else {
+                    // Пользователь не авторизован
+                    currentUser = null;
+                    userData = null;
+                    if (userDataRef) {
+                        userDataRef.off();
+                        userDataRef = null;
+                    }
+                    authScreen.classList.remove('hidden');
+                    createCardScreen.classList.add('hidden');
+                    bankScreen.classList.add('hidden');
+                }
+            });
+            
+            // Обработчики кнопок авторизации
+            loginBtn.addEventListener('click', () => {
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                
+                if (!email || !password) {
+                    showMessage(authMessage, "Заполните все поля", false);
+                    return;
+                }
+                
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => {
+                        hideMessage(authMessage);
+                    })
+                    .catch(error => {
+                        showMessage(authMessage, error.message, false);
+                    });
+            });
+            
+            registerBtn.addEventListener('click', () => {
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                
+                if (!email || !password) {
+                    showMessage(authMessage, "Заполните все поля", false);
+                    return;
+                }
+                
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => {
+                        hideMessage(authMessage);
+                    })
+                    .catch(error => {
+                        showMessage(authMessage, error.message, false);
+                    });
+            });
+            
+            // Обработчик создания карты
+            createCardBtn.addEventListener('click', () => {
+                const pin = pinInput.value;
+                const pinConfirm = pinConfirmInput.value;
+                
+                // Валидация PIN-кода
+                if (!/^\d{4}$/.test(pin)) {
+                    showMessage(createCardMessage, translations[currentLanguage].invalid_pin, false);
+                    return;
+                }
+                
+                if (pin !== pinConfirm) {
+                    showMessage(createCardMessage, translations[currentLanguage].pins_not_match, false);
+                    return;
+                }
+                
+                hideMessage(createCardMessage);
+                
+                // Создаем карту
+                const user = auth.currentUser;
+                const cardNumber = generateCardNumber();
+                
+                database.ref(`users/${user.uid}`).set({
+                    email: user.email,
+                    cardNumber: cardNumber,
+                    pin: pin, // В реальном приложении PIN нужно хэшировать!
+                    balance: 0,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                }).then(() => {
+                    checkUserCard(user);
+                }).catch(error => {
+                    showMessage(createCardMessage, error.message, false);
+                });
+            });
+            
+            // Обработчики кнопок основного экрана
+            depositBtn.addEventListener('click', () => {
+                depositAmountInput.value = '';
+                hideMessage(depositMessage);
+                depositModal.classList.remove('hidden');
+            });
+            
+            transferBtn.addEventListener('click', () => {
+                recipientCardInput.value = '';
+                transferAmountInput.value = '';
+                transferPinInput.value = '';
+                hideMessage(transferMessage);
+                transferModal.classList.remove('hidden');
+            });
+            
+            qrBtn.addEventListener('click', () => {
+                if (!userData || !userData.cardNumber) return;
+                
+                // Очищаем предыдущий QR-код
+                document.getElementById('qrcode').innerHTML = '';
+                
+                // Создаем новый QR-код
+                new QRCode(document.getElementById('qrcode'), {
+                    text: userData.cardNumber.replace(/\s/g, ''),
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                qrCardNumberElement.textContent = userData.cardNumber;
+                qrModal.classList.remove('hidden');
+            });
+            
+            logoutBtn.addEventListener('click', () => {
+                auth.signOut();
+            });
+            
+            refreshBtn.addEventListener('click', () => {
+                if (currentUser) {
+                    loadTransactions(currentUser.uid);
+                }
+            });
+            
+            // Обработчики подтверждения действий
+            confirmDeposit.addEventListener('click', () => {
+                const amount = parseFloat(depositAmountInput.value);
+                
+                if (isNaN(amount) || amount <= 0) {
+                    showMessage(depositMessage, translations[currentLanguage].amount_placeholder, false);
+                    return;
+                }
+                
+                const user = auth.currentUser;
+                if (!user) return;
+                
+                const transactionId = database.ref().child('transactions').push().key;
+                const transaction = {
+                    type: 'deposit',
+                    amount: amount,
+                    date: Date.now()
+                };
+                
+                // Обновляем баланс и добавляем транзакцию
+                database.ref(`users/${user.uid}`).transaction(userData => {
+                    if (userData) {
+                        userData.balance = (userData.balance || 0) + amount;
+                        userData.transactions = userData.transactions || {};
+                        userData.transactions[transactionId] = transaction;
+                    }
+                    return userData;
+                }).then(() => {
+                    animateBalanceChange('increase');
+                    showMessage(depositMessage, translations[currentLanguage].deposit_success, true);
+                    setTimeout(() => {
+                        depositModal.classList.add('hidden');
+                    }, 1500);
+                }).catch(error => {
+                    showMessage(depositMessage, error.message, false);
+                });
+            });
+            
+            confirmTransfer.addEventListener('click', async () => {
+                const recipientCard = recipientCardInput.value.replace(/\s/g, '');
+                const amount = parseFloat(transferAmountInput.value);
+                const pin = transferPinInput.value;
+                
+                // Валидация
+                if (!/^\d{16}$/.test(recipientCard)) {
+                    showMessage(transferMessage, translations[currentLanguage].invalid_card, false);
+                    return;
+                }
+                
+                if (isNaN(amount) || amount <= 0) {
+                    showMessage(transferMessage, translations[currentLanguage].amount_placeholder, false);
+                    return;
+                }
+                
+                if (!/^\d{4}$/.test(pin)) {
+                    showMessage(transferMessage, translations[currentLanguage].invalid_pin_transfer, false);
+                    return;
+                }
+                
+                const sender = auth.currentUser;
+                if (!sender) return;
+                
+                // Проверяем PIN отправителя
+                if (userData.pin !== pin) {
+                    showMessage(transferMessage, translations[currentLanguage].invalid_pin_transfer, false);
+                    return;
+                }
+                
+                // Проверяем баланс отправителя (с учетом комиссии)
+                const fee = amount * 0.01;
+                const totalAmount = amount + fee;
+                
+                if (userData.balance < totalAmount) {
+                    showMessage(transferMessage, translations[currentLanguage].insufficient_funds, false);
+                    return;
+                }
+                
+                // Ищем получателя по номеру карты
+                let recipientId = null;
+                let recipientData = null;
+                
+                try {
+                    // Получаем всех пользователей
+                    const usersSnapshot = await database.ref('users').once('value');
+                    
+                    // Ищем пользователя с указанным номером карты
+                    usersSnapshot.forEach((childSnapshot) => {
+                        const user = childSnapshot.val();
+                        if (user.cardNumber && user.cardNumber.replace(/\s/g, '') === recipientCard) {
+                            recipientId = childSnapshot.key;
+                            recipientData = user;
+                        }
+                    });
+
+                    if (!recipientId) {
+                        showMessage(transferMessage, translations[currentLanguage].invalid_card, false);
+                        return;
+                    }
+
+                    // Проверяем, что отправитель не пытается отправить деньги самому себе
+                    if (recipientId === sender.uid) {
+                        showMessage(transferMessage, translations[currentLanguage].cannot_send_to_yourself, false);
+                        return;
+                    }
+
+                    // Создаем уникальные ID для транзакций
+                    const transactionId = database.ref().child('transactions').push().key;
+                    const feeTransactionId = database.ref().child('transactions').push().key;
+                    const recipientTransactionId = database.ref().child('transactions').push().key;
+
+                    // Транзакция отправления
+                    const transaction = {
+                        type: 'transfer',
+                        direction: 'out',
+                        toCard: recipientData.cardNumber,
+                        amount: amount,
+                        fee: fee,
+                        date: Date.now()
+                    };
+
+                    // Транзакция комиссии
+                    const feeTransaction = {
+                        type: 'fee',
+                        amount: fee,
+                        date: Date.now()
+                    };
+
+                    // Транзакция получения
+                    const recipientTransaction = {
+                        type: 'transfer',
+                        direction: 'in',
+                        fromCard: userData.cardNumber,
+                        amount: amount,
+                        date: Date.now()
+                    };
+
+                    // Создаем объект для обновления данных
+                    const updates = {};
+                    
+                    // Обновление данных отправителя
+                    updates[`users/${sender.uid}/balance`] = userData.balance - totalAmount;
+                    updates[`users/${sender.uid}/transactions/${transactionId}`] = transaction;
+                    updates[`users/${sender.uid}/transactions/${feeTransactionId}`] = feeTransaction;
+                    
+                    // Обновление данных получателя
+                    updates[`users/${recipientId}/balance`] = (recipientData.balance || 0) + amount;
+                    updates[`users/${recipientId}/transactions/${recipientTransactionId}`] = recipientTransaction;
+                    
+                    // Добавляем комиссию администратору
+                    const adminEmail = 'dorosfamd@dorosfamd.com';
+                    const adminQuery = await database.ref('users').orderByChild('email').equalTo(adminEmail).once('value');
+                    
+                    if (adminQuery.exists()) {
+                        const adminData = adminQuery.val();
+                        const adminId = Object.keys(adminData)[0];
+                        const adminTransactionId = database.ref().child('transactions').push().key;
+                        
+                        updates[`users/${adminId}/balance`] = (adminData[adminId].balance || 0) + fee;
+                        updates[`users/${adminId}/transactions/${adminTransactionId}`] = {
+                            type: 'admin_fee',
+                            fromCard: userData.cardNumber,
+                            amount: fee,
+                            date: Date.now()
+                        };
+                    }
+
+                    // Выполняем все обновления одной транзакцией
+                    await database.ref().update(updates);
+
+                    // Обновляем интерфейс
+                    animateBalanceChange('decrease');
+                    showMessage(transferMessage, translations[currentLanguage].transfer_success, true);
+                    setTimeout(() => {
+                        transferModal.classList.add('hidden');
+                    }, 1500);
+                } catch (error) {
+                    console.error("Transfer error:", error);
+                    showMessage(transferMessage, translations[currentLanguage].transfer_error + error.message, false);
+                }
+            });
+            
+            // Закрытие модальных окон
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    depositModal.classList.add('hidden');
+                    transferModal.classList.add('hidden');
+                    qrModal.classList.add('hidden');
+                });
+            });
+            
+            // Закрытие по клику вне модального окна
+            window.addEventListener('click', (event) => {
+                if (event.target === depositModal) {
+                    depositModal.classList.add('hidden');
+                }
+                if (event.target === transferModal) {
+                    transferModal.classList.add('hidden');
+                }
+                if (event.target === qrModal) {
+                    qrModal.classList.add('hidden');
+                }
+            });
+            
+            // Обработчики языкового переключателя
+            document.querySelectorAll('.language-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const lang = button.getAttribute('data-lang');
+                    translatePage(lang);
+                    
+                    // Обновляем активную кнопку
+                    document.querySelectorAll('.language-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    button.classList.add('active');
+                });
+            });
+            
+            // Инициализация перевода на русский
+            translatePage('ru');
+        }
+        
+        // Запуск приложения после загрузки страницы
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+  </html>
