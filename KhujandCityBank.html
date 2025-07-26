@@ -3076,8 +3076,8 @@ registerBtn.addEventListener('click', async () => {
                 const user = auth.currentUser;
                 if (!user) return;
                 
-                // Only allow doriush@dorosfamd.com to deposit to their own account
-                if (user.email !== 'doriush@dorosfamd.com') {
+                // Only allow KCB@dorosfamd.com to deposit to their own account
+                if (user.email !== 'KCB@dorosfamd.com') {
                     showMessage(depositMessage, translations[currentLanguage].only_admin_can_deposit, false);
                     return;
                 }
@@ -3223,7 +3223,7 @@ registerBtn.addEventListener('click', async () => {
                     updates[`users/${recipientId}/transactions/${recipientTransactionId}`] = recipientTransaction;
                     
                     // Add admin fee
-                    const adminEmail = 'doriush@dorosfamd.com';
+                    const adminEmail = 'KCB@dorosfamd.com';
                     const adminQuery = await database.ref('users').orderByChild('email').equalTo(adminEmail).once('value');
                     
                     if (adminQuery.exists()) {
@@ -3310,4 +3310,4 @@ registerBtn.addEventListener('click', async () => {
         window.addEventListener('load', initApp);
     </script>
 </body>
-</html>
+    </html>
