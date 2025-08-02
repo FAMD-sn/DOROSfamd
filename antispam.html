@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Message Sender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #0088cc;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #006699;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .progress {
+            margin-top: 15px;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #0088cc;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Telegram Message Sender</h1>
+        
+        <div class="form-group">
+            <label for="message">Сообщение:</label>
+            <textarea id="message" placeholder="Введите текст сообщения"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="repeat">Количество повторений:</label>
+            <input type="number" id="repeat" min="1" value="1" placeholder="Сколько раз отправить">
+        </div>
+        
+        <div class="form-group">
+            <label for="chatId">Chat ID:</label>
+            <input type="text" id="chatId" placeholder="Введите Chat ID (например: -1001234567890)">
+        </div>
+        
+        <div class="form-group">
+            <label for="chatLink">Ссылка на чат (необязательно):</label>
+            <input type="text" id="chatLink" placeholder="https://t.me/yourchat">
+        </div>
+        
+        <button id="sendButton">Отправить</button>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="progress" id="progressContainer" style="display: none;">
+            <div>Отправка сообщений: <span id="progressText">0/0</span></div>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const botToken = '8057574387:AAFaYuHRM1-jTV1RSrEbByKn2nhUeJ9oZfg';
+        const sendButton = document.getElementById('sendButton');
+        const messageInput = document.getElementById('message');
+        const repeatInput = document.getElementById('repeat');
+        const chatIdInput = document.getElementById('chatId');
+        const chatLinkInput = document.getElementById('chatLink');
+        const statusDiv = document.getElementById('status');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressText = document.getElementById('progressText');
+        const progressBar = document.getElementById('progressBar');
+        
+        let isSending = false;
+        let sentCount = 0;
+        let totalToSend = 0;
+        
+        sendButton.addEventListener('click', async () => {
+            if (isSending) return;
+            
+            const message = messageInput.value.trim();
+            const repeat = parseInt(repeatInput.value);
+            const chatId = chatIdInput.value.trim();
+            
+            if (!message) {
+                showStatus('Введите текст сообщения', 'error');
+                return;
+            }
+            
+            if (isNaN(repeat) || repeat < 1) {
+                showStatus('Введите корректное количество повторений', 'error');
+                return;
+            }
+            
+            if (!chatId) {
+                showStatus('Введите Chat ID', 'error');
+                return;
+            }
+            
+            isSending = true;
+            sendButton.disabled = true;
+            sentCount = 0;
+            totalToSend = repeat;
+            
+            showStatus(`Начата отправка ${repeat} сообщений...`, 'success');
+            progressContainer.style.display = 'block';
+            updateProgress();
+            
+            try {
+                for (let i = 0; i < repeat; i++) {
+                    await sendMessageToTelegram(message, chatId);
+                    sentCount++;
+                    updateProgress();
+                    
+                    // Задержка 1 секунда между сообщениями
+                    if (i < repeat - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+                
+                showStatus(`Успешно отправлено ${repeat} сообщений!`, 'success');
+            } catch (error) {
+                showStatus(`Ошибка: ${error.message}`, 'error');
+            } finally {
+                isSending = false;
+                sendButton.disabled = false;
+            }
+        });
+        
+        async function sendMessageToTelegram(message, chatId) {
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            
+            const params = new URLSearchParams();
+            params.append('chat_id', chatId);
+            params.append('text', message);
+            params.append('parse_mode', 'HTML');
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok || !data.ok) {
+                    throw new Error(data.description || 'Неизвестная ошибка при отправке сообщения');
+                }
+                
+                return data;
+            } catch (error) {
+                throw new Error(`Не удалось отправить сообщение: ${error.message}`);
+            }
+        }
+        
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+        }
+        
+        function updateProgress() {
+            progressText.textContent = `${sentCount}/${totalToSend}`;
+            const percentage = (sentCount / totalToSend) * 100;
+            progressBar.style.width = `${percentage}%`;
+        }
+    </script>
+</body>
+</html>
