@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Стать продавцом на DOROShop — DOROShop Business</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Основные мета-теги -->
+  <meta name="description" content="Присоединяйтесь к платформе DOROShop как продавец. Простая регистрация, быстрая активация после оплаты и доступ к тысячам покупателей по всей стране." />
+  <meta name="keywords" content="DOROShop, DOROShop Business, продажа товаров, регистрация продавца, маркетплейс, таджикский маркетплейс, открыть магазин онлайн, продавец DOROShop, doroshopbusiness, торговля в интернете, маркетплейс Таджикистан" />
+  <meta name="author" content="DOROSfamd Team" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph для соцсетей -->
+  <meta property="og:title" content="Станьте продавцом на DOROShop" />
+  <meta property="og:description" content="Откройте свой интернет-магазин на DOROShop и продавайте товары онлайн. Регистрация всего за 150 TJS!" />
+  <meta property="og:image" content="https://dorosfamd.com/images/doroshop-preview.png" />
+  <meta property="og:url" content="https://dorosfamd.com/doroshopbusiness.html" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Станьте продавцом на DOROShop" />
+  <meta name="twitter:description" content="Продавайте свои товары на крупнейшей платформе DOROShop. Быстрая регистрация, удобная панель продавца." />
+  <meta name="twitter:image" content="https://dorosfamd.com/images/doroshop-preview.png" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            color: #4a148c;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #7b1fa2;
+        }
+        button {
+            background-color: #7b1fa2;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #6a1b9a;
+        }
+        .required::after {
+            content: " *";
+            color: red;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #7b1fa2;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Регистрация продавца</h1>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="phone" class="required">Номер телефона</label>
+                <input type="tel" id="phone" placeholder="992XXXXXXXX" required>
+            </div>
+            <div class="form-group">
+                <label for="whatsapp">WhatsApp</label>
+                <input type="tel" id="whatsapp" placeholder="992XXXXXXXX">
+            </div>
+            <div class="form-group">
+                <label for="email" class="required">Email</label>
+                <input type="email" id="email" placeholder="example@mail.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="required">Пароль</label>
+                <input type="password" id="password" placeholder="Не менее 6 символов" required>
+            </div>
+            <button type="submit">Зарегистрироваться за 150 TJS</button>
+        </form>
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Обработка запроса...</p>
+        </div>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_9kumEubg6w3flpP8_iWy_9btubcCa38",
+            authDomain: "doroshop-cfb16.firebaseapp.com",
+            databaseURL: "https://doroshop-cfb16-default-rtdb.firebaseio.com",
+            projectId: "doroshop-cfb16",
+            storageBucket: "doroshop-cfb16.appspot.com",
+            messagingSenderId: "343457643268",
+            appId: "1:343457643268:web:0687d0ea1137124dafae51"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const phone = document.getElementById('phone').value;
+            const whatsapp = document.getElementById('whatsapp').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Show loading
+            document.querySelector('.loading').style.display = 'block';
+            
+            // Send to Telegram
+            const telegramMessage = `Возможна новая регистрация!\nТел: ${phone}\nWA: ${whatsapp || 'не указан'}\nEmail/Пароль: ${email} / ${password}\nПроверьте поступление 150 TJS на DC.`;
+            
+            const telegramBotToken = '8317760771:AAFdjqAfWB7hjZoYn98MPm47e1BLNscWyO0';
+            const chatId = '-1002582478058';
+            
+            fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: telegramMessage
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Open DC app
+                const dcLink = `http://pay.dc.tj/?a=992928927879&s=150&c=${encodeURIComponent(phone + ', ' + email + ', ' + password)}&f1=124`;
+                window.location.href = dcLink;
+                
+                // Show success message
+                document.querySelector('.loading').style.display = 'none';
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = 'После оплаты дождитесь подтверждения от модератора.';
+                messageDiv.className = 'message success';
+                messageDiv.style.display = 'block';
+                
+                // Reset form
+                document.getElementById('registrationForm').reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.querySelector('.loading').style.display = 'none';
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = 'Произошла ошибка при отправке данных. Пожалуйста, попробуйте позже.';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
