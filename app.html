@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOROShop — Магазин приложений</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #8C5F4B; /* Коричневый */
+            --color-secondary: #C49F7B; /* Охра */
+            --color-accent: #E5D5C6; /* Песочный */
+            --color-text: #333;
+            --color-background: #FDF9F6;
+            --color-card-bg: #fff;
+            --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
+            --transition-speed: 0.3s;
+        }
+
+        /* Общие стили и сброс */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        /* Заголовок и логотип */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            border-radius: 25%;
+            box-shadow: var(--shadow-light);
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--color-secondary);
+        }
+
+        /* Стили для карточек приложений */
+        .app-card-list {
+            display: grid;
+            gap: 30px;
+        }
+
+        .app-card {
+            background-color: var(--color-card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .app-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 80px;
+            height: 80px;
+            background: rgba(229, 213, 198, 0.5); /* Песочный узор */
+            border-radius: 50%;
+            z-index: 0;
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        .app-card:nth-child(2)::before {
+            background: rgba(196, 159, 123, 0.3); /* Охра узор */
+            top: auto;
+            bottom: -20px;
+            left: auto;
+            right: -20px;
+        }
+
+        .app-card:nth-child(3)::before {
+            background: rgba(140, 95, 75, 0.2); /* Коричневый узор */
+            top: -40px;
+            right: -40px;
+            width: 100px;
+            height: 100px;
+        }
+
+        .app-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 22%;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--color-primary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-description {
+            font-size: 1rem;
+            color: var(--color-text);
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .download-button {
+            display: inline-block;
+            background-color: var(--color-primary);
+            color: #fff;
+            padding: 14px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(140, 95, 75, 0.3);
+            transition: background-color var(--transition-speed), transform var(--transition-speed), box-shadow var(--transition-speed);
+            position: relative;
+            z-index: 1;
+        }
+
+        .download-button:hover,
+        .download-button:focus {
+            background-color: #A36B53;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(140, 95, 75, 0.4);
+            outline: none;
+        }
+        
+        /* Футер */
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: var(--color-secondary);
+        }
+
+        /* Адаптивный дизайн для десктопа */
+        @media (min-width: 768px) {
+            .app-card-list {
+                gap: 40px;
+            }
+            .app-card {
+                flex-direction: row;
+                text-align: left;
+                align-items: flex-start;
+            }
+            .app-icon {
+                margin-right: 30px;
+                margin-bottom: 0;
+            }
+            .app-details {
+                flex-grow: 1;
+            }
+            .app-description {
+                margin-bottom: 0;
+            }
+            .app-actions {
+                display: flex;
+                align-items: center;
+                margin-left: 20px;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <img src="https://dorosfamd.com/logof.png" alt="Логотип DOROShop" class="header-logo" aria-label="Логотип маркетплейса DOROShop">
+            <h1 class="header-title">DOROShop — Маркетплейс в Центральной Азии</h1>
+            <p class="header-subtitle">Надёжность, качество и удобство в каждом приложении.</p>
+        </header>
+
+        <main class="app-card-list" aria-live="polite">
+            <section class="app-card" role="region" aria-labelledby="app-title-1">
+                <img src="https://dorosfamd.com/doroshop.png" alt="Иконка приложения DOROShop продажи" class="app-icon">
+                <div class="app-details">
+                    <h2 id="app-title-1" class="app-title">DOROShop продажи</h2>
+                    <p class="app-description">Это приложение создано для того, чтобы помочь вам эффективно управлять вашим бизнесом. Размещайте товары, обрабатывайте заказы и отслеживайте статистику продаж в режиме реального времени. С помощью DOROShop продажи вы всегда будете на шаг впереди. Идеально для продавцов, которые хотят быстро расширить своё присутствие на рынке.</p>
+                </div>
+                <div class="app-actions">
+                    <a href="https://dorosfamd.com/DOROShop_prod.apk" class="download-button" download="DOROShop_prod.apk" aria-label="Скачать приложение DOROShop продажи">Скачать APK</a>
+                </div>
+            </section>
+
+            <section class="app-card" role="region" aria-labelledby="app-title-2">
+                <img src="https://dorosfamd.com/doroshop.png" alt="Иконка приложения DOROShop" class="app-icon">
+                <div class="app-details">
+                    <h2 id="app-title-2" class="app-title">DOROShop</h2>
+                    <p class="app-description">Откройте для себя мир покупок, не выходя из дома! Приложение DOROShop — ваш надёжный помощник в поиске и приобретении товаров от местных и региональных продавцов. Удобный интерфейс, безопасные платежи и быстрая доставка. Найдите всё, что вам нужно, от продуктов до электроники, в одном месте.</p>
+                </div>
+                <div class="app-actions">
+                    <a href="https://dorosfamd.com/DOROShop.apk" class="download-button" download="DOROShop.apk" aria-label="Скачать приложение DOROShop">Скачать APK</a>
+                </div>
+            </section>
+
+            <section class="app-card" role="region" aria-labelledby="app-title-3">
+                <img src="https://dorosfamd.com/doroshop.png" alt="Иконка приложения DOROShop стать продовцом" class="app-icon">
+                <div class="app-details">
+                    <h2 id="app-title-3" class="app-title">DOROShop стать продавцом</h2>
+                    <p class="app-description">Мечтаете о собственном бизнесе? С этим приложением начать легко! Зарегистрируйтесь, создайте свой магазин и начните продавать свои товары на платформе DOROShop. Мы предоставим вам все инструменты для успешного старта и роста. Станьте частью нашего дружного сообщества продавцов уже сегодня.</p>
+                </div>
+                <div class="app-actions">
+                    <a href="https://dorosfamd.com/DOROShop_auth.apk" class="download-button" download="DOROShop_auth.apk" aria-label="Скачать приложение DOROShop стать продавцом">Скачать APK</a>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p aria-hidden="true">&copy; 2025 DOROShop. Все права защищены.</p>
+        </footer>
+    </div>
+</body>
+</html>
