@@ -7,8 +7,8 @@
   <title>DORO-shop prod - вход строго для продавцов</title>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<link rel="icon" href="https://dorosfamd.com/doroshop.png" type="image/png">
-<link rel="apple-touch-icon" href="https://dorosfamd.com/doroshop.png">
+  <link rel="icon" href="https://dorosfamd.com/doroshop.png" type="image/png">
+  <link rel="apple-touch-icon" href="https://dorosfamd.com/doroshop.png">
   <style>
     :root {
       --primary: #00695C;
@@ -402,48 +402,63 @@
 
     .category-tag.electronics {
       background: var(--electronics);
+      color: white;
     }
 
     .category-tag.clothing {
       background: var(--clothing);
+      color: white;
     }
 
     .category-tag.home {
       background: var(--home);
+      color: white;
     }
 
     .category-tag.beauty {
       background: var(--beauty);
+      color: white;
     }
 
     .category-tag.sports {
       background: var(--sports);
+      color: white;
     }
 
     .category-tag.books {
       background: var(--books);
+      color: white;
     }
 
     .category-tag.toys {
       background: var(--toys);
+      color: white;
     }
 
     .category-tag.food {
       background: var(--food);
+      color: white;
     }
 
     .category-tag.cars {
       background: var(--cars);
+      color: white;
     }
 
     .category-tag.health {
       background: var(--health);
+      color: white;
+    }
+    
+    .category-tag:not(.active) {
+      background: var(--surface);
+      color: var(--text-light);
     }
 
     /* Список товаров */
     #product-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1.5rem;
       padding: 1.5rem;
     }
@@ -1093,12 +1108,37 @@
 
     /* Изображения */
     .image-preview {
-      max-width: 100%;
-      max-height: 200px;
+      width: 100%;
+      height: auto;
       margin-top: 1rem;
       display: none;
       border-radius: var(--radius-sm);
       object-fit: contain;
+    }
+
+    .image-preview-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 1rem;
+        border: 1px dashed var(--border);
+        border-radius: var(--radius-sm);
+        padding: 1rem;
+        min-height: 150px;
+        position: relative;
+    }
+
+    .image-preview-container img {
+        max-width: 100%;
+        max-height: 100%;
+        display: none;
+        object-fit: contain;
+    }
+
+    .image-preview-placeholder {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        text-align: center;
     }
     
     .upload-btn {
@@ -1404,7 +1444,6 @@
     </div>
   </header>
 
-  <!-- Секция авторизации -->
   <div class="auth-section" id="auth-section">
     <h2 class="auth-title">Вход в DORO-shop продажи</h2>
     <div class="form-group">
@@ -1423,7 +1462,6 @@
     </div>
   </div>
 
-  <!-- Секция поиска и фильтров -->
   <div class="search-filters-container" id="search-filters" style="display: none;">
     <input type="text" id="search" placeholder="Поиск по названию, описанию или цене...">
     
@@ -1454,7 +1492,6 @@
     </div>
   </div>
 
-  <!-- Статистика для админа -->
   <div class="stats-container" id="stats-container" style="display: none;">
     <div class="stat-card">
       <div class="stat-value" id="total-products">0</div>
@@ -1474,7 +1511,6 @@
     </div>
   </div>
 
-  <!-- Список товаров -->
   <div id="product-list">
     <div class="empty-state" id="empty-state">
       <div class="empty-icon">
@@ -1485,12 +1521,10 @@
     </div>
   </div>
 
-  <!-- Кнопка добавления -->
   <button id="add-button" style="display: none;">
     <i class="fas fa-plus"></i>
   </button>
 
-  <!-- Модальное окно деталей товара -->
   <div class="modal" id="detail-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1498,12 +1532,10 @@
         <span class="close" onclick="closeModal('detail-modal')">×</span>
       </div>
       <div class="modal-body" id="modal-body">
-        <!-- Контент будет загружен здесь -->
-      </div>
+        </div>
     </div>
   </div>
 
-  <!-- Модальное окно добавления товара -->
   <div class="modal" id="add-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1567,20 +1599,15 @@
           <small class="text-muted">Этот номер будет использован для создания ссылки оплаты через Душанбе Сити</small>
         </div>
         <div class="form-group">
-          <label class="form-label">Изображение товара</label>
-          <input type="file" id="file-input" accept="image/*" capture="camera" style="display: none;">
-          <div class="upload-btn" onclick="openFileDialog()">
-            <i class="fas fa-camera"></i> Выберите файл
+          <label class="form-label">Изображение товара (можно выбрать несколько)</label>
+          <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
+          <div class="upload-btn" onclick="document.getElementById('file-input').click()">
+            <i class="fas fa-images"></i> Выберите фото
           </div>
-          <div class="file-options" id="file-options" style="display: none; margin-top: 1rem;">
-            <button class="btn btn-outline" onclick="takePhoto()" style="width: 100%; margin-bottom: 0.5rem;">
-              <i class="fas fa-camera"></i> Снять фото
-            </button>
-            <button class="btn btn-outline" onclick="chooseFromGallery()" style="width: 100%;">
-              <i class="fas fa-images"></i> Выбрать из галереи
-            </button>
+          <div class="image-preview-container">
+            <img id="image-preview" alt="Превью изображения">
+            <span class="image-preview-placeholder">Превью коллажа появится здесь</span>
           </div>
-          <img id="image-preview" class="image-preview" alt="Превью изображения">
           <input type="hidden" class="form-control" id="product-image">
         </div>
         <div class="modal-footer">
@@ -1595,7 +1622,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно редактирования товара -->
   <div class="modal" id="edit-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1603,12 +1629,10 @@
         <span class="close" onclick="closeModal('edit-modal')">×</span>
       </div>
       <div class="modal-body" id="edit-modal-body">
-        <!-- Контент будет загружен здесь -->
-      </div>
+        </div>
     </div>
   </div>
 
-  <!-- Модальное окно профиля пользователя -->
   <div class="modal" id="profile-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1616,12 +1640,10 @@
         <span class="close" onclick="closeModal('profile-modal')">×</span>
       </div>
       <div class="modal-body" id="profile-modal-body">
-        <!-- Контент будет загружен здесь -->
-      </div>
+        </div>
     </div>
   </div>
 
-  <!-- Модальное окно корзины -->
   <div class="modal" id="cart-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1630,8 +1652,7 @@
       </div>
       <div class="modal-body" id="cart-modal-body">
         <div id="cart-items-container">
-          <!-- Товары будут загружены здесь -->
-        </div>
+          </div>
         <div class="cart-total" id="cart-total">
           Итого: 0 сом
         </div>
@@ -1686,13 +1707,11 @@
     let isAdmin = false;
     let selectedCategories = [];
     let searchTimeout = null;
-    let currentImageUrl = '';
     let cart = [];
     let isLoading = false;
     let lastVisibleProductIndex = 0;
-    const productsPerPage = 6; // Количество товаров для ленивой загрузки
+    const productsPerPage = 6;
     let filteredProducts = [];
-    let currentProfile = null;
 
     // Инициализация IndexedDB для корзины
     let dbPromise = indexedDB.open('DOROShopCartDB', 1);
@@ -1738,10 +1757,8 @@
           const tx = db.transaction('cart', 'readwrite');
           const store = tx.objectStore('cart');
           
-          // Очищаем корзину перед сохранением
           store.clear();
           
-          // Добавляем все элементы корзины
           cart.forEach(item => {
             store.add(item);
           });
@@ -1768,12 +1785,9 @@
       }
     }
 
-    // Инициализация приложения
     document.addEventListener('DOMContentLoaded', async () => {
-      // Загружаем корзину из IndexedDB
       await loadCartFromDB();
       
-      // Проверка авторизации
       auth.onAuthStateChanged(async user => {
         if (user) {
           currentUser = user;
@@ -1786,7 +1800,6 @@
           if (isAdmin) {
             loadStats();
             statsContainer.style.display = 'grid';
-            // Добавляем бейдж админа
             const adminBadge = document.createElement('div');
             adminBadge.className = 'admin-badge';
             adminBadge.textContent = 'ADMIN';
@@ -1800,34 +1813,24 @@
         }
       });
 
-      // Настройка поиска
       searchInput.addEventListener('input', () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(filterProducts, 300);
       });
 
-      // Настройка фильтров по цене
       document.getElementById('min-price').addEventListener('change', filterProducts);
       document.getElementById('max-price').addEventListener('change', filterProducts);
 
-      // Настройка кнопки добавления
       addButton.addEventListener('click', openAddModal);
-
-      // Настройка кнопки корзины
       cartBtn.addEventListener('click', openCartModal);
-
-      // Настройка кнопки просмотра профиля
       userChip.addEventListener('click', () => {
         if (currentUser) {
           showUserProfile(currentUser.uid);
         }
       });
-
-      // Настройка бесконечной прокрутки
       window.addEventListener('scroll', handleScroll);
     });
 
-    // Обработчик бесконечной прокрутки
     function handleScroll() {
       if (isLoading) return;
       
@@ -1840,7 +1843,6 @@
       }
     }
 
-    // Загрузка дополнительных товаров
     function loadMoreProducts() {
       isLoading = true;
       
@@ -1856,7 +1858,6 @@
       isLoading = false;
     }
 
-    // Работа с пользователями
     async function getUsername(uid) {
       const snapshot = await db.ref(`users/${uid}/username`).once('value');
       return snapshot.val() || 'Пользователь';
@@ -1911,13 +1912,11 @@
       }
     }
 
-    // Работа с товарами
     async function loadProducts() {
       emptyState.style.display = 'none';
       productList.innerHTML = '<div class="loader"></div>';
 
       try {
-        // Загружаем начальные данные
         const snapshot = await db.ref("products").once("value");
         allProducts = [];
         
@@ -1932,7 +1931,6 @@
           showEmptyState('Товаров пока нет');
         }
 
-        // Настраиваем слушатели для обновлений
         db.ref("products").on("child_added", (snapshot) => {
           const product = snapshot.val();
           product.id = snapshot.key;
@@ -1984,35 +1982,30 @@
       const maxPrice = parseFloat(document.getElementById('max-price').value) || Infinity;
       
       filteredProducts = allProducts.filter(product => {
-        // Фильтрация по поисковому запросу
         const matchesSearch = searchQuery === '' || 
           product.name.toLowerCase().includes(searchQuery) || 
           product.description.toLowerCase().includes(searchQuery) || 
           product.price.toString().includes(searchQuery);
         
-        // Фильтрация по цене
         const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
         
-        // Фильтрация по категориям
         const matchesCategory = selectedCategories.length === 0 || 
           (product.category && selectedCategories.includes(product.category));
         
         return matchesSearch && matchesPrice && matchesCategory;
       });
       
-      // Сброс пагинации
       productList.innerHTML = '';
       lastVisibleProductIndex = 0;
       
       if (filteredProducts.length === 0) {
         showEmptyState('Товаров не найдено');
       } else {
-        // Загружаем первую порцию товаров
         loadMoreProducts();
       }
     }
 
-    function renderProducts(products, append = false) {
+    async function renderProducts(products, append = false) {
       if (!append) {
         productList.innerHTML = '';
       }
@@ -2024,10 +2017,11 @@
       
       const fragment = document.createDocumentFragment();
       
-      products.forEach(product => {
+      for (const product of products) {
         const isAuthor = currentUser && product.userId === currentUser.uid;
         const showControls = isAuthor || isAdmin;
         const inCart = cart.find(item => item.id === product.id);
+        const userRating = await getUserRating(product.userId);
         
         const productElement = document.createElement('div');
         productElement.className = 'product';
@@ -2058,10 +2052,10 @@
               <span>Рейтинг:</span>
               <div class="rating-carts">
                 ${Array(5).fill().map((_, i) => `
-                  <i class="fas fa-shopping-cart rating-cart ${i < Math.floor(product.rating?.average || 0) ? 'active' : ''}"></i>
+                  <i class="fas fa-cart-shopping rating-cart ${i < Math.floor(userRating.average || 0) ? 'active' : ''}"></i>
                 `).join('')}
               </div>
-              <small>(${product.rating?.count || 0})</small>
+              <small>(${userRating.count || 0})</small>
             </div>
             <div class="product-actions">
               <button class="btn-detail" onclick='showDetail("${product.id}")'>
@@ -2091,9 +2085,8 @@
             </div>
           </div>
         `;
-        
         fragment.appendChild(productElement);
-      });
+      }
       
       if (append) {
         productList.appendChild(fragment);
@@ -2102,7 +2095,6 @@
         productList.appendChild(fragment);
       }
       
-      // Анимация появления товаров
       setTimeout(() => {
         const productElements = document.querySelectorAll('.product');
         productElements.forEach((el, index) => {
@@ -2120,7 +2112,6 @@
       productList.appendChild(emptyState);
     }
 
-    // Модальные окна
     async function showDetail(productId) {
       const modal = document.getElementById('detail-modal');
       const modalBody = document.getElementById('modal-body');
@@ -2157,7 +2148,7 @@
             <div class="user-rating">
               <div class="rating-carts">
                 ${Array(5).fill().map((_, i) => `
-                  <i class="fas fa-shopping-cart rating-cart ${i < Math.floor(userRating.average) ? 'active' : ''}"></i>
+                  <i class="fas fa-cart-shopping rating-cart ${i < Math.floor(userRating.average) ? 'active' : ''}"></i>
                 `).join('')}
               </div>
               <small>(${userRating.count})</small>
@@ -2170,7 +2161,7 @@
           <span class="rating-title">Оцените продавца:</span>
           <div class="rating-carts" id="rating-controls">
             ${Array(5).fill().map((_, i) => `
-              <i class="fas fa-shopping-cart rating-cart" 
+              <i class="fas fa-cart-shopping rating-cart" 
                  data-rating="${i+1}" 
                  onclick="rateUser('${product.userId}', ${i+1})"></i>
             `).join('')}
@@ -2242,7 +2233,6 @@
       
       await saveUserRating(userId, rating);
       
-      // Обновляем отображение рейтинга
       const ratingControls = document.getElementById('rating-controls');
       if (ratingControls) {
         const carts = ratingControls.querySelectorAll('.rating-cart');
@@ -2255,7 +2245,6 @@
         });
       }
       
-      // Показываем уведомление
       const notification = document.createElement('div');
       notification.style.position = 'fixed';
       notification.style.bottom = '20px';
@@ -2294,11 +2283,9 @@
       const modal = document.getElementById('profile-modal');
       const modalBody = document.getElementById('profile-modal-body');
       
-      // Показываем загрузчик
       modalBody.innerHTML = '<div class="loader"></div>';
       openModal('profile-modal');
       
-      // Загружаем данные пользователя
       const userData = await getUserData(userId);
       const userRating = await getUserRating(userId);
       
@@ -2307,7 +2294,6 @@
         return;
       }
       
-      // Загружаем товары пользователя
       const userProducts = allProducts.filter(p => p.userId === userId);
       
       modalBody.innerHTML = `
@@ -2322,7 +2308,7 @@
             <div class="profile-rating">
               <div class="rating-carts">
                 ${Array(5).fill().map((_, i) => `
-                  <i class="fas fa-shopping-cart rating-cart ${i < Math.floor(userRating.average) ? 'active' : ''}"></i>
+                  <i class="fas fa-cart-shopping rating-cart ${i < Math.floor(userRating.average) ? 'active' : ''}"></i>
                 `).join('')}
               </div>
               <small>${userRating.average.toFixed(1)} (${userRating.count} оценок)</small>
@@ -2367,7 +2353,7 @@
             <span class="rating-title">Ваша оценка:</span>
             <div class="rating-carts" id="profile-rating-controls">
               ${Array(5).fill().map((_, i) => `
-                <i class="fas fa-shopping-cart rating-cart" 
+                <i class="fas fa-cart-shopping rating-cart" 
                    data-rating="${i+1}" 
                    onclick="rateUser('${userId}', ${i+1})"></i>
               `).join('')}
@@ -2381,7 +2367,6 @@
     function showAllUserProducts(userId) {
       const userProducts = allProducts.filter(p => p.userId === userId);
       
-      // Фильтруем товары по пользователю
       selectedCategories = [];
       document.querySelectorAll('.category-tag').forEach(tag => tag.classList.remove('active'));
       document.getElementById('search').value = '';
@@ -2412,8 +2397,21 @@
     }
 
     function openAddModal() {
-      currentImageUrl = '';
+      document.getElementById('product-name').value = '';
+      document.getElementById('product-price').value = '';
+      document.getElementById('product-original-price').value = '';
+      document.getElementById('product-description').value = '';
+      document.getElementById('product-category').value = 'electronics';
+      document.getElementById('product-phone').value = '';
+      document.getElementById('product-whatsapp').value = '';
+      document.getElementById('product-telegram').value = '';
+      document.getElementById('product-instagram').value = '';
+      document.getElementById('product-dc-card').value = '';
+      document.getElementById('image-preview').src = '';
       document.getElementById('image-preview').style.display = 'none';
+      document.querySelector('.image-preview-placeholder').style.display = 'block';
+      document.getElementById('product-image').value = '';
+      
       document.getElementById('add-modal').classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -2475,7 +2473,6 @@
         cartContainer.appendChild(cartItem);
       });
       
-      // Обновляем итоговую сумму
       const total = cart.reduce((sum, item) => {
         const product = allProducts.find(p => p.id === item.id);
         return sum + (product ? product.price * item.quantity : 0);
@@ -2484,7 +2481,6 @@
       cartTotal.textContent = `Итого: ${total} сом`;
     }
 
-    // Работа с корзиной
     function addToCart(productId, event) {
       if (event) event.stopPropagation();
       
@@ -2505,7 +2501,6 @@
       
       updateCart();
       
-      // Анимация добавления в корзину
       if (event) {
         const btn = event.target.closest('button');
         if (btn) {
@@ -2513,7 +2508,6 @@
           btn.classList.remove('btn-add-to-cart');
           btn.classList.add('btn-success');
           
-          // Создаем эффект "пузырька"
           const bubble = document.createElement('div');
           bubble.style.position = 'fixed';
           bubble.style.width = '20px';
@@ -2584,12 +2578,10 @@
       await saveCartToDB();
       updateCartBadge();
       
-      // Обновляем отображение корзины, если она открыта
       if (document.getElementById('cart-modal').classList.contains('active')) {
         renderCart();
       }
       
-      // Обновляем кнопки "В корзине" в списке товаров
       const productElements = document.querySelectorAll('.product');
       productElements.forEach(el => {
         const productId = el.querySelector('button[onclick^="addToCart"]')?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1] ||
@@ -2619,7 +2611,6 @@
       });
     }
 
-    // Авторизация
     async function login() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
@@ -2645,7 +2636,6 @@
       }
     }
 
-    // Работа с товарами
     async function addProduct() {
       const name = document.getElementById('product-name').value;
       const price = parseFloat(document.getElementById('product-price').value);
@@ -2657,6 +2647,7 @@
       const telegram = document.getElementById('product-telegram').value;
       const instagram = document.getElementById('product-instagram').value;
       const dcCard = document.getElementById('product-dc-card').value;
+      const image = document.getElementById('product-image').value;
       const username = await getUsername(currentUser.uid);
 
       if (!name || !price || !category) {
@@ -2664,7 +2655,7 @@
         return;
       }
 
-      if (!currentImageUrl) {
+      if (!image) {
         alert('Пожалуйста, загрузите изображение товара');
         return;
       }
@@ -2681,7 +2672,7 @@
           telegram: telegram || '',
           instagram: instagram || '',
           dcCard: dcCard || '',
-          image: currentImageUrl,
+          image: image,
           username,
           userId: currentUser.uid,
           timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -2690,12 +2681,13 @@
         const newRef = db.ref('products').push();
         await newRef.set(newProduct);
 
-        // Очистка формы
         document.getElementById('add-modal').querySelectorAll('input, textarea').forEach(el => {
           el.value = '';
         });
+        document.getElementById('image-preview').src = '';
         document.getElementById('image-preview').style.display = 'none';
-        currentImageUrl = '';
+        document.querySelector('.image-preview-placeholder').style.display = 'block';
+        document.getElementById('product-image').value = '';
         closeModal('add-modal');
       } catch (error) {
         alert('Ошибка при добавлении товара: ' + error.message);
@@ -2766,24 +2758,19 @@
         </div>
         <div class="form-group">
           <label class="form-label">Текущее изображение</label>
-          <img src="${product.image || 'https://via.placeholder.com/600x400?text=No+Image'}" 
-               style="width: 100%; border-radius: var(--radius-sm); margin-bottom: 1rem;" 
-               loading="lazy"
-               onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'">
-          <input type="file" id="edit-file-input" accept="image/*" capture="camera" style="display: none;">
-          <div class="upload-btn" onclick="openEditFileDialog()">
-            <i class="fas fa-camera"></i> Заменить изображение
+          <div class="image-preview-container">
+            <img src="${product.image || 'https://via.placeholder.com/600x400?text=No+Image'}" 
+                 id="edit-image-preview"
+                 style="display: block;" 
+                 loading="lazy"
+                 onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'">
+            <span class="image-preview-placeholder" style="display: none;"></span>
           </div>
-          <div class="file-options" id="edit-file-options" style="display: none; margin-top: 1rem;">
-            <button class="btn btn-outline" onclick="takeEditPhoto()" style="width: 100%; margin-bottom: 0.5rem;">
-              <i class="fas fa-camera"></i> Снять фото
-            </button>
-            <button class="btn btn-outline" onclick="chooseEditFromGallery()" style="width: 100%;">
-              <i class="fas fa-images"></i> Выбрать из галереи
-            </button>
+          <input type="file" id="edit-file-input" accept="image/*" multiple style="display: none;">
+          <div class="upload-btn" onclick="document.getElementById('edit-file-input').click()">
+            <i class="fas fa-images"></i> Заменить изображение
           </div>
-          <img id="edit-image-preview" class="image-preview" style="display: none;">
-          <input type="hidden" class="form-control" id="edit-product-image">
+          <input type="hidden" class="form-control" id="edit-product-image" value="${product.image}">
         </div>
         <div class="modal-footer">
           <button class="btn btn-outline" onclick="closeModal('edit-modal')">
@@ -2809,7 +2796,7 @@
       const telegram = document.getElementById('edit-product-telegram').value;
       const instagram = document.getElementById('edit-product-instagram').value;
       const dcCard = document.getElementById('edit-product-dc-card').value;
-      const image = document.getElementById('edit-product-image').value || currentImageUrl;
+      const image = document.getElementById('edit-product-image').value;
 
       if (!name || !price || !category) {
         alert('Пожалуйста, заполните обязательные поля: название, цена и категория');
@@ -2828,12 +2815,9 @@
           telegram: telegram || '',
           instagram: instagram || '',
           dcCard: dcCard || '',
+          image: image,
           updatedAt: firebase.database.ServerValue.TIMESTAMP
         };
-
-        if (image) {
-          updates.image = image;
-        }
 
         await db.ref(`products/${productId}`).update(updates);
         closeModal('edit-modal');
@@ -2852,24 +2836,19 @@
         .catch(error => alert('Ошибка при удалении: ' + error.message));
     }
 
-    // Статистика для админа
     async function loadStats() {
-      // Общее количество товаров
       document.getElementById('total-products').textContent = allProducts.length;
       
-      // Количество товаров по категориям
       document.getElementById('electronics-count').textContent = 
         allProducts.filter(p => p.category === 'electronics').length;
       document.getElementById('clothing-count').textContent = 
         allProducts.filter(p => p.category === 'clothing').length;
       
-      // Количество пользователей
       const usersSnapshot = await db.ref('users').once('value');
       document.getElementById('total-users').textContent = 
         usersSnapshot.exists() ? Object.keys(usersSnapshot.val()).length : 0;
     }
 
-    // Закрытие модальных окон при клике вне контента
     document.querySelectorAll('.modal').forEach(modal => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -2879,67 +2858,100 @@
       });
     });
 
-    // Функции для работы с изображениями
-    function openFileDialog() {
-      document.getElementById('file-options').style.display = 'block';
-    }
-
-    function openEditFileDialog() {
-      document.getElementById('edit-file-options').style.display = 'block';
-    }
-
-    function takePhoto() {
-      document.getElementById('file-input').setAttribute('capture', 'camera');
-      document.getElementById('file-input').click();
-      document.getElementById('file-options').style.display = 'none';
-    }
-
-    function takeEditPhoto() {
-      document.getElementById('edit-file-input').setAttribute('capture', 'camera');
-      document.getElementById('edit-file-input').click();
-      document.getElementById('edit-file-options').style.display = 'none';
-    }
-
-    function chooseFromGallery() {
-      document.getElementById('file-input').removeAttribute('capture');
-      document.getElementById('file-input').click();
-      document.getElementById('file-options').style.display = 'none';
-    }
-
-    function chooseEditFromGallery() {
-      document.getElementById('edit-file-input').removeAttribute('capture');
-      document.getElementById('edit-file-input').click();
-      document.getElementById('edit-file-options').style.display = 'none';
-    }
-
-    // Обработчики изменения файлов
+    // Новая логика для коллажа
     document.getElementById('file-input').addEventListener('change', function(e) {
-      if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          currentImageUrl = event.target.result;
-          document.getElementById('image-preview').src = currentImageUrl;
-          document.getElementById('image-preview').style.display = 'block';
-          document.getElementById('product-image').value = currentImageUrl;
-        };
-        reader.readAsDataURL(e.target.files[0]);
-      }
+      handleFiles(e.target.files, 'image-preview', 'product-image', 'add');
     });
 
     document.getElementById('edit-file-input').addEventListener('change', function(e) {
-      if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          currentImageUrl = event.target.result;
-          document.getElementById('edit-image-preview').src = currentImageUrl;
-          document.getElementById('edit-image-preview').style.display = 'block';
-          document.getElementById('edit-product-image').value = currentImageUrl;
-        };
-        reader.readAsDataURL(e.target.files[0]);
-      }
+      handleFiles(e.target.files, 'edit-image-preview', 'edit-product-image', 'edit');
     });
 
-    // Оформление заказа
+    function handleFiles(files, previewId, inputId, type) {
+        const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+        if (imageFiles.length === 0) {
+            return;
+        }
+
+        const previewImg = document.getElementById(previewId);
+        const placeholder = previewImg.nextElementSibling;
+        const hiddenInput = document.getElementById(inputId);
+
+        const imagesToLoad = imageFiles.length;
+        let loadedImages = 0;
+        const images = [];
+
+        function onImageLoad() {
+            loadedImages++;
+            if (loadedImages === imagesToLoad) {
+                createCollage(images, previewImg, hiddenInput);
+            }
+        }
+
+        imageFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = onImageLoad;
+                img.src = e.target.result;
+                images.push(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function createCollage(images, previewImg, hiddenInput) {
+        const numImages = images.length;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const size = 600;
+        canvas.width = size;
+        canvas.height = size;
+
+        let layout = [];
+        if (numImages === 1) {
+            layout = [{ x: 0, y: 0, w: 1, h: 1 }];
+        } else if (numImages === 2) {
+            layout = [{ x: 0, y: 0, w: 0.5, h: 1 }, { x: 0.5, y: 0, w: 0.5, h: 1 }];
+        } else if (numImages === 3) {
+            layout = [{ x: 0, y: 0, w: 1, h: 1/3 }, { x: 0, y: 1/3, w: 1, h: 1/3 }, { x: 0, y: 2/3, w: 1, h: 1/3 }];
+        } else if (numImages === 4) {
+            layout = [{ x: 0, y: 0, w: 0.5, h: 0.5 }, { x: 0.5, y: 0, w: 0.5, h: 0.5 }, { x: 0, y: 0.5, w: 0.5, h: 0.5 }, { x: 0.5, y: 0.5, w: 0.5, h: 0.5 }];
+        } else if (numImages > 4 && numImages <= 6) {
+             layout = [{x: 0, y: 0, w: 1/3, h: 0.5}, {x: 1/3, y: 0, w: 1/3, h: 0.5}, {x: 2/3, y: 0, w: 1/3, h: 0.5}, {x: 0, y: 0.5, w: 1/3, h: 0.5}, {x: 1/3, y: 0.5, w: 1/3, h: 0.5}, {x: 2/3, y: 0.5, w: 1/3, h: 0.5}];
+        } else {
+            // Вертикальный коллаж по умолчанию
+            const imageHeight = size / numImages;
+            for (let i = 0; i < numImages; i++) {
+                layout.push({ x: 0, y: i * imageHeight, w: size, h: imageHeight });
+            }
+        }
+        
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        images.forEach((img, index) => {
+            const pos = layout[index] || { x: 0, y: index * (size / numImages), w: 1, h: 1/numImages };
+            const drawWidth = size * pos.w;
+            const drawHeight = size * pos.h;
+            
+            let scale = Math.min(drawWidth / img.width, drawHeight / img.height);
+            let scaledWidth = img.width * scale;
+            let scaledHeight = img.height * scale;
+            let xOffset = (drawWidth - scaledWidth) / 2;
+            let yOffset = (drawHeight - scaledHeight) / 2;
+
+            ctx.drawImage(img, size * pos.x + xOffset, size * pos.y + yOffset, scaledWidth, scaledHeight);
+        });
+
+        previewImg.src = canvas.toDataURL('image/jpeg');
+        hiddenInput.value = canvas.toDataURL('image/jpeg');
+        previewImg.style.display = 'block';
+        if (previewImg.nextElementSibling) {
+            previewImg.nextElementSibling.style.display = 'none';
+        }
+    }
+
     document.getElementById('checkout-btn').addEventListener('click', function() {
       if (cart.length === 0) {
         alert('Корзина пуста');
@@ -2959,11 +2971,8 @@
       
       const totalAmount = orderDetails.reduce((sum, item) => sum + item.total, 0);
       
-      // Здесь можно добавить логику оформления заказа
-      // Например, отправку на сервер или открытие диалога оплаты
       alert(`Заказ оформлен! Сумма: ${totalAmount} сом. Товаров: ${orderDetails.length}`);
       
-      // Очищаем корзину после оформления
       cart = [];
       updateCart();
       closeModal('cart-modal');
