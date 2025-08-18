@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOROShop — DOROS Chat</title>
+<style>
+  body { margin:0; font-family: Arial; display:flex; flex-direction:column; height:100vh; background:#f7f8fa; }
+  header { background:#2d2e83; color:#fff; padding:1rem; text-align:center; font-weight:bold; }
+  #chat { flex:1; overflow-y:auto; padding:1rem; display:flex; flex-direction:column; gap:0.5rem; }
+  .msg { max-width:80%; padding:0.75rem 1rem; border-radius:1rem; word-wrap:break-word; font-size:0.95rem; }
+  .user { background:#2d2e83; color:#fff; align-self:flex-end; }
+  .bot { background:#e5e7eb; align-self:flex-start; }
+  #input-area { display:flex; border-top:1px solid #ddd; padding:0.5rem; background:#fff; }
+  #user-input { flex:1; padding:0.5rem 0.75rem; border:1px solid #ccc; border-radius:1rem; font-size:1rem; }
+  #send-btn { margin-left:0.5rem; padding:0.5rem 1rem; background:#2d2e83; color:#fff; border:none; border-radius:1rem; cursor:pointer; }
+  #send-btn:hover { background:#242569; }
+</style>
+</head>
+<body>
+<header>DOROShop — Manager DOROS</header>
+<div id="chat"></div>
+<div id="input-area">
+  <input type="text" id="user-input" placeholder="Type your message...">
+  <button id="send-btn">Send</button>
+</div>
+
+<script>
+const chat = document.getElementById('chat');
+const input = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+
+// Вставь сюда Web App URL из Deploy
+const PROXY_URL = 'YOUR_WEB_APP_URL_HERE';
+
+function addMessage(text, sender) {
+  const msg = document.createElement('div');
+  msg.className = 'msg ' + sender;
+  msg.textContent = text;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendMessage() {
+  const text = input.value.trim();
+  if(!text) return;
+  addMessage(text, 'user');
+  input.value = '';
+
+  try {
+    const res = await fetch(PROXY_URL, {
+      method: 'POST',
+      body: JSON.stringify({ message: text }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    addMessage(data.reply, 'bot');
+  } catch(e) {
+    console.error(e);
+    addMessage('Error connecting to DOROS.', 'bot');
+  }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+input.addEventListener('keypress', e => { if(e.key === 'Enter') sendMessage(); });
+
+addMessage('Hello! I am DOROS, manager of DOROShop. How can I help you?', 'bot');
+</script>
+</body>
+</html>
