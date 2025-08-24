@@ -661,6 +661,10 @@
     .user-name {
       font-weight: 600;
       color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     .user-city {
       font-size: 0.8rem;
@@ -1330,6 +1334,21 @@
       }
     }
 
+    // Функция проверки заморозки пользователя
+    async function isUserFrozen(userId) {
+      try {
+        const snapshot = await db.ref(`users/${userId}`).once('value');
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          return userData.frozen === true;
+        }
+        return false;
+      } catch (error) {
+        console.error("Ошибка проверки заморозки пользователя:", error);
+        return false;
+      }
+    }
+
     async function getUserData(uid) {
       if (allUsers[uid]) {
         return allUsers[uid];
@@ -1367,32 +1386,62 @@
         allProducts = [];
         
         if (snapshot.exists()) {
-          snapshot.forEach(child => {
-            const product = child.val();
-            product.id = child.key;
-            allProducts.push(product);
-          });
+          const productsData = snapshot.val();
+          
+          // Проверяем каждого пользователя на заморозку
+          for (let productId in productsData) {
+            const product = productsData[productId];
+            product.id = productId;
+            
+            // Проверяем, не заморожен ли пользователь
+            const userFrozen = await isUserFrozen(product.userId);
+            
+            // Добавляем товар только если пользователь не заморожен
+            if (!userFrozen) {
+              allProducts.push(product);
+            }
+          }
+          
           shuffleArray(allProducts);
         } else {
           showEmptyState('Товаров пока нет');
         }
 
-        db.ref("products").on("child_added", (snapshot) => {
+        // Слушаем изменения в реальном времени
+        db.ref("products").on("child_added", async (snapshot) => {
           const product = snapshot.val();
           product.id = snapshot.key;
-          if (!allProducts.some(p => p.id === product.id)) {
+          
+          // Проверяем заморозку пользователя перед добавлением
+          const userFrozen = await isUserFrozen(product.userId);
+          
+          if (!userFrozen && !allProducts.some(p => p.id === product.id)) {
             allProducts.unshift(product);
             shuffleArray(allProducts);
             filterProducts();
           }
         });
 
-        db.ref("products").on("child_changed", (snapshot) => {
+        db.ref("products").on("child_changed", async (snapshot) => {
           const updatedProduct = snapshot.val();
           updatedProduct.id = snapshot.key;
+          
+          // Проверяем заморозку пользователя
+          const userFrozen = await isUserFrozen(updatedProduct.userId);
           const index = allProducts.findIndex(p => p.id === updatedProduct.id);
-          if (index !== -1) {
+          
+          if (userFrozen && index !== -1) {
+            // Удаляем товар, если пользователь заморожен
+            allProducts.splice(index, 1);
+            filterProducts();
+          } else if (!userFrozen && index !== -1) {
+            // Обновляем товар, если пользователь не заморожен
             allProducts[index] = updatedProduct;
+            filterProducts();
+          } else if (!userFrozen && index === -1) {
+            // Добавляем товар, если пользователь не заморожен
+            allProducts.push(updatedProduct);
+            shuffleArray(allProducts);
             filterProducts();
           }
         });
@@ -1402,6 +1451,39 @@
           allProducts = allProducts.filter(p => p.id !== productId);
           filterProducts();
         });
+
+        // Слушаем изменения статуса заморозки пользователей
+        db.ref("users").on("child_changed", async (snapshot) => {
+          const userData = snapshot.val();
+          const userId = snapshot.key;
+          
+          if (userData.frozen === true) {
+            // Удаляем все товары замороженного пользователя
+            allProducts = allProducts.filter(p => p.userId !== userId);
+            filterProducts();
+          } else {
+            // Добавляем товары размороженного пользователя
+            const userProductsSnapshot = await db.ref("products")
+              .orderByChild("userId")
+              .equalTo(userId)
+              .once("value");
+              
+            if (userProductsSnapshot.exists()) {
+              const productsData = userProductsSnapshot.val();
+              for (let productId in productsData) {
+                const product = productsData[productId];
+                product.id = productId;
+                
+                if (!allProducts.some(p => p.id === productId)) {
+                  allProducts.push(product);
+                }
+              }
+              shuffleArray(allProducts);
+              filterProducts();
+            }
+          }
+        });
+
       } catch (error) {
         console.error("Ошибка загрузки:", error);
         showEmptyState('Ошибка загрузки товаров');
@@ -1434,38 +1516,37 @@
       filterProducts();
     }
 
-function filterProducts() {
-  const searchQuery = searchInput.value.toLowerCase();
-  const cityQuery = cityInput.value.toLowerCase();
-  const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
-  const maxPrice = parseFloat(document.getElementById('max-price').value) || Infinity;
-  
-  filteredProducts = allProducts.filter(product => {
-    const matchesSearch = searchQuery === '' || 
-      product.name.toLowerCase().includes(searchQuery) || 
-      (product.description && product.description.toLowerCase().includes(searchQuery));
-    
-    const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
-    
-    const matchesCategory = selectedCategories.length === 0 || 
-      (product.category && selectedCategories.includes(product.category));
+    function filterProducts() {
+      const searchQuery = searchInput.value.toLowerCase();
+      const cityQuery = cityInput.value.toLowerCase();
+      const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
+      const maxPrice = parseFloat(document.getElementById('max-price').value) || Infinity;
       
-    // ИСПРАВЛЕНО: получаем город из самого товара, а не из пользователя
-    const productCity = product.city ? product.city.toLowerCase() : '';
-    const matchesCity = cityQuery === '' || productCity.includes(cityQuery);
-    
-    return matchesSearch && matchesPrice && matchesCategory && matchesCity;
-  });
-  
-  productList.innerHTML = '';
-  lastVisibleProductIndex = 0;
-  
-  if (filteredProducts.length === 0) {
-    showEmptyState('Товаров не найдено');
-  } else {
-    loadMoreProducts();
-  }
-}
+      filteredProducts = allProducts.filter(product => {
+        const matchesSearch = searchQuery === '' || 
+          product.name.toLowerCase().includes(searchQuery) || 
+          (product.description && product.description.toLowerCase().includes(searchQuery));
+        
+        const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+        
+        const matchesCategory = selectedCategories.length === 0 || 
+          (product.category && selectedCategories.includes(product.category));
+          
+        const productCity = product.city ? product.city.toLowerCase() : '';
+        const matchesCity = cityQuery === '' || productCity.includes(cityQuery);
+        
+        return matchesSearch && matchesPrice && matchesCategory && matchesCity;
+      });
+      
+      productList.innerHTML = '';
+      lastVisibleProductIndex = 0;
+      
+      if (filteredProducts.length === 0) {
+        showEmptyState('Товаров не найдено');
+      } else {
+        loadMoreProducts();
+      }
+    }
 
     async function loadMoreProducts() {
       if (isLoading) return;
@@ -1483,73 +1564,69 @@ function filterProducts() {
       isLoading = false;
     }
 
-function renderProducts(products, append = false) {
-  if (!append) {
-    productList.innerHTML = '';
-  }
-  
-  if (products.length === 0 && !append) {
-    showEmptyState('Товаров не найдено');
-    return;
-  }
-  
-  const fragment = document.createDocumentFragment();
-  
-  products.forEach(product => {
-    const productElement = document.createElement('div');
-    productElement.className = 'product';
-    
-    const isFavorite = favorites.has(product.id);
-    const categoryMap = {
-        electronics: 'Электроника', clothing: 'Одежда', home: 'Дом',
-        beauty: 'Красота', sports: 'Спорт', books: 'Книги',
-        toys: 'Игрушки', food: 'Еда', cars: 'Авто', health: 'Здоровье',
-    };
-    const categoryText = categoryMap[product.category] || 'Разное';
-    
-    // ИСПРАВЛЕНО: получаем город из самого товара
-    const productCity = product.city || 'Неизвестно';
-
-    productElement.innerHTML = `
-      <div class="category-indicator ${product.category}-bg"></div>
-      ${product.originalPrice && product.price < product.originalPrice ? 
-        `<div class="product-badge">-${Math.round((1 - product.price/product.originalPrice) * 100)}%</div>` : ''}
-      <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite('${product.id}', event)">
-          <i class="fas fa-heart"></i>
-      </button>
-      <div class="product-image-container" onclick="showDetail('${product.id}')">
-        <img src="${product.image || 'https://via.placeholder.com/300x200/2D3748/A0AEC0?text=No+Image'}" 
-             class="product-image" 
-             alt="${product.name}" 
-             loading="lazy"
-             onerror="this.src='https://via.placeholder.com/300x200/2D3748/A0AEC0?text=No+Image'">
-      </div>
+    function renderProducts(products, append = false) {
+      if (!append) {
+        productList.innerHTML = '';
+      }
       
-      <div class="product-content">
-        <p class="product-category-text">${categoryText}</p>
-        <h3 class="product-title">${product.name}</h3>
-        <div class="product-city">
-          <i class="fas fa-map-marker-alt"></i> ${productCity}
-        </div>
-        <div class="product-price">
-          ${product.price} сом
-          ${product.originalPrice ? `<span style="text-decoration: line-through; color: var(--text-light); font-size: 0.7rem;">${product.originalPrice} сом</span>` : ''}
-        </div>
-        <div class="product-user" onclick="showUserProfile('${product.userId}', event)">
-          <i class="fas fa-user-circle"></i>
-          ${product.username || 'Неизвестно'}
-        </div>
-        <button class="btn-detail" onclick="showDetail('${product.id}')">
-            <i class="fas fa-info-circle"></i> Подробнее
-        </button>
-      </div>
-    `;
-    
-    fragment.appendChild(productElement);
-  });
-  
-  // ...  код...
+      if (products.length === 0 && !append) {
+        showEmptyState('Товаров не найдено');
+        return;
+      }
+      
+      const fragment = document.createDocumentFragment();
+      
+      products.forEach(product => {
+        const productElement = document.createElement('div');
+        productElement.className = 'product';
+        
+        const isFavorite = favorites.has(product.id);
+        const categoryMap = {
+            electronics: 'Электроника', clothing: 'Одежда', home: 'Дом',
+            beauty: 'Красота', sports: 'Спорт', books: 'Книги',
+            toys: 'Игрушки', food: 'Еда', cars: 'Авто', health: 'Здоровье',
+        };
+        const categoryText = categoryMap[product.category] || 'Разное';
 
+        const productCity = product.city || 'Неизвестно';
+
+        productElement.innerHTML = `
+          <div class="category-indicator ${product.category}-bg"></div>
+          ${product.originalPrice && product.price < product.originalPrice ? 
+            `<div class="product-badge">-${Math.round((1 - product.price/product.originalPrice) * 100)}%</div>` : ''}
+          <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite('${product.id}', event)">
+              <i class="fas fa-heart"></i>
+          </button>
+          <div class="product-image-container" onclick="showDetail('${product.id}')">
+            <img src="${product.image || 'https://via.placeholder.com/300x200/2D3748/A0AEC0?text=No+Image'}" 
+                 class="product-image" 
+                 alt="${product.name}" 
+                 loading="lazy"
+                 onerror="this.src='https://via.placeholder.com/300x200/2D3748/A0AEC0?text=No+Image'">
+          </div>
+          
+          <div class="product-content">
+            <p class="product-category-text">${categoryText}</p>
+            <h3 class="product-title">${product.name}</h3>
+            <div class="product-city">
+              <i class="fas fa-map-marker-alt"></i> ${productCity}
+            </div>
+            <div class="product-price">
+              ${product.price} сом
+              ${product.originalPrice ? `<span style="text-decoration: line-through; color: var(--text-light); font-size: 0.7rem;">${product.originalPrice} сом</span>` : ''}
+            </div>
+            <div class="product-user" onclick="showUserProfile('${product.userId}', event)">
+              <i class="fas fa-user-circle"></i>
+              ${product.username || 'Неизвестно'}
+            </div>
+            <button class="btn-detail" onclick="showDetail('${product.id}')">
+                <i class="fas fa-info-circle"></i> Подробнее
+            </button>
+          </div>
+        `;
+        
+        fragment.appendChild(productElement);
+      });
       
       if (append) {
         productList.appendChild(fragment);
@@ -1579,64 +1656,57 @@ function renderProducts(products, append = false) {
       `;
     }
     
-async function showDetail(productId) {
-  const modal = document.getElementById('detail-modal');
-  const modalBody = document.getElementById('modal-body');
-  const product = allProducts.find(p => p.id === productId);
-  
-  if (!product) return;
-  
-  const userData = await getUserData(product.userId);
-  const userRating = await getUserRating(product.userId);
-  const isFavorite = favorites.has(productId);
+    async function showDetail(productId) {
+      const modal = document.getElementById('detail-modal');
+      const modalBody = document.getElementById('modal-body');
+      const product = allProducts.find(p => p.id === productId);
+      
+      if (!product) return;
+      
+      const userData = await getUserData(product.userId);
+      const userRating = await getUserRating(product.userId);
+      const isFavorite = favorites.has(productId);
 
-  const shareUrl = `https://dorosfamd.com/DOROShop.html#product-${productId}`;
-  const shareTitle = product.name;
-  const shareText = `Посмотрите этот товар на DORO-shop: ${shareTitle}. Город/Село: ${productCity} Цена: ${product.price} сом.`;
-  
-  // ИСПРАВЛЕНО: получаем город из самого товара
-  const productCity = product.city || 'Неизвестно';
+      const shareUrl = `https://dorosfamd.com/DOROShop.html#product-${productId}`;
+      const shareTitle = product.name;
+      const productCity = product.city || 'Неизвестно';
+      const shareText = `Посмотрите этот товар на DORO-shop: ${shareTitle}. Город/Село: ${productCity} Цена: ${product.price} сом.`;
 
-  modalBody.innerHTML = `
-    <div class="product-detail-image-container">
-      <img src="${product.image || 'https://via.placeholder.com/600x400/2D3748/A0AEC0?text=No+Image'}" 
-           class="product-detail-image" 
-           alt="${product.name}" 
-           loading="lazy"
-           onerror="this.src='https://via.placeholder.com/600x400/2D3748/A0AEC0?text=No+Image'">
-    </div>
-    <h3 class="product-title">${product.name}</h3>
-    <button class="favorite-btn ${isFavorite ? 'active' : ''}" style="position: static; margin-bottom: 1rem;" onclick="toggleFavorite('${productId}')">
-        <i class="fas fa-heart"></i> Добавить в избранное
-    </button>
-    <div class="product-detail-price">
-      ${product.price} сом
-      ${product.originalPrice ? `<span style="text-decoration: line-through; color: var(--text-light); font-size: 1rem;">${product.originalPrice} сом</span>` : ''}
-    </div>
-    <div class="product-detail-description">${product.description || 'Описание отсутствует'}</div>
-    
-    <div class="product-detail-user" onclick="showUserProfile('${product.userId}', event)">
-      <div class="user-avatar">
-        ${userData && userData.username ? userData.username.charAt(0).toUpperCase() : '?'}
-      </div>
-      <div class="user-info">
-        <div class="user-name">${userData && userData.username ? userData.username : 'Неизвестный продавец'}</div>
-        <div class="user-city"><i class="fas fa-map-marker-alt"></i> ${productCity}</div>
-        <div class="user-rating">
-          <div class="rating-carts">
-            ${Array(5).fill().map((_, i) => `
-              <i class="fas fa-star rating-cart ${i < Math.floor(userRating.average) ? 'active' : ''}"></i>
-            `).join('')}
-          </div>
-          <small>${userRating.average.toFixed(1)} (${userRating.count})</small>
+      modalBody.innerHTML = `
+        <div class="product-detail-image-container">
+          <img src="${product.image || 'https://via.placeholder.com/600x400/2D3748/A0AEC0?text=No+Image'}" 
+               class="product-detail-image" 
+               alt="${product.name}" 
+               loading="lazy"
+               onerror="this.src='https://via.placeholder.com/600x400/2D3748/A0AEC0?text=No+Image'">
         </div>
-      </div>
-    </div>
-    
-    
-  
-  
-
+        <h3 class="product-title">${product.name}</h3>
+        <button class="favorite-btn ${isFavorite ? 'active' : ''}" style="position: static; margin-bottom: 1rem;" onclick="toggleFavorite('${productId}')">
+            <i class="fas fa-heart"></i> Добавить в избранное
+        </button>
+        <div class="product-detail-price">
+          ${product.price} сом
+          ${product.originalPrice ? `<span style="text-decoration: line-through; color: var(--text-light); font-size: 1rem;">${product.originalPrice} сом</span>` : ''}
+        </div>
+        <div class="product-detail-description">${product.description || 'Описание отсутствует'}</div>
+        
+        <div class="product-detail-user" onclick="showUserProfile('${product.userId}', event)">
+          <div class="user-avatar">
+            ${userData && userData.username ? userData.username.charAt(0).toUpperCase() : '?'}
+          </div>
+          <div class="user-info">
+            <div class="user-name">${userData && userData.username ? userData.username : 'Неизвестный продавец'}</div>
+            <div class="user-city"><i class="fas fa-map-marker-alt"></i> ${productCity}</div>
+            <div class="user-rating">
+              <div class="rating-carts">
+                ${Array(5).fill().map((_, i) => `
+                  <i class="fas fa-star rating-cart ${i < Math.floor(userRating.average) ? 'active' : ''}"></i>
+                `).join('')}
+              </div>
+              <small>${userRating.average.toFixed(1)} (${userRating.count})</small>
+            </div>
+          </div>
+        </div>
         
         <div class="contact-methods">
           ${product.phone ? `
