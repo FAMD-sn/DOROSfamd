@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Ежики и ИИ EzhAI – Всё о ежах, уход, питание, виды, советы, ИИ с ёжиком</title>
+  <meta name="description" content="Полный гид по ежикам: виды, уход, питание, здоровье, советы для дома. Включает EzhAI — умного ИИ про ежиков, чат с Ёж ИИ, ИИ с ёжиком, ИИ про ежиков. Всё о домашних и диких ежах, факты, лайфхаки и помощь владельцам.">
+  <meta name="keywords" content="ёжики, еж, ежик, домашний еж, уход за ежиком, корм для ежей, EzhAI, Ёж ИИ, ИИ с ёжиком, ИИ про ежиков, ежи, факты о ежах, советы по уходу за ежами">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<style>
+        :root {
+            --primary-green: #7a9f5a;
+            --light-green: #d8e9d3;
+            --dark-green: #4a6b3a;
+            --brown: #a67c52;
+            --light-brown: #d7c5b5;
+            --cream: #f5f0e6;
+            --white: #ffffff;
+            --black: #333333;
+            --gray: #777777;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--black);
+            background-color: var(--cream);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 1rem;
+            color: var(--dark-green);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-green);
+            transition: var(--transition);
+        }
+
+        a:hover {
+            color: var(--dark-green);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--dark-green);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-ai {
+            background-color: var(--brown);
+            font-weight: 600;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+        }
+
+        .btn-ai:hover {
+            background-color: #8a6240;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-green);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--black);
+            position: relative;
+        }
+
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-green);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover:after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-green);
+        }
+
+        .search-container {
+            display: flex;
+            margin-left: 20px;
+        }
+
+        .search-input {
+            padding: 8px 15px;
+            border: 1px solid var(--light-green);
+            border-radius: 20px 0 0 20px;
+            outline: none;
+            width: 200px;
+        }
+
+        .search-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--cream) 100%);
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: var(--dark-green);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: var(--gray);
+        }
+
+        /* Sections */
+        .section {
+            padding: 60px 20px;
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-green);
+        }
+
+        /* Cards */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--dark-green);
+        }
+
+        .card-text {
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        /* Facts Section */
+        .facts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .fact-card {
+            background-color: var(--light-green);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid var(--primary-green);
+        }
+
+        /* AI Section */
+        .ai-section {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--light-brown) 0%, var(--cream) 100%);
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+
+        .ai-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .ai-section p {
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 40px 20px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .footer-logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--light-green);
+        }
+
+        .footer-links a:hover {
+            color: var(--white);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow: auto;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .nav-menu {
+                gap: 15px;
+            }
+            
+            .search-input {
+                width: 150px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu, .search-container {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .facts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .mobile-menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: var(--white);
+                box-shadow: var(--shadow);
+                padding: 20px;
+                display: none;
+                flex-direction: column;
+                gap: 15px;
+                z-index: 99;
+            }
+            
+            .mobile-menu.active {
+                display: flex;
+            }
+            
+            .search-container.mobile {
+                display: flex;
+                width: 100%;
+                margin: 15px 0 0;
+            }
+            
+            .search-input.mobile {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container container">
+            <div class="logo">
+                <i class="fas fa-heart" style="color: #7a9f5a; font-size: 28px;"></i>
+                <span class="logo-text">Ezh</span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Главная</a></li>
+                <li><a href="#types" class="nav-link">Виды ежей</a></li>
+                <li><a href="#care" class="nav-link">Уход и содержание</a></li>
+                <li><a href="#nutrition" class="nav-link">Питание</a></li>
+                <li><a href="#health" class="nav-link">Здоровье</a></li>
+                <li><a href="#fun" class="nav-link">Развлечения</a></li>
+                <li><a href="#facts" class="nav-link">Факты</a></li>
+            </ul>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Поиск...">
+                <button class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="mobile-menu">
+            <a href="#home" class="nav-link">Главная</a>
+            <a href="#types" class="nav-link">Виды ежей</a>
+            <a href="#care" class="nav-link">Уход и содержание</a>
+            <a href="#nutrition" class="nav-link">Питание</a>
+            <a href="#health" class="nav-link">Здоровье</a>
+            <a href="#fun" class="nav-link">Развлечения</a>
+            <a href="#facts" class="nav-link">Факты</a>
+            
+            <div class="search-container mobile">
+                <input type="text" class="search-input mobile" placeholder="Поиск...">
+                <button class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Добро пожаловать в мир ёжиков!</h1>
+            <p>Узнайте всё о содержании, уходе и особенностях этих удивительных животных. Станьте экспертом в вопросах жизни ежей вместе с Ezh!</p>
+            <a href="https://share.character.ai/Wv9R/5dokfjhm" target="_blank" class="btn btn-ai">Перейти в ИИ Ezh <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </section>
+
+    <main class="container">
+        <!-- Types Section -->
+        <section class="section" id="types">
+            <h2 class="section-title">Виды ежей</h2>
+            <p>Существует несколько популярных видов ежей, которых содержат в домашних условиях. Каждый вид имеет свои особенности и требования к содержанию.</p>
+            
+            <div class="cards-container">
+                <div class="card" data-modal="type1">
+                    <img src="https://placehold.co/600x400/7a9f5a/white?text=Африканский+Карликовый" alt="Африканский карликовый ёж" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Африканский карликовый</h3>
+                        <p class="card-text">Самый популярный домашний вид. Размер: 15-20 см, вес: 300-500 г.</p>
+                    </div>
+                </div>
+                
+                <div class="card" data-modal="type2">
+                    <img src="https://placehold.co/600x400/7a9f5a/white?text=Европейский" alt="Европейский ёж" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Европейский</h3>
+                        <p class="card-text">Дикий вид, реже содержится дома. Размер: 20-30 см, вес: 600-1200 г.</p>
+                    </div>
+                </div>
+                
+                <div class="card" data-modal="type3">
+                    <img src="https://placehold.co/600x400/7a9f5a/white?text=Ушастый" alt="Ушастый ёж" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Ушастый</h3>
+                        <p class="card-text">Отличается длинными ушами. Размер: 15-20 см, вес: 300-500 г.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Care Section -->
+        <section class="section" id="care">
+            <h2 class="section-title">Уход и содержание</h2>
+            <p>Правильный уход за ежом включает в себя создание комфортных условий жизни, поддержание чистоты и обеспечение безопасности.</p>
+            
+            <div class="cards-container">
+                <div class="card">
+                    <img src="https://placehold.co/600x400/d7c5b5/white?text=Домик+для+ежа" alt="Домик для ежа" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Жильё</h3>
+                        <p class="card-text">Просторная клетка или террариум с хорошей вентиляцией.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://placehold.co/600x400/d7c5b5/white?text=Температура" alt="Термометр" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Температура</h3>
+                        <p class="card-text">Оптимальная температура: 22-25°C. Избегайте сквозняков.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://placehold.co/600x400/d7c5b5/white?text=Подстилка" alt="Подстилка" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Подстилка</h3>
+                        <p class="card-text">Используйте специальные наполнители или флисовые ткани.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Nutrition Section -->
+        <section class="section" id="nutrition">
+            <h2 class="section-title">Питание</h2>
+            <p>Сбалансированное питание - залог здоровья вашего ежа. Основу рациона составляют насекомые и качественный кошачий корм.</p>
+            
+            <div class="cards-container">
+                <div class="card">
+                    <img src="https://placehold.co/600x400/d8e9d3/white?text=Насекомые" alt="Кормовые насекомые" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Насекомые</h3>
+                        <p class="card-text">Сверчки, тараканы, зофобас - основной источник белка.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://placehold.co/600x400/d8e9d3/white?text=Фрукты+и+Овощи" alt="Фрукты и овощи" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Фрукты и овощи</h3>
+                        <p class="card-text">Яблоки, груши, морковь, кабачки в небольших количествах.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://placehold.co/600x400/d8e9d3/white?text=Запрещённые+продукты" alt="Запрещённые продукты" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Запрещённые продукты</h3>
+                        <p class="card-text">Молоко, орехи, семечки, лук, чеснок, авокадо.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Health Section -->
+        <section class="section" id="health">
+            <h2 class="section-title">Здоровье и профилактика</h2>
+            <p>Регулярный осмотр и правильный уход помогут сохранить здоровье вашего питомца на долгие годы.</p>
+            
+            <div class="cards-container">
+                <div class="card">
+                    <img src="https://placehold.co/600x400/f5f0e6/white?text=Осмотр+у+ветеринара" alt="Осмотр у ветеринара" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Ветеринарный осмотр</h3>
+                        <p class="card-text">Регулярные осмотры у специалиста по экзотическим животным.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://placehold.co/600x400/f5f0e6/white?text=Уход+за+когтями" alt="Уход за когтями" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Уход за когтями</h3>
+                        <p class="card-text">Регулярная стрижка когтей предотвращает проблемы с лапками.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://placehold.co/600x400/f5f0e6/white?text=Чистка+домика" alt="Чистка домика" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Гигиена</h3>
+                        <p class="card-text">Ежедневная уборка и еженедельная дезинфекция клетки.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Fun Section -->
+        <section class="section" id="fun">
+            <h2 class="section-title">Развлечения и социализация</h2>
+            <p>Ежики - любопытные животные, которым необходимо общение и физическая активность для поддержания здоровья.</p>
+            
+            <div class="cards-container">
+                <div class="card">
+                    <img src="https://placehold.co/600x400/d7c5b5/white?text=Игры+с+ежом" alt="Игры с ежом" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Игры</h3>
+                        <p class="card-text">Туннели, мячики, беговое колесо подходящего размера.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://placehold.co/600x400/d7c5b5/white?text=Дрессировка" alt="Дрессировка" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Дрессировка</h3>
+                        <p class="card-text">Обучение откликаться на имя с помощью лакомств.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://placehold.co/600x400/d7c5b5/white?text=Взаимодействие" alt="Взаимодействие" class="card-img">
+                    <div class="card-content">
+                        <h3 class="card-title">Взаимодействие</h3>
+                        <p class="card-text">Регулярный контакт с человеком для социализации.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- AI Section -->
+        <section class="ai-section">
+            <h2>ИИ-помощник Ezh</h2>
+            <p>Задайте любой вопрос о содержании, уходе или здоровье ежей нашему искусственному интеллекту. Ezh даст подробный и информативный ответ!</p>
+            <a href="https://share.character.ai/Wv9R/5dokfjhm" target="_blank" class="btn btn-ai">Задать вопрос ИИ Ezh <i class="fas fa-comments"></i></a>
+        </section>
+        
+        <!-- Facts Section -->
+        <section class="section" id="facts">
+            <h2 class="section-title">Интересные факты о ежах</h2>
+            
+            <div class="facts-container">
+                <div class="fact-card">
+                    <h3>Древние существа</h3>
+                    <p>Ежи существуют на Земле более 15 миллионов лет. Они пережили множество климатических изменений и адаптировались к различным условиям.</p>
+                </div>
+                
+                <div class="fact-card">
+                    <h3>Иголки</h3>
+                    <p>У взрослого ежа может быть до 6000 иголок. Каждая иголка обновляется раз в несколько месяцев.</p>
+                </div>
+                
+                <div class="fact-card">
+                    <h3>Зимняя спячка</h3>
+                    <p>В природе ежи впадают в спячку на зиму. Домашние ежи могут не hiberнировать, если температура окружающей среды остается стабильной.</p>
+                </div>
+                
+                <div class="fact-card">
+                    <h3>Ночной образ жизни</h3>
+                    <p>Ежи - ночные животные. Пик их активности приходится на вечернее и ночное время.</p>
+                </div>
+                
+                <div class="fact-card">
+                    <h3>Уникальный иммунитет</h3>
+                    <p>Ежи имеют естественную устойчивость к некоторым ядам, включая змеиный.</p>
+                </div>
+                
+                <div class="fact-card">
+                    <h3>Хорошие пловцы</h3>
+                    <p>Несмотря на свою внешность, ежи умеют плавать и даже лазать по деревьям.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div>
+                    <div class="footer-logo">
+                        <i class="fas fa-heart" style="color: #d8e9d3; font-size: 28px;"></i>
+                        <span class="footer-logo-text">Ezh</span>
+                    </div>
+                    <p>Сайт создан при поддержке DOROSfamd & DOROShop. Все права защищены.</p>
+                </div>
+                
+                <div>
+                    <h3>Разделы сайта</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Главная</a></li>
+                        <li><a href="#types">Виды ежей</a></li>
+                        <li><a href="#care">Уход и содержание</a></li>
+                        <li><a href="#nutrition">Питание</a></li>
+                        <li><a href="#health">Здоровье</a></li>
+                        <li><a href="#fun">Развлечения</a></li>
+                        <li><a href="#facts">Факты</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>Полезные ссылки</h3>
+                    <ul class="footer-links">
+                        <li><a href="https://share.character.ai/Wv9R/5dokfjhm" target="_blank">ИИ-помощник Ezh</a></li>
+                        <li><a href="#">Форум любителей ежей</a></li>
+                        <li><a href="#">Ветеринары по экзотическим животным</a></li>
+                        <li><a href="#">Магазин товаров для ежей</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>© 2023 Ezh - Всё о ёжиках. DOROSfamd & DOROShop</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking on links
+        const mobileLinks = document.querySelectorAll('.mobile-menu .nav-link');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+            });
+        });
+        
+        // Modal
+        const modal = document.getElementById('modal');
+        const closeModal = document.querySelector('.close-modal');
+        const modalBody = document.getElementById('modal-body');
+        const cards = document.querySelectorAll('.card[data-modal]');
+        
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                const modalType = card.getAttribute('data-modal');
+                showModal(modalType);
+            });
+        });
+        
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+        
+        function showModal(type) {
+            let content = '';
+            
+            switch(type) {
+                case 'type1':
+                    content = `
+                        <h2>Африканский карликовый ёж</h2>
+                        <img src="https://placehold.co/600x400/7a9f5a/white?text=Африканский+Карликовый" alt="Африканский карликовый ёж" style="width: 100%; border-radius: 10px; margin: 15px 0;">
+                        <p><strong>Размер:</strong> 15-20 см</p>
+                        <p><strong>Вес:</strong> 300-500 г</p>
+                        <p><strong>Продолжительность жизни:</strong> 4-6 лет</p>
+                        <p><strong>Характер:</strong> Африканские карликовые ежи являются самыми популярными домашними питомцами среди всех видов ежей. Они были специально выведены для содержания в домашних условиях. Эти ежики обладают дружелюбным характером, легко приручаются и привыкают к человеку.</p>
+                        <p>Они ведут преимущественно ночной образ жизни, поэтому наибольшая активность у них проявляется вечером и ночью. Африканские карликовые ежи не впадают в зимнюю спячку, что делает их удобными для содержания дома.</p>
+                    `;
+                    break;
+                case 'type2':
+                    content = `
+                        <h2>Европейский ёж</h2>
+                        <img src="https://placehold.co/600x400/7a9f5a/white?text=Европейский" alt="Европейский ёж" style="width: 100%; border-radius: 10px; margin: 15px 0;">
+                        <p><strong>Размер:</strong> 20-30 см</p>
+                        <p><strong>Вес:</strong> 600-1200 г</p>
+                        <p><strong>Продолжительность жизни:</strong> 3-5 лет в природе, до 10 лет в неволе</p>
+                        <p><strong>Характер:</strong> Европейские ежи являются диким видом и реже содержатся в домашних условиях. Они более пугливы и менее социальны, чем африканские карликовые ежи. В природе они впадают в зимнюю спячку, что может создавать сложности при домашнем содержании.</p>
+                        <p>Европейские ежи защищены во многих странах, и их содержание может требовать специальных разрешений. Они требуют больше пространства и специальных условий для комфортной жизни.</p>
+                    `;
+                    break;
+                case 'type3':
+                    content = `
+                        <h2>Ушастый ёж</h2>
+                        <img src="https://placehold.co/600x400/7a9f5a/white?text=Ушастый" alt="Ушастый ёж" style="width: 100%; border-radius: 10px; margin: 15px 0;">
+                        <p><strong>Размер:</strong> 15-20 см</p>
+                        <p><strong>Вес:</strong> 300-500 г</p>
+                        <p><strong>Продолжительность жизни:</strong> 3-6 лет</p>
+                        <p><strong>Характер:</strong> Ушастые ежи получили свое название из-за noticeably более длинных ушей по сравнению с другими видами. Они обитают в пустынных и полупустынных регионах и обладают отличным слухом.</p>
+                        <p>Эти ежи более активны и быстры, чем другие виды. Они менее склонны сворачиваться в клубок при опасности, предпочитая убегать. Ушастые ежи хорошо адаптированы к высоким температурам и требуют особого внимания к условиям содержания в плане температуры и влажности.</p>
+                    `;
+                    break;
+            }
+            
+            modalBody.innerHTML = content;
+            modal.style.display = 'flex';
+        }
+        
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        const searchBtn = document.querySelector('.search-btn');
+        
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        function performSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            if (query) {
+                alert(`Поиск по запросу: ${query}\n\nВ реальном приложении здесь бы осуществлялся поиск по сайту.`);
+            }
+        }
+    </script>
+</body>
+</html>
