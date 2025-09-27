@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кто красивее? - Конкурс блогерш</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Базовые стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #ff4d94;
+            --secondary: #6a11cb;
+            --accent: #ff9a3d;
+            --light: #ffffff;
+            --dark: #2d2d2d;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Анимация градиента фона */
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Контейнеры и общие элементы */
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: var(--light);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin: 20px 0 40px;
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            animation: titlePulse 3s infinite alternate;
+            position: relative;
+        }
+
+        @keyframes titlePulse {
+            0% {
+                transform: scale(1);
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            }
+            100% {
+                transform: scale(1.05);
+                text-shadow: 0 5px 20px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+            animation: linePulse 2s infinite alternate;
+        }
+
+        @keyframes linePulse {
+            0% {
+                width: 100px;
+            }
+            100% {
+                width: 200px;
+            }
+        }
+
+        /* Контейнер конкурса */
+        .contest-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 60px;
+            margin-bottom: 40px;
+            perspective: 1000px;
+        }
+
+        /* Карточки блогерш */
+        .blogger-card {
+            background: var(--light);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            width: 320px;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: cardAppear 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes cardAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) rotateY(30deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateY(0);
+            }
+        }
+
+        .blogger-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .blogger-card:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        .blogger-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            z-index: 2;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+
+        .blogger-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .blogger-card:hover {
+            transform: translateY(-15px) scale(1.03) rotateY(5deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .blogger-image-container {
+            position: relative;
+            overflow: hidden;
+            height: 400px;
+        }
+
+        .blogger-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .blogger-card:hover .blogger-image {
+            transform: scale(1.1);
+        }
+
+        .blogger-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.7));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .blogger-card:hover .blogger-overlay {
+            opacity: 1;
+        }
+
+        .blogger-name {
+            color: var(--light);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transform: translateY(20px);
+            transition: transform 0.5s ease;
+        }
+
+        .blogger-card:hover .blogger-name {
+            transform: translateY(0);
+        }
+
+        .blogger-info {
+            padding: 20px;
+            background: var(--light);
+        }
+
+        .username {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px 0;
+            font-size: 1.1rem;
+            color: #555;
+            transition: color 0.3s ease;
+        }
+
+        .username i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .tiktok-username:hover {
+            color: #ff0050;
+        }
+
+        .instagram-username:hover {
+            color: #e4405f;
+        }
+
+        /* VS контейнер */
+        .vs-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--light);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            animation: vsGlow 2s infinite alternate, vsFloat 3s infinite ease-in-out;
+            min-width: 120px;
+            z-index: 2;
+        }
+
+        @keyframes vsGlow {
+            0% {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        @keyframes vsFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .vs-container::before, .vs-container::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: vsPulse 4s infinite linear;
+            z-index: -1;
+        }
+
+        .vs-container::before {
+            top: -10px;
+            left: -10px;
+            animation-delay: 0s;
+        }
+
+        .vs-container::after {
+            bottom: -10px;
+            right: -10px;
+            animation-delay: 2s;
+        }
+
+        @keyframes vsPulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.7;
+            }
+        }
+
+        /* Кнопка истории */
+        .history-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--dark);
+        }
+
+        .history-btn:hover {
+            background: var(--light);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .history-btn i {
+            font-size: 1.3rem;
+        }
+
+        /* Модальное окно истории */
+        .history-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: modalFadeIn 0.5s ease forwards;
+        }
+
+        @keyframes modalFadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .history-content {
+            background: var(--light);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 90%;
+            width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            animation: modalScaleIn 0.5s ease forwards;
+            position: relative;
+        }
+
+        @keyframes modalScaleIn {
+            0% {
+                transform: scale(0.8);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #777;
+            transition: color 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+            background: #f9f9f9;
+        }
+
+        .history-list {
+            text-align: left;
+        }
+
+        .history-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            animation: historyItemAppear 0.5s ease forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        @keyframes historyItemAppear {
+            0% {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .history-item:hover {
+            background: #f9f9f9;
+        }
+
+        .winner {
+            color: var(--success);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .loser {
+            color: var(--danger);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vs-small {
+            font-weight: 700;
+            color: #777;
+            margin: 0 10px;
+        }
+
+        .no-history {
+            text-align: center;
+            color: #777;
+            padding: 40px 20px;
+            font-size: 1.2rem;
+        }
+
+        /* Анимация выбора */
+        .selected {
+            animation: selectedPulse 0.8s ease forwards;
+        }
+
+        @keyframes selectedPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(46, 204, 113, 0.5);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        /* Элементы фона */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+            }
+        }
+
+        /* Счетчик конкурсов */
+        .contest-counter {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 99;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 968px) {
+            .contest-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .vs-container {
+                margin: 0;
+                font-size: 3.5rem;
+                transform: rotate(90deg);
+                min-width: auto;
+                min-height: 120px;
+            }
+            
+            .blogger-card {
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .history-btn {
+                top: 15px;
+                right: 15px;
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            .contest-counter {
+                bottom: 15px;
+                left: 15px;
+                padding: 10px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .vs-container {
+                font-size: 2.5rem;
+                min-height: 100px;
+            }
+            
+            .blogger-card {
+                max-width: 100%;
+            }
+            
+            .history-content {
+                padding: 20px;
+            }
+        }
+
+        /* Анимация завершения */
+        .completion-message {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: var(--shadow);
+            animation: completionAppear 1s ease forwards;
+        }
+
+        @keyframes completionAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .completion-title {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .winner-card {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            animation: winnerGlow 2s infinite alternate;
+        }
+
+        @keyframes winnerGlow {
+            0% {
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+            100% {
+                box-shadow: 0 10px 30px rgba(253, 160, 133, 0.6);
+            }
+        }
+
+        .restart-btn {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Плавающие элементы фона -->
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <div class="container">
+        <h1>КОНКУРС "КТО КРАСИВЕЕ?"</h1>
+        
+        <div class="contest-container" id="contestContainer">
+            <!-- Здесь будут отображаться карточки блогерш -->
+        </div>
+        
+        <!-- Сообщение о завершении конкурса -->
+        <div class="completion-message" id="completionMessage">
+            <h2 class="completion-title">Конкурс завершен!</h2>
+            <p>Поздравляем, вы определили самую красивую блогершу!</p>
+            <div class="winner-card" id="winnerCard">
+                <!-- Победитель будет здесь -->
+            </div>
+            <p>Всего было проведено <span id="totalContests">0</span> конкурсов</p>
+            <button class="restart-btn" id="restartBtn"><i class="fas fa-redo"></i> Начать заново</button>
+        </div>
+        
+        <button class="history-btn" id="historyBtn"><i class="fas fa-history"></i> История конкурсов</button>
+        
+        <div class="contest-counter" id="contestCounter">
+            <i class="fas fa-trophy"></i> Конкурс: <span id="currentContest">1</span> из 5
+        </div>
+        
+        <div class="history-modal" id="historyModal">
+            <div class="history-content">
+                <div class="history-header">
+                    <h2>История конкурсов</h2>
+                    <button class="close-btn" id="closeHistory">&times;</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <!-- Здесь будет отображаться история -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Тестовые данные блогерш
+        // ВАЖНО: Замените эти данные на реальные, когда будете использовать
+        const bloggers = [
+            { id: 1, name: "Анна Светлова", image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", tiktok: "@anna_tik", instagram: "@anna_insta" },
+            { id: 2, name: "Мария Иванова", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", tiktok: "@maria_tik", instagram: "@maria_insta" },
+            { id: 3, name: "Елена Прекрасная", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=688&q=80", tiktok: "@elena_tik", instagram: "@elena_insta" },
+            { id: 4, name: "Ольга Смирнова", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80", tiktok: "@olga_tik", instagram: "@olga_insta" },
+            { id: 5, name: "Ирина Кравцова", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", tiktok: "@irina_tik", instagram: "@irina_insta" },
+            { id: 6, name: "Светлана Орлова", image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1727&q=80", tiktok: "@svetlana_tik", instagram: "@svetlana_insta" },
+            { id: 7, name: "Наталья Ветрова", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", tiktok: "@natalia_tik", instagram: "@natalia_insta" },
+            { id: 8, name: "Юлия Соколова", image: "https://images.unsplash.com/photo-1516726817505-f5ed825624d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", tiktok: "@julia_tik", instagram: "@julia_insta" },
+            { id: 9, name: "Алина Попова", image: "https://images.unsplash.com/photo-1519415711931-702deacf5be7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", tiktok: "@alina_tik", instagram: "@alina_insta" },
+            { id: 10, name: "Кристина Лебедева", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", tiktok: "@kristina_tik", instagram: "@kristina_insta" }
+        ];
+
+        // Переменные для хранения состояния
+        let availableBloggers = [...bloggers];
+        let contestHistory = [];
+        let currentContest = 1;
+        const totalContests = 5;
+        let winners = [];
+
+        // Элементы DOM
+        const contestContainer = document.getElementById('contestContainer');
+        const historyBtn = document.getElementById('historyBtn');
+        const historyModal = document.getElementById('historyModal');
+        const closeHistory = document.getElementById('closeHistory');
+        const historyList = document.getElementById('historyList');
+        const contestCounter = document.getElementById('contestCounter');
+        const currentContestSpan = document.getElementById('currentContest');
+        const completionMessage = document.getElementById('completionMessage');
+        const winnerCard = document.getElementById('winnerCard');
+        const totalContestsSpan = document.getElementById('totalContests');
+        const restartBtn = document.getElementById('restartBtn');
+        const floatingElements = document.getElementById('floatingElements');
+
+        // Создание плавающих элементов фона
+        function createFloatingElements() {
+            for (let i = 0; i < 15; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+                
+                // Случайные параметры
+                const size = Math.random() * 100 + 20;
+                const left = Math.random() * 100;
+                const animationDuration = Math.random() * 30 + 20;
+                const animationDelay = Math.random() * 10;
+                
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                element.style.left = `${left}%`;
+                element.style.animationDuration = `${animationDuration}s`;
+                element.style.animationDelay = `${animationDelay}s`;
+                element.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                floatingElements.appendChild(element);
+            }
+        }
+
+        // Функция для получения случайной пары блогерш
+        function getRandomContest() {
+            if (currentContest > totalContests) {
+                // Если конкурсы завершены, показываем победителя
+                showWinner();
+                return;
+            }
+
+            // Обновляем счетчик
+            currentContestSpan.textContent = currentContest;
+
+            if (availableBloggers.length < 2) {
+                // Если блогерш осталось меньше двух, добавляем новых
+                availableBloggers = [...bloggers.filter(blogger => 
+                    !winners.some(winner => winner.id === blogger.id)
+                )];
+            }
+
+            // Выбираем двух случайных блогерш из доступных
+            const randomIndex1 = Math.floor(Math.random() * availableBloggers.length);
+            let randomIndex2 = Math.floor(Math.random() * availableBloggers.length);
+            
+            // Убеждаемся, что индексы разные
+            while (randomIndex2 === randomIndex1) {
+                randomIndex2 = Math.floor(Math.random() * availableBloggers.length);
+            }
+
+            const blogger1 = availableBloggers[randomIndex1];
+            const blogger2 = availableBloggers[randomIndex2];
+
+            // Создаем HTML для конкурса
+            contestContainer.innerHTML = `
+                <div class="blogger-card" data-id="${blogger1.id}">
+                    <div class="blogger-image-container">
+                        <img src="${blogger1.image}" alt="${blogger1.name}" class="blogger-image">
+                        <div class="blogger-overlay">
+                            <div class="blogger-name">${blogger1.name}</div>
+                        </div>
+                    </div>
+                    <div class="blogger-info">
+                        <span class="username tiktok-username"><i class="fab fa-tiktok"></i> ${blogger1.tiktok}</span>
+                        <span class="username instagram-username"><i class="fab fa-instagram"></i> ${blogger1.instagram}</span>
+                    </div>
+                </div>
+                <div class="vs-container">VS</div>
+                <div class="blogger-card" data-id="${blogger2.id}">
+                    <div class="blogger-image-container">
+                        <img src="${blogger2.image}" alt="${blogger2.name}" class="blogger-image">
+                        <div class="blogger-overlay">
+                            <div class="blogger-name">${blogger2.name}</div>
+                        </div>
+                    </div>
+                    <div class="blogger-info">
+                        <span class="username tiktok-username"><i class="fab fa-tiktok"></i> ${blogger2.tiktok}</span>
+                        <span class="username instagram-username"><i class="fab fa-instagram"></i> ${blogger2.instagram}</span>
+                    </div>
+                </div>
+            `;
+
+            // Добавляем обработчики событий для карточек
+            const cards = document.querySelectorAll('.blogger-card');
+            cards.forEach(card => {
+                card.addEventListener('click', handleBloggerClick);
+            });
+        }
+
+        // Обработчик клика по карточке блогерши
+        function handleBloggerClick(event) {
+            const winnerId = parseInt(event.currentTarget.getAttribute('data-id'));
+            const cards = document.querySelectorAll('.blogger-card');
+            
+            // Находим ID проигравшей блогерши
+            let loserId;
+            cards.forEach(card => {
+                const id = parseInt(card.getAttribute('data-id'));
+                if (id !== winnerId) {
+                    loserId = id;
+                }
+            });
+
+            // Находим объекты блогерш по ID
+            const winner = bloggers.find(b => b.id === winnerId);
+            const loser = bloggers.find(b => b.id === loserId);
+
+            // Добавляем анимацию выбора
+            event.currentTarget.classList.add('selected');
+
+            // Сохраняем результат в историю
+            contestHistory.push({
+                winner: winner,
+                loser: loser,
+                contestNumber: currentContest,
+                timestamp: new Date()
+            });
+
+            // Добавляем победителя в список
+            winners.push(winner);
+
+            // Увеличиваем счетчик конкурсов
+            currentContest++;
+
+            // Ждем завершения анимации и показываем следующую пару
+            setTimeout(() => {
+                getRandomContest();
+            }, 800);
+        }
+
+        // Функция для отображения истории
+        function displayHistory() {
+            if (contestHistory.length === 0) {
+                historyList.innerHTML = '<div class="no-history">История конкурсов пуста</div>';
+                return;
+            }
+
+            historyList.innerHTML = contestHistory.map((contest, index) => `
+                <div class="history-item" style="animation-delay: ${index * 0.1}s">
+                    <span class="winner"><i class="fas fa-crown"></i> ${contest.winner.tiktok}</span>
+                    <span class="vs-small">VS</span>
+                    <span class="loser"><i class="fas fa-times"></i> ${contest.loser.tiktok}</span>
+                    <span style="color: #777; font-size: 0.9rem;">Конкурс ${contest.contestNumber}</span>
+                </div>
+            `).join('');
+        }
+
+        // Функция для показа победителя
+        function showWinner() {
+            contestContainer.style.display = 'none';
+            contestCounter.style.display = 'none';
+            completionMessage.style.display = 'block';
+            
+            // Определяем самого частого победителя
+            const winnerCounts = {};
+            winners.forEach(winner => {
+                winnerCounts[winner.id] = (winnerCounts[winner.id] || 0) + 1;
+            });
+            
+            const mostWins = Math.max(...Object.values(winnerCounts));
+            const topWinners = winners.filter(winner => winnerCounts[winner.id] === mostWins);
+            const finalWinner = topWinners[0];
+            
+            totalContestsSpan.textContent = contestHistory.length;
+            
+            winnerCard.innerHTML = `
+                <img src="${finalWinner.image}" alt="${finalWinner.name}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;">
+                <h3>${finalWinner.name}</h3>
+                <p><i class="fab fa-tiktok"></i> ${finalWinner.tiktok}</p>
+                <p><i class="fab fa-instagram"></i> ${finalWinner.instagram}</p>
+                <p style="margin-top: 10px; font-weight: 600;">Победила в ${mostWins} конкурсах!</p>
+            `;
+        }
+
+        // Функция перезапуска конкурса
+        function restartContest() {
+            availableBloggers = [...bloggers];
+            contestHistory = [];
+            currentContest = 1;
+            winners = [];
+            
+            contestContainer.style.display = 'flex';
+            contestCounter.style.display = 'flex';
+            completionMessage.style.display = 'none';
+            
+            getRandomContest();
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            // Создаем плавающие элементы
+            createFloatingElements();
+            
+            // Показываем первый конкурс
+            getRandomContest();
+
+            // Обработчики для кнопки истории
+            historyBtn.addEventListener('click', () => {
+                displayHistory();
+                historyModal.style.display = 'flex';
+            });
+
+            closeHistory.addEventListener('click', () => {
+                historyModal.style.display = 'none';
+            });
+
+            // Обработчик для кнопки перезапуска
+            restartBtn.addEventListener('click', restartContest);
+
+            // Закрытие модального окна при клике вне его
+            window.addEventListener('click', (event) => {
+                if (event.target === historyModal) {
+                    historyModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
