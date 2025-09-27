@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кто красивее? - Выбери самую красивую блогершу</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.7);
+            background: linear-gradient(45deg, #ff6b9d, #ffd166);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s infinite alternate;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #a0a0c0;
+        }
+
+        .vs-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin: 30px 0;
+        }
+
+        .blogger-card {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .blogger-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 105, 180, 0.5);
+        }
+
+        .blogger-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            filter: brightness(0.9);
+        }
+
+        .blogger-card:hover .blogger-image {
+            filter: brightness(1);
+            transform: scale(1.02);
+        }
+
+        .tiktok-username {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #ffd166;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tiktok-username i {
+            color: #ff006e;
+        }
+
+        .vs {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 0 20px;
+            text-shadow: 0 0 20px rgba(255, 0, 110, 0.8);
+            animation: pulse 1.5s infinite alternate;
+            background: linear-gradient(45deg, #ff006e, #ff5e00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .vs::before, .vs::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ff006e, transparent);
+        }
+
+        .vs::before {
+            right: 100%;
+            margin-right: 20px;
+        }
+
+        .vs::after {
+            left: 100%;
+            margin-left: 20px;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            font-size: 1.1rem;
+            color: #c0c0e0;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer {
+            margin-top: 40px;
+            color: #8080a0;
+            font-size: 0.9rem;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 105, 180, 0.7);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 105, 180, 0.9), 0 0 30px rgba(255, 105, 180, 0.6);
+            }
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Анимация появления карточек */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .vs-container {
+                gap: 20px;
+            }
+            
+            .blogger-card {
+                min-width: 100%;
+            }
+            
+            .vs {
+                font-size: 3rem;
+                margin: 20px 0;
+            }
+            
+            .vs::before, .vs::after {
+                width: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Кто красивее?</h1>
+        <div class="subtitle">Выбери самую красивую блогершу из TikTok</div>
+        
+        <div class="vs-container">
+            <!-- Карточка первой блогерши -->
+            <div class="blogger-card fade-in" id="blogger1">
+                <img src="" alt="Блогерша 1" class="blogger-image" id="image1">
+                <div class="tiktok-username">
+                    <i class="fab fa-tiktok"></i>
+                    <span id="username1">@username1</span>
+                </div>
+            </div>
+            
+            <!-- Надпись VS -->
+            <div class="vs">VS</div>
+            
+            <!-- Карточка второй блогерши -->
+            <div class="blogger-card fade-in" id="blogger2">
+                <img src="" alt="Блогерша 2" class="blogger-image" id="image2">
+                <div class="tiktok-username">
+                    <i class="fab fa-tiktok"></i>
+                    <span id="username2">@username2</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <p>Кликни на фото блогерши, которая тебе нравится больше. После выбора появится следующая пара.</p>
+        </div>
+        
+        <div class="footer">
+            Сайт создан в развлекательных целях. Все изображения взяты из открытых источников.
+        </div>
+    </div>
+
+    <script>
+        // БАЗА ДАННЫХ БЛОГЕРШ
+        // ВАЖНО: Для реального использования замените ссылки на фото и юзернеймы на реальные данные
+        
+        const bloggers = [
+            {
+                // ЗАМЕНИТЕ НА РЕАЛЬНУЮ ССЫЛКУ НА ФОТО
+                image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+                // ЗАМЕНИТЕ НА РЕАЛЬНЫЙ ЮЗЕРНЕЙМ TIKTOK
+                username: "@anna_beauty"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+                username: "@masha_style"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=688&q=80",
+                username: "@katya_fashion"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
+                username: "@liza_trends"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+                username: "@sophia_glam"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1727&q=80",
+                username: "@diana_chic"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80",
+                username: "@olga_vogue"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1167&q=80",
+                username: "@nastya_look"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1554151228-14d9def656e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=686&q=80",
+                username: "@veronika_queen"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+                username: "@irina_star"
+            }
+        ];
+
+        // Перемешиваем массив блогерш для случайного порядка
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        let usedPairs = [];
+        let availableBloggers = [...bloggers];
+        
+        // Функция для получения случайной пары блогерш
+        function getRandomPair() {
+            // Если доступных блогерш меньше 2, перезапускаем список
+            if (availableBloggers.length < 2) {
+                availableBloggers = [...bloggers];
+                usedPairs = [];
+                shuffleArray(availableBloggers);
+            }
+            
+            // Берем первых двух блогерш из перемешанного списка
+            const pair = [availableBloggers[0], availableBloggers[1]];
+            
+            // Удаляем их из доступных
+            availableBloggers.splice(0, 2);
+            
+            // Добавляем пару в использованные
+            usedPairs.push(pair);
+            
+            return pair;
+        }
+
+        // Функция для обновления отображаемой пары
+        function updatePair() {
+            const pair = getRandomPair();
+            
+            // Анимируем смену пар
+            const card1 = document.getElementById('blogger1');
+            const card2 = document.getElementById('blogger2');
+            
+            card1.classList.remove('fade-in');
+            card2.classList.remove('fade-in');
+            
+            setTimeout(() => {
+                // Обновляем данные первой блогерши
+                document.getElementById('image1').src = pair[0].image;
+                document.getElementById('username1').textContent = pair[0].username;
+                
+                // Обновляем данные второй блогерши
+                document.getElementById('image2').src = pair[1].image;
+                document.getElementById('username2').textContent = pair[1].username;
+                
+                card1.classList.add('fade-in');
+                card2.classList.add('fade-in');
+            }, 300);
+        }
+
+        // Обработчики кликов по карточкам
+        document.getElementById('blogger1').addEventListener('click', function() {
+            // Здесь можно добавить логику для победителя
+            updatePair();
+        });
+
+        document.getElementById('blogger2').addEventListener('click', function() {
+            // Здесь можно добавить логику для победителя
+            updatePair();
+        });
+
+        // Инициализация первой пары при загрузке страницы
+        window.addEventListener('load', function() {
+            shuffleArray(availableBloggers);
+            updatePair();
+        });
+    </script>
+</body>
+</html>
