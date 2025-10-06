@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khujand City Taxi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Khujand City Taxi</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div id="loginForm" class="card mb-4">
+                    <div class="card-header">
+                        <h5>Вход</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="clientLoginForm">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Телефон</label>
+                                <input type="tel" class="form-control" id="phone" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Имя</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Пароль</label>
+                                <input type="password" class="form-control" id="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Войти</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="orderForm" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5>Новый заказ</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="taxiOrderForm">
+                            <div class="mb-3">
+                                <label class="form-label">Откуда: <span id="fromAddress"></span></label>
+                                <input type="hidden" id="fromCoords">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Куда: <span id="toAddress"></span></label>
+                                <input type="hidden" id="toCoords">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Расстояние: <span id="distance">0</span> км</label>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Стоимость: <span id="price">0</span> сомони</label>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Тариф</label>
+                                <select class="form-select" id="tariff">
+                                    <option value="economy">Эконом</option>
+                                    <option value="comfort">Комфорт</option>
+                                    <option value="business">Бизнес</option>
+                                    <option value="minivan">На 6 человек</option>
+                                    <option value="delivery">Доставка</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="airConditioner">
+                                <label class="form-check-label" for="airConditioner">Кондиционер (+1 сомони)</label>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="meetWithSign">
+                                <label class="form-check-label" for="meetWithSign">Встреча с табличкой (+4 сомони)</label>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="tips" class="form-label">Чаевые (сомони)</label>
+                                <input type="number" class="form-control" id="tips" min="1" value="1">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Оплата</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment" id="cash" checked>
+                                    <label class="form-check-label" for="cash">Наличные</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment" id="khujandBank">
+                                    <label class="form-check-label" for="khujandBank">KhujandCityBank</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment" id="card">
+                                    <label class="form-check-label" for="card">Карта</label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Время</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="time" id="now" checked>
+                                    <label class="form-check-label" for="now">Сейчас</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="time" id="later">
+                                    <label class="form-check-label" for="later">Указать время</label>
+                                    <input type="datetime-local" class="form-control mt-2" id="specificTime" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="withChildren">
+                                <label class="form-check-label" for="withChildren">С детьми</label>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="comment" class="form-label">Комментарий</label>
+                                <textarea class="form-control" id="comment" rows="2"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Заказать такси</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="orderHistory" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5>История заказов</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul id="historyList" class="list-group">
+                            <!-- History will be populated here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Карта</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="map" style="height: 600px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container text-center">
+            <div class="mb-2">
+                <a href="tel:+992876619999" class="btn btn-primary me-2">Позвонить: +992 87-661-9999</a>
+                <a href="https://t.me/dorosfamd" class="btn btn-success">Написать: @dorosfamd</a>
+            </div>
+            <div>
+                <p>Владелец: Х.Дориуш | Администраторы: Ш.Музаффар и Р.Мубин</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="driverNotification" class="toast-container position-fixed bottom-0 end-0 p-3">
+        <!-- Notifications will appear here -->
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="KCTaxi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

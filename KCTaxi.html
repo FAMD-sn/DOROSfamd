@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KC Taxi - Онлайн заказ такси</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a6bff;
+            --primary-dark: #3a56cc;
+            --secondary: #ff6b6b;
+            --dark: #2c3e50;
+            --light: #f5f7fa;
+            --gray: #95a5a6;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .auth-buttons button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+
+        .sign-in {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .sign-up {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .sign-in:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .sign-up:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-email {
+            margin-right: 15px;
+            font-weight: 500;
+        }
+
+        .sign-out {
+            padding: 8px 15px;
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sign-out:hover {
+            background-color: #c0392b;
+        }
+
+        .panel {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-title i {
+            margin-right: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.2);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .orders-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .order-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: all 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .order-card.pending {
+            border-left-color: var(--warning);
+        }
+
+        .order-card.taken {
+            border-left-color: var(--success);
+        }
+
+        .order-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .order-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .order-meta-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .order-meta-item i {
+            margin-right: 8px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .status-pending {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning);
+        }
+
+        .status-taken {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+        }
+
+        .driver-info, .client-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+
+        .info-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .users-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .user-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .user-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .user-email {
+            font-weight: 500;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .user-role {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .role-client {
+            background-color: rgba(149, 165, 166, 0.1);
+            color: var(--gray);
+        }
+
+        .role-driver {
+            background-color: rgba(74, 107, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .role-admin {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .user-actions .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateX(200%);
+            transition: all 0.3s;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            margin-right: 10px;
+        }
+
+        .notification.error {
+            background-color: var(--danger);
+        }
+
+        .notification.warning {
+            background-color: var(--warning);
+        }
+
+        @media (max-width: 768px) {
+            .orders-list, .users-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .auth-buttons {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .auth-buttons button {
+                width: 48%;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-taxi"></i>
+                <span>KC Taxi</span>
+            </div>
+            <div id="auth-buttons" class="auth-buttons">
+                <button class="sign-in" id="sign-in-btn">Войти</button>
+                <button class="sign-up" id="sign-up-btn">Регистрация</button>
+            </div>
+            <div id="user-info" class="user-info hidden">
+                <span class="user-email" id="user-email"></span>
+                <button class="sign-out" id="sign-out-btn">
+                    <i class="fas fa-sign-out-alt"></i> Выйти
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Клиентская панель -->
+        <div id="client-panel" class="panel hidden">
+            <h2 class="panel-title"><i class="fas fa-user"></i> Панель клиента</h2>
+            <form id="order-form">
+                <div class="form-group">
+                    <label for="phone">Номер телефона</label>
+                    <input type="tel" id="phone" placeholder="+7 (999) 123-45-67" required>
+                </div>
+                <div class="form-group">
+                    <label for="from">Адрес "откуда"</label>
+                    <input type="text" id="from" placeholder="Улица, дом, подъезд" required>
+                </div>
+                <div class="form-group">
+                    <label for="to">Адрес "куда"</label>
+                    <input type="text" id="to" placeholder="Улица, дом (необязательно)">
+                </div>
+                <div class="form-group">
+                    <label for="comment">Комментарий</label>
+                    <textarea id="comment" rows="3" placeholder="Особые пожелания"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="payment">Способ оплаты</label>
+                    <select id="payment" required>
+                        <option value="" disabled selected>Выберите способ оплаты</option>
+                        <option value="Наличные">Наличные</option>
+                        <option value="Карта">Карта</option>
+                        <option value="Payme">Payme</option>
+                        <option value="Click">Click</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-block">
+                    <i class="fas fa-taxi"></i> Заказать такси
+                </button>
+            </form>
+            
+            <div id="client-orders" class="hidden" style="margin-top: 30px;">
+                <h3 class="panel-title"><i class="fas fa-list"></i> Мои заказы</h3>
+                <div id="client-orders-list" class="orders-list"></div>
+            </div>
+        </div>
+
+        <!-- Панель водителя -->
+        <div id="driver-panel" class="panel hidden">
+            <h2 class="panel-title"><i class="fas fa-car"></i> Панель водителя</h2>
+            <div class="tabs">
+                <div class="tab active" data-tab="pending">Новые заказы</div>
+                <div class="tab" data-tab="taken">Мои заказы</div>
+            </div>
+            
+            <div class="tab-content active" id="pending-orders">
+                <div id="pending-orders-list" class="orders-list"></div>
+            </div>
+            
+            <div class="tab-content" id="taken-orders">
+                <div id="taken-orders-list" class="orders-list"></div>
+            </div>
+        </div>
+
+        <!-- Панель администратора -->
+        <div id="admin-panel" class="panel hidden">
+            <h2 class="panel-title"><i class="fas fa-crown"></i> Панель администратора</h2>
+            
+            <div class="search-box">
+                <input type="text" id="user-search" placeholder="Поиск по email...">
+            </div>
+            
+            <div id="users-list" class="users-list"></div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Вход</h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Ваш email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Ваш пароль" required>
+                </div>
+                <div id="password-confirm-group" class="form-group hidden">
+                    <label for="password-confirm">Подтвердите пароль</label>
+                    <input type="password" id="password-confirm" placeholder="Повторите пароль">
+                </div>
+                <button type="submit" class="btn btn-block" id="auth-submit-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message">Успешно!</span>
+    </div>
+
+    <!-- Подключаем Firebase и другие скрипты -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQGsoDWZ-Ddac17nPlKUf36mNkpzZEiQ",
+            authDomain: "drezzsw-af340.firebaseapp.com",
+            databaseURL: "https://drezzsw-af340-default-rtdb.firebaseio.com",
+            projectId: "drezzsw-af340",
+            storageBucket: "drezzsw-af340.appspot.com",
+            messagingSenderId: "444256467193",
+            appId: "1:444256467193:web:3286b00a6f057bae824a28",
+            measurementId: "G-BHSSH8KNXX"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Telegram Bot API
+        const TELEGRAM_BOT_TOKEN = '8233984213:AAE7gKUQRMeacw2X95lRSLrhUYPM-WnjVzg';
+        const TELEGRAM_CHAT_ID = '7456349349';
+
+        // DOM элементы
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userEmail = document.getElementById('user-email');
+        const signOutBtn = document.getElementById('sign-out-btn');
+        const signInBtn = document.getElementById('sign-in-btn');
+        const signUpBtn = document.getElementById('sign-up-btn');
+        
+        const clientPanel = document.getElementById('client-panel');
+        const driverPanel = document.getElementById('driver-panel');
+        const adminPanel = document.getElementById('admin-panel');
+        
+        const orderForm = document.getElementById('order-form');
+        const clientOrders = document.getElementById('client-orders');
+        const clientOrdersList = document.getElementById('client-orders-list');
+        const pendingOrdersList = document.getElementById('pending-orders-list');
+        const takenOrdersList = document.getElementById('taken-orders-list');
+        const usersList = document.getElementById('users-list');
+        const userSearch = document.getElementById('user-search');
+        
+        const authModal = document.getElementById('auth-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const authForm = document.getElementById('auth-form');
+        const passwordConfirmGroup = document.getElementById('password-confirm-group');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const closeModal = document.getElementById('close-modal');
+        
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.getElementById('notification-message');
+        
+        // Текущий режим авторизации (вход/регистрация)
+        let authMode = 'signin';
+        
+        // Текущий пользователь
+        let currentUser = null;
+        let userRole = 'client';
+        
+        // Инициализация приложения
+        function init() {
+            setupEventListeners();
+            checkAuthState();
+        }
+        
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Кнопки авторизации
+            signInBtn.addEventListener('click', () => openAuthModal('signin'));
+            signUpBtn.addEventListener('click', () => openAuthModal('signup'));
+            signOutBtn.addEventListener('click', signOut);
+            
+            // Модальное окно
+            closeModal.addEventListener('click', closeAuthModal);
+            
+            // Форма авторизации
+            authForm.addEventListener('submit', handleAuthFormSubmit);
+            
+            // Форма заказа
+            orderForm.addEventListener('submit', handleOrderSubmit);
+            
+            // Поиск пользователей
+            userSearch.addEventListener('input', searchUsers);
+            
+            // Табы водительской панели
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    switchDriverTab(tabId);
+                });
+            });
+        }
+        
+        // Проверка состояния авторизации
+        function checkAuthState() {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    userEmail.textContent = user.email;
+                    authButtons.classList.add('hidden');
+                    userInfo.classList.remove('hidden');
+                    
+                    // Получаем роль пользователя
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        userRole = userDoc.data().role || 'client';
+                    } else {
+                        // Создаем запись пользователя если ее нет
+                        await db.collection('users').doc(user.uid).set({
+                            email: user.email,
+                            role: user.email === 'KC@taxi.com' ? 'admin' : 'client'
+                        });
+                        userRole = user.email === 'KC@taxi.com' ? 'admin' : 'client';
+                    }
+                    
+                    // Показываем соответствующую панель
+                    showUserPanel();
+                    
+                    // Загружаем данные для панели
+                    loadPanelData();
+                } else {
+                    currentUser = null;
+                    userRole = 'client';
+                    authButtons.classList.remove('hidden');
+                    userInfo.classList.add('hidden');
+                    clientPanel.classList.add('hidden');
+                    driverPanel.classList.add('hidden');
+                    adminPanel.classList.add('hidden');
+                }
+            });
+        }
+// Временная фикса - добавьте после получения userRole
+if (!userRole) userRole = 'client';
+showUserPanel();
+        // Показать соответствующую панель пользователя
+        function showUserPanel() {
+            clientPanel.classList.add('hidden');
+            driverPanel.classList.add('hidden');
+            adminPanel.classList.add('hidden');
+            clientOrders.classList.add('hidden');
+            
+            if (userRole === 'admin') {
+                adminPanel.classList.remove('hidden');
+            } else if (userRole === 'driver') {
+                driverPanel.classList.remove('hidden');
+            } else {
+                clientPanel.classList.remove('hidden');
+            }
+        }
+        
+        // Загрузить данные для текущей панели
+        function loadPanelData() {
+            if (userRole === 'admin') {
+                loadUsers();
+            } else if (userRole === 'driver') {
+                loadDriverOrders();
+            } else {
+                loadClientOrders();
+            }
+        }
+        
+        // Открыть модальное окно авторизации
+        function openAuthModal(mode) {
+            authMode = mode;
+            
+            if (mode === 'signin') {
+                modalTitle.textContent = 'Вход';
+                passwordConfirmGroup.classList.add('hidden');
+                authSubmitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Войти';
+            } else {
+                modalTitle.textContent = 'Регистрация';
+                passwordConfirmGroup.classList.remove('hidden');
+                authSubmitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Зарегистрироваться';
+            }
+            
+            authModal.classList.add('active');
+        }
+        
+        // Закрыть модальное окно авторизации
+        function closeAuthModal() {
+            authModal.classList.remove('active');
+            authForm.reset();
+        }
+        
+        // Обработка формы авторизации
+        function handleAuthFormSubmit(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm').value;
+            
+            if (authMode === 'signup' && password !== passwordConfirm) {
+                showNotification('Пароли не совпадают', 'error');
+                return;
+            }
+            
+            if (authMode === 'signin') {
+                signIn(email, password);
+            } else {
+                signUp(email, password);
+            }
+        }
+        
+        // Вход
+        function signIn(email, password) {
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    closeAuthModal();
+                    showNotification('Вход выполнен успешно');
+                })
+                .catch(error => {
+                    showNotification(getAuthErrorMessage(error), 'error');
+                });
+        }
+        
+        // Регистрация
+        function signUp(email, password) {
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Создаем запись пользователя в Firestore
+                    return db.collection('users').doc(userCredential.user.uid).set({
+                        email: email,
+                        role: 'client'
+                    });
+                })
+                .then(() => {
+                    closeAuthModal();
+                    showNotification('Регистрация прошла успешно');
+                })
+                .catch(error => {
+                    showNotification(getAuthErrorMessage(error), 'error');
+                });
+        }
+        
+        // Выход
+        function signOut() {
+            auth.signOut()
+                .then(() => {
+                    showNotification('Вы вышли из системы');
+                })
+                .catch(error => {
+                    showNotification('Ошибка при выходе', 'error');
+                });
+        }
+        
+        // Обработка формы заказа
+        function handleOrderSubmit(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showNotification('Для заказа нужно войти в систему', 'error');
+                return;
+            }
+            
+            const order = {
+                phone: document.getElementById('phone').value,
+                from: document.getElementById('from').value,
+                to: document.getElementById('to').value,
+                comment: document.getElementById('comment').value,
+                payment: document.getElementById('payment').value,
+                status: 'pending',
+                clientId: currentUser.uid,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            // Добавляем заказ в Firestore
+            db.collection('orders').add(order)
+                .then((docRef) => {
+                    orderForm.reset();
+                    showNotification('Заказ успешно создан');
+                    
+                    // Отправляем уведомление в Telegram
+                    sendTelegramNotification(`Новый заказ такси!\nОт: ${order.from}\nКуда: ${order.to || 'Не указано'}\nТелефон: ${order.phone}`);
+                    
+                    // Обновляем список заказов
+                    loadClientOrders();
+                })
+                .catch(error => {
+                    showNotification('Ошибка при создании заказа', 'error');
+                    console.error('Error adding order: ', error);
+                });
+        }
+        
+        // Загрузка заказов клиента
+        function loadClientOrders() {
+            if (!currentUser) return;
+            
+            clientOrdersList.innerHTML = '';
+            
+            db.collection('orders')
+                .where('clientId', '==', currentUser.uid)
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        clientOrders.classList.add('hidden');
+                        return;
+                    }
+                    
+                    clientOrders.classList.remove('hidden');
+                    
+                    querySnapshot.forEach((doc) => {
+                        const order = doc.data();
+                        order.id = doc.id;
+                        renderClientOrder(order);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error getting client orders: ', error);
+                });
+        }
+        
+        // Отображение заказа клиента
+        function renderClientOrder(order) {
+            const orderElement = document.createElement('div');
+            orderElement.className = `order-card ${order.status}`;
+            
+            let driverInfoHtml = '';
+            if (order.status === 'taken' && order.driverId) {
+                // Загружаем информацию о водителе
+                db.collection('users').doc(order.driverId).get()
+                    .then((driverDoc) => {
+                        if (driverDoc.exists) {
+                            const driverData = driverDoc.data();
+                            const driverInfoElement = orderElement.querySelector('.driver-info');
+                            if (driverInfoElement) {
+                                driverInfoElement.innerHTML = `
+                                    <div class="info-title"><i class="fas fa-id-card"></i> Информация о водителе</div>
+                                    <div class="order-meta-item"><i class="fas fa-user"></i> ${driverData.name || 'Не указано'}</div>
+                                    <div class="order-meta-item"><i class="fas fa-car"></i> ${driverData.carModel || 'Не указано'} (${driverData.carColor || 'Не указано'})</div>
+                                    <div class="order-meta-item"><i class="fas fa-tag"></i> Номер: ${driverData.carNumber || 'Не указано'}</div>
+                                `;
+                            }
+                        }
+                    });
+            }
+            
+            orderElement.innerHTML = `
+                <div class="order-title">Заказ #${order.id.slice(0, 6)}</div>
+                <div class="order-status status-${order.status}">
+                    ${order.status === 'pending' ? 'Ожидает водителя' : 'Принят водителем'}
+                </div>
+                <div class="order-meta">
+                    <div class="order-meta-item"><i class="fas fa-phone"></i> ${order.phone}</div>
+                    <div class="order-meta-item"><i class="fas fa-map-marker-alt"></i> ${order.from}</div>
+                    ${order.to ? `<div class="order-meta-item"><i class="fas fa-flag-checkered"></i> ${order.to}</div>` : ''}
+                    ${order.comment ? `<div class="order-meta-item"><i class="fas fa-comment"></i> ${order.comment}</div>` : ''}
+                    <div class="order-meta-item"><i class="fas fa-money-bill-wave"></i> ${order.payment}</div>
+                </div>
+                ${order.status === 'taken' ? `
+                <div class="driver-info">
+                    <div class="info-title"><i class="fas fa-id-card"></i> Информация о водителе</div>
+                    <div class="order-meta-item"><i class="fas fa-spinner fa-spin"></i> Загрузка...</div>
+                </div>
+                ` : ''}
+            `;
+            
+            clientOrdersList.appendChild(orderElement);
+        }
+        
+        // Загрузка заказов для водителя
+        function loadDriverOrders() {
+            if (!currentUser) return;
+            
+            pendingOrdersList.innerHTML = '';
+            takenOrdersList.innerHTML = '';
+            
+            // Заказы ожидающие принятия
+            db.collection('orders')
+                .where('status', '==', 'pending')
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const order = doc.data();
+                        order.id = doc.id;
+                        renderPendingOrder(order);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error getting pending orders: ', error);
+                });
+            
+            // Заказы принятые текущим водителем
+            db.collection('orders')
+                .where('status', '==', 'taken')
+                .where('driverId', '==', currentUser.uid)
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const order = doc.data();
+                        order.id = doc.id;
+                        renderTakenOrder(order);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error getting taken orders: ', error);
+                });
+        }
+        
+        // Отображение заказа ожидающего принятия
+        function renderPendingOrder(order) {
+            const orderElement = document.createElement('div');
+            orderElement.className = 'order-card pending';
+            
+            orderElement.innerHTML = `
+                <div class="order-title">Заказ #${order.id.slice(0, 6)}</div>
+                <div class="order-status status-pending">Ожидает водителя</div>
+                <div class="order-meta">
+                    <div class="order-meta-item"><i class="fas fa-phone"></i> ${order.phone}</div>
+                    <div class="order-meta-item"><i class="fas fa-map-marker-alt"></i> ${order.from}</div>
+                    ${order.to ? `<div class="order-meta-item"><i class="fas fa-flag-checkered"></i> ${order.to}</div>` : ''}
+                    ${order.comment ? `<div class="order-meta-item"><i class="fas fa-comment"></i> ${order.comment}</div>` : ''}
+                    <div class="order-meta-item"><i class="fas fa-money-bill-wave"></i> ${order.payment}</div>
+                </div>
+                <button class="btn btn-block take-order-btn" data-order-id="${order.id}">
+                    <i class="fas fa-check"></i> Принять заказ
+                </button>
+            `;
+            
+            pendingOrdersList.appendChild(orderElement);
+            
+            // Обработчик кнопки принятия заказа
+            orderElement.querySelector('.take-order-btn').addEventListener('click', () => takeOrder(order.id));
+        }
+        
+        // Отображение принятого заказа
+        function renderTakenOrder(order) {
+            const orderElement = document.createElement('div');
+            orderElement.className = 'order-card taken';
+            
+            // Загружаем информацию о клиенте
+            db.collection('users').doc(order.clientId).get()
+                .then((clientDoc) => {
+                    const clientEmail = clientDoc.exists ? clientDoc.data().email : 'Неизвестный клиент';
+                    
+                    orderElement.innerHTML = `
+                        <div class="order-title">Заказ #${order.id.slice(0, 6)}</div>
+                        <div class="order-status status-taken">Вы приняли этот заказ</div>
+                        <div class="order-meta">
+                            <div class="order-meta-item"><i class="fas fa-phone"></i> ${order.phone}</div>
+                            <div class="order-meta-item"><i class="fas fa-map-marker-alt"></i> ${order.from}</div>
+                            ${order.to ? `<div class="order-meta-item"><i class="fas fa-flag-checkered"></i> ${order.to}</div>` : ''}
+                            ${order.comment ? `<div class="order-meta-item"><i class="fas fa-comment"></i> ${order.comment}</div>` : ''}
+                            <div class="order-meta-item"><i class="fas fa-money-bill-wave"></i> ${order.payment}</div>
+                        </div>
+                        <div class="client-info">
+                            <div class="info-title"><i class="fas fa-user"></i> Информация о клиенте</div>
+                            <div class="order-meta-item"><i class="fas fa-envelope"></i> ${clientEmail}</div>
+                            <div class="order-meta-item"><i class="fas fa-phone"></i> ${order.phone}</div>
+                        </div>
+                    `;
+                });
+            
+            takenOrdersList.appendChild(orderElement);
+        }
+        
+        // Принять заказ
+        function takeOrder(orderId) {
+            if (!currentUser) return;
+            
+            // Получаем данные водителя
+            db.collection('users').doc(currentUser.uid).get()
+                .then((driverDoc) => {
+                    if (!driverDoc.exists) {
+                        throw new Error('Driver data not found');
+                    }
+                    
+                    const driverData = driverDoc.data();
+                    
+                    // Обновляем заказ
+                    return db.collection('orders').doc(orderId).update({
+                        status: 'taken',
+                        driverId: currentUser.uid,
+                        takenAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        // Отправляем уведомление в Telegram
+                        const message = `Заказ #${orderId.slice(0, 6)} принят водителем!\n` +
+                                        `Водитель: ${driverData.name || 'Не указано'}\n` +
+                                        `Машина: ${driverData.carModel || 'Не указано'} (${driverData.carColor || 'Не указано'})\n` +
+                                        `Номер: ${driverData.carNumber || 'Не указано'}`;
+                        
+                        sendTelegramNotification(message);
+                        
+                        // Обновляем список заказов
+                        loadDriverOrders();
+                        
+                        showNotification('Заказ успешно принят');
+                    });
+                })
+                .catch(error => {
+                    showNotification('Ошибка при принятии заказа', 'error');
+                    console.error('Error taking order: ', error);
+                });
+        }
+        
+        // Загрузка пользователей для админа
+        function loadUsers() {
+            if (!currentUser || userRole !== 'admin') return;
+            
+            usersList.innerHTML = '';
+            
+            db.collection('users').get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        user.id = doc.id;
+                        renderUser(user);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error getting users: ', error);
+                });
+        }
+        
+        // Поиск пользователей
+        function searchUsers() {
+            const searchTerm = userSearch.value.toLowerCase();
+            
+            if (searchTerm === '') {
+                loadUsers();
+                return;
+            }
+            
+            usersList.innerHTML = '';
+            
+            db.collection('users')
+                .where('email', '>=', searchTerm)
+                .where('email', '<=', searchTerm + '\uf8ff')
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        user.id = doc.id;
+                        renderUser(user);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error searching users: ', error);
+                });
+        }
+        
+        // Отображение пользователя в списке
+        function renderUser(user) {
+            const userElement = document.createElement('div');
+            userElement.className = 'user-card';
+            
+            const roleClass = user.role === 'admin' ? 'role-admin' : 
+                             user.role === 'driver' ? 'role-driver' : 'role-client';
+            
+            userElement.innerHTML = `
+                <div class="user-email">${user.email}</div>
+                <div class="user-role ${roleClass}">${getRoleName(user.role)}</div>
+                <div class="user-actions">
+                    ${user.role !== 'admin' ? `
+                        ${user.role !== 'driver' ? `
+                            <button class="btn btn-success make-driver-btn" data-user-id="${user.id}">
+                                <i class="fas fa-car"></i> Водитель
+                            </button>
+                        ` : `
+                            <button class="btn btn-warning remove-driver-btn" data-user-id="${user.id}">
+                                <i class="fas fa-user"></i> Клиент
+                            </button>
+                        `}
+                        <button class="btn btn-danger delete-user-btn" data-user-id="${user.id}">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            
+            usersList.appendChild(userElement);
+            
+            // Обработчики кнопок
+            if (user.role !== 'admin') {
+                if (user.role !== 'driver') {
+                    userElement.querySelector('.make-driver-btn').addEventListener('click', () => makeDriver(user.id));
+                } else {
+                    userElement.querySelector('.remove-driver-btn').addEventListener('click', () => removeDriver(user.id));
+                }
+                
+                userElement.querySelector('.delete-user-btn').addEventListener('click', () => deleteUser(user.id));
+            }
+        }
+        
+        // Назначить водителем
+        function makeDriver(userId) {
+            db.collection('users').doc(userId).update({
+                role: 'driver'
+            })
+            .then(() => {
+                showNotification('Пользователь назначен водителем');
+                loadUsers();
+            })
+            .catch(error => {
+                showNotification('Ошибка при назначении водителя', 'error');
+                console.error('Error making driver: ', error);
+            });
+        }
+        
+        // Убрать права водителя
+        function removeDriver(userId) {
+            db.collection('users').doc(userId).update({
+                role: 'client'
+            })
+            .then(() => {
+                showNotification('Права водителя удалены');
+                loadUsers();
+            })
+            .catch(error => {
+                showNotification('Ошибка при изменении роли', 'error');
+                console.error('Error removing driver role: ', error);
+            });
+        }
+        
+        // Удалить пользователя
+        function deleteUser(userId) {
+            if (confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+                db.collection('users').doc(userId).delete()
+                    .then(() => {
+                        showNotification('Пользователь удален');
+                        loadUsers();
+                    })
+                    .catch(error => {
+                        showNotification('Ошибка при удалении пользователя', 'error');
+                        console.error('Error deleting user: ', error);
+                    });
+            }
+        }
+        
+        // Переключение табов в панели водителя
+        function switchDriverTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('data-tab') === tabId);
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === `${tabId}-orders`);
+            });
+        }
+        
+        // Отправка уведомления в Telegram
+        function sendTelegramNotification(message) {
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: message
+                })
+            })
+            .catch(error => {
+                console.error('Error sending Telegram notification: ', error);
+            });
+        }
+        
+        // Показать уведомление
+        function showNotification(message, type = 'success') {
+            notification.className = `notification ${type}`;
+            notificationMessage.textContent = message;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Получить понятное название роли
+        function getRoleName(role) {
+            switch (role) {
+                case 'admin': return 'Администратор';
+                case 'driver': return 'Водитель';
+                default: return 'Клиент';
+            }
+        }
+        
+        // Получить понятное сообщение об ошибке авторизации
+        function getAuthErrorMessage(error) {
+            switch (error.code) {
+                case 'auth/invalid-email':
+                    return 'Некорректный email';
+                case 'auth/user-disabled':
+                    return 'Пользователь заблокирован';
+                case 'auth/user-not-found':
+                    return 'Пользователь не найден';
+                case 'auth/wrong-password':
+                    return 'Неверный пароль';
+                case 'auth/email-already-in-use':
+                    return 'Email уже используется';
+                case 'auth/weak-password':
+                    return 'Пароль слишком простой';
+                default:
+                    return 'Ошибка авторизации';
+            }
+        }
+        
+        // Инициализация приложения при загрузке страницы
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

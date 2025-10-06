@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khujand City Taxi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --secondary: #4D44DB;
+            --accent: #FF6584;
+            --light: #F8F9FA;
+            --dark: #343A40;
+            --success: #28A745;
+            --info: #17A2B8;
+            --warning: #FFC107;
+            --danger: #DC3545;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+        
+        /* Навигация */
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(108, 99, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        /* Карточки */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            border-bottom: none;
+        }
+        
+        /* Кнопки */
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Формы */
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(108, 99, 255, 0.25);
+        }
+        
+        /* Карта */
+        #map {
+            height: 500px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+        
+        /* Поиск на карте */
+        .map-search-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            width: 300px;
+        }
+        
+        .map-search-input {
+            border-radius: 30px;
+            padding: 0.75rem 1.25rem;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+            background: white;
+            border-left: 5px solid var(--success);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            max-width: 350px;
+            transform: translateX(120%);
+            transition: transform 0.3s;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-header {
+            background-color: var(--success);
+            color: white;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        /* Заказы */
+        .order-card {
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+        }
+        
+        .order-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-new {
+            background-color: #FFEECC;
+            color: #FF9900;
+        }
+        
+        .status-accepted {
+            background-color: #D4EDDA;
+            color: #28A745;
+        }
+        
+        .status-completed {
+            background-color: #E2E3E5;
+            color: #6C757D;
+        }
+        
+        /* Футер */
+        .footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            transition: color 0.3s;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        /* Переключатель страниц */
+        .page-switcher {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            #map {
+                height: 300px;
+            }
+            
+            .map-search-container {
+                width: calc(100% - 40px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-taxi me-2"></i>Khujand City Taxi
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" id="clientNavLink"><i class="fas fa-user me-1"></i> Клиент</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="driverNavLink"><i class="fas fa-car me-1"></i> Водитель</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="adminNavLink"><i class="fas fa-cog me-1"></i> Админ</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Клиентский интерфейс -->
+    <div id="clientApp" class="app-container">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-6">
+                    <!-- Форма входа -->
+                    <div id="clientLoginForm" class="card mb-4 fade-in">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Вход для клиентов</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="clientLogin">
+                                <div class="mb-3">
+                                    <label for="clientPhone" class="form-label">Телефон</label>
+                                    <input type="tel" class="form-control" id="clientPhone" placeholder="+992 XX XXX XX XX" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="clientName" class="form-label">Имя</label>
+                                    <input type="text" class="form-control" id="clientName" placeholder="Ваше имя" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="clientPassword" class="form-label">Пароль</label>
+                                    <input type="password" class="form-control" id="clientPassword" placeholder="Не менее 6 символов" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Войти
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Форма заказа -->
+                    <div id="orderForm" class="card mb-4 fade-in" style="display: none;">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-taxi me-2"></i>Новый заказ</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="taxiOrderForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Откуда: <span id="fromAddress" class="fw-bold">не указано</span></label>
+                                    <input type="hidden" id="fromCoords">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Куда: <span id="toAddress" class="fw-bold">не указано</span></label>
+                                    <input type="hidden" id="toCoords">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Расстояние: <span id="distance" class="fw-bold">0</span> км</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Стоимость: <span id="price" class="fw-bold">0</span> сомони</label>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Тариф</label>
+                                    <select class="form-select" id="tariff">
+                                        <option value="economy">Эконом (от 10 сомони)</option>
+                                        <option value="comfort">Комфорт (+20%)</option>
+                                        <option value="business">Бизнес (+50%)</option>
+                                        <option value="minivan">На 6 человек (+30%)</option>
+                                        <option value="delivery">Доставка (15 сомони)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="airConditioner">
+                                            <label class="form-check-label" for="airConditioner">Кондиционер (+1 сомони)</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="meetWithSign">
+                                            <label class="form-check-label" for="meetWithSign">Встреча с табличкой (+4 сомони)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="tips" class="form-label">Чаевые (сомони)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-coins"></i></span>
+                                        <input type="number" class="form-control" id="tips" min="1" value="1">
+                                        <span class="input-group-text">сомони</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Способ оплаты</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <div class="form-check form-check-inline flex-grow-1">
+                                            <input class="form-check-input" type="radio" name="payment" id="cash" checked>
+                                            <label class="form-check-label" for="cash">
+                                                <i class="fas fa-money-bill-wave me-1"></i>Наличные
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline flex-grow-1">
+                                            <input class="form-check-input" type="radio" name="payment" id="khujandBank">
+                                            <label class="form-check-label" for="khujandBank">
+                                                <i class="fas fa-university me-1"></i>KhujandCityBank
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline flex-grow-1">
+                                            <input class="form-check-input" type="radio" name="payment" id="card">
+                                            <label class="form-check-label" for="card">
+                                                <i class="fas fa-credit-card me-1"></i>Карта
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Время подачи</label>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="time" id="now" checked>
+                                        <label class="form-check-label" for="now">
+                                            <i class="fas fa-clock me-1"></i>Сейчас
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="time" id="later">
+                                        <label class="form-check-label" for="later">
+                                            <i class="fas fa-calendar-alt me-1"></i>Указать время
+                                        </label>
+                                    </div>
+                                    <input type="datetime-local" class="form-control" id="specificTime" disabled>
+                                </div>
+                            
+                                <div class="mb-3 form-check">
+                                    <input class="form-check-input" type="checkbox" id="withChildren">
+                                    <label class="form-check-label" for="withChildren">
+                                        <i class="fas fa-child me-1"></i>С детьми (нужно детское кресло)
+                                    </label>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="comment" class="form-label">
+                                        <i class="fas fa-comment me-1"></i>Комментарий к заказу
+                                    </label>
+                                    <textarea class="form-control" id="comment" rows="2" placeholder="Например: 'Позвонить за 5 минут до приезда'"></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                    <i class="fas fa-paper-plane me-2"></i>Заказать такси
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- История заказов -->
+                    <div id="orderHistory" class="card fade-in" style="display: none;">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-history me-2"></i>История заказов</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="historyList" class="list-group">
+                                <!-- История будет загружена здесь -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <!-- Карта -->
+                    <div class="card mb-4 fade-in">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Карта заказа</h5>
+                        </div>
+                        <div class="card-body p-0 position-relative">
+                            <div id="map"></div>
+                            <div class="map-search-container">
+                                <input type="text" id="mapSearch" class="form-control map-search-input" placeholder="Поиск адреса...">
+                                <div id="searchResults" class="list-group mt-2" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Интерфейс водителя -->
+    <div id="driverApp" class="app-container">
+        <div class="container py-5">
+            <!-- Форма входа -->
+            <div id="driverLoginForm" class="card mx-auto fade-in" style="max-width: 500px;">
+                <div class="card-header">
+                    <h5 class="mb-0 text-center"><i class="fas fa-sign-in-alt me-2"></i>Вход для водителей</h5>
+                </div>
+                <div class="card-body">
+                    <form id="driverLogin">
+                        <div class="mb-3">
+                            <label for="driverEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="driverEmail" placeholder="Ваш email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="driverPassword" class="form-label">Пароль</label>
+                            <input type="password" class="form-control" id="driverPassword" placeholder="Ваш пароль" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-sign-in-alt me-2"></i>Войти
+                        </button>
+                    </form>
+                    <div class="mt-3 text-center text-muted">
+                        <small>Для регистрации пишите @dorosfamd</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Панель водителя -->
+            <div id="driverPanel" class="fade-in" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>Информация о водителе</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="driverInfo" class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h5 id="driverName"></h5>
+                                <p class="mb-1"><i class="fas fa-car me-2"></i><span id="driverCar"></span></p>
+                                <p class="mb-1"><i class="fas fa-phone me-2"></i><span id="driverPhone"></span></p>
+                            </div>
+                            <button id="driverLogout" class="btn btn-outline-primary">
+                                <i class="fas fa-sign-out-alt me-1"></i>Выйти
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Текущий заказ -->
+                <div id="currentOrder" class="card mb-4" style="display: none;">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-taxi me-2"></i>Текущий заказ</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="currentOrderDetails"></div>
+                        <div class="d-grid gap-2 mt-3">
+                            <button id="completeOrderBtn" class="btn btn-success">
+                                <i class="fas fa-check-circle me-2"></i>Завершить заказ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Доступные заказы -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Доступные заказы</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="ordersList" class="list-group">
+                            <!-- Заказы будут загружены здесь -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Админ-панель -->
+    <div id="adminApp" class="app-container">
+        <div class="container py-5">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Панель администратора</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Пользователи</h5>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" id="searchUsers" class="form-control" placeholder="Поиск пользователей...">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Роль</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTable">
+                                    <!-- Пользователи будут загружены здесь -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h5>Заказы</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Клиент</th>
+                                        <th>Откуда</th>
+                                        <th>Куда</th>
+                                        <th>Статус</th>
+                                        <th>Водитель</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTable">
+                                    <!-- Заказы будут загружены здесь -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <h5><i class="fas fa-taxi me-2"></i>Khujand City Taxi</h5>
+                    <p>Быстро, безопасно, комфортно</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="mb-3">
+                        <a href="tel:+992876619999" class="btn btn-outline-light me-2">
+                            <i class="fas fa-phone me-1"></i>+992 87-661-9999
+                        </a>
+                        <a href="https://t.me/dorosfamd" class="btn btn-outline-light">
+                            <i class="fab fa-telegram me-1"></i>@dorosfamd
+                        </a>
+                    </div>
+                    <p class="mb-0">Владелец: Х.Дориуш | Администраторы: Ш.Музаффар и Р.Мубин</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Уведомления -->
+    <div id="notification" class="notification">
+        <div class="notification-header">
+            <i class="fas fa-check-circle me-2"></i>Уведомление
+        </div>
+        <div class="notification-body p-3">
+            <p id="notificationText"></p>
+        </div>
+    </div>
+
+    <!-- Скрипты -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQGsoDWZ-Ddac17nPlKUf36mNkpzZEiQ",
+            authDomain: "drezzsw-af340.firebaseapp.com",
+            databaseURL: "https://drezzsw-af340-default-rtdb.firebaseio.com",
+            projectId: "drezzsw-af340",
+            storageBucket: "drezzsw-af340.appspot.com",
+            messagingSenderId: "444256467193",
+            appId: "1:444256467193:web:3286b00a6f057bae824a28",
+            measurementId: "G-BHSSH8KNXX"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Глобальные переменные
+        let map, routingControl, fromMarker, toMarker, fromPoint, toPoint;
+        let currentPage = 'client';
+        
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', function() {
+            // Показать клиентский интерфейс по умолчанию
+            showPage('client');
+            
+            // Навигация
+            document.getElementById('clientNavLink').addEventListener('click', () => showPage('client'));
+            document.getElementById('driverNavLink').addEventListener('click', () => showPage('driver'));
+            document.getElementById('adminNavLink').addEventListener('click', () => showPage('admin'));
+            
+            // Инициализация клиентского интерфейса
+            initClientApp();
+            
+            // Инициализация интерфейса водителя
+            initDriverApp();
+            
+            // Инициализация админ-панели
+            initAdminApp();
+        });
+        
+        // Функция переключения страниц
+        function showPage(page) {
+            currentPage = page;
+            document.querySelectorAll('.app-container').forEach(el => el.style.display = 'none');
+            document.getElementById(page + 'App').style.display = 'block';
+            
+            // Обновление активной ссылки в навигации
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.getElementById(page + 'NavLink').classList.add('active');
+            
+            // Инициализация карты для клиентского интерфейса
+            if (page === 'client' && !map) {
+                initMap();
+            }
+        }
+        
+        // Клиентский интерфейс
+        function initClientApp() {
+            // Форма входа
+            document.getElementById('clientLogin').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const phone = document.getElementById('clientPhone').value;
+                const name = document.getElementById('clientName').value;
+                const password = document.getElementById('clientPassword').value;
+                
+                if (phone && name && password) {
+                    localStorage.setItem('clientPhone', phone);
+                    localStorage.setItem('clientName', name);
+                    
+                    document.getElementById('clientLoginForm').style.display = 'none';
+                    document.getElementById('orderForm').style.display = 'block';
+                    document.getElementById('orderHistory').style.display = 'block';
+                    
+                    loadOrderHistory();
+                    showNotification('Вы успешно вошли в систему');
+                } else {
+                    showNotification('Пожалуйста, заполните все поля', 'error');
+                }
+            });
+            
+            // Форма заказа
+            document.getElementById('taxiOrderForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                createOrder();
+            });
+            
+            // Выбор времени
+            document.querySelector('input[name="time"][value="later"]').addEventListener('change', function() {
+                document.getElementById('specificTime').disabled = !this.checked;
+            });
+            
+            // Проверка авторизации клиента
+            if (localStorage.getItem('clientPhone')) {
+                document.getElementById('clientLoginForm').style.display = 'none';
+                document.getElementById('orderForm').style.display = 'block';
+                document.getElementById('orderHistory').style.display = 'block';
+                loadOrderHistory();
+            }
+            
+            // Слушатель изменений статуса заказа
+            if (localStorage.getItem('clientPhone')) {
+                db.collection('orders')
+                    .where('clientPhone', '==', localStorage.getItem('clientPhone'))
+                    .where('status', '==', 'accepted')
+                    .onSnapshot(snapshot => {
+                        snapshot.docChanges().forEach(change => {
+                            if (change.type === 'added') {
+                                const order = change.doc.data();
+                                showDriverNotification(order);
+                            }
+                        });
+                    });
+            }
+        }
+        
+        // Инициализация карты
+        function initMap() {
+            map = L.map('map').setView([40.2833, 69.6333], 13); // Координаты Худжанда
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Обработчик кликов по карте
+            map.on('click', function(e) {
+                if (!fromPoint) {
+                    setFromPoint(e.latlng);
+                } else if (!toPoint) {
+                    setToPoint(e.latlng);
+                } else {
+                    resetPoints(e.latlng);
+                }
+            });
+            
+            // Поиск по карте
+            document.getElementById('mapSearch').addEventListener('input', function(e) {
+                const query = e.target.value;
+                if (query.length > 2) {
+                    searchAddress(query);
+                } else {
+                    document.getElementById('searchResults').style.display = 'none';
+                }
+            });
+        }
+        
+        // Установка точки отправления
+        function setFromPoint(latlng) {
+            fromPoint = latlng;
+            if (fromMarker) map.removeLayer(fromMarker);
+            
+            fromMarker = L.marker(latlng, {
+                icon: L.divIcon({
+                    className: 'from-marker',
+                    html: '<div style="background-color: #6C63FF; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></div>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map)
+            .bindPopup('Точка отправления')
+            .openPopup();
+            
+            getAddress(latlng).then(address => {
+                document.getElementById('fromAddress').textContent = address;
+                document.getElementById('fromCoords').value = `${latlng.lat},${latlng.lng}`;
+            });
+        }
+        
+        // Установка точки назначения
+        function setToPoint(latlng) {
+            toPoint = latlng;
+            if (toMarker) map.removeLayer(toMarker);
+            
+            toMarker = L.marker(latlng, {
+                icon: L.divIcon({
+                    className: 'to-marker',
+                    html: '<div style="background-color: #FF6584; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></div>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map)
+            .bindPopup('Точка назначения')
+            .openPopup();
+            
+            getAddress(latlng).then(address => {
+                document.getElementById('toAddress').textContent = address;
+                document.getElementById('toCoords').value = `${latlng.lat},${latlng.lng}`;
+                calculateRoute(fromPoint, toPoint);
+            });
+        }
+        
+        // Сброс точек
+        function resetPoints(latlng) {
+            map.removeLayer(fromMarker);
+            map.removeLayer(toMarker);
+            if (routingControl) map.removeControl(routingControl);
+            
+            fromPoint = latlng;
+            toPoint = null;
+            
+            document.getElementById('toAddress').textContent = 'не указано';
+            document.getElementById('toCoords').value = '';
+            document.getElementById('distance').textContent = '0';
+            document.getElementById('price').textContent = '0';
+            
+            setFromPoint(latlng);
+        }
+        
+        // Поиск адреса
+        function searchAddress(query) {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=5&accept-language=ru`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsContainer = document.getElementById('searchResults');
+                    resultsContainer.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        resultsContainer.style.display = 'none';
+                        return;
+                    }
+                    
+                    data.forEach(item => {
+                        const resultItem = document.createElement('button');
+                        resultItem.className = 'list-group-item list-group-item-action';
+                        resultItem.innerHTML = `<small>${item.display_name}</small>`;
+                        resultItem.addEventListener('click', () => {
+                            const latlng = L.latLng(parseFloat(item.lat), parseFloat(item.lon));
+                            map.setView(latlng, 16);
+                            
+                            if (!fromPoint) {
+                                setFromPoint(latlng);
+                            } else if (!toPoint) {
+                                setToPoint(latlng);
+                            } else {
+                                resetPoints(latlng);
+                            }
+                            
+                            resultsContainer.style.display = 'none';
+                            document.getElementById('mapSearch').value = '';
+                        });
+                        
+                        resultsContainer.appendChild(resultItem);
+                    });
+                    
+                    resultsContainer.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error searching address:', error);
+                });
+        }
+        
+        // Получение адреса по координатам
+        function getAddress(latlng) {
+            return fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&accept-language=ru`)
+                .then(response => response.json())
+                .then(data => {
+                    return data.display_name || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`;
+                })
+                .catch(error => {
+                    console.error('Error getting address:', error);
+                    return `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`;
+                });
+        }
+        
+        // Расчет маршрута
+        function calculateRoute(from, to) {
+            if (routingControl) {
+                map.removeControl(routingControl);
+            }
+            
+            routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(from.lat, from.lng),
+                    L.latLng(to.lat, to.lng)
+                ],
+                routeWhileDragging: true,
+                show: false,
+                lineOptions: {
+                    styles: [{color: '#6C63FF', opacity: 0.7, weight: 5}]
+                },
+                createMarker: function() { return null; }
+            }).addTo(map);
+            
+            routingControl.on('routesfound', function(e) {
+                const routes = e.routes;
+                const distance = routes[0].summary.totalDistance / 1000; // в км
+                document.getElementById('distance').textContent = distance.toFixed(2);
+                updatePrice(distance);
+            });
+        }
+        
+        // Обновление цены
+        function updatePrice(distance) {
+            let price = 0;
+            const tariff = document.getElementById('tariff').value;
+            
+            // Базовая цена
+            if (tariff === 'delivery') {
+                price = 15;
+            } else if (distance <= 4) {
+                price = 10;
+            } else {
+                price = 2.5 * distance;
+            }
+            
+            // Наценка за тариф
+            if (tariff === 'comfort') price *= 1.2;
+            else if (tariff === 'business') price *= 1.5;
+            else if (tariff === 'minivan') price *= 1.3;
+            
+            // Дополнительные услуги
+            if (document.getElementById('airConditioner').checked) price += 1;
+            if (document.getElementById('meetWithSign').checked) price += 4;
+            
+            document.getElementById('price').textContent = price.toFixed(2);
+        }
+        
+        // Создание заказа
+        function createOrder() {
+            if (!fromPoint || !toPoint) {
+                showNotification('Пожалуйста, укажите точки отправления и назначения на карте', 'error');
+                return;
+            }
+            
+            const order = {
+                clientPhone: localStorage.getItem('clientPhone'),
+                clientName: localStorage.getItem('clientName'),
+                fromAddress: document.getElementById('fromAddress').textContent,
+                toAddress: document.getElementById('toAddress').textContent,
+                fromCoords: document.getElementById('fromCoords').value,
+                toCoords: document.getElementById('toCoords').value,
+                distance: parseFloat(document.getElementById('distance').textContent),
+                price: parseFloat(document.getElementById('price').textContent),
+                tariff: document.getElementById('tariff').value,
+                airConditioner: document.getElementById('airConditioner').checked,
+                meetWithSign: document.getElementById('meetWithSign').checked,
+                tips: parseInt(document.getElementById('tips').value),
+                payment: document.querySelector('input[name="payment"]:checked').value,
+                time: document.querySelector('input[name="time"]:checked').value === 'now' ? 'now' : 
+                     document.getElementById('specificTime').value,
+                withChildren: document.getElementById('withChildren').checked,
+                comment: document.getElementById('comment').value,
+                status: 'new',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            // Сохранение в Firestore
+            db.collection('orders').add(order)
+                .then(docRef => {
+                    // Отправка в Telegram
+                    sendToTelegram(order, docRef.id);
+                    
+                    // Сохранение в историю
+                    saveToHistory(order, docRef.id);
+                    
+                    showNotification('Заказ успешно создан! Ожидайте водителя');
+                    resetOrderForm();
+                })
+                .catch(error => {
+                    console.error('Error creating order:', error);
+                    showNotification('Ошибка при создании заказа: ' + error.message, 'error');
+                });
+        }
+        
+        // Отправка заказа в Telegram
+        function sendToTelegram(order, orderId) {
+            const botToken = '8233984213:AAE7gKUQRMeacw2X95lRSLrhUYPM-WnjVzg';
+            const chatId = '7456349349';
+            
+            let message = `🚖 <b>Новый заказ #${orderId.substring(0, 8)}</b>\n\n`;
+            message += `👤 <b>Клиент:</b> ${order.clientName} (${order.clientPhone})\n`;
+            message += `📍 <b>Откуда:</b> ${order.fromAddress}\n`;
+            message += `🏁 <b>Куда:</b> ${order.toAddress}\n`;
+            message += `📏 <b>Расстояние:</b> ${order.distance} км\n`;
+            message += `💰 <b>Стоимость:</b> ${order.price} сомони\n`;
+            message += `📊 <b>Тариф:</b> ${getTariffName(order.tariff)}\n`;
+            message += `💳 <b>Оплата:</b> ${getPaymentName(order.payment)}\n`;
+            message += `⏰ <b>Время:</b> ${order.time === 'now' ? 'Сейчас' : order.time}\n`;
+            if (order.airConditioner) message += `❄️ <b>Кондиционер:</b> Да\n`;
+            if (order.meetWithSign) message += `🪧 <b>Встреча с табличкой:</b> Да\n`;
+            if (order.withChildren) message += `👶 <b>Детское кресло:</b> Да\n`;
+            if (order.comment) message += `📝 <b>Комментарий:</b> ${order.comment}\n`;
+            
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            }).catch(error => console.error('Error sending to Telegram:', error));
+        }
+        
+        // Сохранение заказа в историю
+    // Замените функцию saveToHistory
+    function saveToHistory(order, orderId) {
+        let history;
+        try {
+            const historyStr = localStorage.getItem('orderHistory');
+            history = historyStr ? JSON.parse(historyStr) : [];
+        } catch (e) {
+            console.error('Ошибка загрузки истории:', e);
+            history = [];
+        }
+        
+        if (!Array.isArray(history)) {
+            history = [];
+        }
+        
+        history.unshift({
+            id: orderId,
+            ...order
+        });
+        
+        try {
+            localStorage.setItem('orderHistory', JSON.stringify(history));
+        } catch (e) {
+            console.error('Ошибка сохранения истории:', e);
+        }
+        
+        loadOrderHistory();
+    }
+  
+  
+    // Добавьте обработку ошибок для всех API-запросов
+    async function searchAddress(query) {
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=5&accept-language=ru`);
+            if (!response.ok) throw new Error('Ошибка сети');
+            const data = await response.json();
+                } catch (error) {
+            console.error('Ошибка поиска адреса:', error);
+            showNotification('Ошибка при поиске адреса', 'error');
+        }
+    }
+        // Загрузка истории заказов
+        // В функции loadOrderHistory() замените:
+    // Замените функцию loadOrderHistory
+    function loadOrderHistory() {
+        let history;
+        try {
+            const historyStr = localStorage.getItem('orderHistory');
+            history = historyStr ? JSON.parse(historyStr) : [];
+        } catch (e) {
+            console.error('Ошибка загрузки истории:', e);
+            history = [];
+        }
+        
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        
+        if (!history || history.length === 0) {
+            historyList.innerHTML = '<div class="text-center py-3 text-muted">Нет истории заказов</div>';
+            return;
+        }
+        
+        history.forEach(item => {
+            const li = document.createElement('div');
+            li.className = 'list-group-item order-card';
+            li.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">Заказ #${item.id?.substring(0, 8) || 'N/A'}...</h6>
+                        <small class="text-muted">${item.timestamp ? new Date(item.timestamp?.toDate?.() || item.timestamp).toLocaleString() : 'N/A'}</small>
+                    </div>
+                    <span class="order-status ${getStatusClass(item.status)}">${getStatusText(item.status)}</span>
+                </div>
+                <p class="mb-1 mt-2">${item.fromAddress || 'N/A'} → ${item.toAddress || 'N/A'}</p>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <strong>${item.price || '0'} сомони</strong>
+                    <small>${item.distance || '0'} км</small>
+                </div>
+            `;
+            historyList.appendChild(li);
+        });
+    }
+
+        
+        // Сброс формы заказа
+        function resetOrderForm() {
+            document.getElementById('taxiOrderForm').reset();
+            
+            if (fromMarker) map.removeLayer(fromMarker);
+            if (toMarker) map.removeLayer(toMarker);
+            if (routingControl) map.removeControl(routingControl);
+            
+            fromPoint = null;
+            toPoint = null;
+            
+            document.getElementById('fromAddress').textContent = 'не указано';
+            document.getElementById('toAddress').textContent = 'не указано';
+            document.getElementById('fromCoords').value = '';
+            document.getElementById('toCoords').value = '';
+            document.getElementById('distance').textContent = '0';
+            document.getElementById('price').textContent = '0';
+            document.getElementById('specificTime').disabled = true;
+        }
+        
+        // Уведомление о принятии заказа водителем
+        function showDriverNotification(order) {
+            const notificationText = `
+                <b>Ваш заказ принят!</b><br><br>
+                🚗 <b>Водитель:</b> ${order.driverName}<br>
+                🚘 <b>Автомобиль:</b> ${order.carModel}, ${order.carColor}, ${order.carNumber}<br>
+                📞 <b>Телефон:</b> ${order.driverPhone}
+            `;
+            
+            showNotification(notificationText, 'success', 10000);
+        }
+        
+        // Интерфейс водителя
+        function initDriverApp() {
+            // Проверка авторизации водителя
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    checkDriverRole(user.uid);
+                } else {
+                    document.getElementById('driverLoginForm').style.display = 'block';
+                    document.getElementById('driverPanel').style.display = 'none';
+                }
+            });
+            
+            // Форма входа
+            document.getElementById('driverLogin').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('driverEmail').value;
+                const password = document.getElementById('driverPassword').value;
+                
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(userCredential => {
+                        checkDriverRole(userCredential.user.uid);
+                    })
+                    .catch(error => {
+                        console.error('Login error:', error);
+                        showNotification('Ошибка входа: ' + error.message, 'error');
+                    });
+            });
+            
+            // Выход
+            document.getElementById('driverLogout').addEventListener('click', function() {
+                auth.signOut().then(() => {
+                    document.getElementById('driverLoginForm').style.display = 'block';
+                    document.getElementById('driverPanel').style.display = 'none';
+                    showNotification('Вы успешно вышли из системы');
+                });
+            });
+            
+            // Завершение заказа
+            document.getElementById('completeOrderBtn').addEventListener('click', function() {
+                const orderId = this.getAttribute('data-id');
+                completeOrder(orderId);
+            });
+            
+            // Слушатель новых заказов
+            db.collection('orders')
+                .where('status', '==', 'new')
+                .onSnapshot(snapshot => {
+                    const ordersList = document.getElementById('ordersList');
+                    ordersList.innerHTML = '';
+                    
+                    if (snapshot.empty) {
+                        ordersList.innerHTML = '<div class="text-center py-3 text-muted">Нет доступных заказов</div>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderItem = document.createElement('div');
+                        orderItem.className = 'list-group-item list-group-item-action order-card';
+                        orderItem.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">Заказ #${doc.id.substring(0, 8)}...</h6>
+                                    <small class="text-muted">${new Date(order.timestamp?.toDate() || Date.now()).toLocaleString()}</small>
+                                </div>
+                                <span class="order-status status-new">Новый</span>
+                            </div>
+                            <p class="mb-1 mt-2">${order.fromAddress} → ${order.toAddress}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <strong>${order.price} сомони</strong>
+                                <small>${order.distance} км</small>
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-primary accept-order-btn" data-id="${doc.id}">
+                                    <i class="fas fa-check-circle me-2"></i>Принять заказ
+                                </button>
+                            </div>
+                        `;
+                        
+                        ordersList.appendChild(orderItem);
+                        
+                        // Обработчик кнопки принятия заказа
+                        orderItem.querySelector('.accept-order-btn').addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            acceptOrder(this.getAttribute('data-id'));
+                        });
+                    });
+                });
+        }
+        
+        // Проверка роли водителя
+        function checkDriverRole(userId) {
+            db.collection('users').doc(userId).get()
+                .then(doc => {
+                    if (doc.exists && doc.data().role === 'driver') {
+                        // Пользователь является водителем
+                        document.getElementById('driverLoginForm').style.display = 'none';
+                        document.getElementById('driverPanel').style.display = 'block';
+                        
+                        // Загрузка информации о водителе
+                        loadDriverInfo(userId);
+                        
+                        // Проверка активного заказа
+                        checkActiveOrder(userId);
+                    } else {
+                        // Пользователь не является водителем
+                        auth.signOut();
+                        showNotification('У вас нет прав водителя. Обратитесь к администратору.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking role:', error);
+                    showNotification('Ошибка проверки прав: ' + error.message, 'error');
+                });
+        }
+        
+        // Загрузка информации о водителе
+        function loadDriverInfo(userId) {
+            db.collection('drivers').doc(userId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const driver = doc.data();
+                        document.getElementById('driverName').textContent = driver.name;
+                        document.getElementById('driverCar').textContent = `${driver.carModel}, ${driver.carColor}, ${driver.carNumber}`;
+                        document.getElementById('driverPhone').textContent = driver.phone;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading driver info:', error);
+                });
+        }
+        
+        // Проверка активного заказа
+        function checkActiveOrder(userId) {
+            db.collection('orders')
+                .where('driverId', '==', userId)
+                .where('status', '==', 'accepted')
+                .limit(1)
+                .get()
+                .then(querySnapshot => {
+                    if (!querySnapshot.empty) {
+                        const doc = querySnapshot.docs[0];
+                        showCurrentOrder(doc.id, doc.data());
+                    }
+                });
+        }
+        
+        // Принятие заказа
+        function acceptOrder(orderId) {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            // Получение информации о водителе
+            db.collection('drivers').doc(user.uid).get()
+                .then(driverDoc => {
+                    if (!driverDoc.exists) {
+                        throw new Error('Информация о водителе не найдена');
+                    }
+                    
+                    const driver = driverDoc.data();
+                    
+                    // Обновление заказа
+                    db.collection('orders').doc(orderId).update({
+                        status: 'accepted',
+                        driverId: user.uid,
+                        driverName: driver.name,
+                        driverPhone: driver.phone,
+                        carModel: driver.carModel,
+                        carColor: driver.carColor,
+                        carNumber: driver.carNumber,
+                        acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    })
+                    .then(() => {
+                        // Показать текущий заказ
+                        db.collection('orders').doc(orderId).get()
+                            .then(doc => {
+                                showCurrentOrder(orderId, doc.data());
+                                showNotification('Заказ успешно принят');
+                            });
+                    })
+                    .catch(error => {
+                        console.error('Error accepting order:', error);
+                        showNotification('Ошибка при принятии заказа: ' + error.message, 'error');
+                    });
+                })
+                .catch(error => {
+                    console.error('Error getting driver info:', error);
+                    showNotification('Ошибка при получении информации о водителе: ' + error.message, 'error');
+                });
+        }
+        
+        // Отображение текущего заказа
+        function showCurrentOrder(orderId, order) {
+            const currentOrder = document.getElementById('currentOrder');
+            const currentOrderDetails = document.getElementById('currentOrderDetails');
+            
+            currentOrderDetails.innerHTML = `
+                <div class="mb-3">
+                    <h6>Информация о клиенте</h6>
+                    <p class="mb-1"><i class="fas fa-user me-2"></i>${order.clientName}</p>
+                    <p class="mb-1"><i class="fas fa-phone me-2"></i>${order.clientPhone}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Маршрут</h6>
+                    <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>${order.fromAddress}</p>
+                    <p class="mb-1"><i class="fas fa-flag-checkered me-2"></i>${order.toAddress}</p>
+                    <p class="mb-1"><i class="fas fa-road me-2"></i>${order.distance} км</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Детали заказа</h6>
+                    <p class="mb-1"><i class="fas fa-money-bill-wave me-2"></i>${order.price} сомони</p>
+                    <p class="mb-1"><i class="fas fa-tag me-2"></i>${getTariffName(order.tariff)}</p>
+                    <p class="mb-1"><i class="fas fa-clock me-2"></i>${order.time === 'now' ? 'Сейчас' : order.time}</p>
+                    ${order.comment ? `<p class="mb-1"><i class="fas fa-comment me-2"></i>${order.comment}</p>` : ''}
+                </div>
+            `;
+            
+            document.getElementById('completeOrderBtn').setAttribute('data-id', orderId);
+            currentOrder.style.display = 'block';
+        }
+        
+        // Завершение заказа
+        function completeOrder(orderId) {
+            db.collection('orders').doc(orderId).update({
+                status: 'completed',
+                completedAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                document.getElementById('currentOrder').style.display = 'none';
+                showNotification('Заказ успешно завершен');
+            })
+            .catch(error => {
+                console.error('Error completing order:', error);
+                showNotification('Ошибка при завершении заказа: ' + error.message, 'error');
+            });
+        }
+        
+        // Админ-панель
+        function initAdminApp() {
+            // Загрузка пользователей
+            loadAdminUsers();
+            loadAdminOrders();
+            
+            // Поиск пользователей
+            document.getElementById('searchUsers').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('#usersTable tr');
+                
+                rows.forEach(row => {
+                    const email = row.cells[0].textContent.toLowerCase();
+                    if (email.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Загрузка пользователей для админа
+        function loadAdminUsers() {
+            db.collection('users').get().then(querySnapshot => {
+                const usersTable = document.getElementById('usersTable');
+                usersTable.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    usersTable.innerHTML = '<tr><td colspan="3" class="text-center py-3 text-muted">Нет пользователей</td></tr>';
+                    return;
+                }
+                
+                querySnapshot.forEach(doc => {
+                    const user = doc.data();
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${user.email}</td>
+                        <td>${user.role || 'user'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success make-driver-btn me-2" data-id="${doc.id}" ${user.role === 'driver' ? 'disabled' : ''}>
+                                <i class="fas fa-user-shield me-1"></i>Сделать водителем
+                            </button>
+                            <button class="btn btn-sm btn-danger remove-driver-btn" data-id="${doc.id}" ${user.role !== 'driver' ? 'disabled' : ''}>
+                                <i class="fas fa-user-minus me-1"></i>Убрать права
+                            </button>
+                        </td>
+                    `;
+                    
+                    usersTable.appendChild(row);
+                    
+                    // Обработчики кнопок
+                    row.querySelector('.make-driver-btn').addEventListener('click', function() {
+                        makeDriver(this.getAttribute('data-id'));
+                    });
+                    
+                    row.querySelector('.remove-driver-btn').addEventListener('click', function() {
+                        removeDriver(this.getAttribute('data-id'));
+                    });
+                });
+            });
+        }
+        
+        // Загрузка заказов для админа
+        function loadAdminOrders() {
+            db.collection('orders').orderBy('timestamp', 'desc').get().then(querySnapshot => {
+                const ordersTable = document.getElementById('ordersTable');
+                ordersTable.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    ordersTable.innerHTML = '<tr><td colspan="6" class="text-center py-3 text-muted">Нет заказов</td></tr>';
+                    return;
+                }
+                
+                querySnapshot.forEach(doc => {
+                    const order = doc.data();
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td><small>${doc.id.substring(0, 8)}...</small></td>
+                        <td>${order.clientName}<br><small>${order.clientPhone}</small></td>
+                        <td><small>${order.fromAddress}</small></td>
+                        <td><small>${order.toAddress}</small></td>
+                        <td><span class="order-status ${getStatusClass(order.status)}">${getStatusText(order.status)}</span></td>
+                        <td>${order.driverName || '—'}<br><small>${order.driverPhone || ''}</small></td>
+                    `;
+                    
+                    ordersTable.appendChild(row);
+                });
+            });
+        }
+        
+        // Назначение водителя
+        function makeDriver(userId) {
+            db.collection('users').doc(userId).update({
+                role: 'driver'
+            }).then(() => {
+                showNotification('Пользователь теперь водитель');
+                loadAdminUsers();
+            }).catch(error => {
+                console.error('Error making driver:', error);
+                showNotification('Ошибка: ' + error.message, 'error');
+            });
+        }
+        
+        // Удаление прав водителя
+        function removeDriver(userId) {
+            db.collection('users').doc(userId).update({
+                role: 'user'
+            }).then(() => {
+                showNotification('Права водителя убраны');
+                loadAdminUsers();
+            }).catch(error => {
+                console.error('Error removing driver:', error);
+                showNotification('Ошибка: ' + error.message, 'error');
+            });
+        }
+        
+        // Вспомогательные функции
+        function getTariffName(tariff) {
+            const names = {
+                economy: 'Эконом',
+                comfort: 'Комфорт',
+                business: 'Бизнес',
+                minivan: 'На 6 человек',
+                delivery: 'Доставка'
+            };
+            return names[tariff] || tariff;
+        }
+        
+        function getPaymentName(payment) {
+            const names = {
+                cash: 'Наличные',
+                khujandBank: 'KhujandCityBank',
+                card: 'Карта'
+            };
+            return names[payment] || payment;
+        }
+        
+        function getStatusText(status) {
+            const statuses = {
+                new: 'Новый',
+                accepted: 'Принят',
+                completed: 'Завершен'
+            };
+            return statuses[status] || status;
+        }
+        
+        function getStatusClass(status) {
+            const classes = {
+                new: 'status-new',
+                accepted: 'status-accepted',
+                completed: 'status-completed'
+            };
+            return classes[status] || '';
+        }
+        
+        // Показать уведомление
+        function showNotification(text, type = 'success', duration = 5000) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            // Установка цвета в зависимости от типа
+            const header = notification.querySelector('.notification-header');
+            header.className = 'notification-header';
+            
+            if (type === 'success') {
+                header.classList.add('bg-success');
+            } else if (type === 'error') {
+                header.classList.add('bg-danger');
+            } else {
+                header.classList.add('bg-primary');
+            }
+            
+            notificationText.innerHTML = text;
+            notification.classList.add('show');
+            
+            // Автоматическое скрытие
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+    </script>
+</body>
+</html>

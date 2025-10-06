@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCTaxi - Панель водителя (Telegram Bot)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .order-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .order-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .order-detail {
+            margin-bottom: 8px;
+            display: flex;
+        }
+        .detail-label {
+            font-weight: bold;
+            min-width: 120px;
+            color: #7f8c8d;
+        }
+        .detail-value {
+            flex: 1;
+        }
+        .accept-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .status-pending {
+            color: #e67e22;
+            font-weight: bold;
+        }
+        .debug-panel {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Доступные заказы (Telegram Bot)</h1>
+    <div id="ordersList">Загрузка заказов...</div>
+    
+    <div class="debug-panel">
+        <h3>Информация о подключении:</h3>
+        <div id="debugInfo">Инициализация...</div>
+    </div>
+
+    <script>
+        // Конфигурация Telegram бота
+        const BOT_TOKEN = "8233984213:AAE7gKUQRMeacw2X95lRSLrhUYPM-WnjVzg";
+        const CHAT_ID = "7456349349";
+        
+        // ID текущего водителя (можно получить после авторизации)
+        const currentDriverId = "driver_123";
+        const debugInfo = document.getElementById('debugInfo');
+
+        // Загрузка заказов из Telegram бота
+        async function loadOrders() {
+            debugInfo.textContent = "Запрашиваем заказы у Telegram бота...";
+            
+            try {
+                // Получаем обновления от бота
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`);
+                const data = await response.json();
+                
+                if (!data.ok) {
+                    throw new Error(data.description || "Не удалось получить данные от бота");
+                }
+                
+                // Фильтруем только сообщения с заказами
+                const orders = data.result
+                    .filter(update => update.message && update.message.chat.id == CHAT_ID)
+                    .map(update => {
+                        const text = update.message.text;
+                        return parseOrderMessage(text);
+                    })
+                    .filter(order => order && order.status === "pending");
+                
+                debugInfo.textContent = `Найдено заказов: ${orders.length}`;
+                
+                const ordersList = document.getElementById('ordersList');
+                
+                if (orders.length === 0) {
+                    ordersList.innerHTML = "<div style='text-align:center; padding:20px; color:#7f8c8d;'>Нет доступных заказов</div>";
+                    return;
+                }
+
+                ordersList.innerHTML = '';
+                orders.forEach((order, index) => {
+                    ordersList.innerHTML += `
+                        <div class="order-card">
+                            <div class="order-header">Заказ #${index + 1}</div>
+                            
+                            <div class="order-detail">
+                                <span class="detail-label">Откуда:</span>
+                                <span class="detail-value">${order.from || 'не указано'}</span>
+                            </div>
+                            
+                            <div class="order-detail">
+                                <span class="detail-label">Куда:</span>
+                                <span class="detail-value">${order.to || 'не указано'}</span>
+                            </div>
+                            
+                            <div class="order-detail">
+                                <span class="detail-label">Телефон:</span>
+                                <span class="detail-value">${order.phone || 'не указан'}</span>
+                            </div>
+                            
+                            <div class="order-detail">
+                                <span class="detail-label">Оплата:</span>
+                                <span class="detail-value">${order.payment || 'не указана'}</span>
+                            </div>
+                            
+                            <div class="order-detail">
+                                <span class="detail-label">Комментарий:</span>
+                                <span class="detail-value">${order.comment || 'нет'}</span>
+                            </div>
+                            
+                            <div class="order-detail">
+                                <span class="detail-label">Статус:</span>
+                                <span class="detail-value status-pending">${order.status}</span>
+                            </div>
+                            
+                            <button onclick="acceptOrder(${index})" class="accept-btn">
+                                Принять заказ
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                // Сохраняем заказы для последующего принятия
+                window.currentOrders = orders;
+                
+            } catch (error) {
+                debugInfo.textContent = "Ошибка: " + error.message;
+                document.getElementById('ordersList').innerHTML = `
+                    <div style="color:#e74c3c; padding:20px; text-align:center;">
+                        Ошибка загрузки заказов: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Парсинг сообщения с заказом из Telegram
+        function parseOrderMessage(text) {
+            try {
+                // Пример формата сообщения от бота
+                const fromMatch = text.match(/Откуда:\s*(.+)/);
+                const toMatch = text.match(/Куда:\s*(.+)/);
+                const phoneMatch = text.match(/Телефон:\s*(.+)/);
+                const paymentMatch = text.match(/Оплата:\s*(.+)/);
+                const commentMatch = text.match(/Комментарий:\s*(.+)/);
+                
+                return {
+                    from: fromMatch ? fromMatch[1].trim() : null,
+                    to: toMatch ? toMatch[1].trim() : null,
+                    phone: phoneMatch ? phoneMatch[1].trim() : null,
+                    payment: paymentMatch ? paymentMatch[1].trim() : null,
+                    comment: commentMatch ? commentMatch[1].trim() : null,
+                    status: "pending",
+                    message: text
+                };
+            } catch (e) {
+                console.error("Ошибка парсинга сообщения:", e);
+                return null;
+            }
+        }
+
+        // Принять заказ
+        async function acceptOrder(orderIndex) {
+            const order = window.currentOrders[orderIndex];
+            if (!order) return;
+            
+            debugInfo.textContent = `Принимаем заказ из ${order.from} в ${order.to}...`;
+            
+            try {
+                // Отправляем сообщение боту о принятии заказа
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: `🚕 Водитель принял заказ!\n\n` +
+                              `Откуда: ${order.from}\n` +
+                              `Куда: ${order.to}\n` +
+                              `Водитель ID: ${currentDriverId}`
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.ok) {
+                    throw new Error(data.description || "Не удалось отправить сообщение боту");
+                }
+                
+                alert('Вы успешно приняли заказ! Бот уведомил клиента.');
+                debugInfo.textContent = `Заказ принят! Ответ бота: ${JSON.stringify(data.result)}`;
+                
+                // Обновляем список заказов
+                loadOrders();
+                
+            } catch (error) {
+                debugInfo.textContent = "Ошибка: " + error.message;
+                alert('Ошибка при принятии заказа: ' + error.message);
+            }
+        }
+
+        // Загружаем заказы при открытии страницы
+        window.onload = loadOrders;
+        window.acceptOrder = acceptOrder;
+    </script>
+</body>
+</html>

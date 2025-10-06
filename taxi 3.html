@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>KCTaxi — Заказать такси</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; }
+    input, select, textarea, button {
+      width: 100%; padding: 10px; margin: 10px 0; font-size: 1em; border-radius: 5px; border: 1px solid #ccc;
+    }
+    button { background: #28a745; color: white; border: none; cursor: pointer; }
+    button:hover { background: #218838; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>🚕 Заказать такси</h2>
+  <form id="orderForm">
+    <input type="text" id="from" placeholder="Откуда" required>
+    <input type="text" id="to" placeholder="Куда" required>
+    <input type="datetime-local" id="time" required>
+    
+    <select id="payment" required>
+      <option value="">Способ оплаты</option>
+      <option value="cash">Наличными</option>
+      <option value="KhujandCityBank">KhujandCityBank</option>
+    </select>
+    
+    <textarea id="comment" placeholder="Комментарий (необязательно)"></textarea>
+    
+    <button type="submit">🚖 Вызвать такси</button>
+  </form>
+
+  <p id="result"></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.28.0/firebase-app.js";
+  import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.28.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "8233984213:AAE7gKUQRMeacw2X95lRSLrhUYPM-WnjVzg",
+    authDomain: "your-app.firebaseapp.com",
+    databaseURL: "https://your-app.firebaseio.com",
+    projectId: "your-app"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const form = document.getElementById('orderForm');
+  const result = document.getElementById('result');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const from = document.getElementById('from').value;
+    const to = document.getElementById('to').value;
+    const time = document.getElementById('time').value;
+    const payment = document.getElementById('payment').value;
+    const comment = document.getElementById('comment').value;
+
+    // Простой расчет цены (пример)
+    const distance = 5; // TODO: подключить Google Maps API для точного расстояния
+    const price = 5 + distance * 3;
+
+    const orderRef = ref(db, 'orders');
+    const newOrder = await push(orderRef, {
+      from, to, time, payment, comment, price,
+      status: "waiting",
+      ts: Date.now()
+    });
+
+    result.innerText = `✅ Заказ отправлен! Ожидайте подтверждения. Цена: ${price} сомони.`;
+    form.reset();
+
+    // Отправляем информацию о заказе в Telegram-канал
+    const telegramUrl = `https://api.telegram.org/bot8233984213:AAE7gKUQRMeacw2X95lRSLrhUYPM-WnjVzg/sendMessage`;
+
+    const message = `🚕 Новый заказ!
+    📍 Откуда: ${from}
+    📍 Куда: ${to}
+    🕐 Время: ${time}
+    💳 Оплата: ${payment}
+    💬 Комментарий: ${comment || 'Без комментариев'}
+    💸 Предварительная цена: ${price} сомони`;
+
+    await fetch(`${telegramUrl}?chat_id=@KCTaxi&text=${encodeURIComponent(message)}`);
+  });
+</script>
+
+</body>
+</html>

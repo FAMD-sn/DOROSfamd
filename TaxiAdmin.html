@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление пользователями KCTaxi</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .user-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-info {
+            flex: 1;
+        }
+        .user-email {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        .driver-badge {
+            display: inline-block;
+            background-color: #27ae60;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .make-driver-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        .make-driver-btn:hover {
+            background-color: #2980b9;
+        }
+        .remove-driver-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .remove-driver-btn:hover {
+            background-color: #c0392b;
+        }
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #7f8c8d;
+            margin: 50px 0;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section-title {
+            font-size: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Управление пользователями KCTaxi</h1>
+    
+    <div class="section">
+        <h2 class="section-title">Текущие водители</h2>
+        <div id="driversList">
+            <div class="loading">Загрузка водителей...</div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Добавить нового водителя</h2>
+        <form id="addDriverForm">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Email пользователя:</label>
+                <input type="email" id="driverEmail" required style="width: 100%; padding: 8px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Имя водителя:</label>
+                <input type="text" id="driverName" required style="width: 100%; padding: 8px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Телефон:</label>
+                <input type="text" id="driverPhone" required style="width: 100%; padding: 8px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Номер машины:</label>
+                <input type="text" id="carNumber" required style="width: 100%; padding: 8px; box-sizing: border-box;">
+            </div>
+            <button type="submit" class="make-driver-btn">Добавить водителя</button>
+        </form>
+    </div>
+
+    <script>
+        // Ваша конфигурация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQGsoDWZ-Ddac17nPlKUf36mNkpzZEiQ",
+            authDomain: "drezzsw-af340.firebaseapp.com",
+            databaseURL: "https://drezzsw-af340-default-rtdb.firebaseio.com",
+            projectId: "drezzsw-af340",
+            storageBucket: "drezzsw-af340.appspot.com",
+            messagingSenderId: "444256467193",
+            appId: "1:444256467193:web:3286b00a6f057bae824a28",
+            measurementId: "G-BHSSH8KNXX"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // DOM элементы
+        const driversList = document.getElementById('driversList');
+        const addDriverForm = document.getElementById('addDriverForm');
+
+        // Загрузка водителей
+        function loadDrivers() {
+            driversList.innerHTML = '<div class="loading">Загрузка водителей...</div>';
+            
+            database.ref('drivers').on('value', (snapshot) => {
+                const drivers = snapshot.val() || {};
+                displayDrivers(drivers);
+            }, (error) => {
+                console.error('Ошибка загрузки водителей:', error);
+                driversList.innerHTML = '<div>Ошибка загрузки водителей</div>';
+            });
+        }
+
+        // Отображение водителей
+        function displayDrivers(drivers) {
+            if (Object.keys(drivers).length === 0) {
+                driversList.innerHTML = '<div>Нет зарегистрированных водителей</div>';
+                return;
+            }
+
+            driversList.innerHTML = '';
+            
+            Object.keys(drivers).forEach(driverId => {
+                const driver = drivers[driverId];
+                const driverElement = document.createElement('div');
+                driverElement.className = 'user-card';
+                
+                driverElement.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-email">${driver.email}</div>
+                        <div>Имя: ${driver.name}</div>
+                        <div>Телефон: ${driver.phone}</div>
+                        <div>Номер машины: ${driver.carNumber}</div>
+                    </div>
+                    <div>
+                        <button onclick="removeDriver('${driverId}')" class="remove-driver-btn">Удалить водителя</button>
+                    </div>
+                `;
+                
+                driversList.appendChild(driverElement);
+            });
+        }
+
+        // Добавление нового водителя
+        addDriverForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const driverData = {
+                email: document.getElementById('driverEmail').value.trim(),
+                name: document.getElementById('driverName').value.trim(),
+                phone: document.getElementById('driverPhone').value.trim(),
+                carNumber: document.getElementById('carNumber').value.trim(),
+                status: 'free',
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            if (!driverData.email || !driverData.name || !driverData.phone || !driverData.carNumber) {
+                alert('Пожалуйста, заполните все поля');
+                return;
+            }
+            
+            // Добавляем водителя в базу данных
+            database.ref('drivers').push(driverData)
+                .then(() => {
+                    alert('Водитель успешно добавлен');
+                    addDriverForm.reset();
+                })
+                .catch(error => {
+                    console.error('Ошибка добавления водителя:', error);
+                    alert('Ошибка при добавлении водителя');
+                });
+        });
+
+        // Удаление водителя
+        function removeDriver(driverId) {
+            if (confirm('Вы уверены, что хотите удалить этого водителя?')) {
+                database.ref(`drivers/${driverId}`).remove()
+                    .then(() => {
+                        alert('Водитель удален');
+                    })
+                    .catch(error => {
+                        console.error('Ошибка удаления водителя:', error);
+                        alert('Ошибка при удалении водителя');
+                    });
+            }
+        }
+
+        // Делаем функцию глобальной для использования в onclick
+        window.removeDriver = removeDriver;
+
+        // Загружаем водителей при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadDrivers);
+    </script>
+</body>
+</html>

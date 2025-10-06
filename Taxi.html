@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCTaxi - Сервис заказа такси</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --light: #f3f4f6;
+            --dark: #1f2937;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9fafb;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .auth-buttons button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .login-btn {
+            background-color: var(--primary);
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .logout-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .admin-btn {
+            background-color: var(--success);
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .driver-card {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .driver-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .driver-car {
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .driver-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-free {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .status-busy {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .order-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .order-from, .order-to {
+            font-weight: 500;
+        }
+        
+        .order-price {
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .order-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-waiting {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .status-accepted {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .status-canceled {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .driver-info {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--success);
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">KCTaxi</div>
+            <div class="auth-buttons">
+                <button id="adminBtn" class="admin-btn hidden">Админ-панель</button>
+                <button id="loginBtn" class="login-btn">Вход для админа</button>
+                <button id="logoutBtn" class="logout-btn hidden">Выйти</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Уведомление -->
+        <div id="notification" class="notification"></div>
+
+        <!-- Форма заказа такси -->
+        <div class="section" id="orderSection">
+            <h2 class="section-title">Заказать такси</h2>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="fromAddress">Откуда</label>
+                    <input type="text" id="fromAddress" required placeholder="Укажите адрес отправления">
+                </div>
+                <div class="form-group">
+                    <label for="toAddress">Куда</label>
+                    <input type="text" id="toAddress" required placeholder="Укажите адрес назначения">
+                </div>
+                <div class="form-group">
+                    <label for="orderTime">Время</label>
+                    <select id="orderTime" required>
+                        <option value="now">Сейчас</option>
+                        <option value="later">Указать время</option>
+                    </select>
+                </div>
+                <div class="form-group" id="specificTimeGroup" style="display: none;">
+                    <label for="specificTime">Точное время</label>
+                    <input type="datetime-local" id="specificTime">
+                </div>
+                <div class="form-group">
+                    <label for="paymentMethod">Способ оплаты</label>
+                    <select id="paymentMethod" required>
+                        <option value="cash">Наличными</option>
+                        <option value="KhujandCityBank">KhujandCityBank</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="comment">Комментарий (необязательно)</label>
+                    <textarea id="comment" placeholder="Детское кресло, животное и т.д."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Предварительная цена: <span id="pricePreview">0</span> сомони</label>
+                </div>
+                <button type="submit" class="btn">Заказать такси</button>
+            </form>
+        </div>
+
+        <!-- Информация о водителе -->
+        <div class="section hidden" id="driverInfoSection">
+            <h2 class="section-title">Ваш водитель</h2>
+            <div id="driverInfoContent"></div>
+        </div>
+
+        <!-- Админ-панель -->
+        <div class="section hidden" id="adminSection">
+            <h2 class="section-title">Админ-панель</h2>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="drivers">Водители</div>
+                <div class="tab" data-tab="orders">Заказы</div>
+                <div class="tab" data-tab="addDriver">Добавить водителя</div>
+            </div>
+            
+            <div class="tab-content active" id="driversTab">
+                <h3>Список водителей</h3>
+                <div id="driversList"></div>
+            </div>
+            
+            <div class="tab-content" id="ordersTab">
+                <h3>Активные заказы</h3>
+                <div id="ordersList"></div>
+            </div>
+            
+            <div class="tab-content" id="addDriverTab">
+                <h3>Добавить нового водителя</h3>
+                <form id="addDriverForm">
+                    <div class="form-group">
+                        <label for="driverName">Имя водителя</label>
+                        <input type="text" id="driverName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="driverPhone">Телефон</label>
+                        <input type="text" id="driverPhone" required placeholder="+992900000000">
+                    </div>
+                    <div class="form-group">
+                        <label for="driverTelegram">Telegram username</label>
+                        <input type="text" id="driverTelegram" required placeholder="@username">
+                    </div>
+                    <div class="form-group">
+                        <label for="carNumber">Номер машины</label>
+                        <input type="text" id="carNumber" required placeholder="2345TA01">
+                    </div>
+                    <div class="form-group">
+                        <label for="carColor">Цвет машины</label>
+                        <input type="text" id="carColor" required placeholder="белый">
+                    </div>
+                    <div class="form-group">
+                        <label for="carModel">Модель машины</label>
+                        <input type="text" id="carModel" required placeholder="Toyota Camry">
+                    </div>
+                    <div class="form-group">
+                        <label for="driverDescription">Характеристика</label>
+                        <textarea id="driverDescription" required placeholder="чистая, кондиционер"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Добавить водителя</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Форма входа -->
+        <div class="section hidden" id="loginSection">
+            <h2 class="section-title">Вход для администратора</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required value="doros@famd.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn">Войти</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEXAMPLEEXAMPLEEXAMPLE",
+            authDomain: "kctaxi-example.firebaseapp.com",
+            databaseURL: "https://kctaxi-example-default-rtdb.firebaseio.com",
+            projectId: "kctaxi-example",
+            storageBucket: "kctaxi-example.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef1234567890"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+        const firestore = firebase.firestore();
+
+        // DOM элементы
+        const orderForm = document.getElementById('orderForm');
+        const fromAddress = document.getElementById('fromAddress');
+        const toAddress = document.getElementById('toAddress');
+        const orderTime = document.getElementById('orderTime');
+        const specificTimeGroup = document.getElementById('specificTimeGroup');
+        const specificTime = document.getElementById('specificTime');
+        const paymentMethod = document.getElementById('paymentMethod');
+        const comment = document.getElementById('comment');
+        const pricePreview = document.getElementById('pricePreview');
+        const driverInfoSection = document.getElementById('driverInfoSection');
+        const driverInfoContent = document.getElementById('driverInfoContent');
+        const adminSection = document.getElementById('adminSection');
+        const loginSection = document.getElementById('loginSection');
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminBtn = document.getElementById('adminBtn');
+        const notification = document.getElementById('notification');
+        const driversList = document.getElementById('driversList');
+        const ordersList = document.getElementById('ordersList');
+        const addDriverForm = document.getElementById('addDriverForm');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Переменные состояния
+        let currentOrderId = null;
+        let currentUser = null;
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', () => {
+            // Слушатель изменения времени заказа
+            orderTime.addEventListener('change', (e) => {
+                if (e.target.value === 'later') {
+                    specificTimeGroup.style.display = 'block';
+                } else {
+                    specificTimeGroup.style.display = 'none';
+                }
+            });
+
+            // Слушатель изменения адресов для расчета цены
+            fromAddress.addEventListener('input', calculatePrice);
+            toAddress.addEventListener('input', calculatePrice);
+
+            // Форма заказа такси
+            orderForm.addEventListener('submit', handleOrderSubmit);
+
+            // Форма входа
+            loginForm.addEventListener('submit', handleLogin);
+
+            // Форма добавления водителя
+            addDriverForm.addEventListener('submit', handleAddDriver);
+
+            // Кнопка выхода
+            logoutBtn.addEventListener('click', handleLogout);
+
+            // Кнопка админ-панели
+            adminBtn.addEventListener('click', showAdminPanel);
+
+            // Переключение табов
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab') + 'Tab';
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Проверка состояния аутентификации
+            auth.onAuthStateChanged(user => {
+                currentUser = user;
+                if (user && user.email === 'doros@famd.com') {
+                    // Админ вошел
+                    loginBtn.classList.add('hidden');
+                    logoutBtn.classList.remove('hidden');
+                    adminBtn.classList.remove('hidden');
+                    loginSection.classList.add('hidden');
+                    
+                    // Загружаем данные для админа
+                    loadDrivers();
+                    loadOrders();
+                } else {
+                    // Не админ или не вошел
+                    loginBtn.classList.remove('hidden');
+                    logoutBtn.classList.add('hidden');
+                    adminBtn.classList.add('hidden');
+                    adminSection.classList.add('hidden');
+                }
+            });
+
+            // Проверяем, есть ли активный заказ
+            checkActiveOrder();
+        });
+
+        // Функции
+
+        function calculatePrice() {
+            // Простая логика расчета цены (3 сомони/км + 5 сомони за посадку)
+            // В реальном приложении здесь можно использовать API для расчета расстояния
+            if (fromAddress.value && toAddress.value) {
+                // Произвольная цена для демонстрации
+                const price = 5 + Math.floor(Math.random() * 30) + 10;
+                pricePreview.textContent = price;
+            } else {
+                pricePreview.textContent = '0';
+            }
+        }
+
+        function handleOrderSubmit(e) {
+            e.preventDefault();
+            
+            const from = fromAddress.value.trim();
+            const to = toAddress.value.trim();
+            const time = orderTime.value === 'now' ? 'now' : specificTime.value;
+            const payment = paymentMethod.value;
+            const commentText = comment.value.trim();
+            const price = parseInt(pricePreview.textContent) || 0;
+            
+            if (!from || !to) {
+                showNotification('Пожалуйста, укажите адреса отправления и назначения', 'error');
+                return;
+            }
+            
+            // Создаем заказ в Firebase
+            const newOrderRef = database.ref('orders').push();
+            const orderId = newOrderRef.key;
+            currentOrderId = orderId;
+            
+            const orderData = {
+                from,
+                to,
+                time,
+                payment,
+                comment: commentText,
+                price,
+                status: 'waiting',
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            newOrderRef.set(orderData)
+                .then(() => {
+                    // Также сохраняем в Firestore для истории
+                    firestore.collection('orderHistory').doc(orderId).set({
+                        ...orderData,
+                        createdAt: new Date()
+                    });
+                    
+                    showNotification('Ваш заказ принят! Ожидайте водителя', 'success');
+                    monitorOrderStatus(orderId);
+                })
+                .catch(error => {
+                    console.error('Error creating order:', error);
+                    showNotification('Ошибка при создании заказа', 'error');
+                });
+        }
+
+        function monitorOrderStatus(orderId) {
+            const orderRef = database.ref(`orders/${orderId}`);
+            
+            orderRef.on('value', (snapshot) => {
+                const order = snapshot.val();
+                if (!order) return;
+                
+                if (order.status === 'accepted' && order.acceptedBy) {
+                    // Заказ принят водителем
+                    showDriverInfo(order.acceptedBy);
+                } else if (order.status === 'canceled') {
+                    // Заказ отменен
+                    showNotification('Заказ отменен', 'error');
+                    orderRef.off(); // Отключаем слушатель
+                }
+            });
+        }
+
+        function showDriverInfo(driverId) {
+            database.ref(`drivers/${driverId}`).once('value')
+                .then(snapshot => {
+                    const driver = snapshot.val();
+                    if (driver) {
+                        driverInfoContent.innerHTML = `
+                            <div class="driver-card">
+                                <div class="driver-name">${driver.name}</div>
+                                <div class="driver-car">${driver.carColor} ${driver.carModel} (${driver.carNumber})</div>
+                                <div class="driver-description">${driver.description}</div>
+                                <div class="driver-phone">Телефон: ${driver.phone}</div>
+                            </div>
+                        `;
+                        driverInfoSection.classList.remove('hidden');
+                    }
+                });
+        }
+
+        function checkActiveOrder() {
+            // Проверяем, есть ли активный заказ для текущего пользователя
+            // В реальном приложении можно использовать localStorage или cookies
+            // Здесь просто скрываем/показываем секцию
+            driverInfoSection.classList.add('hidden');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    showNotification('Успешный вход', 'success');
+                    loginSection.classList.add('hidden');
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    showNotification('Ошибка входа: ' + error.message, 'error');
+                });
+        }
+
+        function handleLogout() {
+            auth.signOut()
+                .then(() => {
+                    showNotification('Вы вышли из системы', 'success');
+                    adminSection.classList.add('hidden');
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                });
+        }
+
+        function showAdminPanel() {
+            adminSection.classList.remove('hidden');
+            loginSection.classList.add('hidden');
+        }
+
+        function loadDrivers() {
+            database.ref('drivers').on('value', snapshot => {
+                driversList.innerHTML = '';
+                const drivers = snapshot.val() || {};
+                
+                Object.keys(drivers).forEach(driverId => {
+                    const driver = drivers[driverId];
+                    const driverElement = document.createElement('div');
+                    driverElement.className = 'driver-card';
+                    driverElement.innerHTML = `
+                        <div class="driver-name">${driver.name}</div>
+                        <div class="driver-car">${driver.carColor} ${driver.carModel} (${driver.carNumber})</div>
+                        <div class="driver-status ${driver.status === 'free' ? 'status-free' : 'status-busy'}">${driver.status === 'free' ? 'Свободен' : 'Занят'}</div>
+                        <div class="driver-phone">Телефон: ${driver.phone}</div>
+                        <div class="driver-telegram">Telegram: ${driver.telegram}</div>
+                        <button onclick="deleteDriver('${driverId}')" class="btn" style="margin-top: 10px; background-color: var(--danger);">Удалить</button>
+                    `;
+                    driversList.appendChild(driverElement);
+                });
+            });
+        }
+
+        function loadOrders() {
+            database.ref('orders').orderByChild('createdAt').limitToLast(50).on('value', snapshot => {
+                ordersList.innerHTML = '';
+                const orders = snapshot.val() || {};
+                
+                Object.keys(orders).forEach(orderId => {
+                    const order = orders[orderId];
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'order-card';
+                    
+                    let statusText = 'Ожидание';
+                    let statusClass = 'status-waiting';
+                    
+                    if (order.status === 'accepted') {
+                        statusText = 'Принят';
+                        statusClass = 'status-accepted';
+                    } else if (order.status === 'canceled') {
+                        statusText = 'Отменен';
+                        statusClass = 'status-canceled';
+                    }
+                    
+                    orderElement.innerHTML = `
+                        <div class="order-status ${statusClass}">${statusText}</div>
+                        <div class="order-from">Откуда: ${order.from}</div>
+                        <div class="order-to">Куда: ${order.to}</div>
+                        <div class="order-price">Цена: ${order.price} сомони</div>
+                        <div>Оплата: ${order.payment === 'cash' ? 'Наличными' : 'KhujandCityBank'}</div>
+                        ${order.comment ? `<div>Комментарий: ${order.comment}</div>` : ''}
+                    `;
+                    
+                    if (order.acceptedBy) {
+                        database.ref(`drivers/${order.acceptedBy}`).once('value', driverSnapshot => {
+                            const driver = driverSnapshot.val();
+                            if (driver) {
+                                const driverInfo = document.createElement('div');
+                                driverInfo.className = 'driver-info';
+                                driverInfo.innerHTML = `
+                                    <div>Водитель: ${driver.name}</div>
+                                    <div>Телефон: ${driver.phone}</div>
+                                    <div>Машина: ${driver.carColor} ${driver.carModel} (${driver.carNumber})</div>
+                                `;
+                                orderElement.appendChild(driverInfo);
+                            }
+                        });
+                    }
+                    
+                    ordersList.appendChild(orderElement);
+                });
+            });
+        }
+
+        function handleAddDriver(e) {
+            e.preventDefault();
+            
+            const driverData = {
+                name: document.getElementById('driverName').value.trim(),
+                phone: document.getElementById('driverPhone').value.trim(),
+                telegram: document.getElementById('driverTelegram').value.trim(),
+                carNumber: document.getElementById('carNumber').value.trim(),
+                carColor: document.getElementById('carColor').value.trim(),
+                carModel: document.getElementById('carModel').value.trim(),
+                description: document.getElementById('driverDescription').value.trim(),
+                status: 'free',
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            if (!driverData.name || !driverData.phone || !driverData.telegram || !driverData.carNumber) {
+                showNotification('Пожалуйста, заполните все обязательные поля', 'error');
+                return;
+            }
+            
+            const newDriverRef = database.ref('drivers').push();
+            newDriverRef.set(driverData)
+                .then(() => {
+                    showNotification('Водитель успешно добавлен', 'success');
+                    addDriverForm.reset();
+                    
+                    // Также сохраняем в Firestore
+                    firestore.collection('drivers').doc(newDriverRef.key).set({
+                        ...driverData,
+                        createdAt: new Date()
+                    });
+                })
+                .catch(error => {
+                    console.error('Error adding driver:', error);
+                    showNotification('Ошибка при добавлении водителя', 'error');
+                });
+        }
+
+        function deleteDriver(driverId) {
+            if (confirm('Вы уверены, что хотите удалить этого водителя?')) {
+                database.ref(`drivers/${driverId}`).remove()
+                    .then(() => {
+                        showNotification('Водитель удален', 'success');
+                        // Также удаляем из Firestore
+                        firestore.collection('drivers').doc(driverId).delete();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting driver:', error);
+                        showNotification('Ошибка при удалении водителя', 'error');
+                    });
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.style.backgroundColor = type === 'success' ? 'var(--success)' : 'var(--danger)';
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Глобальные функции для использования в onclick
+        window.deleteDriver = deleteDriver;
+    </script>
+</body>
+</html>
