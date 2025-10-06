@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCT - Панель водителя</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4D44DB;
+            --secondary: #6C63FF;
+            --success: #28A745;
+            --danger: #DC3545;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+        }
+        .order-card {
+            transition: all 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .badge-status {
+            font-size: 0.8rem;
+            padding: 0.35rem 0.6rem;
+        }
+        #map {
+            height: 400px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Шапка -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="fas fa-taxi text-primary"></i> Панель водителя KCT
+            </h1>
+            <div id="driverInfo"></div>
+        </div>
+
+        <!-- Текущий заказ -->
+        <div id="currentOrderContainer" class="card mb-4 border-success" style="display: none;">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Ваш текущий заказ</h5>
+            </div>
+            <div class="card-body">
+                <div id="currentOrderDetails"></div>
+                <div class="mt-3">
+                    <button id="completeOrderBtn" class="btn btn-success me-2">
+                        <i class="fas fa-flag-checkered me-1"></i>Завершить
+                    </button>
+                    <button id="cancelOrderBtn" class="btn btn-outline-danger">
+                        <i class="fas fa-times me-1"></i>Отменить
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список заказов -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Свободные заказы</h5>
+            </div>
+            <div class="card-body">
+                <div id="ordersList" class="list-group">
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Загрузка заказов...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Карта -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Карта</h5>
+            </div>
+            <div class="card-body p-0">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase и карты -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQGsoDWZ-Ddac17nPlKUf36mNkpzZEiQ",
+            authDomain: "drezzsw-af340.firebaseapp.com",
+            projectId: "drezzsw-af340",
+            storageBucket: "drezzsw-af340.appspot.com",
+            messagingSenderId: "444256467193",
+            appId: "1:444256467193:web:3286b00a6f057bae824a28"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Глобальные переменные
+        let map, currentOrder = null;
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initAuth();
+            initMap();
+        });
+
+        // Аутентификация
+        function initAuth() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    checkDriverRole(user.uid);
+                } else {
+                    showLoginModal();
+                }
+            });
+        }
+
+        // Проверка роли водителя
+        function checkDriverRole(uid) {
+            db.collection("drivers").doc(uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        showDriverInfo(doc.data());
+                        initRealTimeOrders();
+                        checkActiveOrder(uid);
+                    } else {
+                        auth.signOut();
+                        showError("Ваш профиль не найден в базе водителей");
+                    }
+                });
+        }
+
+        // Информация о водителе
+        function showDriverInfo(driver) {
+            document.getElementById("driverInfo").innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <strong>${driver.name}</strong>
+                        <div class="text-muted small">${driver.carModel}, ${driver.carNumber}</div>
+                    </div>
+                    <button id="logoutBtn" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            `;
+            document.getElementById("logoutBtn").addEventListener("click", () => auth.signOut());
+        }
+
+        // Инициализация карты
+        function initMap() {
+            map = L.map('map').setView([40.2833, 69.6333], 13); // Худжанд
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+        }
+
+        // Загрузка заказов в реальном времени
+        function initRealTimeOrders() {
+            db.collection("orders")
+                .where("status", "==", "new")
+                .orderBy("timestamp", "desc")
+                .onSnapshot(snapshot => {
+                    const ordersList = document.getElementById("ordersList");
+                    
+                    if (snapshot.empty) {
+                        ordersList.innerHTML = '<div class="text-center py-4 text-muted">Нет доступных заказов</div>';
+                        return;
+                    }
+
+                    ordersList.innerHTML = "";
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        ordersList.appendChild(createOrderCard(order, doc.id));
+                    });
+                });
+        }
+
+        // Создание карточки заказа
+        function createOrderCard(order, orderId) {
+            const card = document.createElement("div");
+            card.className = "list-group-item order-card mb-2";
+            card.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 class="mb-1">Заказ #${orderId.substring(0, 8)}</h6>
+                        <small class="text-muted">
+                            ${new Date(order.timestamp?.toDate()).toLocaleString()}
+                        </small>
+                    </div>
+                    <span class="badge bg-primary badge-status">${order.price} сомони</span>
+                </div>
+                <div class="mb-2">
+                    <p class="mb-1"><i class="fas fa-map-marker-alt text-danger me-2"></i>${order.fromAddress}</p>
+                    <p class="mb-1"><i class="fas fa-flag-checkered text-success me-2"></i>${order.toAddress}</p>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small><i class="fas fa-road me-1"></i>${order.distance} км</small>
+                    <button class="btn btn-sm btn-primary accept-order-btn">
+                        <i class="fas fa-check me-1"></i>Принять
+                    </button>
+                </div>
+            `;
+
+            card.querySelector(".accept-order-btn").addEventListener("click", () => {
+                acceptOrder(orderId);
+            });
+
+            return card;
+        }
+
+        // Принятие заказа
+        function acceptOrder(orderId) {
+            const driverId = auth.currentUser.uid;
+            
+            db.collection("drivers").doc(driverId).get()
+                .then(driverDoc => {
+                    const driver = driverDoc.data();
+                    
+                    return db.collection("orders").doc(orderId).update({
+                        status: "accepted",
+                        driverId: driverId,
+                        driverName: driver.name,
+                        driverPhone: driver.phone,
+                        carModel: driver.carModel,
+                        carNumber: driver.carNumber,
+                        acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    showSuccess("Заказ принят!");
+                })
+                .catch(error => {
+                    showError("Ошибка: " + error.message);
+                });
+        }
+
+        // Проверка активного заказа
+        function checkActiveOrder(driverId) {
+            db.collection("orders")
+                .where("driverId", "==", driverId)
+                .where("status", "==", "accepted")
+                .limit(1)
+                .onSnapshot(snapshot => {
+                    if (!snapshot.empty) {
+                        const doc = snapshot.docs[0];
+                        currentOrder = {id: doc.id, ...doc.data()};
+                        showCurrentOrder(currentOrder);
+                    }
+                });
+        }
+
+        // Отображение текущего заказа
+        function showCurrentOrder(order) {
+            const container = document.getElementById("currentOrderContainer");
+            const details = document.getElementById("currentOrderDetails");
+            
+            details.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-user me-2"></i>Клиент</h6>
+                        <p>${order.clientName}<br>
+                        <small class="text-muted">${order.clientPhone}</small></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-car me-2"></i>Маршрут</h6>
+                        <p><i class="fas fa-map-marker-alt text-danger me-2"></i>${order.fromAddress}</p>
+                        <p><i class="fas fa-flag-checkered text-success me-2"></i>${order.toAddress}</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p><i class="fas fa-money-bill-wave me-2"></i> <strong>${order.price} сомони</strong></p>
+                    ${order.comment ? `<p><i class="fas fa-comment me-2"></i>${order.comment}</p>` : ''}
+                </div>
+            `;
+            
+            document.getElementById("completeOrderBtn").onclick = () => completeOrder(order.id);
+            document.getElementById("cancelOrderBtn").onclick = () => cancelOrder(order.id);
+            
+            container.style.display = "block";
+            updateMapRoute(order);
+        }
+
+        // Обновление маршрута на карте
+        function updateMapRoute(order) {
+            if (map.routeControl) {
+                map.removeControl(map.routeControl);
+            }
+            
+            const fromCoords = order.fromCoords.split(",").map(Number);
+            const toCoords = order.toCoords.split(",").map(Number);
+            
+            map.routeControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(fromCoords[0], fromCoords[1]),
+                    L.latLng(toCoords[0], toCoords[1])
+                ],
+                routeWhileDragging: true,
+                show: false,
+                lineOptions: {styles: [{color: '#4D44DB', opacity: 0.7, weight: 5}]}
+            }).addTo(map);
+            
+            map.fitBounds([
+                [fromCoords[0], fromCoords[1]],
+                [toCoords[0], toCoords[1]]
+            ]);
+        }
+
+        // Завершение заказа
+        function completeOrder(orderId) {
+            db.collection("orders").doc(orderId).update({
+                status: "completed",
+                completedAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                currentOrder = null;
+                document.getElementById("currentOrderContainer").style.display = "none";
+                showSuccess("Заказ завершен!");
+            });
+        }
+
+        // Отмена заказа
+        function cancelOrder(orderId) {
+            if (confirm("Вы уверены, что хотите отменить заказ?")) {
+                db.collection("orders").doc(orderId).update({
+                    status: "new",
+                    driverId: null,
+                    driverName: null,
+                    carModel: null,
+                    carNumber: null
+                })
+                .then(() => {
+                    currentOrder = null;
+                    document.getElementById("currentOrderContainer").style.display = "none";
+                    showSuccess("Заказ отменен");
+                });
+            }
+        }
+
+        // Модальное окно входа
+        function showLoginModal() {
+            document.body.innerHTML = `
+                <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+                    <div class="card" style="width: 400px;">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Вход для водителей</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" id="email" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Пароль</label>
+                                    <input type="password" id="password" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Войти
+                                </button>
+                            </form>
+                            <div class="mt-3 text-center text-muted small">
+                                Для регистрации пишите @dorosfamd
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById("loginForm").addEventListener("submit", function(e) {
+                e.preventDefault();
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+                
+                auth.signInWithEmailAndPassword(email, password)
+                    .catch(error => {
+                        showError("Ошибка входа: " + error.message);
+                    });
+            });
+        }
+
+        // Уведомления
+        function showSuccess(message) {
+            alert(message); // В реальном проекте заменить на красивый toast
+        }
+
+        function showError(message) {
+            alert(message); // В реальном проекте заменить на красивый toast
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KhujandCityTaxi</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        .auth-section, .client-section, .driver-section, .admin-section {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        select,
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .logout-button {
+            background-color: #dc3545;
+        }
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+        #map {
+            height: 300px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .order-item {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .user-item {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Added for responsiveness */
+        }
+        .user-item > div {
+            margin-top: 5px;
+        }
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #e2e3e5;
+            color: #383d41;
+            display: none;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        .price-info {
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #eaf6ff;
+            border-left: 3px solid #007bff;
+            border-radius: 4px;
+        }
+        .driver-accepted-order-details {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #007bff;
+            border-radius: 8px;
+            background-color: #eaf6ff;
+        }
+        .client-order-status {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+        }
+        .waiting-timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KhujandCityTaxi</h1>
+        <button id="logoutBtn" class="logout-button" style="display: none; float: right;">Выйти</button>
+        <div style="clear: both;"></div>
+
+        <div id="authSection" class="auth-section">
+            <h2>Вход / Регистрация</h2>
+            <input type="email" id="authEmail" placeholder="Email">
+            <input type="password" id="authPassword" placeholder="Пароль">
+            <button id="loginBtn">Войти</button>
+            <button id="registerBtn">Зарегистрироваться</button>
+            <div id="authMessage" class="message"></div>
+        </div>
+
+        <div id="clientSection" class="client-section">
+            <h2>Заказать такси</h2>
+            <form id="orderForm">
+                <label for="fromAddress">Откуда:</label>
+                <input type="text" id="fromAddress" required placeholder="Начните вводить адрес или выберите на карте">
+                <label for="toAddress">Куда (необязательно):</label>
+                <input type="text" id="toAddress" placeholder="Начните вводить адрес или выберите на карте">
+
+                <div id="map"></div>
+
+                <div class="price-info" id="priceInfo">
+                    Приблизительная стоимость: 0 сомони
+                </div>
+
+                <label for="tariff">Тариф:</label>
+                <select id="tariff">
+                    <option value="Эконом">Эконом</option>
+                    <option value="Комфорт">Комфорт</option>
+                    <option value="Бизнес">Бизнес</option>
+                    <option value="Для 6">Для 6</option>
+                    <option value="Доставка">Доставка</option>
+                </select>
+
+                <label for="wishes">Пожелания:</label>
+                <textarea id="wishes" rows="3" placeholder="Дополнительные пожелания к поездке"></textarea>
+
+                <input type="checkbox" id="airConditioner">
+                <label for="airConditioner">С кондиционером? (+1 сомони)</label><br>
+
+                <label for="paymentMethod">Способ оплаты:</label>
+                <select id="paymentMethod">
+                    <option value="Наличными">Наличными</option>
+                    <option value="KhujandCityBank">KhujandCityBank</option>
+                    <option value="Карта">Карта</option>
+                </select><br>
+
+                <label for="timeOption">Время:</label>
+                <input type="radio" id="timeNow" name="timeOption" value="Сейчас" checked>
+                <label for="timeNow">Сейчас</label>
+                <input type="radio" id="timeLater" name="timeOption" value="Выбрать время">
+                <label for="timeLater">Выбрать время</label><br>
+                <input type="datetime-local" id="desiredTime" style="display: none;"><br>
+
+                <label for="tips">Чаевые (от 1 сомони):</label>
+                <input type="number" id="tips" min="1" value="0"><br>
+
+                <input type="checkbox" id="meetingSign">
+                <label for="meetingSign">Встреча с табличкой? (+4 сомони)</label><br>
+
+                <input type="checkbox" id="withChildren">
+                <label for="withChildren">С детьми?</label><br>
+
+                <label for="clientPhone">Телефон клиента:</label>
+                <input type="text" id="clientPhone" required placeholder="+992 (ХХ) ХХХ-ХХ-ХХ">
+
+                <button type="submit">Заказать такси</button>
+            </form>
+            <div id="clientMessage" class="message"></div>
+            <div id="clientOrderStatus" class="client-order-status" style="display:none;"></div>
+        </div>
+
+        <div id="driverSection" class="driver-section">
+            <h2>Активные заказы</h2>
+            <div id="activeOrdersList">
+                </div>
+            <div id="driverAcceptedOrderDetails" class="driver-accepted-order-details" style="display:none;">
+                <h3>Принятый заказ</h3>
+                <p><b>Откуда:</b> <span id="acceptedFrom"></span></p>
+                <p><b>Куда:</b> <span id="acceptedTo"></span></p>
+                <p><b>Пожелания:</b> <span id="acceptedWishes"></span></p>
+                <p><b>Итоговая цена:</b> <span id="acceptedPrice"></span> сомони</p>
+                <div class="waiting-timer">Ожидание: <span id="waitingTime">00:00</span> (+<span id="waitingCost">0</span> сомони)</div>
+                <button id="startWaitingTimeBtn">Начать ожидание</button>
+                <button id="stopWaitingTimeBtn" style="display:none;">Остановить ожидание</button>
+                <button id="completeOrderBtn">Завершить заказ</button>
+            </div>
+            <div id="driverMessage" class="message"></div>
+        </div>
+
+        <div id="adminSection" class="admin-section">
+            <h2>Панель администратора - Управление пользователями</h2>
+            <input type="text" id="userSearch" placeholder="Поиск по Email">
+            <button id="searchUsersBtn">Поиск</button>
+            <div id="userList">
+                </div>
+            <div id="adminMessage" class="message"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQGsoDWZ-Ddac17nPlKUf36mNkpzZEiQ",
+            authDomain: "drezzsw-af340.firebaseapp.com",
+            databaseURL: "https://drezzsw-af340-default-rtdb.firebaseio.com",
+            projectId: "drezzsw-af340",
+            storageBucket: "drezzsw-af340.firebasestorage.app",
+            messagingSenderId: "444256467193",
+            appId: "1:444256467193:web:3286b00a6f057bae824a28",
+            measurementId: "G-BHSSH8KNXX"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Telegram Bot API configuration
+        const TELEGRAM_BOT_TOKEN = '8233984213:AAE7gKUQRMeacw2X95lRSLrhUYPM-WnjVzg';
+        const TELEGRAM_CHAT_ID = '-1002861984015'; // Public channel chat_id
+
+        // Admin email
+        const ADMIN_EMAIL = 'KC@taxi.com'; // Admin's email
+
+        // UI Elements
+        const authSection = document.getElementById('authSection');
+        const clientSection = document.getElementById('clientSection');
+        const driverSection = document.getElementById('driverSection');
+        const adminSection = document.getElementById('adminSection');
+
+        const authEmailInput = document.getElementById('authEmail');
+        const authPasswordInput = document.getElementById('authPassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const authMessageDiv = document.getElementById('authMessage');
+
+        const orderForm = document.getElementById('orderForm');
+        const fromAddressInput = document.getElementById('fromAddress');
+        const toAddressInput = document.getElementById('toAddress');
+        const tariffSelect = document.getElementById('tariff');
+        const wishesTextarea = document.getElementById('wishes');
+        const airConditionerCheckbox = document.getElementById('airConditioner');
+        const paymentMethodSelect = document.getElementById('paymentMethod');
+        const timeNowRadio = document.getElementById('timeNow');
+        const timeLaterRadio = document.getElementById('timeLater');
+        const desiredTimeInput = document.getElementById('desiredTime');
+        const tipsInput = document.getElementById('tips');
+        const meetingSignCheckbox = document.getElementById('meetingSign');
+        const withChildrenCheckbox = document.getElementById('withChildren');
+        const clientPhoneInput = document.getElementById('clientPhone');
+        const clientMessageDiv = document.getElementById('clientMessage');
+        const priceInfoDiv = document.getElementById('priceInfo');
+        const clientOrderStatusDiv = document.getElementById('clientOrderStatus');
+
+
+        const activeOrdersListDiv = document.getElementById('activeOrdersList');
+        const driverAcceptedOrderDetailsDiv = document.getElementById('driverAcceptedOrderDetails');
+        const acceptedFromSpan = document.getElementById('acceptedFrom');
+        const acceptedToSpan = document.getElementById('acceptedTo');
+        const acceptedWishesSpan = document.getElementById('acceptedWishes');
+        const acceptedPriceSpan = document.getElementById('acceptedPrice');
+        const waitingTimeSpan = document.getElementById('waitingTime');
+        const waitingCostSpan = document.getElementById('waitingCost');
+        const startWaitingTimeBtn = document.getElementById('startWaitingTimeBtn');
+        const stopWaitingTimeBtn = document.getElementById('stopWaitingTimeBtn');
+        const completeOrderBtn = document.getElementById('completeOrderBtn');
+        const driverMessageDiv = document.getElementById('driverMessage');
+
+        const userSearchInput = document.getElementById('userSearch');
+        const searchUsersBtn = document.getElementById('searchUsersBtn');
+        const userListDiv = document.getElementById('userList');
+        const adminMessageDiv = document.getElementById('adminMessage');
+
+        let map, fromMarker, toMarker;
+        let fromLatLng = null;
+        let toLatLng = null;
+        let userRole = 'client'; // Default role
+        let currentUserId = null;
+        let currentClientOrderId = null; // To track the client's active order
+        let driverAcceptedOrderId = null; // To track the driver's accepted order
+        let waitingTimerInterval = null;
+        let totalWaitingTimeSeconds = 0;
+        let baseOrderPrice = 0; // Base price for the driver's accepted order
+
+        // --- Map Initialization ---
+        function initMap() {
+            if (map) { // Destroy existing map instance if it exists
+                map.remove();
+            }
+            map = L.map('map').setView([39.9015, 69.6200], 13); // Centered on Khujand
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            fromMarker = null;
+            toMarker = null;
+            fromLatLng = null;
+            toLatLng = null;
+            updatePriceInfo(); // Reset price info
+
+            map.on('click', async function(e) {
+                if (!fromMarker) {
+                    fromMarker = L.marker(e.latlng).addTo(map)
+                        .bindPopup('Откуда').openPopup();
+                    fromLatLng = e.latlng;
+                    await reverseGeocode(e.latlng, 'from');
+                } else if (!toMarker) {
+                    toMarker = L.marker(e.latlng).addTo(map)
+                        .bindPopup('Куда').openPopup();
+                    toLatLng = e.latlng;
+                    await reverseGeocode(e.latlng, 'to');
+                } else {
+                    // If both are set, clear 'to' and set 'from' to new click
+                    map.removeLayer(toMarker);
+                    toMarker = null;
+                    toLatLng = null;
+
+                    fromMarker.setLatLng(e.latlng);
+                    fromMarker.bindPopup('Откуда').openPopup();
+                    fromLatLng = e.latlng;
+                    await reverseGeocode(e.latlng, 'from');
+                }
+                updatePriceInfo();
+            });
+        }
+
+        // Reverse Geocoding using OpenStreetMap Nominatim
+        async function reverseGeocode(latlng, type) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&zoom=18&addressdetails=1`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const address = data.display_name || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`;
+                if (type === 'from') {
+                    fromAddressInput.value = address;
+                } else {
+                    toAddressInput.value = address;
+                }
+            } catch (error) {
+                console.error('Error during reverse geocoding:', error);
+                if (type === 'from') {
+                    fromAddressInput.value = `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`;
+                } else {
+                    toAddressInput.value = `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`;
+                }
+            }
+        }
+
+        // Forward Geocoding (for input fields)
+        async function forwardGeocode(address, type) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.length > 0) {
+                    const latlng = L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
+                    if (type === 'from') {
+                        if (fromMarker) map.removeLayer(fromMarker);
+                        fromMarker = L.marker(latlng).addTo(map)
+                            .bindPopup('Откуда').openPopup();
+                        fromLatLng = latlng;
+                        map.setView(latlng, 13);
+                    } else {
+                        if (toMarker) map.removeLayer(toMarker);
+                        toMarker = L.marker(latlng).addTo(map)
+                            .bindPopup('Куда').openPopup();
+                        toLatLng = latlng;
+                        map.setView(latlng, 13);
+                    }
+                    updatePriceInfo();
+                }
+            } catch (error) {
+                console.error('Error during forward geocoding:', error);
+            }
+        }
+
+        // Event listeners for address inputs to update map
+        fromAddressInput.addEventListener('change', () => forwardGeocode(fromAddressInput.value, 'from'));
+        toAddressInput.addEventListener('change', () => forwardGeocode(toAddressInput.value, 'to'));
+
+        // Price calculation logic
+        function calculatePrice() {
+            let price = 0;
+            let distanceKm = 0;
+
+            if (fromLatLng && toLatLng) {
+                // Leaflet's distanceTo gives distance in meters
+                distanceKm = fromLatLng.distanceTo(toLatLng) / 1000;
+            } else if (fromLatLng && !toLatLng) {
+                // If only 'from' is set, assume it's a short ride or pickup price
+                // For simplicity, let's say minimum price if no destination
+                distanceKm = 0; // Or a small default distance
+            }
+
+            const baseKm = 4;
+            const basePrice = 10; // Сомони
+            const pricePerExtraKm = 2.5; // Сомони
+
+            if (distanceKm <= baseKm) {
+                price = basePrice;
+            } else {
+                price = basePrice + (distanceKm - baseKm) * pricePerExtraKm;
+            }
+
+            // Add extra charges
+            if (airConditionerCheckbox.checked) {
+                price += 1; // +1 сомони за кондиционер
+            }
+            if (meetingSignCheckbox.checked) {
+                price += 4; // +4 сомони за встречу с табличкой
+            }
+            price += parseInt(tipsInput.value) || 0; // Добавить чаевые
+
+            return price.toFixed(2); // Округляем до двух знаков после запятой
+        }
+
+        function updatePriceInfo() {
+            const calculatedPrice = calculatePrice();
+            priceInfoDiv.textContent = `Приблизительная стоимость: ${calculatedPrice} сомони`;
+        }
+
+        // Update price on input changes
+        tariffSelect.addEventListener('change', updatePriceInfo);
+        airConditionerCheckbox.addEventListener('change', updatePriceInfo);
+        meetingSignCheckbox.addEventListener('change', updatePriceInfo);
+        tipsInput.addEventListener('input', updatePriceInfo);
+
+
+        // --- Firebase Authentication ---
+        loginBtn.addEventListener('click', async () => {
+            const email = authEmailInput.value;
+            const password = authPasswordInput.value;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showMessage(authMessageDiv, 'Авторизация успешна!', 'success');
+            } catch (error) {
+                showMessage(authMessageDiv, `Ошибка входа: ${error.message}`, 'error');
+            }
+        });
+
+        registerBtn.addEventListener('click', async () => {
+            const email = authEmailInput.value;
+            const password = authPasswordInput.value;
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    email: email,
+                    role: 'client', // Default role
+                    carModel: null, // Default for client
+                    carPlate: null  // Default for client
+                });
+                showMessage(authMessageDiv, 'Регистрация успешна!', 'success');
+            } catch (error) {
+                showMessage(authMessageDiv, `Ошибка регистрации: ${error.message}`, 'error');
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await auth.signOut();
+            showMessage(authMessageDiv, 'Вы вышли из системы.', 'success');
+            renderUI(null); // Reset UI
+            if (map) { // Destroy map on logout
+                map.remove();
+                map = null;
+            }
+        });
+
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    userRole = userDoc.data().role;
+                } else {
+                    // Create user document if it doesn't exist (e.g., old users without role)
+                    userRole = 'client';
+                    await db.collection('users').doc(user.uid).set({
+                        email: user.email,
+                        role: userRole,
+                        carModel: null,
+                        carPlate: null
+                    });
+                }
+                renderUI(userRole);
+            } else {
+                currentUserId = null;
+                userRole = 'client'; // Reset to default
+                renderUI(null);
+            }
+        });
+
+        // --- UI Rendering based on Role ---
+        function renderUI(role) {
+            authSection.style.display = 'none';
+            clientSection.style.display = 'none';
+            driverSection.style.display = 'none';
+            adminSection.style.display = 'none';
+            logoutBtn.style.display = 'none';
+            hideMessage(authMessageDiv);
+            hideMessage(clientMessageDiv);
+            hideMessage(driverMessageDiv);
+            hideMessage(adminMessageDiv);
+            clientOrderStatusDiv.style.display = 'none'; // Hide client status by default
+
+            if (map) { // Always destroy map when changing UI sections to prevent issues
+                map.remove();
+                map = null;
+            }
+
+            if (role) {
+                logoutBtn.style.display = 'block';
+                initMap(); // Initialize map for logged in users
+
+                if (role === 'client') {
+                    clientSection.style.display = 'block';
+                    listenForClientOrderStatus(); // Start listening for order updates
+                } else if (role === 'driver') {
+                    driverSection.style.display = 'block';
+                    loadDriverOrders();
+                } else if (role === 'admin') {
+                    adminSection.style.display = 'block';
+                    loadAdminUsers();
+                }
+            } else {
+                // Not logged in, show only auth section
+                authSection.style.display = 'block';
+            }
+        }
+
+        // --- Client Section Logic (Order Form) ---
+        timeLaterRadio.addEventListener('change', () => {
+            desiredTimeInput.style.display = timeLaterRadio.checked ? 'block' : 'none';
+        });
+
+        orderForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const from = fromAddressInput.value.trim();
+            if (!from || !fromLatLng) {
+                showMessage(clientMessageDiv, 'Пожалуйста, укажите адрес "Откуда" на карте.', 'error');
+                return;
+            }
+
+            const calculatedPrice = calculatePrice(); // Final price at the time of order
+            baseOrderPrice = parseFloat(calculatedPrice); // Store for driver UI
+
+
+            const order = {
+                from: from,
+                fromLat: fromLatLng.lat,
+                fromLng: fromLatLng.lng,
+                to: toAddressInput.value.trim(),
+                toLat: toLatLng ? toLatLng.lat : null,
+                toLng: toLatLng ? toLatLng.lng : null,
+                tariff: tariffSelect.value,
+                wishes: wishesTextarea.value.trim(),
+                airConditioner: airConditionerCheckbox.checked,
+                paymentMethod: paymentMethodSelect.value,
+                time: timeNowRadio.checked ? 'Сейчас' : desiredTimeInput.value,
+                tips: parseInt(tipsInput.value) || 0,
+                meetingSign: meetingSignCheckbox.checked,
+                withChildren: withChildrenCheckbox.checked,
+                clientPhone: clientPhoneInput.value.trim(),
+                status: 'pending', // pending, accepted, completed, cancelled
+                clientId: currentUserId,
+                initialPrice: baseOrderPrice, // Store the calculated price
+                currentPrice: baseOrderPrice, // Current price, might change with waiting
+                waitingTimeSeconds: 0,
+                driverId: null,
+                driverEmail: null,
+                driverCarModel: null,
+                driverCarPlate: null,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                const docRef = await db.collection('orders').add(order);
+                currentClientOrderId = docRef.id; // Store order ID for client to listen
+                await sendOrderToTelegram(order, docRef.id);
+                showMessage(clientMessageDiv, 'Ваш заказ успешно отправлен! Ожидайте водителя.', 'success');
+                orderForm.reset();
+                desiredTimeInput.style.display = 'none'; // Hide datetime input after reset
+                if (fromMarker) { map.removeLayer(fromMarker); fromMarker = null; fromLatLng = null;}
+                if (toMarker) { map.removeLayer(toMarker); toMarker = null; toLatLng = null;}
+                updatePriceInfo(); // Reset price display
+            } catch (error) {
+                console.error('Error submitting order:', error);
+                showMessage(clientMessageDiv, `Ошибка при отправке заказа: ${error.message}`, 'error');
+            }
+        });
+
+        async function sendOrderToTelegram(order, orderId) {
+            let message = `<b>Новый заказ такси KhujandCityTaxi</b>\n\n`;
+            message += `<b>Откуда:</b> ${order.from}\n`;
+            if (order.to) message += `<b>Куда:</b> ${order.to}\n`;
+            message += `<b>Тариф:</b> ${order.tariff}\n`;
+            if (order.wishes) message += `<b>Пожелания:</b> ${order.wishes}\n`;
+            if (order.airConditioner) message += `<b>С кондиционером:</b> Да (+1 сомони)\n`;
+            message += `<b>Оплата:</b> ${order.paymentMethod}\n`;
+            message += `<b>Время:</b> ${order.time}\n`;
+            if (order.tips > 0) message += `<b>Чаевые:</b> ${order.tips} сомони\n`;
+            if (order.meetingSign) message += `<b>Встреча с табличкой:</b> Да (+4 сомони)\n`;
+            if (order.withChildren) message += `<b>С детьми:</b> Да\n`;
+            message += `<b>Телефон клиента:</b> ${order.clientPhone}\n\n`;
+            message += `<b>Приблизительная цена:</b> ${order.initialPrice} сомони\n`;
+            message += `ID заказа: ${orderId}\n`;
+
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            const params = new URLSearchParams({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            });
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                const data = await response.json();
+                if (!data.ok) {
+                    console.error('Error sending to Telegram:', data.description);
+                    throw new Error(`Telegram API error: ${data.description}`);
+                }
+            } catch (error) {
+                console.error('Failed to send order to Telegram:', error);
+                throw error; // Re-throw to be caught by the orderForm submit handler
+            }
+        }
+
+        // Listen for client order status updates
+        function listenForClientOrderStatus() {
+            if (!currentUserId) return;
+
+            db.collection('orders')
+                .where('clientId', '==', currentUserId)
+                .where('status', 'in', ['pending', 'accepted']) // Listen for pending or accepted orders
+                .orderBy('createdAt', 'desc')
+                .limit(1) // Get the latest active order
+                .onSnapshot(snapshot => {
+                    if (!snapshot.empty) {
+                        const orderDoc = snapshot.docs[0];
+                        const order = orderDoc.data();
+                        currentClientOrderId = orderDoc.id; // Update current client order ID
+
+                        let statusMessage = `Ваш текущий заказ (ID: ${orderDoc.id}): <br>`;
+                        statusMessage += `Статус: <b>${order.status === 'pending' ? 'Ожидает водителя' : 'Принят водителем'}</b><br>`;
+                        if (order.status === 'accepted' && order.driverEmail) {
+                            statusMessage += `Водитель: <b>${order.driverEmail}</b><br>`;
+                            if (order.driverCarModel) statusMessage += `Машина: <b>${order.driverCarModel}</b><br>`;
+                            if (order.driverCarPlate) statusMessage += `Гос. номер: <b>${order.driverCarPlate}</b><br>`;
+                            statusMessage += `Приблизительная цена: <b>${order.initialPrice} сомони</b><br>`;
+                            if (order.waitingTimeSeconds > 0) {
+                                const minutes = Math.floor(order.waitingTimeSeconds / 60);
+                                const seconds = order.waitingTimeSeconds % 60;
+                                const waitingCost = (order.waitingTimeSeconds / 60 * 0.5).toFixed(2);
+                                statusMessage += `Время ожидания: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} (+${waitingCost} сомони)<br>`;
+                                statusMessage += `Итоговая цена: <b>${order.currentPrice} сомони</b><br>`;
+                            }
+                        }
+                        clientOrderStatusDiv.innerHTML = statusMessage;
+                        clientOrderStatusDiv.style.display = 'block';
+                    } else {
+                        clientOrderStatusDiv.style.display = 'none'; // No active orders
+                    }
+                }, error => {
+                    console.error("Error listening for client orders:", error);
+                });
+        }
+
+
+        // --- Driver Section Logic ---
+        function loadDriverOrders() {
+            // Hide driver accepted order details when loading new orders list
+            driverAcceptedOrderDetailsDiv.style.display = 'none';
+            // Stop any active waiting timer
+            clearInterval(waitingTimerInterval);
+            waitingTimerInterval = null;
+            totalWaitingTimeSeconds = 0;
+            waitingTimeSpan.textContent = '00:00';
+            waitingCostSpan.textContent = '0';
+
+            db.collection('orders')
+                .where('status', '==', 'pending')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    activeOrdersListDiv.innerHTML = '';
+                    if (snapshot.empty) {
+                        activeOrdersListDiv.innerHTML = '<p>Нет активных заказов.</p>';
+                        return;
+                    }
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderItem = document.createElement('div');
+                        orderItem.className = 'order-item';
+                        orderItem.innerHTML = `
+                            <p><b>Откуда:</b> ${order.from}</p>
+                            ${order.to ? `<p><b>Куда:</b> ${order.to}</p>` : ''}
+                            <p><b>Тариф:</b> ${order.tariff}</p>
+                            ${order.wishes ? `<p><b>Пожелания:</b> ${order.wishes}</p>` : ''}
+                            ${order.airConditioner ? `<p><b>С кондиционером:</b> Да</p>` : ''}
+                            <p><b>Оплата:</b> ${order.paymentMethod}</p>
+                            <p><b>Время:</b> ${order.time}</p>
+                            ${order.tips > 0 ? `<p><b>Чаевые:</b> ${order.tips} сомони</p>` : ''}
+                            ${order.meetingSign ? `<p><b>Встреча с табличкой:</b> Да</p>` : ''}
+                            ${order.withChildren ? `<p><b>С детьми:</b> Да</p>` : ''}
+                            <p><b>Телефон клиента:</b> ${order.clientPhone}</p>
+                            <p><b>Приблизительная цена:</b> ${order.initialPrice} сомони</p>
+                            <button data-id="${doc.id}" class="accept-order-btn">Принять</button>
+                        `;
+                        activeOrdersListDiv.appendChild(orderItem);
+                    });
+                    addAcceptOrderListeners();
+                }, error => {
+                    console.error("Error fetching driver orders:", error);
+                    showMessage(driverMessageDiv, `Ошибка загрузки заказов: ${error.message}`, 'error');
+                });
+
+            // Also listen for the driver's own accepted order
+            db.collection('orders')
+                .where('driverId', '==', currentUserId)
+                .where('status', '==', 'accepted')
+                .limit(1)
+                .onSnapshot(snapshot => {
+                    if (!snapshot.empty) {
+                        const orderDoc = snapshot.docs[0];
+                        const order = orderDoc.data();
+                        driverAcceptedOrderId = orderDoc.id; // Store accepted order ID
+                        showDriverAcceptedOrder(order);
+                    } else {
+                        driverAcceptedOrderDetailsDiv.style.display = 'none';
+                        // If no accepted order, ensure we are listening for new pending orders
+                        loadDriverOrders();
+                    }
+                }, error => {
+                    console.error("Error listening for driver's accepted orders:", error);
+                });
+        }
+
+        function addAcceptOrderListeners() {
+            document.querySelectorAll('.accept-order-btn').forEach(button => {
+                button.onclick = async (e) => {
+                    const orderId = e.target.dataset.id;
+                    try {
+                        await db.runTransaction(async (transaction) => {
+                            const orderRef = db.collection('orders').doc(orderId);
+                            const orderDoc = await transaction.get(orderRef);
+
+                            if (!orderDoc.exists) {
+                                throw new Error("Заказ не найден!");
+                            }
+
+                            if (orderDoc.data().status !== 'pending') {
+                                throw new Error("Этот заказ уже принят или отменен.");
+                            }
+
+                            // Get driver's car info
+                            const driverDoc = await db.collection('users').doc(currentUserId).get();
+                            const driverData = driverDoc.data();
+
+                            transaction.update(orderRef, {
+                                status: 'accepted',
+                                driverId: currentUserId,
+                                driverEmail: auth.currentUser.email,
+                                driverCarModel: driverData.carModel || 'Не указана',
+                                driverCarPlate: driverData.carPlate || 'Не указан',
+                                acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        });
+                        showMessage(driverMessageDiv, `Заказ ${orderId} успешно принят!`, 'success');
+                        // UI will be updated by the onSnapshot listener for accepted orders
+                    } catch (error) {
+                        console.error('Error accepting order:', error);
+                        showMessage(driverMessageDiv, `Ошибка принятия заказа: ${error.message}`, 'error');
+                    }
+                };
+            });
+        }
+
+        function showDriverAcceptedOrder(order) {
+            activeOrdersListDiv.innerHTML = ''; // Clear pending orders list
+            driverAcceptedOrderDetailsDiv.style.display = 'block';
+
+            acceptedFromSpan.textContent = order.from;
+            acceptedToSpan.textContent = order.to || 'Не указано';
+            acceptedWishesSpan.textContent = order.wishes || 'Нет пожеланий';
+            acceptedPriceSpan.textContent = order.currentPrice.toFixed(2); // Show current price
+
+            totalWaitingTimeSeconds = order.waitingTimeSeconds || 0;
+            updateWaitingTimeDisplay();
+
+            startWaitingTimeBtn.style.display = 'inline-block';
+            stopWaitingTimeBtn.style.display = 'none';
+            clearInterval(waitingTimerInterval); // Clear any old timer
+
+            if (order.status === 'accepted') { // Re-evaluate if timer was running
+                 if (order.waitingStartTime && !order.waitingEndTime) { // If timer was running and not stopped
+                    startWaitingTimeBtn.style.display = 'none';
+                    stopWaitingTimeBtn.style.display = 'inline-block';
+                    startWaitingTimer(order.waitingStartTime);
+                }
+            }
+        }
+
+        // Waiting Timer Logic
+        startWaitingTimeBtn.addEventListener('click', async () => {
+            if (!driverAcceptedOrderId) return;
+            startWaitingTimeBtn.style.display = 'none';
+            stopWaitingTimeBtn.style.display = 'inline-block';
+
+            try {
+                await db.collection('orders').doc(driverAcceptedOrderId).update({
+                    waitingStartTime: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                startWaitingTimer(new Date()); // Start timer immediately with current time
+            } catch (error) {
+                console.error('Error starting waiting time:', error);
+                showMessage(driverMessageDiv, `Ошибка начала ожидания: ${error.message}`, 'error');
+                startWaitingTimeBtn.style.display = 'inline-block'; // Re-enable button
+                stopWaitingTimeBtn.style.display = 'none';
+            }
+        });
+
+        stopWaitingTimeBtn.addEventListener('click', async () => {
+            if (!driverAcceptedOrderId) return;
+            stopWaitingTimeBtn.style.display = 'none';
+            startWaitingTimeBtn.style.display = 'inline-block';
+            clearInterval(waitingTimerInterval);
+            waitingTimerInterval = null;
+
+            try {
+                // Fetch the order to get the initialPrice and waitingTimeSeconds
+                const orderDoc = await db.collection('orders').doc(driverAcceptedOrderId).get();
+                const orderData = orderDoc.data();
+                const calculatedCurrentPrice = parseFloat(orderData.initialPrice) + (totalWaitingTimeSeconds / 60 * 0.5);
+
+                await db.collection('orders').doc(driverAcceptedOrderId).update({
+                    waitingEndTime: firebase.firestore.FieldValue.serverTimestamp(),
+                    waitingTimeSeconds: totalWaitingTimeSeconds,
+                    currentPrice: calculatedCurrentPrice.toFixed(2)
+                });
+                showMessage(driverMessageDiv, `Ожидание остановлено. Добавлено ${ (totalWaitingTimeSeconds / 60 * 0.5).toFixed(2) } сомони.`, 'success');
+            } catch (error) {
+                console.error('Error stopping waiting time:', error);
+                showMessage(driverMessageDiv, `Ошибка остановки ожидания: ${error.message}`, 'error');
+                stopWaitingTimeBtn.style.display = 'inline-block'; // Re-enable button
+                startWaitingTimeBtn.style.display = 'none';
+            }
+        });
+
+        completeOrderBtn.addEventListener('click', async () => {
+            if (!driverAcceptedOrderId) return;
+
+            // Stop any active timer before completing
+            clearInterval(waitingTimerInterval);
+            waitingTimerInterval = null;
+
+            try {
+                // Ensure final price is calculated and updated before completion
+                const orderDoc = await db.collection('orders').doc(driverAcceptedOrderId).get();
+                const orderData = orderDoc.data();
+                const finalPrice = parseFloat(orderData.initialPrice) + (orderData.waitingTimeSeconds / 60 * 0.5);
+
+                await db.collection('orders').doc(driverAcceptedOrderId).update({
+                    status: 'completed',
+                    completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    currentPrice: finalPrice.toFixed(2) // Final price calculation
+                });
+                showMessage(driverMessageDiv, `Заказ ${driverAcceptedOrderId} завершен!`, 'success');
+                driverAcceptedOrderId = null; // Clear accepted order
+                loadDriverOrders(); // Go back to pending orders list
+            } catch (error) {
+                console.error('Error completing order:', error);
+                showMessage(driverMessageDiv, `Ошибка завершения заказа: ${error.message}`, 'error');
+            }
+        });
+
+        function startWaitingTimer(startTime) {
+            const startTimestamp = new Date(startTime).getTime();
+            waitingTimerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                totalWaitingTimeSeconds = Math.floor((now - startTimestamp) / 1000);
+                updateWaitingTimeDisplay();
+            }, 1000);
+        }
+
+        function updateWaitingTimeDisplay() {
+            const minutes = Math.floor(totalWaitingTimeSeconds / 60);
+            const seconds = totalWaitingTimeSeconds % 60;
+            const waitingCost = (totalWaitingTimeSeconds / 60 * 0.5).toFixed(2); // 0.5 somoni per minute
+            waitingTimeSpan.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            waitingCostSpan.textContent = waitingCost;
+        }
+
+        // --- Admin Section Logic ---
+        searchUsersBtn.addEventListener('click', () => loadAdminUsers(userSearchInput.value.trim()));
+
+        async function loadAdminUsers(searchQuery = '') {
+            userListDiv.innerHTML = '<p>Загрузка пользователей...</p>';
+            let usersRef = db.collection('users').orderBy('email');
+
+            if (searchQuery) {
+                usersRef = usersRef
+                    .where('email', '>=', searchQuery)
+                    .where('email', '<=', searchQuery + '\uf8ff');
+            }
+
+            try {
+                const snapshot = await usersRef.get();
+                userListDiv.innerHTML = '';
+                if (snapshot.empty) {
+                    userListDiv.innerHTML = '<p>Пользователи не найдены.</p>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.innerHTML = `
+                        <span>
+                            ${userData.email} (${userData.role})
+                            ${userData.role === 'driver' ? `<br>Машина: ${userData.carModel || 'Н/Д'}, Гос. номер: ${userData.carPlate || 'Н/Д'}` : ''}
+                        </span>
+                        <div>
+                            ${userData.role === 'client' ?
+                                `<button class="set-driver-btn" data-uid="${doc.id}" data-email="${userData.email}">Назначить водителем</button>` :
+                                `<button class="edit-driver-btn" data-uid="${doc.id}" data-email="${userData.email}" data-car-model="${userData.carModel || ''}" data-car-plate="${userData.carPlate || ''}">Редактировать водителя</button>
+                                <button class="remove-driver-btn" data-uid="${doc.id}" data-email="${userData.email}">Убрать водителя</button>`
+                            }
+                        </div>
+                    `;
+                    userListDiv.appendChild(userItem);
+                });
+                addAdminUserListeners();
+            } catch (error) {
+                console.error('Error loading admin users:', error);
+                showMessage(adminMessageDiv, `Ошибка загрузки пользователей: ${error.message}`, 'error');
+            }
+        }
+
+        function addAdminUserListeners() {
+            document.querySelectorAll('.set-driver-btn').forEach(button => {
+                button.onclick = async (e) => {
+                    const uid = e.target.dataset.uid;
+                    const email = e.target.dataset.email;
+                    const carModel = prompt(`Введите модель машины для ${email}:`);
+                    if (carModel === null) return; // User cancelled
+                    const carPlate = prompt(`Введите гос. номер для ${email}:`);
+                    if (carPlate === null) return; // User cancelled
+
+                    if (confirm(`Вы уверены, что хотите назначить ${email} водителем (Машина: ${carModel}, Гос. номер: ${carPlate})?`)) {
+                        try {
+                            await db.collection('users').doc(uid).update({ role: 'driver', carModel: carModel, carPlate: carPlate });
+                            showMessage(adminMessageDiv, `Пользователь ${email} назначен водителем.`, 'success');
+                            loadAdminUsers(userSearchInput.value.trim()); // Refresh list
+                        } catch (error) {
+                            console.error('Error setting driver role:', error);
+                            showMessage(adminMessageDiv, `Ошибка: ${error.message}`, 'error');
+                        }
+                    }
+                };
+            });
+
+            document.querySelectorAll('.edit-driver-btn').forEach(button => {
+                button.onclick = async (e) => {
+                    const uid = e.target.dataset.uid;
+                    const email = e.target.dataset.email;
+                    const currentCarModel = e.target.dataset.carModel;
+                    const currentCarPlate = e.target.dataset.carPlate;
+
+                    const newCarModel = prompt(`Редактировать модель машины для ${email}:`, currentCarModel);
+                    if (newCarModel === null) return;
+                    const newCarPlate = prompt(`Редактировать гос. номер для ${email}:`, currentCarPlate);
+                    if (newCarPlate === null) return;
+
+                    if (confirm(`Вы уверены, что хотите обновить данные водителя ${email} (Машина: ${newCarModel}, Гос. номер: ${newCarPlate})?`)) {
+                        try {
+                            await db.collection('users').doc(uid).update({ carModel: newCarModel, carPlate: newCarPlate });
+                            showMessage(adminMessageDiv, `Данные водителя ${email} обновлены.`, 'success');
+                            loadAdminUsers(userSearchInput.value.trim()); // Refresh list
+                        } catch (error) {
+                            console.error('Error updating driver data:', error);
+                            showMessage(adminMessageDiv, `Ошибка: ${error.message}`, 'error');
+                        }
+                    }
+                };
+            });
+
+
+            document.querySelectorAll('.remove-driver-btn').forEach(button => {
+                button.onclick = async (e) => {
+                    const uid = e.target.dataset.uid;
+                    const email = e.target.dataset.email;
+                    if (confirm(`Вы уверены, что хотите убрать статус водителя у ${email}?`)) {
+                        try {
+                            await db.collection('users').doc(uid).update({ role: 'client', carModel: null, carPlate: null }); // Clear car info
+                            showMessage(adminMessageDiv, `У пользователя ${email} убран статус водителя.`, 'success');
+                            loadAdminUsers(userSearchInput.value.trim()); // Refresh list
+                        } catch (error) {
+                            console.error('Error removing driver role:', error);
+                            showMessage(adminMessageDiv, `Ошибка: ${error.message}`, 'error');
+                        }
+                    }
+                };
+            });
+        }
+
+        // --- Utility Functions ---
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `message ${type}-message`;
+            element.style.display = 'block';
+            setTimeout(() => {
+                hideMessage(element);
+            }, 5000); // Hide after 5 seconds
+        }
+
+        function hideMessage(element) {
+            element.style.display = 'none';
+            element.textContent = '';
+            element.className = 'message';
+        }
+
+        // Initialize map when the page loads, but only if a user is logged in
+        document.addEventListener('DOMContentLoaded', () => {
+             // Initial render based on auth state
+            if (!auth.currentUser) {
+                renderUI(null); // Show auth section if no user
+            }
+            // onAuthStateChanged will handle subsequent UI rendering
+        });
+    </script>
+</body>
+</html>
