@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KhujandCityTaxi</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        .auth-section, .client-section, .driver-section, .admin-section {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        select,
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .logout-button {
+            background-color: #dc3545;
+        }
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+        #map {
+            height: 300px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .order-item {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .user-item {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #e2e3e5;
+            color: #383d41;
+            display: none;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KhujandCityTaxi</h1>
+        <button id="logoutBtn" class="logout-button" style="display: none; float: right;">Выйти</button>
+        <div style="clear: both;"></div>
+
+        <div id="authSection" class="auth-section">
+            <h2>Вход / Регистрация</h2>
+            <input type="email" id="authEmail" placeholder="Email">
+            <input type="password" id="authPassword" placeholder="Пароль">
+            <button id="loginBtn">Войти</button>
+            <button id="registerBtn">Зарегистрироваться</button>
+            <div id="authMessage" class="message"></div>
+        </div>
+
+        <div id="clientSection" class="client-section">
+            <h2>Заказать такси</h2>
+            <form id="orderForm">
+                <label for="fromAddress">Откуда:</label>
+                <input type="text" id="fromAddress" required placeholder="Начните вводить адрес или выберите на карте">
+                <label for="toAddress">Куда (необязательно):</label>
+                <input type="text" id="toAddress" placeholder="Начните вводить адрес или выберите на карте">
+
+                <div id="map"></div>
+
+                <label for="tariff">Тариф:</label>
+                <select id="tariff">
+                    <option value="Эконом">Эконом</option>
+                    <option value="Комфорт">Комфорт</option>
+                    <option value="Бизнес">Бизнес</option>
+                    <option value="Для 6">Для 6</option>
+                    <option value="Доставка">Доставка</option>
+                </select>
+
+                <label for="wishes">Пожелания:</label>
+                <textarea id="wishes" rows="3" placeholder="Дополнительные пожелания к поездке"></textarea>
+
+                <input type="checkbox" id="airConditioner">
+                <label for="airConditioner">С кондиционером? (+1 сомони)</label><br>
+
+                <label for="paymentMethod">Способ оплаты:</label>
+                <select id="paymentMethod">
+                    <option value="Наличными">Наличными</option>
+                    <option value="KhujandCityBank">KhujandCityBank</option>
+                    <option value="Карта">Карта</option>
+                </select><br>
+
+                <label for="timeOption">Время:</label>
+                <input type="radio" id="timeNow" name="timeOption" value="Сейчас" checked>
+                <label for="timeNow">Сейчас</label>
+                <input type="radio" id="timeLater" name="timeOption" value="Выбрать время">
+                <label for="timeLater">Выбрать время</label><br>
+                <input type="datetime-local" id="desiredTime" style="display: none;"><br>
+
+                <label for="tips">Чаевые (от 1 сомони):</label>
+                <input type="number" id="tips" min="1" value="0"><br>
+
+                <input type="checkbox" id="meetingSign">
+                <label for="meetingSign">Встреча с табличкой? (+4 сомони)</label><br>
+
+                <input type="checkbox" id="withChildren">
+                <label for="withChildren">С детьми?</label><br>
+
+                <label for="clientPhone">Телефон клиента:</label>
+                <input type="text" id="clientPhone" required placeholder="+992 (ХХ) ХХХ-ХХ-ХХ">
+
+                <button type="submit">Заказать такси</button>
+            </form>
+            <div id="clientMessage" class="message"></div>
+        </div>
+
+        <div id="driverSection" class="driver-section">
+            <h2>Активные заказы</h2>
+            <div id="activeOrdersList">
+                </div>
+            <div id="driverMessage" class="message"></div>
+        </div>
+
+        <div id="adminSection" class="admin-section">
+            <h2>Панель администратора - Управление пользователями</h2>
+            <input type="text" id="userSearch" placeholder="Поиск по Email">
+            <button id="searchUsersBtn">Поиск</button>
+            <div id="userList">
+                </div>
+            <div id="adminMessage" class="message"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQGsoDWZ-Ddac17nPlKUf36mNkpzZEiQ",
+            authDomain: "drezzsw-af340.firebaseapp.com",
+            databaseURL: "https://drezzsw-af340-default-rtdb.firebaseio.com",
+            projectId: "drezzsw-af340",
+            storageBucket: "drezzsw-af340.firebasestorage.app",
+            messagingSenderId: "444256467193",
+            appId: "1:444256467193:web:3286b00a6f057bae824a28",
+            measurementId: "G-BHSSH8KNXX"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Telegram Bot API configuration
+        const TELEGRAM_BOT_TOKEN = '8233984213:AAE7gKUQRMeacw2X95lRSLrhUYPM-WnjVzg';
+        const TELEGRAM_CHAT_ID = '-1002861984015'; // Public channel chat_id
+
+        // Admin email
+        const ADMIN_EMAIL = 'KC@taxi.com';
+
+        // UI Elements
+        const authSection = document.getElementById('authSection');
+        const clientSection = document.getElementById('clientSection');
+        const driverSection = document.getElementById('driverSection');
+        const adminSection = document.getElementById('adminSection');
+
+        const authEmailInput = document.getElementById('authEmail');
+        const authPasswordInput = document.getElementById('authPassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const authMessageDiv = document.getElementById('authMessage');
+
+        const orderForm = document.getElementById('orderForm');
+        const fromAddressInput = document.getElementById('fromAddress');
+        const toAddressInput = document.getElementById('toAddress');
+        const tariffSelect = document.getElementById('tariff');
+        const wishesTextarea = document.getElementById('wishes');
+        const airConditionerCheckbox = document.getElementById('airConditioner');
+        const paymentMethodSelect = document.getElementById('paymentMethod');
+        const timeNowRadio = document.getElementById('timeNow');
+        const timeLaterRadio = document.getElementById('timeLater');
+        const desiredTimeInput = document.getElementById('desiredTime');
+        const tipsInput = document.getElementById('tips');
+        const meetingSignCheckbox = document.getElementById('meetingSign');
+        const withChildrenCheckbox = document.getElementById('withChildren');
+        const clientPhoneInput = document.getElementById('clientPhone');
+        const clientMessageDiv = document.getElementById('clientMessage');
+
+        const activeOrdersListDiv = document.getElementById('activeOrdersList');
+        const driverMessageDiv = document.getElementById('driverMessage');
+
+        const userSearchInput = document.getElementById('userSearch');
+        const searchUsersBtn = document.getElementById('searchUsersBtn');
+        const userListDiv = document.getElementById('userList');
+        const adminMessageDiv = document.getElementById('adminMessage');
+
+        let map, fromMarker, toMarker;
+        let userRole = 'client'; // Default role
+        let currentUserId = null;
+
+        // --- Map Initialization ---
+        function initMap() {
+            map = L.map('map').setView([39.9015, 69.6200], 13); // Centered on Khujand
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            map.on('click', function(e) {
+                if (!fromMarker) {
+                    fromMarker = L.marker(e.latlng).addTo(map)
+                        .bindPopup('Откуда').openPopup();
+                    reverseGeocode(e.latlng, 'from');
+                } else if (!toMarker) {
+                    toMarker = L.marker(e.latlng).addTo(map)
+                        .bindPopup('Куда').openPopup();
+                    reverseGeocode(e.latlng, 'to');
+                } else {
+                    fromMarker.setLatLng(e.latlng);
+                    fromMarker.bindPopup('Откуда').openPopup();
+                    toMarker.remove();
+                    toMarker = null;
+                    reverseGeocode(e.latlng, 'from');
+                }
+            });
+        }
+
+        // Reverse Geocoding using OpenStreetMap Nominatim
+        async function reverseGeocode(latlng, type) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&zoom=18&addressdetails=1`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const address = data.display_name || `${latlng.lat}, ${latlng.lng}`;
+                if (type === 'from') {
+                    fromAddressInput.value = address;
+                } else {
+                    toAddressInput.value = address;
+                }
+            } catch (error) {
+                console.error('Error during reverse geocoding:', error);
+                if (type === 'from') {
+                    fromAddressInput.value = `${latlng.lat}, ${latlng.lng}`;
+                } else {
+                    toAddressInput.value = `${latlng.lat}, ${latlng.lng}`;
+                }
+            }
+        }
+
+        // Forward Geocoding (for input fields)
+        async function forwardGeocode(address, type) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.length > 0) {
+                    const latlng = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+                    if (type === 'from') {
+                        if (fromMarker) map.removeLayer(fromMarker);
+                        fromMarker = L.marker(latlng).addTo(map)
+                            .bindPopup('Откуда').openPopup();
+                        map.setView(latlng, 13);
+                    } else {
+                        if (toMarker) map.removeLayer(toMarker);
+                        toMarker = L.marker(latlng).addTo(map)
+                            .bindPopup('Куда').openPopup();
+                        map.setView(latlng, 13);
+                    }
+                }
+            } catch (error) {
+                console.error('Error during forward geocoding:', error);
+            }
+        }
+
+        // Event listeners for address inputs to update map
+        fromAddressInput.addEventListener('change', () => forwardGeocode(fromAddressInput.value, 'from'));
+        toAddressInput.addEventListener('change', () => forwardGeocode(toAddressInput.value, 'to'));
+
+        // --- Firebase Authentication ---
+        loginBtn.addEventListener('click', async () => {
+            const email = authEmailInput.value;
+            const password = authPasswordInput.value;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showMessage(authMessageDiv, 'Авторизация успешна!', 'success');
+            } catch (error) {
+                showMessage(authMessageDiv, `Ошибка входа: ${error.message}`, 'error');
+            }
+        });
+
+        registerBtn.addEventListener('click', async () => {
+            const email = authEmailInput.value;
+            const password = authPasswordInput.value;
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    email: email,
+                    role: 'client' // Default role
+                });
+                showMessage(authMessageDiv, 'Регистрация успешна!', 'success');
+            } catch (error) {
+                showMessage(authMessageDiv, `Ошибка регистрации: ${error.message}`, 'error');
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await auth.signOut();
+            showMessage(authMessageDiv, 'Вы вышли из системы.', 'success');
+            renderUI(null); // Reset UI
+        });
+
+        auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        currentUserId = user.uid;
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+            userRole = userDoc.data().role;
+        } else {
+            // Это важно! Если документа нет, создаем его с ролью клиента
+            userRole = 'client'; // Default if user document somehow doesn't exist
+            await db.collection('users').doc(user.uid).set({ email: user.email, role: userRole });
+        }
+        renderUI(userRole); // Здесь вызывается функция, которая должна правильно отображать UI
+    } else {
+        currentUserId = null;
+        userRole = 'client'; // Reset to default
+        renderUI(null);
+    }
+});
+
+
+        // --- UI Rendering based on Role ---
+        function renderUI(role) {
+            authSection.style.display = 'block';
+            clientSection.style.display = 'none';
+            driverSection.style.display = 'none';
+            adminSection.style.display = 'none';
+            logoutBtn.style.display = 'none';
+            hideMessage(authMessageDiv);
+            hideMessage(clientMessageDiv);
+            hideMessage(driverMessageDiv);
+            hideMessage(adminMessageDiv);
+
+            if (role) {
+                authSection.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                if (!map) {
+                    initMap();
+                }
+
+                if (role === 'client') {
+                    clientSection.style.display = 'block';
+                } else if (role === 'driver') {
+                    driverSection.style.display = 'block';
+                    loadDriverOrders();
+                } else if (role === 'admin') {
+                    adminSection.style.display = 'block';
+                    loadAdminUsers();
+                }
+            } else {
+                // Not logged in, show only auth section
+                authSection.style.display = 'block';
+            }
+        }
+
+        // --- Client Section Logic (Order Form) ---
+        timeLaterRadio.addEventListener('change', () => {
+            desiredTimeInput.style.display = timeLaterRadio.checked ? 'block' : 'none';
+        });
+
+        orderForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const from = fromAddressInput.value.trim();
+            if (!from) {
+                showMessage(clientMessageDiv, 'Пожалуйста, укажите адрес "Откуда".', 'error');
+                return;
+            }
+
+            const order = {
+                from: from,
+                to: toAddressInput.value.trim(),
+                tariff: tariffSelect.value,
+                wishes: wishesTextarea.value.trim(),
+                airConditioner: airConditionerCheckbox.checked,
+                paymentMethod: paymentMethodSelect.value,
+                time: timeNowRadio.checked ? 'Сейчас' : desiredTimeInput.value,
+                tips: parseInt(tipsInput.value) || 0,
+                meetingSign: meetingSignCheckbox.checked,
+                withChildren: withChildrenCheckbox.checked,
+                clientPhone: clientPhoneInput.value.trim(),
+                status: 'pending', // pending, accepted, completed, cancelled
+                clientId: currentUserId,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                const docRef = await db.collection('orders').add(order);
+                await sendOrderToTelegram(order, docRef.id);
+                showMessage(clientMessageDiv, 'Ваш заказ успешно отправлен!', 'success');
+                orderForm.reset();
+                desiredTimeInput.style.display = 'none'; // Hide datetime input after reset
+                if (fromMarker) { map.removeLayer(fromMarker); fromMarker = null; }
+                if (toMarker) { map.removeLayer(toMarker); toMarker = null; }
+            } catch (error) {
+                console.error('Error submitting order:', error);
+                showMessage(clientMessageDiv, `Ошибка при отправке заказа: ${error.message}`, 'error');
+            }
+        });
+
+        async function sendOrderToTelegram(order, orderId) {
+            let message = `<b>Новый заказ такси KhujandCityTaxi</b>\n\n`;
+            message += `<b>Откуда:</b> ${order.from}\n`;
+            if (order.to) message += `<b>Куда:</b> ${order.to}\n`;
+            message += `<b>Тариф:</b> ${order.tariff}\n`;
+            if (order.wishes) message += `<b>Пожелания:</b> ${order.wishes}\n`;
+            if (order.airConditioner) message += `<b>С кондиционером:</b> Да (+1 сомони)\n`;
+            message += `<b>Оплата:</b> ${order.paymentMethod}\n`;
+            message += `<b>Время:</b> ${order.time}\n`;
+            if (order.tips > 0) message += `<b>Чаевые:</b> ${order.tips} сомони\n`;
+            if (order.meetingSign) message += `<b>Встреча с табличкой:</b> Да (+4 сомони)\n`;
+            if (order.withChildren) message += `<b>С детьми:</b> Да\n`;
+            message += `<b>Телефон клиента:</b> ${order.clientPhone}\n\n`;
+            message += `ID заказа: ${orderId}\n`;
+
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            const params = new URLSearchParams({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            });
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                const data = await response.json();
+                if (!data.ok) {
+                    console.error('Error sending to Telegram:', data.description);
+                    throw new Error(`Telegram API error: ${data.description}`);
+                }
+            } catch (error) {
+                console.error('Failed to send order to Telegram:', error);
+                throw error; // Re-throw to be caught by the orderForm submit handler
+            }
+        }
+
+        // --- Driver Section Logic ---
+        function loadDriverOrders() {
+            db.collection('orders')
+                .where('status', '==', 'pending')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    activeOrdersListDiv.innerHTML = '';
+                    if (snapshot.empty) {
+                        activeOrdersListDiv.innerHTML = '<p>Нет активных заказов.</p>';
+                        return;
+                    }
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderItem = document.createElement('div');
+                        orderItem.className = 'order-item';
+                        orderItem.innerHTML = `
+                            <p><b>Откуда:</b> ${order.from}</p>
+                            ${order.to ? `<p><b>Куда:</b> ${order.to}</p>` : ''}
+                            <p><b>Тариф:</b> ${order.tariff}</p>
+                            ${order.wishes ? `<p><b>Пожелания:</b> ${order.wishes}</p>` : ''}
+                            ${order.airConditioner ? `<p><b>С кондиционером:</b> Да</p>` : ''}
+                            <p><b>Оплата:</b> ${order.paymentMethod}</p>
+                            <p><b>Время:</b> ${order.time}</p>
+                            ${order.tips > 0 ? `<p><b>Чаевые:</b> ${order.tips} сомони</p>` : ''}
+                            ${order.meetingSign ? `<p><b>Встреча с табличкой:</b> Да</p>` : ''}
+                            ${order.withChildren ? `<p><b>С детьми:</b> Да</p>` : ''}
+                            <p><b>Телефон клиента:</b> ${order.clientPhone}</p>
+                            <button data-id="${doc.id}" class="accept-order-btn">Принять</button>
+                        `;
+                        activeOrdersListDiv.appendChild(orderItem);
+                    });
+                    addAcceptOrderListeners();
+                }, error => {
+                    console.error("Error fetching driver orders:", error);
+                    showMessage(driverMessageDiv, `Ошибка загрузки заказов: ${error.message}`, 'error');
+                });
+        }
+
+        function addAcceptOrderListeners() {
+            document.querySelectorAll('.accept-order-btn').forEach(button => {
+                button.onclick = async (e) => {
+                    const orderId = e.target.dataset.id;
+                    try {
+                        // Use a transaction to ensure atomicity
+                        await db.runTransaction(async (transaction) => {
+                            const orderRef = db.collection('orders').doc(orderId);
+                            const orderDoc = await transaction.get(orderRef);
+
+                            if (!orderDoc.exists) {
+                                throw new Error("Заказ не найден!");
+                            }
+
+                            if (orderDoc.data().status !== 'pending') {
+                                throw new Error("Этот заказ уже принят или отменен.");
+                            }
+
+                            transaction.update(orderRef, {
+                                status: 'accepted',
+                                driverId: currentUserId,
+                                acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        });
+                        showMessage(driverMessageDiv, `Заказ ${orderId} успешно принят!`, 'success');
+                        // No need to manually remove, onSnapshot will update the list
+                        // Optionally, send update to Telegram
+                        const orderData = (await db.collection('orders').doc(orderId).get()).data();
+                        sendOrderAcceptedToTelegram(orderData, orderId, auth.currentUser.email);
+                    } catch (error) {
+                        console.error('Error accepting order:', error);
+                        showMessage(driverMessageDiv, `Ошибка принятия заказа: ${error.message}`, 'error');
+                    }
+                };
+            });
+        }
+
+        async function sendOrderAcceptedToTelegram(order, orderId, driverEmail) {
+            let message = `<b>Заказ принят водителем!</b>\n\n`;
+            message += `<b>ID заказа:</b> ${orderId}\n`;
+            message += `<b>Водитель:</b> ${driverEmail}\n\n`;
+            message += `<b>Откуда:</b> ${order.from}\n`;
+            if (order.to) message += `<b>Куда:</b> ${order.to}\n`;
+            message += `<b>Телефон клиента:</b> ${order.clientPhone}\n`;
+
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            const params = new URLSearchParams({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            });
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                const data = await response.json();
+                if (!data.ok) {
+                    console.error('Error sending accepted order to Telegram:', data.description);
+                }
+            } catch (error) {
+                console.error('Failed to send accepted order to Telegram:', error);
+            }
+        }
+
+        // --- Admin Section Logic ---
+        searchUsersBtn.addEventListener('click', () => loadAdminUsers(userSearchInput.value.trim()));
+
+        async function loadAdminUsers(searchQuery = '') {
+            userListDiv.innerHTML = '<p>Загрузка пользователей...</p>';
+            let usersRef = db.collection('users').orderBy('email');
+
+            if (searchQuery) {
+                // For startsWith search, Firestore recommends a range query
+                // This is a basic implementation, more advanced text search might need external tools
+                usersRef = usersRef
+                    .where('email', '>=', searchQuery)
+                    .where('email', '<=', searchQuery + '\uf8ff');
+            }
+
+            try {
+                const snapshot = await usersRef.get();
+                userListDiv.innerHTML = '';
+                if (snapshot.empty) {
+                    userListDiv.innerHTML = '<p>Пользователи не найдены.</p>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.innerHTML = `
+                        <span>${userData.email} (${userData.role})</span>
+                        <div>
+                            ${userData.role === 'client' ?
+                                `<button class="set-driver-btn" data-uid="${doc.id}" data-email="${userData.email}">Назначить водителем</button>` :
+                                `<button class="remove-driver-btn" data-uid="${doc.id}" data-email="${userData.email}">Убрать водителя</button>`
+                            }
+                        </div>
+                    `;
+                    userListDiv.appendChild(userItem);
+                });
+                addAdminUserListeners();
+            } catch (error) {
+                console.error('Error loading admin users:', error);
+                showMessage(adminMessageDiv, `Ошибка загрузки пользователей: ${error.message}`, 'error');
+            }
+        }
+
+        function addAdminUserListeners() {
+            document.querySelectorAll('.set-driver-btn').forEach(button => {
+                button.onclick = async (e) => {
+                    const uid = e.target.dataset.uid;
+                    const email = e.target.dataset.email;
+                    if (confirm(`Вы уверены, что хотите назначить ${email} водителем?`)) {
+                        try {
+                            await db.collection('users').doc(uid).update({ role: 'driver' });
+                            showMessage(adminMessageDiv, `Пользователь ${email} назначен водителем.`, 'success');
+                            loadAdminUsers(userSearchInput.value.trim()); // Refresh list
+                        } catch (error) {
+                            console.error('Error setting driver role:', error);
+                            showMessage(adminMessageDiv, `Ошибка: ${error.message}`, 'error');
+                        }
+                    }
+                };
+            });
+
+            document.querySelectorAll('.remove-driver-btn').forEach(button => {
+                button.onclick = async (e) => {
+                    const uid = e.target.dataset.uid;
+                    const email = e.target.dataset.email;
+                    if (confirm(`Вы уверены, что хотите убрать статус водителя у ${email}?`)) {
+                        try {
+                            await db.collection('users').doc(uid).update({ role: 'client' });
+                            showMessage(adminMessageDiv, `У пользователя ${email} убран статус водителя.`, 'success');
+                            loadAdminUsers(userSearchInput.value.trim()); // Refresh list
+                        } catch (error) {
+                            console.error('Error removing driver role:', error);
+                            showMessage(adminMessageDiv, `Ошибка: ${error.message}`, 'error');
+                        }
+                    }
+                };
+            });
+        }
+
+        // --- Utility Functions ---
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `message ${type}-message`;
+            element.style.display = 'block';
+            setTimeout(() => {
+                hideMessage(element);
+            }, 5000); // Hide after 5 seconds
+        }
+
+        function hideMessage(element) {
+            element.style.display = 'none';
+            element.textContent = '';
+            element.className = 'message';
+        }
+
+        // Initialize map when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+             // If not logged in, only auth section is shown, and map is initialized upon login
+            if (auth.currentUser) {
+                initMap();
+            } else {
+                renderUI(null); // Ensure only auth section is visible initially
+            }
+        });
+    </script>
+</body>
+</html>

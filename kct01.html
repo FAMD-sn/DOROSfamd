@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khujand City Taxi</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        /* --- Общие стили и темная тема --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1c1c1c; /* Очень темный фон */
+            color: #e0e0e0; /* Светлый текст */
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #2a2a2a; /* Темнее серая шапка */
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        header img {
+            height: 45px;
+            margin-right: 15px;
+            border-radius: 5px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #00bcd4; /* Яркий акцент для названия */
+        }
+
+        #auth-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #user-email {
+            font-weight: bold;
+            color: #a0a0a0;
+        }
+
+        .container {
+            flex-grow: 1;
+            max-width: 1300px;
+            margin: 25px auto;
+            padding: 30px;
+            background-color: #252525; /* Темный фон контейнера */
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+            border: 1px solid #333;
+        }
+
+        h2, h3 {
+            color: #00bcd4; /* Акцентные заголовки */
+            border-bottom: 2px solid #3a3a3a;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        /* --- Формы и элементы ввода --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #c0c0c0;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group input[type="tel"],
+        .form-group input[type="number"],
+        .form-group input[type="datetime-local"],
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background-color: #333;
+            color: #f0f0f0;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #00bcd4;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.3);
+            outline: none;
+        }
+
+        .form-group input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2); /* Увеличиваем размер чекбокса */
+            vertical-align: middle;
+        }
+
+        /* --- Кнопки --- */
+        button {
+            background-color: #007bff; /* Стандартная синяя кнопка */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-green {
+            background-color: #28a745;
+        }
+        .btn-green:hover {
+            background-color: #218838;
+        }
+
+        .btn-red {
+            background-color: #dc3545;
+        }
+        .btn-red:hover {
+            background-color: #c82333;
+        }
+
+        .btn-blue-light {
+            background-color: #17a2b8;
+        }
+        .btn-blue-light:hover {
+            background-color: #138496;
+        }
+
+        /* --- Карта --- */
+        #map {
+            height: 450px;
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #444;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Секции приложения (скрыты по умолчанию) --- */
+        .auth-section, .client-section, .driver-section, .admin-section {
+            display: none; /* По умолчанию скрыто, будет показано через JS */
+            padding-top: 20px;
+        }
+
+        /* --- Карточки заказов/пользователей --- */
+        .order-card, .user-card {
+            background-color: #333;
+            border: 1px solid #4a4a4a;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .order-card:hover, .user-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .order-card h3, .user-card p strong {
+            color: #00bcd4;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .order-card p, .user-card p {
+            margin-bottom: 8px;
+        }
+
+        /* --- Уведомления --- */
+        .notification {
+            background-color: #28a745; /* Зеленый для успеха */
+            color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: none; /* Скрыто по умолчанию */
+            animation: fadeInOut 5s forwards; /* Анимация появления/исчезновения */
+        }
+
+        .notification.error {
+            background-color: #dc3545; /* Красный для ошибок */
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* --- Адаптивный дизайн --- */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            #auth-status {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            header h1 {
+                font-size: 1.5em;
+            }
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+            button {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            .form-group input, .form-group select, .form-group textarea {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: center;">
+            <img src="https://dorosfamd.com/logotaxi.png" alt="Khujand City Taxi Logo">
+            <h1>Khujand City Taxi</h1>
+        </div>
+        <div id="auth-status">
+            <span id="user-email"></span>
+            <button id="logout-btn" style="display: none;">Выйти</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="auth-section" class="auth-section">
+            <h2>Авторизация / Регистрация</h2>
+            <div class="form-group">
+                <label for="auth-email">Email:</label>
+                <input type="email" id="auth-email" placeholder="example@mail.com">
+            </div>
+            <div class="form-group">
+                <label for="auth-password">Пароль:</label>
+                <input type="password" id="auth-password" placeholder="Минимум 6 символов">
+            </div>
+            <button id="login-btn" class="btn-green">Войти</button>
+            <button id="signup-btn" class="btn-blue-light">Зарегистрироваться</button>
+            <p id="auth-error" class="notification error" style="display: none;"></p>
+        </section>
+
+        <section id="client-section" class="client-section">
+            <h2>Создать новый заказ</h2>
+            <form id="order-form">
+                <div class="form-group">
+                    <label for="phone-number">📞 Номер телефона:</label>
+                    <input type="tel" id="phone-number" placeholder="+992 XXX XX XX XX" required>
+                </div>
+                <div class="form-group">
+                    <label for="from-location">📍 Откуда (на карте или поиск):</label>
+                    <input type="text" id="from-location" placeholder="Введите адрес или выберите на карте" required>
+                </div>
+                <div class="form-group">
+                    <label for="to-location">📍 Куда (на карте или поиск):</label>
+                    <input type="text" id="to-location" placeholder="Введите адрес или выберите на карте">
+                </div>
+                <div id="map"></div>
+                <button type="button" id="select-from-map-btn" class="btn-blue-light">Выбрать Откуда на карте</button>
+                <button type="button" id="select-to-map-btn" class="btn-blue-light">Выбрать Куда на карте</button>
+
+                <h3>Дополнительные опции:</h3>
+                <div class="form-group">
+                    <input type="checkbox" id="luggage"> <label for="luggage">Чемоданы (+4 сомони)</label>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="kids"> <label for="kids">С детьми (+0 сомони)</label>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="ac"> <label for="ac">Кондиционер (+1 сомони)</label>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="female-driver"> <label for="female-driver">Женщина за рулём (+40%)</label>
+                </div>
+                <div class="form-group">
+                    <label for="tips">Чаевые (сомони):</label>
+                    <input type="number" id="tips" min="0" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="tariff">Тариф:</label>
+                    <select id="tariff">
+                        <option value="economy">Эконом</option>
+                        <option value="comfort">Комфорт (+30%)</option>
+                        <option value="business">Бизнес (+20%)</option>
+                        <option value="delivery">Доставка (+3 сомони)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="comment">Комментарий:</label>
+                    <textarea id="comment" placeholder="Дополнительные пожелания"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="payment-method">Оплата:</label>
+                    <select id="payment-method">
+                        <option value="cash">Наличные</option>
+                        <option value="card">Карта</option>
+                        <option value="khujandcitybank">KhujandCityBank</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="time-option">Время подачи:</label>
+                    <select id="time-option">
+                        <option value="now">Сейчас</option>
+                        <option value="later">Выбрать конкретное время</option>
+                    </select>
+                    <input type="datetime-local" id="pickup-time" style="display: none;">
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="signboard"> <label for="signboard">Встреча с табличкой (+4 сомони)</label>
+                </div>
+                <p>Предварительная стоимость: <span id="estimated-price">0.00</span> сомони</p>
+                <button type="submit" class="btn-green">Заказать такси</button>
+            </form>
+
+            <hr>
+            <h3>Мои активные заказы</h3>
+            <div id="client-active-orders-list"></div>
+            <h3>История заказов</h3>
+            <div id="client-orders-history"></div>
+            <div id="client-order-notification" class="notification"></div>
+        </section>
+
+        <section id="driver-section" class="driver-section">
+            <h2>Доступные заказы</h2>
+            <div id="available-orders-list"></div>
+
+            <hr>
+            <h2>Мои принятые заказы</h2>
+            <div id="accepted-orders-list"></div>
+
+            <hr>
+            <h2>Моя история поездок</h2>
+            <div id="driver-history-list"></div>
+        </section>
+
+        <section id="admin-section" class="admin-section">
+            <h2>Управление пользователями</h2>
+            <div class="form-group">
+                <label for="admin-user-search">Поиск пользователей по Email:</label>
+                <input type="email" id="admin-user-search" placeholder="Поиск по email">
+            </div>
+            <button id="admin-search-user-btn" class="btn-blue-light">Найти</button>
+            <div id="user-list"></div>
+
+            <hr>
+            <h2>Управление заказами</h2>
+            <div class="form-group">
+                <label for="admin-order-search">Поиск заказов (ID, адрес):</label>
+                <input type="text" id="admin-order-search" placeholder="Поиск по ID или адресу">
+            </div>
+            <button id="admin-search-order-btn" class="btn-blue-light">Найти</button>
+            <div id="admin-orders-list"></div>
+        </section>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // --- 1. Конфигурация Firebase ---
+        // ЗАМЕНИТЕ ЭТО СВОИМИ ДАННЫМИ ИЗ КОНСОЛИ FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAu-3nDoDijgkmFozFuGNhSsODArolpwA4",
+            authDomain: "muzaffar-taxi-427fa.firebaseapp.com",
+            projectId: "muzaffar-taxi-427fa",
+            storageBucket: "muzaffar-Taxi-427fa.firebasestorage.app",
+            messagingSenderId: "1076361280717",
+            appId: "1:1076361280717:web:226ca42c35b740fd07fd84"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // --- 2. Константы и глобальные переменные ---
+        const ADMIN_EMAIL = 'KC@taxi.com';
+        const TELEGRAM_BOT_TOKEN = '8233984213:AAE7gKUQRMeacw2X95lRSLrhUYPM-WnjVzg';
+        const TELEGRAM_CHAT_ID = '-1002861984015'; // ID чата, куда отправляются заказы
+
+        // Элементы DOM
+        const authSection = document.getElementById('auth-section');
+        const clientSection = document.getElementById('client-section');
+        const driverSection = document.getElementById('driver-section');
+        const adminSection = document.getElementById('admin-section');
+
+        const logoutBtn = document.getElementById('logout-btn');
+        const userEmailSpan = document.getElementById('user-email');
+        const authError = document.getElementById('auth-error');
+
+        let userRole = 'client'; // Роль текущего пользователя
+        let currentMap = null; // Инстанс карты Leaflet
+        let fromMarker = null;
+        let toMarker = null;
+        let selectingLocationFor = null; // 'from' или 'to'
+        const initialMapCenter = [38.5733, 68.7735]; // Центр карты (Душанбе)
+
+        // --- 3. Вспомогательные функции ---
+
+        function showNotification(message, isError = false) {
+            const notificationDiv = authError; // Используем тот же элемент для простоты
+            notificationDiv.textContent = message;
+            notificationDiv.classList.remove('error');
+            if (isError) {
+                notificationDiv.classList.add('error');
+            }
+            notificationDiv.style.display = 'block';
+            setTimeout(() => {
+                notificationDiv.style.display = 'none';
+            }, 5000); // Скрыть через 5 секунд
+        }
+
+        async function reverseGeocode(lat, lon) {
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
+                const data = await response.json();
+                return data.display_name || 'Неизвестный адрес';
+            } catch (error) {
+                console.error('Error in reverse geocoding:', error);
+                return `${lat.toFixed(4)}, ${lon.toFixed(4)}`; // Вернуть координаты, если адрес не найден
+            }
+        }
+
+        async function geocodeAddress(address) {
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`);
+                const data = await response.json();
+                if (data.length > 0) {
+                    return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+                }
+                return null;
+            } catch (error) {
+                console.error('Error in geocoding:', error);
+                return null;
+            }
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Радиус Земли в км
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+            return distance; // Расстояние в км
+        }
+
+        async function sendTelegramMessage(text) {
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: text,
+                        parse_mode: 'HTML' // Для форматирования
+                    })
+                });
+                const data = await response.json();
+                if (!data.ok) {
+                    console.error('Ошибка отправки в Telegram:', data);
+                }
+            } catch (error) {
+                console.error('Сетевая ошибка при отправке в Telegram:', error);
+            }
+        }
+
+        // --- 4. Управление отображением разделов ---
+        function displayContentBasedOnRole(role) {
+            authSection.style.display = 'none';
+            clientSection.style.display = 'none';
+            driverSection.style.display = 'none';
+            adminSection.style.display = 'none';
+
+            if (role === 'client') {
+                clientSection.style.display = 'block';
+                initMap();
+                loadClientOrders();
+            } else if (role === 'driver') {
+                driverSection.style.display = 'block';
+                loadAvailableOrders();
+                loadAcceptedDriverOrders();
+                loadDriverHistory();
+            } else if (role === 'admin') {
+                adminSection.style.display = 'block';
+                loadUsersForAdmin();
+                loadOrdersForAdmin();
+            }
+        }
+
+        // --- 5. Аутентификация и инициализация пользователя ---
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                userEmailSpan.textContent = user.email;
+                logoutBtn.style.display = 'inline-block';
+                authSection.style.display = 'none';
+
+                const userDoc = await db.collection('users').doc(user.email).get();
+                if (userDoc.exists) {
+                    userRole = userDoc.data().role;
+                } else {
+                    // Если пользователя нет в Firestore (первый вход после регистрации), создаем его как клиента
+                    userRole = 'client';
+                    await db.collection('users').doc(user.email).set({
+                        email: user.email,
+                        role: userRole
+                    });
+                }
+
+                // Специфическое правило для админа
+                if (user.email === ADMIN_EMAIL) {
+                    userRole = 'admin';
+                    await db.collection('users').doc(user.email).set({
+                        email: user.email,
+                        role: userRole
+                    }, { merge: true }); // Обновить, если уже существует
+                }
+
+                displayContentBasedOnRole(userRole);
+
+            } else {
+                userEmailSpan.textContent = '';
+                logoutBtn.style.display = 'none';
+                authSection.style.display = 'block';
+                // Скрываем все разделы, если пользователь не авторизован
+                clientSection.style.display = 'none';
+                driverSection.style.display = 'none';
+                adminSection.style.display = 'none';
+            }
+        });
+
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showNotification('Вход выполнен успешно!', false);
+            } catch (error) {
+                showNotification(`Ошибка входа: ${error.message}`, true);
+            }
+        });
+
+        document.getElementById('signup-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                // При регистрации все по умолчанию клиенты
+                await db.collection('users').doc(userCredential.user.email).set({
+                    email: userCredential.user.email,
+                    role: 'client'
+                });
+                showNotification('Регистрация успешна! Вы вошли как клиент.', false);
+            } catch (error) {
+                showNotification(`Ошибка регистрации: ${error.message}`, true);
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await auth.signOut();
+            showNotification('Вы вышли из аккаунта.', false);
+        });
+
+        // --- 6. Функционал карты Leaflet ---
+        function initMap() {
+            if (currentMap) {
+                currentMap.remove(); // Удаляем предыдущий инстанс карты, если он есть
+            }
+            currentMap = L.map('map').setView(initialMapCenter, 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(currentMap);
+
+            currentMap.on('click', async (e) => {
+                const latlng = e.latlng;
+                const address = await reverseGeocode(latlng.lat, latlng.lng);
+
+                if (selectingLocationFor === 'from') {
+                    if (fromMarker) currentMap.removeLayer(fromMarker);
+                    fromMarker = L.marker(latlng).addTo(currentMap)
+                        .bindPopup(`Откуда: ${address}`).openPopup();
+                    document.getElementById('from-location').value = address;
+                } else if (selectingLocationFor === 'to') {
+                    if (toMarker) currentMap.removeLayer(toMarker);
+                    toMarker = L.marker(latlng).addTo(currentMap)
+                        .bindPopup(`Куда: ${address}`).openPopup();
+                    document.getElementById('to-location').value = address;
+                }
+                selectingLocationFor = null; // Сбросить режим выбора
+                calculatePrice(); // Пересчитать цену после выбора точек
+            });
+
+            document.getElementById('select-from-map-btn').addEventListener('click', () => {
+                selectingLocationFor = 'from';
+                showNotification('Нажмите на карту, чтобы выбрать точку "Откуда"', false);
+            });
+
+            document.getElementById('select-to-map-btn').addEventListener('click', () => {
+                selectingLocationFor = 'to';
+                showNotification('Нажмите на карту, чтобы выбрать точку "Куда"', false);
+            });
+
+            // Автоматическое обновление маркеров по вводу адреса
+            document.getElementById('from-location').addEventListener('change', async (e) => {
+                const address = e.target.value;
+                const coords = await geocodeAddress(address);
+                if (coords) {
+                    if (fromMarker) currentMap.removeLayer(fromMarker);
+                    fromMarker = L.marker([coords.lat, coords.lon]).addTo(currentMap)
+                        .bindPopup(`Откуда: ${address}`).openPopup();
+                    currentMap.setView([coords.lat, coords.lon], 15);
+                    calculatePrice();
+                } else {
+                    showNotification('Адрес "Откуда" не найден.', true);
+                }
+            });
+
+            document.getElementById('to-location').addEventListener('change', async (e) => {
+                const address = e.target.value;
+                const coords = await geocodeAddress(address);
+                if (coords) {
+                    if (toMarker) currentMap.removeLayer(toMarker);
+                    toMarker = L.marker([coords.lat, coords.lon]).addTo(currentMap)
+                        .bindPopup(`Куда: ${address}`).openPopup();
+                    currentMap.setView([coords.lat, coords.lon], 15);
+                    calculatePrice();
+                } else {
+                    showNotification('Адрес "Куда" не найден.', true);
+                }
+            });
+        }
+
+        // --- 7. Расчет стоимости поездки ---
+        const estimatedPriceSpan = document.getElementById('estimated-price');
+
+        document.querySelectorAll('#order-form input, #order-form select').forEach(element => {
+            element.addEventListener('change', calculatePrice);
+            element.addEventListener('input', calculatePrice); // Для чаевых и динамического ввода
+        });
+
+        function calculatePrice() {
+            let basePrice = 0;
+            let distanceKm = 0;
+
+            if (fromMarker && toMarker) {
+                distanceKm = calculateDistance(
+                    fromMarker.getLatLng().lat, fromMarker.getLatLng().lng,
+                    toMarker.getLatLng().lat, toMarker.getLatLng().lng
+                );
+
+                if (distanceKm >= 1 && distanceKm <= 4) {
+                    basePrice = 10;
+                } else if (distanceKm > 4) {
+                    basePrice = 10 + (distanceKm - 4) * 2.5;
+                }
+            }
+
+            let totalPrice = basePrice;
+
+            // Дополнительные опции
+            if (document.getElementById('luggage').checked) totalPrice += 4;
+            // if (document.getElementById('kids').checked) totalPrice += 0; // +0 сомони, так что не влияет
+            if (document.getElementById('ac').checked) totalPrice += 1;
+            if (document.getElementById('signboard').checked) totalPrice += 4;
+
+            const tariff = document.getElementById('tariff').value;
+            if (tariff === 'comfort') totalPrice *= 1.30;
+            if (tariff === 'business') totalPrice *= 1.20;
+            if (tariff === 'delivery') totalPrice += 3;
+
+            if (document.getElementById('female-driver').checked) totalPrice *= 1.40;
+
+            const tips = parseFloat(document.getElementById('tips').value) || 0;
+            totalPrice += tips;
+
+            estimatedPriceSpan.textContent = totalPrice.toFixed(2);
+        }
+
+        // --- 8. Клиентский функционал ---
+        const orderForm = document.getElementById('order-form');
+        const clientActiveOrdersList = document.getElementById('client-active-orders-list');
+        const clientOrdersHistoryList = document.getElementById('client-orders-history');
+        const clientOrderNotification = document.getElementById('client-order-notification');
+
+        document.getElementById('time-option').addEventListener('change', (e) => {
+            document.getElementById('pickup-time').style.display = e.target.value === 'later' ? 'block' : 'none';
+        });
+
+        orderForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!fromMarker || !toMarker) {
+                showNotification('Пожалуйста, выберите точки Откуда и Куда на карте.', true);
+                return;
+            }
+
+            const pickupTimeElement = document.getElementById('pickup-time');
+            const selectedTime = document.getElementById('time-option').value === 'later'
+                ? new Date(pickupTimeElement.value)
+                : new Date();
+
+            if (document.getElementById('time-option').value === 'later' && !pickupTimeElement.value) {
+                showNotification('Пожалуйста, выберите время подачи.', true);
+                return;
+            }
+
+            const orderData = {
+                phoneNumber: document.getElementById('phone-number').value,
+                from: {
+                    address: document.getElementById('from-location').value,
+                    coords: new firebase.firestore.GeoPoint(fromMarker.getLatLng().lat, fromMarker.getLatLng().lng)
+                },
+                to: {
+                    address: document.getElementById('to-location').value,
+                    coords: new firebase.firestore.GeoPoint(toMarker.getLatLng().lat, toMarker.getLatLng().lng)
+                },
+                options: {
+                    luggage: document.getElementById('luggage').checked,
+                    kids: document.getElementById('kids').checked,
+                    ac: document.getElementById('ac').checked,
+                    femaleDriver: document.getElementById('female-driver').checked,
+                    signboard: document.getElementById('signboard').checked
+                },
+                tips: parseFloat(document.getElementById('tips').value) || 0,
+                tariff: document.getElementById('tariff').value,
+                comment: document.getElementById('comment').value,
+                paymentMethod: document.getElementById('payment-method').value,
+                timeOption: document.getElementById('time-option').value,
+                pickupTime: selectedTime,
+                estimatedPrice: parseFloat(estimatedPriceSpan.textContent),
+                status: 'pending', // pending, accepted, cancelled, completed, waiting
+                clientId: auth.currentUser.email,
+                driverId: null,
+                driverInfo: null, // Имя водителя, номер телефона, гос номер машины, марка, цвет
+                waitingStartedAt: null, // Для водителя
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                const docRef = await db.collection('orders').add(orderData);
+                showNotification('Заказ успешно создан!', false);
+                orderForm.reset();
+                if (fromMarker) { currentMap.removeLayer(fromMarker); fromMarker = null; }
+                if (toMarker) { currentMap.removeLayer(toMarker); toMarker = null; }
+                document.getElementById('pickup-time').style.display = 'none'; // Скрыть поле времени
+                calculatePrice(); // Сброс цены
+
+                await sendTelegramMessage(
+                    `<b>Новый заказ #${docRef.id}</b>\n` +
+                    `<b>Откуда:</b> ${orderData.from.address}\n` +
+                    `<b>Куда:</b> ${orderData.to.address || 'Не указано'}\n` +
+                    `<b>Телефон:</b> ${orderData.phoneNumber}\n` +
+                    `<b>Предварительная цена:</b> ${orderData.estimatedPrice.toFixed(2)} сомони\n` +
+                    `<b>Тариф:</b> ${orderData.tariff}\n` +
+                    `<b>Опции:</b> ${Object.keys(orderData.options).filter(k => orderData.options[k]).join(', ') || 'Нет'}\n` +
+                    (orderData.comment ? `<b>Комментарий:</b> ${orderData.comment}\n` : '') +
+                    `<b>Оплата:</b> ${orderData.paymentMethod}\n` +
+                    `<b>Время:</b> ${orderData.timeOption === 'now' ? 'Сейчас' : orderData.pickupTime.toLocaleString('ru-RU')}`
+                );
+
+            } catch (error) {
+                console.error('Ошибка при создании заказа:', error);
+                showNotification('Не удалось создать заказ. Попробуйте снова.', true);
+            }
+        });
+
+        function loadClientOrders() {
+            if (!auth.currentUser) return;
+
+            db.collection('orders')
+                .where('clientId', '==', auth.currentUser.email)
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    clientActiveOrdersList.innerHTML = '';
+                    clientOrdersHistoryList.innerHTML = '';
+
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderId = doc.id;
+                        const orderCard = document.createElement('div');
+                        orderCard.classList.add('order-card');
+                        orderCard.innerHTML = `
+                            <h3>Заказ #${orderId}</h3>
+                            <p><strong>Откуда:</strong> ${order.from.address}</p>
+                            <p><strong>Куда:</strong> ${order.to.address || 'Не указано'}</p>
+                            <p><strong>Цена:</strong> ${order.estimatedPrice.toFixed(2)} сомони</p>
+                            <p><strong>Статус:</strong> <span style="color: ${getOrderStatusColor(order.status)}; font-weight: bold;">${getOrderStatusText(order.status)}</span></p>
+                            ${order.driverInfo ? `
+                                <p><strong>Водитель:</strong> ${order.driverInfo.name || 'Неизвестно'} (${order.driverInfo.phone || 'Нет телефона'})</p>
+                                <p><strong>Машина:</strong> ${order.driverInfo.carModel || ''} ${order.driverInfo.carColor || ''} (${order.driverInfo.carPlate || 'Нет номера'})</p>
+                            ` : ''}
+                            <p><strong>Время подачи:</strong> ${order.pickupTime ? new Date(order.pickupTime.toDate()).toLocaleString('ru-RU') : 'Сейчас'}</p>
+                            <p><strong>Комментарий:</strong> ${order.comment || 'Нет'}</p>
+                        `;
+
+                        if (order.status === 'pending') {
+                            orderCard.innerHTML += `
+                                <button class="cancel-order-btn btn-red" data-id="${orderId}">Отменить</button>
+                                <button class="edit-order-btn btn-blue-light" data-id="${orderId}">Редактировать</button>
+                            `;
+                            clientActiveOrdersList.appendChild(orderCard);
+                        } else if (order.status === 'accepted' || order.status === 'waiting') {
+                             orderCard.innerHTML += `
+                                <button class="cancel-order-btn btn-red" data-id="${orderId}">Отменить</button>
+                                <button class="edit-order-btn btn-blue-light" data-id="${orderId}">Редактировать</button>
+                            `; // Можно разрешить редактирование до определенного момента
+                            clientActiveOrdersList.appendChild(orderCard);
+
+                            if (!localStorage.getItem(`client_notified_${orderId}`)) {
+                                clientOrderNotification.textContent = `Ваш заказ #${orderId} принят водителем ${order.driverInfo.name || ''}!`;
+                                clientOrderNotification.style.display = 'block';
+                                setTimeout(() => clientOrderNotification.style.display = 'none', 7000);
+                                localStorage.setItem(`client_notified_${orderId}`, 'true');
+                            }
+                        } else { // cancelled, completed
+                            clientOrdersHistoryList.appendChild(orderCard);
+                        }
+                    });
+
+                    // Обработчики для кнопок
+                    clientActiveOrdersList.querySelectorAll('.cancel-order-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => cancelClientOrder(e.target.dataset.id));
+                    });
+                    clientActiveOrdersList.querySelectorAll('.edit-order-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => editClientOrder(e.target.dataset.id));
+                    });
+                });
+        }
+
+        async function cancelClientOrder(orderId) {
+            if (confirm('Вы уверены, что хотите отменить этот заказ?')) {
+                try {
+                    await db.collection('orders').doc(orderId).update({ status: 'cancelled' });
+                    showNotification('Заказ отменен.', false);
+                } catch (error) {
+                    console.error('Ошибка отмены заказа:', error);
+                    showNotification('Не удалось отменить заказ.', true);
+                }
+            }
+        }
+
+        async function editClientOrder(orderId) {
+            showNotification('Функция редактирования заказа пока не реализована.', true);
+            // TODO: Реализовать загрузку данных заказа в форму и обновление
+        }
+
+        // --- 9. Водительский функционал ---
+        const availableOrdersList = document.getElementById('available-orders-list');
+        const acceptedOrdersList = document.getElementById('accepted-orders-list');
+        const driverHistoryList = document.getElementById('driver-history-list');
+
+        function loadAvailableOrders() {
+            db.collection('orders')
+                .where('status', '==', 'pending')
+                .orderBy('createdAt', 'asc')
+                .onSnapshot(snapshot => {
+                    availableOrdersList.innerHTML = '';
+                    if (snapshot.empty) {
+                        availableOrdersList.innerHTML = '<p>Пока нет доступных заказов.</p>';
+                    }
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderId = doc.id;
+                        const orderCard = document.createElement('div');
+                        orderCard.classList.add('order-card');
+                        orderCard.innerHTML = `
+                            <h3>Заказ #${orderId}</h3>
+                            <p><strong>Откуда:</strong> ${order.from.address}</p>
+                            <p><strong>Куда:</strong> ${order.to.address || 'Не указано'}</p>
+                            <p><strong>Цена:</strong> ${order.estimatedPrice.toFixed(2)} сомони</p>
+                            <p><strong>Телефон клиента:</strong> ${order.phoneNumber}</p>
+                            <p><strong>Время подачи:</strong> ${order.pickupTime ? new Date(order.pickupTime.toDate()).toLocaleString('ru-RU') : 'Сейчас'}</p>
+                            <p><strong>Тариф:</strong> ${order.tariff}</p>
+                            <p><strong>Опции:</strong> ${Object.keys(order.options).filter(k => order.options[k]).join(', ') || 'Нет'}</p>
+                            <p><strong>Комментарий:</strong> ${order.comment || 'Нет'}</p>
+                            <button class="accept-order-btn btn-green" data-id="${orderId}">Принять заказ</button>
+                        `;
+                        availableOrdersList.appendChild(orderCard);
+                    });
+
+                    availableOrdersList.querySelectorAll('.accept-order-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => acceptOrder(e.target.dataset.id));
+                    });
+                });
+        }
+
+        async function acceptOrder(orderId) {
+            if (!auth.currentUser) {
+                showNotification('Вы не авторизованы.', true);
+                return;
+            }
+
+            // В реальном приложении driverInfo нужно получать из профиля водителя в Firestore
+            const driverInfo = {
+                name: auth.currentUser.email.split('@')[0], // Просто имя из email
+                phone: '+992987654321', // Пример
+                carPlate: '01TAXI99', // Пример
+                carModel: 'Hyundai Elantra', // Пример
+                carColor: 'Белый' // Пример
+            };
+
+            try {
+                // Проверяем, не принят ли заказ уже
+                const orderDoc = await db.collection('orders').doc(orderId).get();
+                if (orderDoc.exists && orderDoc.data().status !== 'pending') {
+                    showNotification('Этот заказ уже принят или отменен.', true);
+                    return;
+                }
+
+                await db.collection('orders').doc(orderId).update({
+                    status: 'accepted',
+                    driverId: auth.currentUser.email,
+                    driverInfo: driverInfo
+                });
+                showNotification(`Заказ #${orderId} принят!`, false);
+
+                await sendTelegramMessage(
+                    `Заказ <b>#${orderId}</b> принят водителем: <b>${auth.currentUser.email}</b>`
+                );
+
+            } catch (error) {
+                console.error('Ошибка при принятии заказа:', error);
+                showNotification(`Не удалось принять заказ: ${error.message}`, true);
+            }
+        }
+
+        function loadAcceptedDriverOrders() {
+            if (!auth.currentUser) return;
+
+            db.collection('orders')
+                .where('driverId', '==', auth.currentUser.email)
+                .where('status', 'in', ['accepted', 'waiting']) // Водитель видит принятые и в ожидании
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    acceptedOrdersList.innerHTML = '';
+                    if (snapshot.empty) {
+                        acceptedOrdersList.innerHTML = '<p>У вас нет активных принятых заказов.</p>';
+                    }
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderId = doc.id;
+                        const orderCard = document.createElement('div');
+                        orderCard.classList.add('order-card');
+                        orderCard.innerHTML = `
+                            <h3>Мой заказ #${orderId}</h3>
+                            <p><strong>Откуда:</strong> ${order.from.address}</p>
+                            <p><strong>Куда:</strong> ${order.to.address || 'Не указано'}</p>
+                            <p><strong>Цена:</strong> ${order.estimatedPrice.toFixed(2)} сомони</p>
+                            <p><strong>Телефон клиента:</strong> ${order.phoneNumber}</p>
+                            <p><strong>Статус:</strong> <span style="color: ${getOrderStatusColor(order.status)}; font-weight: bold;">${getOrderStatusText(order.status)}</span></p>
+                            <p><strong>Время подачи:</strong> ${order.pickupTime ? new Date(order.pickupTime.toDate()).toLocaleString('ru-RU') : 'Сейчас'}</p>
+                            <hr>
+                            <button class="driver-cancel-order-btn btn-red" data-id="${orderId}">Отменить</button>
+                            <button class="driver-edit-order-btn btn-blue-light" data-id="${orderId}">Редактировать</button>
+                            <button class="driver-toggle-waiting-btn ${order.waiting ? 'btn-red' : 'btn-blue-light'}" data-id="${orderId}" data-waiting="${order.waiting || false}">
+                                ${order.waiting ? 'Выключить ожидание' : 'Включить ожидание'}
+                            </button>
+                            <button class="complete-order-btn btn-green" data-id="${orderId}">Завершить заказ</button>
+                        `;
+                        acceptedOrdersList.appendChild(orderCard);
+                    });
+
+                    acceptedOrdersList.querySelectorAll('.driver-cancel-order-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => driverCancelOrder(e.target.dataset.id));
+                    });
+                    acceptedOrdersList.querySelectorAll('.driver-edit-order-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => driverEditOrder(e.target.dataset.id));
+                    });
+                    acceptedOrdersList.querySelectorAll('.driver-toggle-waiting-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => toggleWaiting(e.target.dataset.id, e.target.dataset.waiting === 'true'));
+                    });
+                     acceptedOrdersList.querySelectorAll('.complete-order-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => completeOrder(e.target.dataset.id));
+                    });
+                });
+        }
+
+        function loadDriverHistory() {
+            if (!auth.currentUser) return;
+
+            db.collection('orders')
+                .where('driverId', '==', auth.currentUser.email)
+                .where('status', '==', 'completed')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    driverHistoryList.innerHTML = '';
+                    if (snapshot.empty) {
+                        driverHistoryList.innerHTML = '<p>У вас пока нет завершенных поездок.</p>';
+                    }
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderId = doc.id;
+                        const orderCard = document.createElement('div');
+                        orderCard.classList.add('order-card');
+                        orderCard.innerHTML = `
+                            <h3>Завершённый заказ #${orderId}</h3>
+                            <p><strong>Откуда:</strong> ${order.from.address}</p>
+                            <p><strong>Куда:</strong> ${order.to.address || 'Не указано'}</p>
+                            <p><strong>Итоговая цена:</strong> ${order.estimatedPrice.toFixed(2)} сомони</p>
+                            <p><strong>Дата завершения:</strong> ${order.completedAt ? new Date(order.completedAt.toDate()).toLocaleString('ru-RU') : 'Неизвестно'}</p>
+                        `;
+                        driverHistoryList.appendChild(orderCard);
+                    });
+                });
+        }
+
+        async function driverCancelOrder(orderId) {
+            if (confirm('Вы уверены, что хотите отменить этот заказ? Он вернется в список доступных.')) {
+                try {
+                    await db.collection('orders').doc(orderId).update({ status: 'pending', driverId: null, driverInfo: null });
+                    showNotification('Заказ отменен и возвращен в список доступных.', false);
+                } catch (error) {
+                    console.error('Ошибка отмены заказа водителем:', error);
+                    showNotification('Не удалось отменить заказ.', true);
+                }
+            }
+        }
+
+        async function driverEditOrder(orderId) {
+            showNotification('Функция редактирования заказа водителем пока не реализована.', true);
+            // TODO: Реализовать логику редактирования для водителя
+        }
+
+        async function toggleWaiting(orderId, currentWaitingStatus) {
+            const newWaitingStatus = !currentWaitingStatus;
+            try {
+                if (newWaitingStatus) {
+                    await db.collection('orders').doc(orderId).update({
+                        status: 'waiting',
+                        waiting: true,
+                        waitingStartedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showNotification('Режим ожидания включен. Начинается отсчет времени.', false);
+                } else {
+                    const orderDoc = await db.collection('orders').doc(orderId).get();
+                    if (orderDoc.exists && orderDoc.data().waitingStartedAt) {
+                        const startedAt = orderDoc.data().waitingStartedAt.toDate();
+                        const now = new Date();
+                        const minutesWaited = Math.ceil((now - startedAt) / (1000 * 60)); // Минуты
+                        const waitingCost = minutesWaited * 0.5; // 0.5 сомони за минуту
+                        const currentPrice = orderDoc.data().estimatedPrice;
+                        const newPrice = currentPrice + waitingCost;
+
+                        await db.collection('orders').doc(orderId).update({
+                            status: 'accepted', // Возвращаем статус к accepted
+                            waiting: false,
+                            waitingStartedAt: null,
+                            estimatedPrice: newPrice
+                        });
+                        showNotification(`Режим ожидания выключен. Добавлено ${waitingCost.toFixed(2)} сомони за ${minutesWaited} минут ожидания. Новая цена: ${newPrice.toFixed(2)}`, false);
+                    } else {
+                        await db.collection('orders').doc(orderId).update({
+                            status: 'accepted', // Возвращаем статус к accepted
+                            waiting: false,
+                            waitingStartedAt: null
+                        });
+                        showNotification('Режим ожидания выключен.', false);
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка переключения ожидания:', error);
+                showNotification('Не удалось переключить режим ожидания.', true);
+            }
+        }
+
+        async function completeOrder(orderId) {
+             if (confirm('Вы уверены, что хотите завершить этот заказ?')) {
+                try {
+                    await db.collection('orders').doc(orderId).update({
+                        status: 'completed',
+                        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showNotification('Заказ завершен!', false);
+                } catch (error) {
+                    console.error('Ошибка завершения заказа:', error);
+                    showNotification('Не удалось завершить заказ.', true);
+                }
+             }
+        }
+
+        // --- 10. Административный функционал ---
+        const userListDiv = document.getElementById('user-list');
+        const adminOrderListDiv = document.getElementById('admin-orders-list');
+        const adminUserSearchInput = document.getElementById('admin-user-search');
+        const adminOrderSearchInput = document.getElementById('admin-order-search');
+
+        document.getElementById('admin-search-user-btn').addEventListener('click', loadUsersForAdmin);
+        document.getElementById('admin-search-order-btn').addEventListener('click', loadOrdersForAdmin);
+
+        function loadUsersForAdmin() {
+            let usersRef = db.collection('users');
+            const searchTerm = adminUserSearchInput.value.trim().toLowerCase();
+
+            if (searchTerm) {
+                // Поиск по email, начинающемуся с searchTerm
+                usersRef = usersRef.where('email', '>=', searchTerm).where('email', '<=', searchTerm + '\uf8ff');
+            }
+
+            usersRef.onSnapshot(snapshot => {
+                userListDiv.innerHTML = '';
+                if (snapshot.empty) {
+                    userListDiv.innerHTML = '<p>Пользователи не найдены.</p>';
+                }
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    if (user.email === ADMIN_EMAIL) return; // Не показывать админа в списке для редактирования
+
+                    const userCard = document.createElement('div');
+                    userCard.classList.add('user-card');
+                    userCard.innerHTML = `
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Роль:</strong> ${user.role}</p>
+                        ${user.role !== 'driver' ? `<button class="assign-driver-btn btn-green" data-email="${user.email}">Назначить водителем</button>` : ''}
+                        ${user.role === 'driver' ? `<button class="remove-driver-btn btn-red" data-email="${user.email}">Уволить водителя</button>` : ''}
+                    `;
+                    userListDiv.appendChild(userCard);
+                });
+
+                userListDiv.querySelectorAll('.assign-driver-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => assignDriver(e.target.dataset.email));
+                });
+                userListDiv.querySelectorAll('.remove-driver-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => removeDriver(e.target.dataset.email));
+                });
+            });
+        }
+
+        async function assignDriver(email) {
+            try {
+                await db.collection('users').doc(email).update({ role: 'driver' });
+                showNotification(`${email} назначен водителем.`, false);
+            } catch (error) {
+                console.error('Ошибка при назначении водителя:', error);
+                showNotification('Не удалось назначить водителя.', true);
+            }
+        }
+
+        async function removeDriver(email) {
+            try {
+                await db.collection('users').doc(email).update({ role: 'client' });
+                showNotification(`${email} больше не водитель.`, false);
+            } catch (error) {
+                console.error('Ошибка при увольнении водителя:', error);
+                showNotification('Не удалось уволить водителя.', true);
+            }
+        }
+
+        function loadOrdersForAdmin() {
+            let ordersRef = db.collection('orders');
+            const searchTerm = adminOrderSearchInput.value.trim().toLowerCase();
+
+            ordersRef.orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                adminOrderListDiv.innerHTML = '';
+                if (snapshot.empty) {
+                    adminOrderListDiv.innerHTML = '<p>Заказы не найдены.</p>';
+                }
+                snapshot.forEach(doc => {
+                    const order = doc.data();
+                    const orderId = doc.id;
+
+                    const match = searchTerm === '' ||
+                                  orderId.toLowerCase().includes(searchTerm) ||
+                                  (order.from && order.from.address && order.from.address.toLowerCase().includes(searchTerm)) ||
+                                  (order.to && order.to.address && order.to.address.toLowerCase().includes(searchTerm)) ||
+                                  (order.clientId && order.clientId.toLowerCase().includes(searchTerm)) ||
+                                  (order.driverId && order.driverId.toLowerCase().includes(searchTerm));
+
+                    if (match) {
+                        const orderCard = document.createElement('div');
+                        orderCard.classList.add('order-card');
+                        orderCard.innerHTML = `
+                            <h3>Заказ #${orderId}</h3>
+                            <p><strong>Клиент:</strong> ${order.clientId}</p>
+                            <p><strong>Откуда:</strong> ${order.from.address}</p>
+                            <p><strong>Куда:</strong> ${order.to.address || 'Не указано'}</p>
+                            <p><strong>Цена:</strong> ${order.estimatedPrice.toFixed(2)} сомони</p>
+                            <p><strong>Статус:</strong> <span style="color: ${getOrderStatusColor(order.status)}; font-weight: bold;">${getOrderStatusText(order.status)}</span></p>
+                            ${order.driverId ? `<p><strong>Водитель:</strong> ${order.driverId}</p>` : ''}
+                            <p><strong>Телефон клиента:</strong> ${order.phoneNumber}</p>
+                            <p><strong>Время подачи:</strong> ${order.pickupTime ? new Date(order.pickupTime.toDate()).toLocaleString('ru-RU') : 'Сейчас'}</p>
+                            <button class="admin-cancel-order-btn btn-red" data-id="${orderId}">Отменить заказ</button>
+                        `;
+                        adminOrderListDiv.appendChild(orderCard);
+                    }
+                });
+
+                adminOrderListDiv.querySelectorAll('.admin-cancel-order-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => adminCancelOrder(e.target.dataset.id));
+                });
+            });
+        }
+
+        async function adminCancelOrder(orderId) {
+            if (confirm('Вы уверены, что хотите отменить этот заказ?')) {
+                try {
+                    await db.collection('orders').doc(orderId).update({ status: 'cancelled' });
+                    showNotification('Заказ отменен администратором.', false);
+                } catch (error) {
+                    console.error('Ошибка при отмене заказа администратором:', error);
+                    showNotification('Не удалось отменить заказ.', true);
+                }
+            }
+        }
+
+        // --- Вспомогательные функции для статусов ---
+        function getOrderStatusColor(status) {
+            switch (status) {
+                case 'pending': return '#ffc107'; // Желтый
+                case 'accepted': return '#007bff'; // Синий
+                case 'waiting': return '#fd7e14'; // Оранжевый
+                case 'completed': return '#28a745'; // Зеленый
+                case 'cancelled': return '#dc3545'; // Красный
+                default: return '#e0e0e0';
+            }
+        }
+
+        function getOrderStatusText(status) {
+            switch (status) {
+                case 'pending': return 'В ожидании';
+                case 'accepted': return 'Принят';
+                case 'waiting': return 'Ожидание клиента';
+                case 'completed': return 'Завершён';
+                case 'cancelled': return 'Отменён';
+                default: return 'Неизвестно';
+            }
+        }
+    </script>
+</body>
+</html>
