@@ -1,0 +1,3681 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+<!-- Основная информация -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TezPul — Современный цифровой банк Таджикистана | Онлайн-кошелёк и переводы</title>
+
+<!-- Описание -->
+<meta name="description" content="TezPul — первый современный цифровой банк из Таджикистана. Умные переводы, безопасный кошелёк, контроль баланса, мгновенные платежи и удобный интерфейс. Ваши финансы под полным контролем с TezPul.">
+
+<!-- Ключевые слова -->
+<meta name="keywords" content="TezPul, ТезПул, таджикский банк, онлайн банк Таджикистан, цифровой банк, мобильный банк, финтех Таджикистан, переводы, кошелёк, суперапп, TezPul bank, TezPul Tajikistan, Dorosfamd, финансы, переводы, безопасность, приложение банк, платёжная система, онлайн кошелёк, отправить деньги, получить деньги, бизнес-платежи, TezPul приложение, банковская карта, финансовое приложение">
+
+<!-- Автор и издатель -->
+<meta name="author" content="TezPul — Современный цифровой банк | DOROSfamd">
+<meta name="publisher" content="TezPul Digital Finance">
+<meta name="copyright" content="© 2025 TezPul Digital Bank — Все права защищены.">
+
+<!-- Гео-данные -->
+<meta name="geo.region" content="TJ">
+<meta name="geo.placename" content="Dushanbe">
+<meta name="geo.position" content="38.5598;68.7870">
+<meta name="ICBM" content="38.5598, 68.7870">
+
+<!-- Языковые версии -->
+<meta http-equiv="Content-Language" content="ru-TJ, en, tg">
+
+<!-- Open Graph (Facebook, WhatsApp, LinkedIn и др.) -->
+<meta property="og:title" content="TezPul — Современный цифровой банк Таджикистана">
+<meta property="og:description" content="TezPul — ваш надёжный цифровой кошелёк. Переводы, баланс, безопасность и инновационные решения для каждого пользователя в Таджикистане.">
+<meta property="og:image" content="https://dorosfamd.com/logobank.png">
+<meta property="og:image:alt" content="TezPul Digital Bank Logo">
+<meta property="og:url" content="https://tezpul.tj">
+<meta property="og:site_name" content="TezPul">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:locale:alternate" content="tg_TJ">
+<meta property="og:locale:alternate" content="en_US">
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TezPul — цифровой банк нового поколения из Таджикистана">
+<meta name="twitter:description" content="Быстрые и безопасные переводы, онлайн-кошелёк, управление балансом и мгновенные платежи. TezPul — всё, что нужно для финансов будущего.">
+<meta name="twitter:image" content="https://dorosfamd.com/logobank.png">
+<meta name="twitter:site" content="@TezPulOfficial">
+<meta name="twitter:creator" content="@TezPulOfficial">
+
+<!-- Apple / Android / PWA -->
+<meta name="theme-color" content="#1a4d2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TezPul">
+<meta name="application-name" content="TezPul">
+<link rel="apple-touch-icon" href="https://dorosfamd.com/logobank.png">
+<link rel="icon" type="image/png" sizes="512x512" href="https://dorosfamd.com/logobank.png">
+
+<!-- Шрифты и библиотеки -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase и утилиты -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>  <style>
+  /* Modern Color Scheme */
+          :root {
+              --primary: #4361ee;
+              --primary-dark: #3a56d4;
+              --primary-light: #4f6df5;
+              --secondary: #3f37c9;
+              --accent: #4895ef;
+              --accent-dark: #3a7bc8;
+              --success: #4cc9f0;
+              --success-dark: #3ab7d8;
+              --danger: #f72585;
+              --danger-dark: #e5177b;
+              --warning: #f8961e;
+              --warning-dark: #e68717;
+              --info: #38b000;
+              --info-dark: #2d8f00;
+              --light: #f8f9fa;
+              --light-gray: #e9ecef;
+              --gray: #adb5bd;
+              --dark: #212529;
+              --dark-gray: #495057;
+              --black: #0a0a0a;
+              --white: #ffffff;
+              
+              --card-gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+              --card-silver: linear-gradient(135deg, #f1f1f1 0%, #e1e1e1 100%);
+              --card-gold: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
+              --card-platinum: linear-gradient(135deg, #e5e4e2 0%, #c0c0c0 100%);
+              
+              --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.05);
+              --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+              --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+              --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.1);
+              --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+              --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+              
+              --radius-sm: 4px;
+              --radius-md: 8px;
+              --radius-lg: 12px;
+              --radius-xl: 16px;
+              --radius-2xl: 20px;
+              --radius-3xl: 24px;
+              --radius-full: 9999px;
+              
+              --space-xxs: 4px;
+              --space-xs: 8px;
+              --space-sm: 12px;
+              --space-md: 16px;
+              --space-lg: 24px;
+              --space-xl: 32px;
+              --space-2xl: 40px;
+              --space-3xl: 48px;
+              --space-4xl: 64px;
+              
+              --text-xs: 0.75rem;
+              --text-sm: 0.875rem;
+              --text-md: 1rem;
+              --text-lg: 1.125rem;
+              --text-xl: 1.25rem;
+              --text-2xl: 1.5rem;
+              --text-3xl: 1.875rem;
+              --text-4xl: 2.25rem;
+              --text-5xl: 3rem;
+              
+              --transition-fast: 0.15s ease;
+              --transition-normal: 0.3s ease;
+              --transition-slow: 0.45s ease;
+          }
+          
+          /* Base Styles */
+          *,
+          *::before,
+          *::after {
+              box-sizing: border-box;
+              margin: 0;
+              padding: 0;
+          }
+          
+          html {
+              scroll-behavior: smooth;
+              font-size: 16px;
+              height: 100%;
+          }
+          
+          body {
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+              line-height: 1.6;
+              color: var(--dark);
+              background-color: var(--light);
+              min-height: 100vh;
+              overflow-x: hidden;
+              text-rendering: optimizeLegibility;
+              -webkit-font-smoothing: antialiased;
+              -moz-osx-font-smoothing: grayscale;
+          }
+          
+          /* Typography */
+          h1, h2, h3, h4, h5, h6 {
+              font-weight: 600;
+              line-height: 1.25;
+              margin-bottom: var(--space-sm);
+              color: var(--dark);
+          }
+          
+          h1 {
+              font-size: var(--text-4xl);
+          }
+          
+          h2 {
+              font-size: var(--text-3xl);
+          }
+          
+          h3 {
+              font-size: var(--text-2xl);
+          }
+          
+          h4 {
+              font-size: var(--text-xl);
+          }
+          
+          p {
+              margin-bottom: var(--space-md);
+              color: var(--dark-gray);
+          }
+          
+          a {
+              color: var(--primary);
+              text-decoration: none;
+              transition: color var(--transition-fast);
+          }
+          
+          a:hover {
+              color: var(--primary-dark);
+          }
+          
+          /* Layout */
+          .container {
+              width: 100%;
+              max-width: 1200px;
+              margin: 0 auto;
+              padding: 0 var(--space-md);
+          }
+          
+          .section {
+              padding: var(--space-3xl) 0;
+          }
+          
+          .grid {
+              display: grid;
+              gap: var(--space-md);
+          }
+          
+          .grid-cols-2 {
+              grid-template-columns: repeat(2, 1fr);
+          }
+          
+          .grid-cols-3 {
+              grid-template-columns: repeat(3, 1fr);
+          }
+          
+          .grid-cols-4 {
+              grid-template-columns: repeat(4, 1fr);
+          }
+          
+          .flex {
+              display: flex;
+          }
+          
+          .flex-col {
+              flex-direction: column;
+          }
+          
+          .items-center {
+              align-items: center;
+          }
+          
+          .items-start {
+              align-items: flex-start;
+          }
+          
+          .items-end {
+              align-items: flex-end;
+          }
+          
+          .justify-center {
+              justify-content: center;
+          }
+          
+          .justify-between {
+              justify-content: space-between;
+          }
+          
+          .justify-end {
+              justify-content: flex-end;
+          }
+          
+          .gap-xs {
+              gap: var(--space-xs);
+          }
+          
+          .gap-sm {
+              gap: var(--space-sm);
+          }
+          
+          .gap-md {
+              gap: var(--space-md);
+          }
+          
+          .gap-lg {
+              gap: var(--space-lg);
+          }
+          
+          .gap-xl {
+              gap: var(--space-xl);
+          }
+          
+          /* Components */
+          .btn {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              padding: var(--space-sm) var(--space-md);
+              border-radius: var(--radius-lg);
+              font-weight: 500;
+              font-size: var(--text-md);
+              line-height: 1;
+              text-align: center;
+              cursor: pointer;
+              transition: all var(--transition-normal);
+              border: none;
+              background: var(--primary);
+              color: var(--white);
+              box-shadow: var(--shadow-sm);
+              min-width: 120px;
+              gap: var(--space-xs);
+              position: relative;
+              overflow: hidden;
+          }
+          
+          .btn::after {
+              content: '';
+              position: absolute;
+              top: -50%;
+              left: -50%;
+              width: 200%;
+              height: 200%;
+              background: linear-gradient(
+                  to bottom right,
+                  rgba(255, 255, 255, 0.3),
+                  rgba(255, 255, 255, 0.1),
+                  rgba(255, 255, 255, 0)
+              );
+              transform: rotate(30deg);
+              transition: all var(--transition-normal);
+              opacity: 0;
+          }
+          
+          .btn:hover {
+              transform: translateY(-2px);
+              box-shadow: var(--shadow-md);
+              background: var(--primary-dark);
+          }
+          
+          .btn:hover::after {
+              opacity: 1;
+              animation: shine 1.5s ease infinite;
+          }
+          
+          .btn:active {
+              transform: translateY(0);
+              box-shadow: var(--shadow-sm);
+          }
+          
+          .btn:disabled {
+              opacity: 0.7;
+              cursor: not-allowed;
+          }
+          
+          .btn-outline {
+              background: transparent;
+              border: 2px solid var(--primary);
+              color: var(--primary);
+              box-shadow: none;
+          }
+          
+          .btn-outline:hover {
+              background: var(--primary);
+              color: var(--white);
+          }
+          
+          .btn-secondary {
+              background: var(--card-silver);
+              color: var(--dark);
+          }
+          
+          .btn-secondary:hover {
+              background: linear-gradient(135deg, #e1e1e1 0%, #d1d1d1 100%);
+          }
+          
+          .btn-success {
+              background: var(--success);
+          }
+          
+          .btn-success:hover {
+              background: var(--success-dark);
+          }
+          
+          .btn-danger {
+              background: var(--danger);
+          }
+          
+          .btn-danger:hover {
+              background: var(--danger-dark);
+          }
+          
+          .btn-warning {
+              background: var(--warning);
+          }
+          
+          .btn-warning:hover {
+              background: var(--warning-dark);
+          }
+          
+          .btn-info {
+              background: var(--info);
+          }
+          
+          .btn-info:hover {
+              background: var(--info-dark);
+          }
+          
+          .btn-small {
+              padding: var(--space-xs) var(--space-sm);
+              font-size: var(--text-sm);
+              min-width: auto;
+          }
+          
+          .btn-large {
+              padding: var(--space-md) var(--space-lg);
+              font-size: var(--text-lg);
+          }
+          
+          .btn-icon {
+              width: 40px;
+              height: 40px;
+              min-width: auto;
+              padding: 0;
+              border-radius: var(--radius-full);
+          }
+          
+          .card {
+              background: var(--white);
+              border-radius: var(--radius-xl);
+              box-shadow: var(--shadow-sm);
+              padding: var(--space-lg);
+              transition: all var(--transition-normal);
+              position: relative;
+              overflow: hidden;
+          }
+          
+          .card::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 4px;
+              background: var(--primary);
+          }
+          
+          .card:hover {
+              transform: translateY(-5px);
+              box-shadow: var(--shadow-md);
+          }
+          
+          .card-header {
+              padding-bottom: var(--space-sm);
+              margin-bottom: var(--space-md);
+              border-bottom: 1px solid var(--light-gray);
+          }
+          
+          .card-footer {
+              padding-top: var(--space-sm);
+              margin-top: var(--space-md);
+              border-top: 1px solid var(--light-gray);
+          }
+          
+          .form-group {
+              margin-bottom: var(--space-lg);
+          }
+          
+          .form-label {
+              display: block;
+              margin-bottom: var(--space-xs);
+              font-weight: 500;
+              color: var(--dark);
+          }
+          
+          .form-control {
+              width: 100%;
+              padding: var(--space-sm) var(--space-md);
+              border: 1px solid var(--light-gray);
+              border-radius: var(--radius-lg);
+              font-size: var(--text-md);
+              transition: all var(--transition-normal);
+              background-color: var(--white);
+              color: var(--dark);
+          }
+          
+          .form-control:focus {
+              border-color: var(--primary);
+              outline: none;
+              box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+          }
+          
+          .form-control::placeholder {
+              color: var(--gray);
+          }
+          
+          .form-text {
+              display: block;
+              margin-top: var(--space-xs);
+              font-size: var(--text-sm);
+              color: var(--gray);
+          }
+          
+          .form-select {
+              appearance: none;
+              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234361ee' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+              background-repeat: no-repeat;
+              background-position: right var(--space-sm) center;
+              background-size: 16px 12px;
+              padding-right: var(--space-2xl);
+          }
+          
+          .checkbox {
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+              cursor: pointer;
+          }
+          
+          .checkbox-input {
+              appearance: none;
+              width: 18px;
+              height: 18px;
+              border: 2px solid var(--light-gray);
+              border-radius: var(--radius-sm);
+              background-color: var(--white);
+              transition: all var(--transition-fast);
+              position: relative;
+              cursor: pointer;
+          }
+          
+          .checkbox-input:checked {
+              background-color: var(--primary);
+              border-color: var(--primary);
+          }
+          
+          .checkbox-input:checked::after {
+              content: '';
+              position: absolute;
+              top: 2px;
+              left: 5px;
+              width: 5px;
+              height: 10px;
+              border: solid var(--white);
+              border-width: 0 2px 2px 0;
+              transform: rotate(45deg);
+          }
+          
+          .radio {
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+              cursor: pointer;
+          }
+          
+          .radio-input {
+              appearance: none;
+              width: 18px;
+              height: 18px;
+              border: 2px solid var(--light-gray);
+              border-radius: var(--radius-full);
+              background-color: var(--white);
+              transition: all var(--transition-fast);
+              position: relative;
+              cursor: pointer;
+          }
+          
+          .radio-input:checked {
+              background-color: var(--primary);
+              border-color: var(--primary);
+          }
+          
+          .radio-input:checked::after {
+              content: '';
+              position: absolute;
+              top: 4px;
+              left: 4px;
+              width: 6px;
+              height: 6px;
+              background-color: var(--white);
+              border-radius: var(--radius-full);
+          }
+          
+          .switch {
+              position: relative;
+              display: inline-block;
+              width: 44px;
+              height: 24px;
+          }
+          
+          .switch-input {
+              opacity: 0;
+              width: 0;
+              height: 0;
+          }
+          
+          .switch-slider {
+              position: absolute;
+              cursor: pointer;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: var(--light-gray);
+              transition: all var(--transition-normal);
+              border-radius: var(--radius-full);
+          }
+          
+          .switch-slider::before {
+              position: absolute;
+              content: '';
+              height: 18px;
+              width: 18px;
+              left: 3px;
+              bottom: 3px;
+              background-color: var(--white);
+              transition: all var(--transition-normal);
+              border-radius: var(--radius-full);
+          }
+          
+          .switch-input:checked + .switch-slider {
+              background-color: var(--primary);
+          }
+          
+          .switch-input:checked + .switch-slider::before {
+              transform: translateX(20px);
+          }
+          
+          .badge {
+              display: inline-flex;
+              align-items: center;
+              padding: var(--space-xxs) var(--space-sm);
+              border-radius: var(--radius-full);
+              font-size: var(--text-xs);
+              font-weight: 500;
+              line-height: 1;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+          }
+          
+          .badge-primary {
+              background-color: rgba(67, 97, 238, 0.1);
+              color: var(--primary);
+          }
+          
+          .badge-secondary {
+              background-color: rgba(63, 55, 201, 0.1);
+              color: var(--secondary);
+          }
+          
+          .badge-success {
+              background-color: rgba(76, 201, 240, 0.1);
+              color: var(--success-dark);
+          }
+          
+          .badge-danger {
+              background-color: rgba(247, 37, 133, 0.1);
+              color: var(--danger-dark);
+          }
+          
+          .badge-warning {
+              background-color: rgba(248, 150, 30, 0.1);
+              color: var(--warning-dark);
+          }
+          
+          .badge-info {
+              background-color: rgba(56, 176, 0, 0.1);
+              color: var(--info-dark);
+          }
+          
+          .alert {
+              padding: var(--space-md);
+              border-radius: var(--radius-lg);
+              margin-bottom: var(--space-md);
+              display: flex;
+              align-items: flex-start;
+              gap: var(--space-sm);
+              font-size: var(--text-md);
+          }
+          
+          .alert-primary {
+              background-color: rgba(67, 97, 238, 0.1);
+              color: var(--primary-dark);
+          }
+          
+          .alert-success {
+              background-color: rgba(76, 201, 240, 0.1);
+              color: var(--success-dark);
+          }
+          
+          .alert-danger {
+              background-color: rgba(247, 37, 133, 0.1);
+              color: var(--danger-dark);
+          }
+          
+          .alert-warning {
+              background-color: rgba(248, 150, 30, 0.1);
+              color: var(--warning-dark);
+          }
+          
+          .alert-info {
+              background-color: rgba(56, 176, 0, 0.1);
+              color: var(--info-dark);
+          }
+          
+          .modal {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.5);
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              z-index: 1000;
+              backdrop-filter: blur(5px);
+              padding: var(--space-md);
+              opacity: 0;
+              visibility: hidden;
+              transition: all var(--transition-normal);
+          }
+          
+          .modal.active {
+              opacity: 1;
+              visibility: visible;
+          }
+          
+          .modal-content {
+              background: var(--white);
+              padding: var(--space-xl);
+              border-radius: var(--radius-xl);
+              max-width: 500px;
+              width: 100%;
+              box-shadow: var(--shadow-xl);
+              position: relative;
+              transform: translateY(20px);
+              transition: all var(--transition-normal);
+              max-height: 90vh;
+              overflow-y: auto;
+          }
+          
+          .modal.active .modal-content {
+              transform: translateY(0);
+          }
+          
+          .modal-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: var(--space-lg);
+          }
+          
+          .modal-title {
+              margin: 0;
+              color: var(--dark);
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+          }
+          
+          .modal-close {
+              background: none;
+              border: none;
+              font-size: var(--text-xl);
+              cursor: pointer;
+              color: var(--gray);
+              transition: color var(--transition-fast);
+              padding: var(--space-xs);
+              margin: calc(-1 * var(--space-xs));
+          }
+          
+          .modal-close:hover {
+              color: var(--danger);
+          }
+          
+          .modal-body {
+              margin-bottom: var(--space-lg);
+          }
+          
+          .modal-footer {
+              display: flex;
+              justify-content: flex-end;
+              gap: var(--space-sm);
+          }
+          
+          .tabs {
+              display: flex;
+              border-bottom: 1px solid var(--light-gray);
+              margin-bottom: var(--space-lg);
+          }
+          
+          .tab {
+              padding: var(--space-sm) var(--space-md);
+              cursor: pointer;
+              font-weight: 500;
+              color: var(--gray);
+              border-bottom: 2px solid transparent;
+              transition: all var(--transition-fast);
+              margin-bottom: -1px;
+          }
+          
+          .tab:hover {
+              color: var(--dark);
+          }
+          
+          .tab.active {
+              color: var(--primary);
+              border-bottom-color: var(--primary);
+          }
+          
+          .tab-content {
+              display: none;
+          }
+          
+          .tab-content.active {
+              display: block;
+          }
+          
+          .table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: var(--space-lg);
+          }
+          
+          .table th,
+          .table td {
+              padding: var(--space-sm) var(--space-md);
+              text-align: left;
+              border-bottom: 1px solid var(--light-gray);
+          }
+          
+          .table th {
+              font-weight: 600;
+              color: var(--dark);
+              background-color: rgba(0, 0, 0, 0.02);
+          }
+          
+          .table tr:hover td {
+              background-color: rgba(0, 0, 0, 0.02);
+          }
+          
+          .avatar {
+              width: 40px;
+              height: 40px;
+              border-radius: var(--radius-full);
+              background-color: var(--light-gray);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              position: relative;
+          }
+          
+          .avatar img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+          }
+          
+          .avatar-initials {
+              font-weight: 600;
+              color: var(--dark);
+          }
+          
+          .avatar-sm {
+              width: 32px;
+              height: 32px;
+              font-size: var(--text-sm);
+          }
+          
+          .avatar-md {
+              width: 48px;
+              height: 48px;
+              font-size: var(--text-lg);
+          }
+          
+          .avatar-lg {
+              width: 64px;
+              height: 64px;
+              font-size: var(--text-xl);
+          }
+          
+          .progress {
+              height: 8px;
+              background-color: var(--light-gray);
+              border-radius: var(--radius-full);
+              overflow: hidden;
+          }
+          
+          .progress-bar {
+              height: 100%;
+              background-color: var(--primary);
+              border-radius: var(--radius-full);
+              transition: width var(--transition-slow);
+          }
+          
+          .tooltip {
+              position: relative;
+              display: inline-block;
+          }
+          
+          .tooltip-text {
+              position: absolute;
+              bottom: 100%;
+              left: 50%;
+              transform: translateX(-50%);
+              background-color: var(--dark);
+              color: var(--white);
+              padding: var(--space-xs) var(--space-sm);
+              border-radius: var(--radius-sm);
+              font-size: var(--text-xs);
+              white-space: nowrap;
+              opacity: 0;
+              visibility: hidden;
+              transition: all var(--transition-fast);
+              margin-bottom: var(--space-xs);
+              z-index: 10;
+          }
+          
+          .tooltip-text::after {
+              content: '';
+              position: absolute;
+              top: 100%;
+              left: 50%;
+              transform: translateX(-50%);
+              border-width: 5px;
+              border-style: solid;
+              border-color: var(--dark) transparent transparent transparent;
+          }
+          
+          .tooltip:hover .tooltip-text {
+              opacity: 1;
+              visibility: visible;
+          }
+          
+          .dropdown {
+              position: relative;
+              display: inline-block;
+          }
+          
+          .dropdown-menu {
+              position: absolute;
+              top: 100%;
+              left: 0;
+              background-color: var(--white);
+              border-radius: var(--radius-lg);
+              box-shadow: var(--shadow-md);
+              padding: var(--space-sm) 0;
+              min-width: 200px;
+              z-index: 100;
+              opacity: 0;
+              visibility: hidden;
+              transform: translateY(10px);
+              transition: all var(--transition-fast);
+          }
+          
+          .dropdown.active .dropdown-menu {
+              opacity: 1;
+              visibility: visible;
+              transform: translateY(0);
+          }
+          
+          .dropdown-item {
+              display: block;
+              padding: var(--space-xs) var(--space-md);
+              color: var(--dark);
+              transition: all var(--transition-fast);
+              cursor: pointer;
+          }
+          
+          .dropdown-item:hover {
+              background-color: var(--light);
+              color: var(--primary);
+          }
+          
+          .divider {
+              height: 1px;
+              background-color: var(--light-gray);
+              margin: var(--space-md) 0;
+          }
+          
+          .empty-state {
+              text-align: center;
+              padding: var(--space-xl) var(--space-md);
+          }
+          
+          .empty-state-icon {
+              font-size: var(--text-4xl);
+              color: var(--gray);
+              margin-bottom: var(--space-md);
+          }
+          
+          .empty-state-title {
+              font-size: var(--text-lg);
+              color: var(--dark);
+              margin-bottom: var(--space-xs);
+          }
+          
+          .empty-state-description {
+              color: var(--gray);
+              margin-bottom: var(--space-md);
+          }
+          
+          /* Bank Specific Components */
+          .bank-card {
+              position: relative;
+              height: 220px;
+              border-radius: var(--radius-xl);
+              padding: var(--space-lg);
+              color: var(--white);
+              overflow: hidden;
+              box-shadow: var(--shadow-lg);
+              margin-bottom: var(--space-xl);
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              transition: all var(--transition-normal);
+              z-index: 1;
+          }
+          
+          .bank-card:hover {
+              transform: translateY(-5px);
+              box-shadow: var(--shadow-xl);
+          }
+          
+          .bank-card::before {
+              content: '';
+              position: absolute;
+              top: -50%;
+              right: -50%;
+              width: 200%;
+              height: 200%;
+              background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+              transform: rotate(30deg);
+              z-index: -1;
+          }
+          
+          .bank-card::after {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: var(--card-gradient);
+              z-index: -2;
+          }
+          
+          .bank-card.silver {
+              background: var(--card-silver);
+              color: var(--dark);
+          }
+          
+          .bank-card.silver::after {
+              background: var(--card-silver);
+          }
+          
+          .bank-card.gold {
+              background: var(--card-gold);
+              color: var(--dark);
+          }
+          
+          .bank-card.gold::after {
+              background: var(--card-gold);
+          }
+          
+          .bank-card.platinum {
+              background: var(--card-platinum);
+              color: var(--dark);
+          }
+          
+          .bank-card.platinum::after {
+              background: var(--card-platinum);
+          }
+          
+          .bank-card-logo {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: var(--space-md);
+          }
+          
+          .bank-card-logo img {
+              height: 24px;
+          }
+          
+          .bank-card-type {
+              font-size: var(--text-sm);
+              font-weight: 500;
+              opacity: 0.8;
+          }
+          
+          .bank-card-number {
+              font-size: var(--text-xl);
+              letter-spacing: 2px;
+              margin: var(--space-md) 0;
+              font-family: 'Courier New', monospace;
+              text-align: center;
+              flex-grow: 1;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              word-spacing: 8px;
+          }
+          
+          .bank-card-details {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+          }
+          
+          .bank-card-name {
+              font-size: var(--text-md);
+              text-transform: uppercase;
+              margin-top: var(--space-sm);
+              letter-spacing: 1px;
+          }
+          
+          .bank-card-expiry {
+              font-size: var(--text-md);
+              letter-spacing: 1px;
+          }
+          
+          .bank-card-chip {
+              position: absolute;
+              top: var(--space-lg);
+              left: var(--space-lg);
+              width: 40px;
+              height: 30px;
+              background: rgba(255, 255, 255, 0.3);
+              border-radius: 5px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+          }
+          
+          .bank-card-chip::before {
+              content: '';
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              right: 5px;
+              bottom: 5px;
+              border: 1px solid rgba(255, 255, 255, 0.5);
+              border-radius: 3px;
+          }
+          
+          .balance-container {
+              text-align: center;
+              margin: var(--space-xl) 0;
+              position: relative;
+          }
+          
+          .balance-label {
+              font-size: var(--text-md);
+              color: var(--gray);
+              margin-bottom: var(--space-xs);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: var(--space-xs);
+          }
+          
+          .balance {
+              font-size: var(--text-4xl);
+              font-weight: 700;
+              color: var(--primary);
+              transition: all var(--transition-normal);
+          }
+          
+          .balance-change {
+              font-size: var(--text-md);
+              color: var(--gray);
+              margin-top: var(--space-xs);
+          }
+          
+          .actions-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+              gap: var(--space-md);
+              margin-top: var(--space-lg);
+          }
+          
+          .action-card {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              padding: var(--space-lg);
+              border-radius: var(--radius-lg);
+              background-color: var(--white);
+              box-shadow: var(--shadow-sm);
+              transition: all var(--transition-normal);
+              cursor: pointer;
+              text-align: center;
+          }
+          
+          .action-card:hover {
+              transform: translateY(-5px);
+              box-shadow: var(--shadow-md);
+              background-color: var(--primary);
+              color: var(--white);
+          }
+          
+          .action-card:hover .action-icon {
+              color: var(--white);
+          }
+          
+          .action-card:hover .action-title {
+              color: var(--white);
+          }
+          
+          .action-icon {
+              font-size: var(--text-3xl);
+              color: var(--primary);
+              margin-bottom: var(--space-sm);
+              transition: all var(--transition-normal);
+          }
+          
+          .action-title {
+              font-size: var(--text-md);
+              font-weight: 500;
+              color: var(--dark);
+              transition: all var(--transition-normal);
+          }
+          
+          .transaction {
+              display: flex;
+              justify-content: space-between;
+              padding: var(--space-md) 0;
+              border-bottom: 1px solid var(--light-gray);
+              align-items: center;
+              gap: var(--space-md);
+              transition: all var(--transition-fast);
+          }
+          
+          .transaction:last-child {
+              border-bottom: none;
+          }
+          
+          .transaction:hover {
+              background-color: rgba(0, 0, 0, 0.02);
+          }
+          
+          .transaction-info {
+              flex-grow: 1;
+          }
+          
+          .transaction-date {
+              font-size: var(--text-sm);
+              color: var(--gray);
+              display: flex;
+              align-items: center;
+              gap: var(--space-xs);
+              margin-bottom: var(--space-xs);
+          }
+          
+          .transaction-description {
+              font-weight: 500;
+              margin-top: var(--space-xs);
+              display: flex;
+              align-items: center;
+              gap: var(--space-xs);
+          }
+          
+          .transaction-comment {
+              font-size: var(--text-sm);
+              color: var(--gray);
+              margin-top: var(--space-xs);
+              font-style: italic;
+          }
+          
+          .transaction-amount {
+              font-weight: 600;
+              font-size: var(--text-md);
+              min-width: 100px;
+              text-align: right;
+          }
+          
+          .positive {
+              color: var(--success-dark);
+          }
+          
+          .negative {
+              color: var(--danger-dark);
+          }
+          
+          .neutral {
+              color: var(--info-dark);
+          }
+          
+          .status-message {
+              padding: var(--space-md);
+              border-radius: var(--radius-lg);
+              margin: var(--space-md) 0;
+              display: none;
+              font-size: var(--text-md);
+          }
+          
+          .success {
+              background-color: rgba(76, 201, 240, 0.1);
+              color: var(--success-dark);
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+          }
+          
+          .error {
+              background-color: rgba(247, 37, 133, 0.1);
+              color: var(--danger-dark);
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+          }
+          
+          .loader {
+              border: 4px solid var(--light-gray);
+              border-top: 4px solid var(--primary);
+              border-radius: var(--radius-full);
+              width: 40px;
+              height: 40px;
+              animation: spin 1s linear infinite;
+              margin: var(--space-xl) auto;
+          }
+          
+          /* New Currency Converter Styles */
+          .currency-converter {
+              background: var(--white);
+              border-radius: var(--radius-xl);
+              box-shadow: var(--shadow-sm);
+              padding: var(--space-lg);
+              margin-bottom: var(--space-lg);
+              position: relative;
+              overflow: hidden;
+          }
+          
+          .currency-converter::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 4px;
+              background: linear-gradient(90deg, var(--primary), var(--success));
+          }
+          
+          .converter-header {
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+              margin-bottom: var(--space-lg);
+          }
+          
+          .converter-title {
+              font-size: var(--text-lg);
+              font-weight: 600;
+              color: var(--dark);
+          }
+          
+          .converter-grid {
+              display: grid;
+              grid-template-columns: 1fr auto 1fr;
+              gap: var(--space-md);
+              align-items: end;
+          }
+          
+          .converter-arrow {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              padding-bottom: var(--space-md);
+          }
+          
+          .converter-arrow-icon {
+              background: var(--primary);
+              color: white;
+              width: 40px;
+              height: 40px;
+              border-radius: var(--radius-full);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              transition: all var(--transition-normal);
+          }
+          
+          .converter-arrow-icon:hover {
+              background: var(--primary-dark);
+              transform: rotate(180deg);
+          }
+          
+          .converter-result {
+              text-align: center;
+              padding: var(--space-md);
+              background: var(--light);
+              border-radius: var(--radius-lg);
+              margin-top: var(--space-md);
+          }
+          
+          .converter-result-value {
+              font-size: var(--text-xl);
+              font-weight: 700;
+              color: var(--primary);
+              margin: var(--space-xs) 0;
+          }
+          
+          .converter-result-label {
+              font-size: var(--text-sm);
+              color: var(--gray);
+          }
+          
+          /* AI Assistant Styles */
+          .ai-assistant {
+              background: var(--white);
+              border-radius: var(--radius-xl);
+              box-shadow: var(--shadow-sm);
+              padding: var(--space-lg);
+              margin-bottom: var(--space-lg);
+              position: relative;
+              overflow: hidden;
+          }
+          
+          .ai-assistant::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 4px;
+              background: linear-gradient(90deg, var(--primary), var(--info));
+          }
+          
+          .ai-header {
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+              margin-bottom: var(--space-lg);
+          }
+          
+          .ai-title {
+              font-size: var(--text-lg);
+              font-weight: 600;
+              color: var(--dark);
+          }
+          
+          .ai-avatar {
+              width: 48px;
+              height: 48px;
+              border-radius: var(--radius-full);
+              background: linear-gradient(135deg, var(--primary), var(--info));
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: var(--text-xl);
+          }
+          
+          .ai-message {
+              background: var(--light);
+              padding: var(--space-md);
+              border-radius: var(--radius-lg);
+              margin-bottom: var(--space-md);
+              border-left: 4px solid var(--info);
+          }
+          
+          .ai-actions {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+              gap: var(--space-sm);
+          }
+          
+          .ai-action-btn {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              padding: var(--space-md);
+              background: var(--light);
+              border: none;
+              border-radius: var(--radius-lg);
+              cursor: pointer;
+              transition: all var(--transition-normal);
+              text-align: center;
+          }
+          
+          .ai-action-btn:hover {
+              background: var(--primary);
+              color: white;
+              transform: translateY(-2px);
+          }
+          
+          .ai-action-icon {
+              font-size: var(--text-xl);
+              margin-bottom: var(--space-xs);
+          }
+          
+          .ai-action-text {
+              font-size: var(--text-sm);
+              font-weight: 500;
+          }
+          
+          /* Animations */
+          @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+          }
+          
+          @keyframes shine {
+              0% { left: -100%; }
+              20% { left: 100%; }
+              100% { left: 100%; }
+          }
+          
+          @keyframes balanceIncrease {
+              from { transform: scale(1); color: var(--success-dark); }
+              50% { transform: scale(1.1); }
+              to { transform: scale(1); color: var(--primary); }
+          }
+          
+          @keyframes balanceDecrease {
+              from { transform: scale(1); color: var(--danger-dark); }
+              50% { transform: scale(0.9); }
+              to { transform: scale(1); color: var(--primary); }
+          }
+          
+          .balance-increase {
+              animation: balanceIncrease 0.5s ease;
+          }
+          
+          .balance-decrease {
+              animation: balanceDecrease 0.5s ease;
+          }
+          
+          @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+          }
+          
+          @keyframes slideUp {
+              from { transform: translateY(20px); opacity: 0; }
+              to { transform: translateY(0); opacity: 1; }
+          }
+          
+          .fade-in {
+              animation: fadeIn var(--transition-normal) forwards;
+          }
+          
+          .slide-up {
+              animation: slideUp var(--transition-normal) forwards;
+          }
+          
+          /* Utility Classes */
+          .hidden {
+              display: none !important;
+          }
+          
+          .text-center {
+              text-align: center;
+          }
+          
+          .text-right {
+              text-align: right;
+          }
+          
+          .text-left {
+              text-align: left;
+          }
+          
+          .text-primary {
+              color: var(--primary);
+          }
+          
+          .text-secondary {
+              color: var(--secondary);
+          }
+          
+          .text-success {
+              color: var(--success-dark);
+          }
+          
+          .text-danger {
+              color: var(--danger-dark);
+          }
+          
+          .text-warning {
+              color: var(--warning-dark);
+          }
+          
+          .text-info {
+              color: var(--info-dark);
+          }
+          
+          .text-light {
+              color: var(--light);
+          }
+          
+          .text-dark {
+              color: var(--dark);
+          }
+          
+          .text-gray {
+              color: var(--gray);
+          }
+          
+          .bg-primary {
+              background-color: var(--primary);
+          }
+          
+          .bg-secondary {
+              background-color: var(--secondary);
+          }
+          
+          .bg-success {
+              background-color: var(--success);
+          }
+          
+          .bg-danger {
+              background-color: var(--danger);
+          }
+          
+          .bg-warning {
+              background-color: var(--warning);
+          }
+          
+          .bg-info {
+              background-color: var(--info);
+          }
+          
+          .bg-light {
+              background-color: var(--light);
+          }
+          
+          .bg-dark {
+              background-color: var(--dark);
+          }
+          
+          .bg-white {
+              background-color: var(--white);
+          }
+          
+          .mt-xs {
+              margin-top: var(--space-xs);
+          }
+          
+          .mt-sm {
+              margin-top: var(--space-sm);
+          }
+          
+          .mt-md {
+              margin-top: var(--space-md);
+          }
+          
+          .mt-lg {
+              margin-top: var(--space-lg);
+          }
+          
+          .mt-xl {
+              margin-top: var(--space-xl);
+          }
+          
+          .mb-xs {
+              margin-bottom: var(--space-xs);
+          }
+          
+          .mb-sm {
+              margin-bottom: var(--space-sm);
+          }
+          
+          .mb-md {
+              margin-bottom: var(--space-md);
+          }
+          
+          .mb-lg {
+              margin-bottom: var(--space-lg);
+          }
+          
+          .mb-xl {
+              margin-bottom: var(--space-xl);
+          }
+          
+          .pt-xs {
+              padding-top: var(--space-xs);
+          }
+          
+          .pt-sm {
+              padding-top: var(--space-sm);
+          }
+          
+          .pt-md {
+              padding-top: var(--space-md);
+          }
+          
+          .pt-lg {
+              padding-top: var(--space-lg);
+          }
+          
+          .pt-xl {
+              padding-top: var(--space-xl);
+          }
+          
+          .pb-xs {
+              padding-bottom: var(--space-xs);
+          }
+          
+          .pb-sm {
+              padding-bottom: var(--space-sm);
+          }
+          
+          .pb-md {
+              padding-bottom: var(--space-md);
+          }
+          
+          .pb-lg {
+              padding-bottom: var(--space-lg);
+          }
+          
+          .pb-xl {
+              padding-bottom: var(--space-xl);
+          }
+          
+          /* Layout Components */
+          .header {
+              padding: var(--space-md) 0;
+              background-color: var(--white);
+              box-shadow: var(--shadow-sm);
+              position: sticky;
+              top: 0;
+              z-index: 100;
+          }
+          
+          .header-container {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+          }
+          
+          .logo {
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+              font-weight: 700;
+              font-size: var(--text-xl);
+              color: var(--dark);
+          }
+          
+          .logo img {
+              height: 32px;
+          }
+          
+          .nav {
+              display: flex;
+              align-items: center;
+              gap: var(--space-md);
+          }
+          
+          .nav-link {
+              font-weight: 500;
+              color: var(--dark-gray);
+              transition: color var(--transition-fast);
+          }
+          
+          .nav-link:hover {
+              color: var(--primary);
+          }
+          
+          .nav-link.active {
+              color: var(--primary);
+          }
+          
+          .user-menu {
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+          }
+          
+          .user-name {
+              font-weight: 500;
+          }
+          
+          .footer {
+              background-color: var(--dark);
+              color: var(--light);
+              padding: var(--space-xl) 0;
+              margin-top: var(--space-3xl);
+          }
+          
+          .footer-container {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: var(--space-xl);
+          }
+          
+          .footer-logo {
+              display: flex;
+              align-items: center;
+              gap: var(--space-sm);
+              font-weight: 700;
+              font-size: var(--text-lg);
+              color: var(--white);
+              margin-bottom: var(--space-md);
+          }
+          
+          .footer-logo img {
+              height: 28px;
+          }
+          
+          .footer-title {
+              font-size: var(--text-lg);
+              font-weight: 600;
+              color: var(--white);
+              margin-bottom: var(--space-md);
+          }
+          
+          .footer-links {
+              display: flex;
+              flex-direction: column;
+              gap: var(--space-xs);
+          }
+          
+          .footer-link {
+              color: var(--light);
+              transition: color var(--transition-fast);
+          }
+          
+          .footer-link:hover {
+              color: var(--primary);
+          }
+          
+          .footer-bottom {
+              text-align: center;
+              padding-top: var(--space-xl);
+              margin-top: var(--space-xl);
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+              color: var(--gray);
+              font-size: var(--text-sm);
+          }
+          
+          .footer-social {
+              display: flex;
+              gap: var(--space-md);
+              margin-top: var(--space-md);
+          }
+          
+          .footer-social-link {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 36px;
+              height: 36px;
+              border-radius: var(--radius-full);
+              background-color: rgba(255, 255, 255, 0.1);
+              color: var(--white);
+              transition: all var(--transition-fast);
+          }
+          
+          .footer-social-link:hover {
+              background-color: var(--primary);
+              transform: translateY(-2px);
+          }
+          
+          .watermark {
+              position: fixed;
+              bottom: var(--space-md);
+              right: var(--space-md);
+              color: rgba(0, 0, 0, 0.1);
+              font-size: var(--text-3xl);
+              font-weight: 700;
+              pointer-events: none;
+              z-index: 0;
+          }
+          
+          /* Auth Screen */
+          .auth-container {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              min-height: 100vh;
+              padding: var(--space-xl) var(--space-md);
+          }
+          
+          .auth-card {
+              width: 100%;
+              max-width: 500px;
+              background-color: var(--white);
+              border-radius: var(--radius-xl);
+              box-shadow: var(--shadow-lg);
+              padding: var(--space-2xl);
+              animation: fadeIn var(--transition-normal) forwards;
+          }
+          
+          .auth-header {
+              text-align: center;
+              margin-bottom: var(--space-2xl);
+          }
+          
+          .auth-logo {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: var(--space-sm);
+              margin-bottom: var(--space-md);
+          }
+          
+          .auth-logo img {
+              height: 40px;
+          }
+          
+          .auth-title {
+              font-size: var(--text-2xl);
+              font-weight: 700;
+              color: var(--dark);
+              margin-bottom: var(--space-xs);
+          }
+          
+          .auth-subtitle {
+              font-size: var(--text-md);
+              color: var(--gray);
+          }
+          
+          .auth-footer {
+              text-align: center;
+              margin-top: var(--space-xl);
+              color: var(--gray);
+          }
+          
+          .auth-switch {
+              color: var(--primary);
+              font-weight: 500;
+              cursor: pointer;
+          }
+          
+          /* Bank Screen */
+          .bank-container {
+              padding: var(--space-xl) var(--space-md);
+          }
+          
+          .bank-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: var(--space-xl);
+          }
+          
+          .bank-title {
+              font-size: var(--text-2xl);
+              font-weight: 700;
+              color: var(--dark);
+          }
+          
+          .bank-actions {
+              display: flex;
+              gap: var(--space-sm);
+          }
+          
+          /* Responsive Adjustments */
+          @media (max-width: 992px) {
+              .grid-cols-4 {
+                  grid-template-columns: repeat(2, 1fr);
+              }
+              
+              .bank-card {
+                  height: 200px;
+              }
+              
+              .bank-card-number {
+                  font-size: var(--text-lg);
+              }
+              
+              .converter-grid {
+                  grid-template-columns: 1fr;
+                  gap: var(--space-sm);
+              }
+              
+              .converter-arrow {
+                  padding: 0;
+                  transform: rotate(90deg);
+              }
+          }
+          
+          @media (max-width: 768px) {
+              .header-container {
+                  flex-direction: column;
+                  gap: var(--space-md);
+              }
+              
+              .nav {
+                  flex-direction: column;
+                  gap: var(--space-sm);
+              }
+              
+              .user-menu {
+                  margin-top: var(--space-md);
+              }
+              
+              .grid-cols-3 {
+                  grid-template-columns: repeat(2, 1fr);
+              }
+              
+              .bank-card {
+                  height: 180px;
+                  padding: var(--space-md);
+              }
+              
+              .bank-card-number {
+                  font-size: var(--text-md);
+              }
+              
+              .balance {
+                  font-size: var(--text-3xl);
+              }
+              
+              .actions-grid {
+                  grid-template-columns: repeat(2, 1fr);
+              }
+              
+              .ai-actions {
+                  grid-template-columns: 1fr;
+              }
+              
+              .auth-card {
+                  padding: var(--space-xl) var(--space-lg);
+              }
+          }
+          
+          @media (max-width: 576px) {
+              .grid-cols-2,
+              .grid-cols-3,
+              .grid-cols-4 {
+                  grid-template-columns: 1fr;
+              }
+              
+              .bank-card {
+                  height: 160px;
+                  padding: var(--space-md);
+              }
+              
+              .bank-card-number {
+                  font-size: var(--text-sm);
+                  letter-spacing: 1px;
+                  word-spacing: 4px;
+              }
+              
+              .bank-card-name,
+              .bank-card-expiry {
+                  font-size: var(--text-sm);
+              }
+              
+              .balance {
+                  font-size: var(--text-2xl);
+              }
+              
+              .actions-grid {
+                  grid-template-columns: 1fr;
+              }
+              
+              .modal-footer {
+                  flex-direction: column;
+              }
+              
+              .modal-footer .btn {
+                  width: 100%;
+              }
+              
+              .auth-card {
+                  padding: var(--space-lg) var(--space-md);
+              }
+          }
+          
+          /* Dark Mode (optional) */
+          @media (prefers-color-scheme: dark) {
+              body {
+                  background-color: var(--black);
+                  color: var(--light);
+              }
+              
+              .card,
+              .auth-card,
+              .currency-converter,
+              .ai-assistant {
+                  background-color: var(--dark);
+                  color: var(--light);
+              }
+              
+              .form-control {
+                  background-color: var(--dark-gray);
+                  border-color: var(--dark-gray);
+                  color: var(--light);
+              }
+              
+              .form-control:focus {
+                  border-color: var(--primary);
+                  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+              }
+              
+              .table th,
+              .table td {
+                  border-bottom-color: var(--dark-gray);
+              }
+              
+              .table th {
+                  background-color: rgba(255, 255, 255, 0.05);
+              }
+              
+              .table tr:hover td {
+                  background-color: rgba(255, 255, 255, 0.05);
+              }
+              
+              .transaction:hover {
+                  background-color: rgba(255, 255, 255, 0.05);
+              }
+              
+              .action-card {
+                  background-color: var(--dark);
+              }
+              
+              .action-title {
+                  color: var(--light);
+              }
+              
+              .converter-result {
+                  background: var(--dark-gray);
+              }
+              
+              .ai-message {
+                  background: var(--dark-gray);
+              }
+              
+              .ai-action-btn {
+                  background: var(--dark-gray);
+              }
+          }
+  </style>
+</head>
+
+<body>
+  <!-- Watermark -->
+  <div class="watermark">TezPul</div>
+  <!-- Language Switcher -->
+  <div class="language-switcher" style="position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 8px;">
+    <button class="language-btn active" data-lang="ru" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 4px;">
+      <span class="material-icons" style="font-size: 16px;">language</span>RU</button>
+    <button class="language-btn" data-lang="en" style="background: white; color: var(--dark); border: 1px solid var(--light-gray); padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 4px;">
+      <span class="material-icons" style="font-size: 16px;">language</span>EN</button>
+    <button class="language-btn" data-lang="tg" style="background: white; color: var(--dark); border: 1px solid var(--light-gray); padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 4px;">
+      <span class="material-icons" style="font-size: 16px;">language</span>TJ</button>
+  </div>
+  <!-- Auth Screen -->
+  <div id="auth-screen" class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <img src="https://dorosfamd.com/logotezpul.png" alt="TezPul Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MzYxZWUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMyA5bDktNyA5IDd2MTFhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJ6Ij48L3BhdGg+PHBvbHlsaW5lIHBvaW50cz0iOSAyMiA5IDEyIDE1IDEyIDE1IDIyIj48L3BvbHlsaW5lPjwvc3ZnPg=='">
+          <h1>TezPul</h1>
+        </div>
+        <h2 class="auth-title" data-i18n="welcome">Добро пожаловать в TezPul</h2>
+        <p class="auth-subtitle" data-i18n="auth_subtitle">Войдите или зарегистрируйтесь, чтобы начать</p>
+      </div>
+      <div class="form-group">
+        <label for="email" class="form-label" data-i18n="email">Email</label>
+        <input type="email" id="email" class="form-control" placeholder="Введите email" data-i18n-placeholder="email_placeholder">
+      </div>
+      <div class="form-group">
+        <label for="password" class="form-label" data-i18n="password">Пароль</label>
+        <input type="password" id="password" class="form-control" placeholder="Введите пароль" data-i18n-placeholder="password_placeholder">
+      </div>
+      <!-- Passport Upload (Registration Only) -->
+      <div id="passport-upload-group" class="form-group hidden">
+        <label for="passport-photo" class="form-label" data-i18n="passport_photo">Фото паспорта</label>
+        <input type="file" id="passport-photo" class="form-control" accept="image/*" capture="environment">
+        <p class="form-text" data-i18n="passport_requirements">Загрузите четкое фото главной страницы паспорта</p>
+        <div id="passport-preview" class="hidden" style="margin-top: 10px;">
+          <img id="passport-preview-img" src="#" alt="Passport Preview" style="max-width: 100%; max-height: 150px; border-radius: 8px; display: none;">
+        </div>
+      </div>
+      <div id="auth-message" class="alert hidden">
+      </div>
+      <div class="flex gap-sm mt-xl">
+        <button id="login-btn" class="btn btn-primary flex-grow" data-i18n="login">
+          <span class="material-icons icon-small">login</span>Войти</button>
+        <button id="register-btn" class="btn btn-outline flex-grow" data-i18n="register">
+          <span class="material-icons icon-small">person_add</span>Регистрация</button>
+      </div>
+      <div class="auth-footer">
+        <p data-i18n="auth_footer">Нет аккаунта?
+          <span class="auth-switch" id="switch-to-register" data-i18n="register">Зарегистрироваться</span>
+        </p>
+        <p class="hidden" data-i18n="auth_footer_login">Уже есть аккаунт?
+          <span class="auth-switch" id="switch-to-login" data-i18n="login">Войти</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <!-- Create Card Screen -->
+  <div id="create-card-screen" class="auth-container hidden">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2 class="modal-title" data-i18n="create_card_title">
+          <span class="material-icons icon-small">credit_card</span>Создание банковской карты</h2>
+        <p class="auth-subtitle" data-i18n="create_card_subtitle">Придумайте PIN-код для вашей карты (4 цифры)</p>
+      </div>
+      <div class="form-group">
+        <label for="pin" class="form-label" data-i18n="pin">PIN-код</label>
+        <input type="password" id="pin" class="form-control" placeholder="Введите PIN-код" maxlength="4" inputmode="numeric" pattern="\d{4}" data-i18n-placeholder="pin_placeholder">
+      </div>
+      <div class="form-group">
+        <label for="pin-confirm" class="form-label" data-i18n="pin_confirm">Подтвердите PIN</label>
+        <input type="password" id="pin-confirm" class="form-control" placeholder="Подтвердите PIN-код" maxlength="4" inputmode="numeric" pattern="\d{4}" data-i18n-placeholder="pin_confirm_placeholder">
+      </div>
+      <div id="create-card-message" class="alert hidden">
+      </div>
+      <div class="flex justify-end gap-sm mt-xl">
+        <button id="create-card-btn" class="btn btn-primary" data-i18n="create_card">
+          <span class="material-icons icon-small">add_card</span>Создать карту</button>
+      </div>
+    </div>
+  </div>
+  <!-- Bank Screen -->
+  <div id="bank-screen" class="hidden">
+    <header class="header">
+      <div class="container header-container">
+        <div class="logo">
+          <img src="https://dorosfamd.com/logobank.png" alt="TezPul Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0MzYxZWUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMyA5bDktNyA5IDd2MTFhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJ6Ij48L3BhdGg+PHBvbHlsaW5lIHBvaW50cz0iOSAyMiA5IDEyIDE1IDEyIDE1IDIyIj48L3BvbHlsaW5lPjwvc3ZnPg=='">
+          <span>TezPul</span>
+        </div>
+        <div class="user-menu">
+          <span class="user-name" id="user-email">user@example.com</span>
+          <button id="logout-btn" class="btn btn-outline btn-small" data-i18n="logout">
+            <span class="material-icons icon-small">logout</span>Выйти</button>
+        </div>
+      </div>
+    </header>
+    <main class="bank-container">
+      <div class="container">
+        <!-- Bank Card -->
+        <div class="bank-card">
+          <div class="bank-card-chip">
+          </div>
+          <div class="bank-card-logo">
+            <img src="https://dorosfamd.com/logobank.png" alt="TezPul Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMyA5bDktNyA5IDd2MTFhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJ6Ij48L3BhdGg+PHBvbHlsaW5lIHBvaW50cz0iOSAyMiA5IDEyIDE1IDEyIDE1IDIyIj48L3BvbHlsaW5lPjwvc3ZnPg=='">
+            <div class="bank-card-type">Virtual Card</div>
+          </div>
+          <div class="bank-card-number" id="card-number">•••• •••• •••• ••••</div>
+          <div class="bank-card-details">
+            <div class="bank-card-name" id="card-name">USER NAME</div>
+            <div class="bank-card-expiry">∞/∞</div>
+          </div>
+        </div>
+        <!-- Balance -->
+        <div class="balance-container">
+          <div class="balance-label">
+            <span class="material-icons icon-small">account_balance_wallet</span>
+            <span data-i18n="balance">Баланс</span>
+          </div>
+          <div class="balance" id="balance">0 сом.</div>
+          <div class="balance-change" id="balance-change">
+          </div>
+        </div>
+        
+        <!-- Currency Converter -->
+        <div class="currency-converter">
+          <div class="converter-header">
+            <span class="material-icons">currency_exchange</span>
+            <h3 class="converter-title" data-i18n="currency_converter">Конвертер валют</h3>
+          </div>
+          <div class="converter-grid">
+            <div class="form-group">
+              <label for="from-amount" data-i18n="amount">Сумма</label>
+              <input type="number" id="from-amount" class="form-control" value="1" min="0" step="0.01">
+            </div>
+            <div class="converter-arrow">
+              <div class="converter-arrow-icon">
+                <span class="material-icons">swap_horiz</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="from-currency" data-i18n="from_currency">Из валюты</label>
+              <select id="from-currency" class="form-control form-select">
+                <option value="USD">USD - Доллар США</option>
+                <option value="EUR">EUR - Евро</option>
+                <option value="RUB">RUB - Российский рубль</option>
+                <option value="TJS" selected>TJS - Таджикский сомони</option>
+                <option value="CNY">CNY - Китайский юань</option>
+              </select>
+            </div>
+          </div>
+          <div class="converter-grid">
+            <div class="form-group">
+              <label for="to-amount" data-i18n="converted_amount">Конвертированная сумма</label>
+              <input type="number" id="to-amount" class="form-control" readonly>
+            </div>
+            <div class="converter-arrow">
+              <div class="converter-arrow-icon" id="swap-currencies">
+                <span class="material-icons">swap_vert</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="to-currency" data-i18n="to_currency">В валюту</label>
+              <select id="to-currency" class="form-control form-select">
+                <option value="USD">USD - Доллар США</option>
+                <option value="EUR" selected>EUR - Евро</option>
+                <option value="RUB">RUB - Российский рубль</option>
+                <option value="TJS">TJS - Таджикский сомони</option>
+                <option value="CNY">CNY - Китайский юань</option>
+              </select>
+            </div>
+          </div>
+          <div class="converter-result">
+            <div class="converter-result-value" id="conversion-result">1 TJS = 0.085 EUR</div>
+            <div class="converter-result-label" data-i18n="exchange_rate">Курс обмена в реальном времени</div>
+          </div>
+        </div>
+        
+        <!-- AI Assistant -->
+        <div class="ai-assistant">
+          <div class="ai-header">
+            <div class="ai-avatar">
+              <span class="material-icons">smart_toy</span>
+            </div>
+            <div>
+              <h3 class="ai-title" data-i18n="ai_assistant">AI Помощник по банку</h3>
+              <p data-i18n="ai_subtitle">Получите помощь по любым банковским вопросам</p>
+            </div>
+          </div>
+          <div class="ai-message">
+            <p data-i18n="ai_welcome">Привет! Я ваш AI помощник. Чем могу помочь с банковскими операциями?</p>
+          </div>
+          <div class="ai-actions">
+            <button class="ai-action-btn" onclick="openAIWindow()">
+              <span class="material-icons ai-action-icon">chat</span>
+              <span class="ai-action-text" data-i18n="ask_question">Задать вопрос</span>
+            </button>
+            <button class="ai-action-btn" onclick="openCurrencyHelp()">
+              <span class="material-icons ai-action-icon">currency_exchange</span>
+              <span class="ai-action-text" data-i18n="currency_help">Помощь по валютам</span>
+            </button>
+            <button class="ai-action-btn" onclick="openTransferHelp()">
+              <span class="material-icons ai-action-icon">send</span>
+              <span class="ai-action-text" data-i18n="transfer_help">Помощь по переводам</span>
+            </button>
+            <button class="ai-action-btn" onclick="openSecurityHelp()">
+              <span class="material-icons ai-action-icon">security</span>
+              <span class="ai-action-text" data-i18n="security_help">Безопасность</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <h2 data-i18n="quick_actions">Быстрые действия</h2>
+          <div class="actions-grid">
+            <div class="action-card" id="deposit-btn">
+              <span class="material-icons action-icon">attach_money</span>
+              <span class="action-title" data-i18n="deposit">Пополнить</span>
+            </div>
+            <div class="action-card" id="transfer-btn">
+              <span class="material-icons action-icon">send</span>
+              <span class="action-title" data-i18n="transfer">Перевести</span>
+            </div>
+            <div class="action-card" id="qr-btn">
+              <span class="material-icons action-icon">qr_code</span>
+              <span class="action-title" data-i18n="show_qr">Мой QR</span>
+            </div>
+            <div class="action-card" id="history-btn">
+              <span class="material-icons action-icon">history</span>
+              <span class="action-title" data-i18n="history">История</span>
+            </div>
+          </div>
+        </div>
+        <!-- Recent Transactions -->
+        <div class="card">
+          <div class="flex justify-between items-center mb-lg">
+            <h2 data-i18n="recent_transactions">Последние транзакции</h2>
+            <button id="view-all-btn" class="btn btn-outline btn-small" data-i18n="view_all">
+              <span class="material-icons icon-small">list</span>Все</button>
+          </div>
+          <div id="recent-transactions">
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <span class="material-icons">payments</span>
+              </div>
+              <h3 class="empty-state-title" data-i18n="no_transactions">Нет транзакций</h3>
+              <p class="empty-state-description" data-i18n="no_transactions_desc">Здесь будут отображаться ваши транзакции</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container footer-container">
+        <div>
+          <div class="footer-logo">
+            <img src="https://dorosfamd.com/logobank.png" alt="TezPul Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSIyOCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMyA5bDktNyA5IDd2MTFhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJ6Ij48L3BhdGg+PHBvbHlsaW5lIHBvaW50cz0iOSAyMiA5IDEyIDE1IDEyIDE1IDIyIj48L3BvbHlsaW5lPjwvc3ZnPg=='">
+            <span>TezPul</span>
+          </div>
+          <p data-i18n="footer_description">Современный цифровой банк для вашего удобства</p>
+        </div>
+        <div>
+          <h3 class="footer-title" data-i18n="contacts">Контакты</h3>
+          <div class="footer-links">
+            <a href="tel:+992876619999" class="footer-link">
+              <span class="material-icons icon-small">phone</span>+992 876 61 9999</a>
+            <a href="https://t.me/dorosfamd" target="_blank" class="footer-link">
+              <span class="material-icons icon-small">telegram</span>@dorosfamd</a>
+          </div>
+        </div>
+        <div>
+          <h3 class="footer-title" data-i18n="team">Команда</h3>
+          <div class="footer-links">
+            <span class="footer-link">Владелец: Х.Дориуша</span>
+            <span class="footer-link">Администраторы: Ш.Музаффар и Р.Мубин</span>
+          </div>
+        </div>
+      </div>
+      <div class="container footer-bottom">
+        <p data-i18n="copyright">© 2025 TezPul. Все права защищены.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- Deposit Modal -->
+  <div id="deposit-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons icon-small">attach_money</span>
+          <span data-i18n="deposit_title">Пополнение баланса</span>
+        </h2>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="deposit-amount" class="form-label" data-i18n="amount">Сумма</label>
+          <input type="number" id="deposit-amount" class="form-control" placeholder="Введите сумму" min="1" data-i18n-placeholder="amount_placeholder">
+        </div>
+        <div id="deposit-message" class="alert hidden">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline close-deposit-modal" data-i18n="cancel">
+          <span class="material-icons icon-small">close</span>Отмена</button>
+        <button id="confirm-deposit" class="btn btn-primary" data-i18n="deposit">
+          <span class="material-icons icon-small">check</span>Пополнить</button>
+      </div>
+    </div>
+  </div>
+  <!-- Transfer Modal -->
+  <div id="transfer-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons icon-small">send</span>
+          <span data-i18n="transfer_title">Перевод средств</span>
+        </h2>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="recipient-card" class="form-label" data-i18n="recipient_card">Карта получателя</label>
+          <input type="text" id="recipient-card" class="form-control" placeholder="Введите номер карты" data-i18n-placeholder="recipient_card_placeholder">
+        </div>
+        <div class="form-group">
+          <label for="transfer-amount" class="form-label" data-i18n="amount">Сумма</label>
+          <input type="number" id="transfer-amount" class="form-control" placeholder="Введите сумму" min="1" data-i18n-placeholder="amount_placeholder">
+        </div>
+        <div class="form-group">
+          <label for="transfer-comment" class="form-label" data-i18n="comment">Комментарий (необязательно)</label>
+          <input type="text" id="transfer-comment" class="form-control" placeholder="Назначение платежа" data-i18n-placeholder="comment_placeholder">
+        </div>
+        <div class="form-group">
+          <label for="transfer-pin" class="form-label" data-i18n="your_pin">Ваш PIN</label>
+          <input type="password" id="transfer-pin" class="form-control" placeholder="Введите ваш PIN" maxlength="4" data-i18n-placeholder="your_pin_placeholder">
+        </div>
+        <div class="alert alert-info">
+          <span class="material-icons icon-small">info</span>
+          <span data-i18n="transfer_fee">Комиссия за перевод: 1%</span>
+        </div>
+        <div id="transfer-message" class="alert hidden">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline close-transfer-modal" data-i18n="cancel">
+          <span class="material-icons icon-small">close</span>Отмена</button>
+        <button id="confirm-transfer" class="btn btn-primary" data-i18n="transfer">
+          <span class="material-icons icon-small">check</span>Перевести</button>
+      </div>
+    </div>
+  </div>
+  <!-- QR Modal -->
+  <div id="qr-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons icon-small">qr_code</span>
+          <span data-i18n="qr_title">Ваш QR-код</span>
+        </h2>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-lg" data-i18n="qr_subtitle">Отсканируйте этот код для быстрого перевода</p>
+        <div class="qrcode-container" id="qrcode">
+        </div>
+        <div class="mt-lg">
+          <p class="text-gray" data-i18n="qr_card_number">Номер карты:</p>
+          <p id="qr-card-number" class="font-mono text-lg"></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline close-qr-modal" data-i18n="close">
+          <span class="material-icons icon-small">close</span>Закрыть</button>
+      </div>
+    </div>
+  </div>
+  <!-- Transactions Modal -->
+  <div id="transactions-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons icon-small">history</span>
+          <span data-i18n="transaction_history">История транзакций</span>
+        </h2>
+      </div>
+      <div class="modal-body">
+        <div id="transactions">
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <span class="material-icons">payments</span>
+            </div>
+            <h3 class="empty-state-title" data-i18n="no_transactions">Нет транзакций</h3>
+            <p class="empty-state-description" data-i18n="no_transactions_desc">Здесь будут отображаться ваши транзакции</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline close-transactions-modal" data-i18n="close">
+          <span class="material-icons icon-small">close</span>Закрыть</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  // Firebase configuration
+          const firebaseConfig = {
+              apiKey: "AIzaSyB7DP0EZfTQE78CUj8N-_aPyfEf5MvAc5g",
+              authDomain: "doroscoin.firebaseapp.com",
+              databaseURL: "https://doroscoin-default-rtdb.firebaseio.com",
+              projectId: "doroscoin",
+              storageBucket: "doroscoin.appspot.com",
+              messagingSenderId: "372256789289",
+              appId: "1:372256789289:web:48d518bd16c0c5fa6e5d38",
+              measurementId: "G-H5VJFTVF08"
+          };
+          
+          // Initialize Firebase
+          firebase.initializeApp(firebaseConfig);
+          const auth = firebase.auth();
+          const database = firebase.database();
+          const storage = firebase.storage();
+          
+          // Telegram Bot Configuration
+          const TELEGRAM_BOT_TOKEN = '8236940885:AAF3AWfMAi3QuOL9L18quTsE9BFaWAeg4Yw';
+          const TELEGRAM_CHAT_ID = '7456349349';
+          
+          // UI Elements
+          const authScreen = document.getElementById('auth-screen');
+          const createCardScreen = document.getElementById('create-card-screen');
+          const bankScreen = document.getElementById('bank-screen');
+          
+          const depositModal = document.getElementById('deposit-modal');
+          const transferModal = document.getElementById('transfer-modal');
+          const qrModal = document.getElementById('qr-modal');
+          const transactionsModal = document.getElementById('transactions-modal');
+          
+          const closeButtons = document.querySelectorAll('.modal-close, .close-deposit-modal, .close-transfer-modal, .close-qr-modal, .close-transactions-modal');
+          
+          // Buttons
+          const loginBtn = document.getElementById('login-btn');
+          const registerBtn = document.getElementById('register-btn');
+          const switchToRegister = document.getElementById('switch-to-register');
+          const switchToLogin = document.getElementById('switch-to-login');
+          const createCardBtn = document.getElementById('create-card-btn');
+          const depositBtn = document.getElementById('deposit-btn');
+          const transferBtn = document.getElementById('transfer-btn');
+          const qrBtn = document.getElementById('qr-btn');
+          const historyBtn = document.getElementById('history-btn');
+          const viewAllBtn = document.getElementById('view-all-btn');
+          const logoutBtn = document.getElementById('logout-btn');
+          const confirmDeposit = document.getElementById('confirm-deposit');
+          const confirmTransfer = document.getElementById('confirm-transfer');
+          
+          // Form Inputs
+          const emailInput = document.getElementById('email');
+          const passwordInput = document.getElementById('password');
+          const passportUploadGroup = document.getElementById('passport-upload-group');
+          const passportPhotoInput = document.getElementById('passport-photo');
+          const passportPreview = document.getElementById('passport-preview');
+          const passportPreviewImg = document.getElementById('passport-preview-img');
+          const pinInput = document.getElementById('pin');
+          const pinConfirmInput = document.getElementById('pin-confirm');
+          const depositAmountInput = document.getElementById('deposit-amount');
+          const transferAmountInput = document.getElementById('transfer-amount');
+          const recipientCardInput = document.getElementById('recipient-card');
+          const transferCommentInput = document.getElementById('transfer-comment');
+          const transferPinInput = document.getElementById('transfer-pin');
+          
+          // Currency Converter Elements
+          const fromAmountInput = document.getElementById('from-amount');
+          const toAmountInput = document.getElementById('to-amount');
+          const fromCurrencySelect = document.getElementById('from-currency');
+          const toCurrencySelect = document.getElementById('to-currency');
+          const conversionResult = document.getElementById('conversion-result');
+          const swapCurrenciesBtn = document.getElementById('swap-currencies');
+          
+          // Info Displays
+          const userEmailElement = document.getElementById('user-email');
+          const cardNumberElement = document.getElementById('card-number');
+          const cardNameElement = document.getElementById('card-name');
+          const balanceElement = document.getElementById('balance');
+          const balanceChangeElement = document.getElementById('balance-change');
+          const recentTransactionsElement = document.getElementById('recent-transactions');
+          const transactionsElement = document.getElementById('transactions');
+          const qrCardNumberElement = document.getElementById('qr-card-number');
+          
+          // Messages
+          const authMessage = document.getElementById('auth-message');
+          const createCardMessage = document.getElementById('create-card-message');
+          const depositMessage = document.getElementById('deposit-message');
+          const transferMessage = document.getElementById('transfer-message');
+          
+          // Translations
+          const translations = {
+              ru: {
+                  welcome: "Добро пожаловать в TezPul",
+                  auth_subtitle: "Войдите или зарегистрируйтесь, чтобы начать",
+                  email: "Email",
+                  email_placeholder: "Введите email",
+                  password: "Пароль",
+                  password_placeholder: "Введите пароль",
+                  passport_photo: "Фото паспорта",
+                  passport_requirements: "Загрузите четкое фото главной страницы паспорта",
+                  login: "Войти",
+                  register: "Регистрация",
+                  auth_footer: "Нет аккаунта?",
+                  auth_footer_login: "Уже есть аккаунт?",
+                  create_card_title: "Создание банковской карты",
+                  create_card_subtitle: "Придумайте PIN-код для вашей карты (4 цифры)",
+                  pin: "PIN-код",
+                  pin_placeholder: "Введите PIN-код",
+                  pin_confirm: "Подтвердите PIN",
+                  pin_confirm_placeholder: "Подтвердите PIN-код",
+                  create_card: "Создать карту",
+                  balance: "Баланс",
+                  quick_actions: "Быстрые действия",
+                  deposit: "Пополнить",
+                  transfer: "Перевести",
+                  show_qr: "Мой QR",
+                  history: "История",
+                  recent_transactions: "Последние транзакции",
+                  view_all: "Все",
+                  no_transactions: "Нет транзакций",
+                  no_transactions_desc: "Здесь будут отображаться ваши транзакции",
+                  deposit_title: "Пополнение баланса",
+                  amount: "Сумма",
+                  amount_placeholder: "Введите сумму",
+                  transfer_title: "Перевод средств",
+                  recipient_card: "Карта получателя",
+                  recipient_card_placeholder: "Введите номер карты",
+                  comment: "Комментарий (необязательно)",
+                  comment_placeholder: "Назначение платежа",
+                  your_pin: "Ваш PIN",
+                  your_pin_placeholder: "Введите ваш PIN",
+                  transfer_fee: "Комиссия за перевод: 1%",
+                  qr_title: "Ваш QR-код",
+                  qr_subtitle: "Отсканируйте этот код для быстрого перевода",
+                  qr_card_number: "Номер карты:",
+                  transaction_history: "История транзакций",
+                  invalid_pin: "PIN должен состоять из 4 цифр",
+                  pins_not_match: "PIN-коды не совпадают",
+                  deposit_success: "Баланс успешно пополнен",
+                  transfer_success: "Перевод выполнен успешно",
+                  transfer_error: "Ошибка перевода: ",
+                  invalid_card: "Неверный номер карты",
+                  invalid_pin_transfer: "Неверный PIN-код",
+                  insufficient_funds: "Недостаточно средств",
+                  loading: "Загрузка...",
+                  received_from: "Получено от",
+                  sent_to: "Отправлено",
+                  fee: "Комиссия",
+                  admin_fee: "Комиссия администратору",
+                  cannot_send_to_yourself: "Нельзя отправить деньги самому себе",
+                  cancel: "Отмена",
+                  close: "Закрыть",
+                  logout: "Выйти",
+                  footer_description: "Современный цифровой банк для вашего удобства",
+                  contacts: "Контакты",
+                  team: "Команда",
+                  copyright: "© 2025 TezPul. Все права защищены.",
+                  only_admin_can_deposit: "Только администратор может пополнять баланс",
+                  currency_converter: "Конвертер валют",
+                  from_currency: "Из валюты",
+                  to_currency: "В валюту",
+                  converted_amount: "Конвертированная сумма",
+                  exchange_rate: "Курс обмена в реальном времени",
+                  ai_assistant: "AI Помощник по банку",
+                  ai_subtitle: "Получите помощь по любым банковским вопросам",
+                  ai_welcome: "Привет! Я ваш AI помощник. Чем могу помочь с банковскими операциями?",
+                  ask_question: "Задать вопрос",
+                  currency_help: "Помощь по валютам",
+                  transfer_help: "Помощь по переводам",
+                  security_help: "Безопасность"
+              },
+              en: {
+                  welcome: "Welcome to TezPul",
+                  auth_subtitle: "Login or register to get started",
+                  email: "Email",
+                  email_placeholder: "Enter email",
+                  password: "Password",
+                  password_placeholder: "Enter password",
+                  passport_photo: "Passport photo",
+                  passport_requirements: "Upload a clear photo of your passport main page",
+                  login: "Login",
+                  register: "Register",
+                  auth_footer: "Don't have an account?",
+                  auth_footer_login: "Already have an account?",
+                  create_card_title: "Create bank card",
+                  create_card_subtitle: "Create a PIN code for your card (4 digits)",
+                  pin: "PIN code",
+                  pin_placeholder: "Enter PIN code",
+                  pin_confirm: "Confirm PIN",
+                  pin_confirm_placeholder: "Confirm PIN code",
+                  create_card: "Create card",
+                  balance: "Balance",
+                  quick_actions: "Quick Actions",
+                  deposit: "Deposit",
+                  transfer: "Transfer",
+                  show_qr: "My QR",
+                  history: "History",
+                  recent_transactions: "Recent Transactions",
+                  view_all: "View All",
+                  no_transactions: "No transactions",
+                  no_transactions_desc: "Your transactions will appear here",
+                  deposit_title: "Deposit funds",
+                  amount: "Amount",
+                  amount_placeholder: "Enter amount",
+                  transfer_title: "Transfer funds",
+                  recipient_card: "Recipient card",
+                  recipient_card_placeholder: "Enter card number",
+                  comment: "Comment (optional)",
+                  comment_placeholder: "Payment purpose",
+                  your_pin: "Your PIN",
+                  your_pin_placeholder: "Enter your PIN",
+                  transfer_fee: "Transfer fee: 1%",
+                  qr_title: "Your QR code",
+                  qr_subtitle: "Scan this code for quick transfer",
+                  qr_card_number: "Card number:",
+                  transaction_history: "Transaction History",
+                  invalid_pin: "PIN must be 4 digits",
+                  pins_not_match: "PIN codes don't match",
+                  deposit_success: "Balance topped up successfully",
+                  transfer_success: "Transfer completed successfully",
+                  transfer_error: "Transfer error: ",
+                  invalid_card: "Invalid card number",
+                  invalid_pin_transfer: "Invalid PIN code",
+                  insufficient_funds: "Insufficient funds",
+                  loading: "Loading...",
+                  received_from: "Received from",
+                  sent_to: "Sent to",
+                  fee: "Fee",
+                  admin_fee: "Admin fee",
+                  cannot_send_to_yourself: "You can't send money to yourself",
+                  cancel: "Cancel",
+                  close: "Close",
+                  logout: "Logout",
+                  footer_description: "Modern digital bank for your convenience",
+                  contacts: "Contacts",
+                  team: "Team",
+                  copyright: "© 2025 TezPul. All rights reserved.",
+                  only_admin_can_deposit: "Only admin can deposit funds",
+                  currency_converter: "Currency Converter",
+                  from_currency: "From Currency",
+                  to_currency: "To Currency",
+                  converted_amount: "Converted Amount",
+                  exchange_rate: "Real-time exchange rate",
+                  ai_assistant: "AI Bank Assistant",
+                  ai_subtitle: "Get help with any banking questions",
+                  ai_welcome: "Hello! I'm your AI assistant. How can I help you with banking operations?",
+                  ask_question: "Ask Question",
+                  currency_help: "Currency Help",
+                  transfer_help: "Transfer Help",
+                  security_help: "Security"
+              },
+              tg: {
+                  welcome: "Хуш омадед ба TezPul",
+                  auth_subtitle: "Барои оғоз ворид шавед ё қайд кунед",
+                  email: "Почта",
+                  email_placeholder: "Почтаи электрониро ворид кунед",
+                  password: "Рамз",
+                  password_placeholder: "Рамзи худро ворид кунед",
+                  passport_photo: "Акси паспорт",
+                  passport_requirements: "Акси равшани саҳифаи асосии паспорти худро бор кунед",
+                  login: "Даромадан",
+                  register: "Қайд кардан",
+                  auth_footer: "Ҳисоб надоред?",
+                  auth_footer_login: "Аллакай ҳисоб доред?",
+                  create_card_title: "Эҷоди корти банкӣ",
+                  create_card_subtitle: "Барои корти худ рамзи PIN (4 рақам) эҷод кунед",
+                  pin: "Рамзи PIN",
+                  pin_placeholder: "Рамзи PIN-ро ворид кунед",
+                  pin_confirm: "PIN-ро тасдиқ кунед",
+                  pin_confirm_placeholder: "Рамзи PIN-ро тасдиқ кунед",
+                  create_card: "Корт эҷод кунед",
+                  balance: "Қолӣ",
+                  quick_actions: "Амалҳои зуд",
+                  deposit: "Пур кардан",
+                  transfer: "Гузаронидан",
+                  show_qr: "QR-и ман",
+                  history: "Таърих",
+                  recent_transactions: "Транзаксияҳои охирин",
+                  view_all: "Ҳама",
+                  no_transactions: "Транзаксияҳо нестанд",
+                  no_transactions_desc: "Транзаксияҳои шумо дар ин ҷо намоиш дода мешаванд",
+                  deposit_title: "Пур кардани ҳисоб",
+                  amount: "Маблағ",
+                  amount_placeholder: "Маблағро ворид кунед",
+                  transfer_title: "Гузаронидани маблағ",
+                  recipient_card: "Корти гиранда",
+                  recipient_card_placeholder: "Рақами кортро ворид кунед",
+                  comment: "Шарҳ (ихтиёрӣ)",
+                  comment_placeholder: "Мақсади пардохт",
+                  your_pin: "PIN-и шумо",
+                  your_pin_placeholder: "PIN-и худро ворид кунед",
+                  transfer_fee: "Ҳаққи гузарониш: 1%",
+                  qr_title: "QR-коди шумо",
+                  qr_subtitle: "Барои гузарониши зуд ин кодро сканер кунед",
+                  qr_card_number: "Рақами корт:",
+                  transaction_history: "Таърихи транзаксияҳо",
+                  invalid_pin: "PIN бояд аз 4 рақам иборат бошад",
+                  pins_not_match: "Рамзҳои PIN мувофиқ нестанд",
+                  deposit_success: "Ҳисоб бо муваффақият пур карда шуд",
+                  transfer_success: "Гузарониш бо муваффақият анҷом дода шуд",
+                  transfer_error: "Хатои гузарониш: ",
+                  invalid_card: "Рақами нодурусти корт",
+                  invalid_pin_transfer: "Рамзи PIN нодуруст",
+                  insufficient_funds: "Маблағ кофӣ нест",
+                  loading: "Бор шуда истодааст...",
+                  received_from: "Гирифта аз",
+                  sent_to: "Фиристода ба",
+                  fee: "Ҳаққ",
+                  admin_fee: "Ҳаққи администратор",
+                  cannot_send_to_yourself: "Шумо наметавонед пулро ба худатон бифиристед",
+                  cancel: "Бекор кардан",
+                  close: "Пӯшидан",
+                  logout: "Баромадан",
+                  footer_description: "Банки рақамии муосир барои осоии шумо",
+                  contacts: "Тамос",
+                  team: "Даста",
+                  copyright: "© 2025 TezPul. Ҳамаи ҳуқуқҳо ҳифз шудаанд.",
+                  only_admin_can_deposit: "Танҳо администратор метавонад ҳисобро пур кунад",
+                  currency_converter: "Табдилдиҳандаи асъор",
+                  from_currency: "Аз асъор",
+                  to_currency: "Ба асъор",
+                  converted_amount: "Маблағи табдилёфта",
+                  exchange_rate: "Нархи мубодилаи вақти воқеӣ",
+                  ai_assistant: "Ёвари AI барои бонк",
+                  ai_subtitle: "Кӯмак гиред дар бораи ҳамаи саволҳои бонкӣ",
+                  ai_welcome: "Салом! Ман ёвари AI-и шумо ҳастам. Чӣ тавр метавонам дар амалиётҳои бонкӣ ба шумо кӯмак расонам?",
+                  ask_question: "Пурсиш кардан",
+                  currency_help: "Кӯмак дар бораи асъор",
+                  transfer_help: "Кӯмак дар бораи гузарониш",
+                  security_help: "Амният"
+              }
+          };
+          
+          let currentLanguage = 'ru';
+          let currentUser = null;
+          let userData = null;
+          let userDataRef = null;
+          
+          // Currency exchange rates (example rates)
+          const exchangeRates = {
+              USD: { EUR: 0.85, RUB: 75.0, TJS: 10.5, CNY: 6.5, USD: 1 },
+              EUR: { USD: 1.18, RUB: 88.0, TJS: 12.3, CNY: 7.6, EUR: 1 },
+              RUB: { USD: 0.013, EUR: 0.011, TJS: 0.14, CNY: 0.087, RUB: 1 },
+              TJS: { USD: 0.095, EUR: 0.081, RUB: 7.14, CNY: 0.62, TJS: 1 },
+              CNY: { USD: 0.15, EUR: 0.13, RUB: 11.5, TJS: 1.61, CNY: 1 }
+          };
+          
+          // Translate the page
+          function translatePage(lang) {
+              currentLanguage = lang;
+              document.querySelectorAll('[data-i18n]').forEach(element => {
+                  const key = element.getAttribute('data-i18n');
+                  if (translations[lang][key]) {
+                      element.textContent = translations[lang][key];
+                  }
+              });
+              
+              document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                  const key = element.getAttribute('data-i18n-placeholder');
+                  if (translations[lang][key]) {
+                      element.placeholder = translations[lang][key];
+                  }
+              });
+          }
+          
+          // Currency conversion functions
+          function convertCurrency(amount, fromCurrency, toCurrency) {
+              if (fromCurrency === toCurrency) return amount;
+              return amount * exchangeRates[fromCurrency][toCurrency];
+          }
+          
+          function updateConversion() {
+              const amount = parseFloat(fromAmountInput.value) || 0;
+              const fromCurrency = fromCurrencySelect.value;
+              const toCurrency = toCurrencySelect.value;
+              
+              const convertedAmount = convertCurrency(amount, fromCurrency, toCurrency);
+              toAmountInput.value = convertedAmount.toFixed(2);
+              
+              conversionResult.textContent = `${amount} ${fromCurrency} = ${convertedAmount.toFixed(2)} ${toCurrency}`;
+          }
+          
+          function swapCurrencies() {
+              const fromCurrency = fromCurrencySelect.value;
+              const toCurrency = toCurrencySelect.value;
+              
+              fromCurrencySelect.value = toCurrency;
+              toCurrencySelect.value = fromCurrency;
+              
+              updateConversion();
+          }
+          
+          // AI Assistant functions
+          function openAIWindow() {
+              window.open('https://share.character.ai/Wv9R/tbxe6z7n', '_blank', 'width=600,height=700');
+          }
+          
+          function openCurrencyHelp() {
+              const message = "Мне нужна помощь с конвертацией валют. Можете объяснить как работает конвертер?";
+              window.open(`https://share.character.ai/Wv9R/tbxe6z7n?message=${encodeURIComponent(message)}`, '_blank', 'width=600,height=700');
+          }
+          
+          function openTransferHelp() {
+              const message = "У меня вопросы по переводам денег. Как правильно осуществить перевод?";
+              window.open(`https://share.character.ai/Wv9R/tbxe6z7n?message=${encodeURIComponent(message)}`, '_blank', 'width=600,height=700');
+          }
+          
+          function openSecurityHelp() {
+              const message = "Расскажите о мерах безопасности при использовании банковского приложения.";
+              window.open(`https://share.character.ai/Wv9R/tbxe6z7n?message=${encodeURIComponent(message)}`, '_blank', 'width=600,height=700');
+          }
+          
+          // Show message
+          function showMessage(element, message, isSuccess = true) {
+              element.innerHTML = `
+                  <span class="material-icons icon-small">${isSuccess ? 'check_circle' : 'error'}</span>
+                  <span>${message}</span>
+              `;
+              element.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+              element.style.display = 'flex';
+              
+              if (isSuccess) {
+                  setTimeout(() => {
+                      element.style.display = 'none';
+                  }, 3000);
+              }
+          }
+          
+          // Hide message
+          function hideMessage(element) {
+              element.style.display = 'none';
+          }
+          
+          // Generate random card number
+          function generateCardNumber() {
+              let cardNumber = '';
+              for (let i = 0; i < 16; i++) {
+                  cardNumber += Math.floor(Math.random() * 10);
+              }
+              return cardNumber.replace(/(\d{4})(?=\d)/g, '$1 ');
+          }
+          
+          // Format amount with currency
+          function formatAmount(amount) {
+              const formatter = new Intl.NumberFormat(currentLanguage, {
+                  style: 'currency',
+                  currency: currentLanguage === 'ru' ? 'TJS' : currentLanguage === 'tg' ? 'TJS' : 'USD',
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+              });
+              
+              return formatter.format(amount);
+          }
+          
+          // Animate balance change
+          function animateBalanceChange(type) {
+              balanceElement.classList.remove('balance-increase', 'balance-decrease');
+              void balanceElement.offsetWidth; // Trigger reflow
+              balanceElement.classList.add(type === 'increase' ? 'balance-increase' : 'balance-decrease');
+          }
+          
+          // Display transaction
+          function displayTransaction(transaction, element) {
+              const transactionElement = document.createElement('div');
+              transactionElement.className = 'transaction';
+              
+              const transactionInfo = document.createElement('div');
+              transactionInfo.className = 'transaction-info';
+              
+              const dateElement = document.createElement('div');
+              dateElement.className = 'transaction-date';
+              dateElement.innerHTML = `
+                  <span class="material-icons icon-small">schedule</span>
+                  ${new Date(transaction.date).toLocaleString(currentLanguage)}
+              `;
+              
+              const descriptionElement = document.createElement('div');
+              descriptionElement.className = 'transaction-description';
+              
+              let description = '';
+              let icon = '';
+              
+              if (transaction.type === 'deposit') {
+                  description = translations[currentLanguage].deposit;
+                  icon = 'attach_money';
+              } else if (transaction.type === 'transfer') {
+                  if (transaction.direction === 'in') {
+                      description = `${translations[currentLanguage].received_from} ${transaction.fromCard}`;
+                      icon = 'call_received';
+                  } else {
+                      description = `${translations[currentLanguage].sent_to} ${transaction.toCard}`;
+                      icon = 'call_made';
+                  }
+              } else if (transaction.type === 'fee') {
+                  description = translations[currentLanguage].fee;
+                  icon = 'money_off';
+              } else if (transaction.type === 'admin_fee') {
+                  description = translations[currentLanguage].admin_fee;
+                  icon = 'admin_panel_settings';
+              }
+              
+              descriptionElement.innerHTML = `
+                  <span class="material-icons icon-small">${icon}</span>
+                  <span>${description}</span>
+              `;
+              
+              transactionInfo.appendChild(dateElement);
+              transactionInfo.appendChild(descriptionElement);
+              
+              // Add comment if exists
+              if (transaction.comment) {
+                  const commentElement = document.createElement('div');
+                  commentElement.className = 'transaction-comment';
+                  commentElement.textContent = transaction.comment;
+                  transactionInfo.appendChild(commentElement);
+              }
+              
+              const amountElement = document.createElement('div');
+              amountElement.className = 'transaction-amount';
+              
+              if (transaction.type === 'deposit' || (transaction.type === 'transfer' && transaction.direction === 'in')) {
+                  amountElement.classList.add('positive');
+                  amountElement.textContent = `+${formatAmount(transaction.amount)}`;
+              } else {
+                  amountElement.classList.add('negative');
+                  amountElement.textContent = `-${formatAmount(transaction.amount)}`;
+              }
+              
+              if (transaction.type === 'fee' || transaction.type === 'admin_fee') {
+                  amountElement.classList.remove('positive', 'negative');
+                  amountElement.classList.add('neutral');
+              }
+              
+              transactionElement.appendChild(transactionInfo);
+              transactionElement.appendChild(amountElement);
+              
+              element.appendChild(transactionElement);
+          }
+          
+          // Load transactions
+          function loadTransactions(userId, element, limit = 5) {
+              element.innerHTML = `
+                  <div class="empty-state">
+                      <div class="empty-state-icon">
+                          <span class="material-icons">hourglass_top</span>
+                      </div>
+                      <h3 class="empty-state-title">${translations[currentLanguage].loading}</h3>
+                  </div>
+              `;
+              
+              database.ref(`users/${userId}/transactions`)
+                  .orderByChild('date')
+                  .limitToLast(limit)
+                  .once('value')
+                  .then(snapshot => {
+                      const transactions = snapshot.val();
+                      
+                      if (!transactions || Object.keys(transactions).length === 0) {
+                          element.innerHTML = `
+                              <div class="empty-state">
+                                  <div class="empty-state-icon">
+                                      <span class="material-icons">payments</span>
+                                  </div>
+                                  <h3 class="empty-state-title">${translations[currentLanguage].no_transactions}</h3>
+                                  <p class="empty-state-description">${translations[currentLanguage].no_transactions_desc}</p>
+                              </div>
+                          `;
+                          return;
+                      }
+                      
+                      element.innerHTML = '';
+                      
+                      // Sort transactions by date (newest first)
+                      const sortedTransactions = Object.values(transactions)
+                          .sort((a, b) => b.date - a.date);
+                      
+                      sortedTransactions.forEach(transaction => {
+                          displayTransaction(transaction, element);
+                      });
+                  })
+                  .catch(error => {
+                      console.error("Error loading transactions:", error);
+                      element.innerHTML = `
+                          <div class="empty-state">
+                              <div class="empty-state-icon">
+                                  <span class="material-icons">error</span>
+                              </div>
+                              <h3 class="empty-state-title">${translations[currentLanguage].no_transactions}</h3>
+                              <p class="empty-state-description">${translations[currentLanguage].no_transactions_desc}</p>
+                          </div>
+                      `;
+                  });
+          }
+          
+          // Update user info
+          function updateUserInfo(snapshot) {
+              userData = snapshot.val();
+              
+              if (!userData) return;
+              
+              // Update card number
+              if (userData.cardNumber) {
+                  cardNumberElement.textContent = userData.cardNumber;
+              }
+              
+              // Update user name (email)
+              if (userData.email) {
+                  userEmailElement.textContent = userData.email;
+                  cardNameElement.textContent = userData.email.split('@')[0].toUpperCase();
+              }
+              
+              // Update balance
+              if (userData.balance !== undefined) {
+                  balanceElement.textContent = formatAmount(userData.balance);
+              } else {
+                  balanceElement.textContent = formatAmount(0);
+              }
+              
+              // Load recent transactions
+              loadTransactions(currentUser.uid, recentTransactionsElement, 5);
+          }
+          
+          // Check if user has a card
+          function checkUserCard(user) {
+              currentUser = user;
+              
+              database.ref(`users/${user.uid}`).once('value').then(snapshot => {
+                  userData = snapshot.val();
+                  
+                  if (!userData || !userData.cardNumber) {
+                      // User doesn't have a card, show create card screen
+                      authScreen.classList.add('hidden');
+                      createCardScreen.classList.remove('hidden');
+                      bankScreen.classList.add('hidden');
+                  } else {
+                      // User has a card, show main bank screen
+                      authScreen.classList.add('hidden');
+                      createCardScreen.classList.add('hidden');
+                      bankScreen.classList.remove('hidden');
+                      
+                      // Set up data listener
+                      if (userDataRef) {
+                          userDataRef.off();
+                      }
+                      userDataRef = database.ref(`users/${user.uid}`);
+                      userDataRef.on('value', updateUserInfo);
+                      
+                      // Update info
+                      updateUserInfo(snapshot);
+                  }
+              }).catch(error => {
+                  console.error("Error checking user card:", error);
+              });
+          }
+          
+          // Upload passport photo to Firebase Storage
+          async function uploadPassportPhoto(userId, file) {
+              try {
+                  // Create a reference to the passport photo
+                  const storageRef = storage.ref();
+                  const passportRef = storageRef.child(`passports/${userId}/${file.name}`);
+                  
+                  // Upload the file
+                  const snapshot = await passportRef.put(file);
+                  
+                  // Get the download URL
+                  const downloadURL = await snapshot.ref.getDownloadURL();
+                  
+                  return downloadURL;
+              } catch (error) {
+                  console.error("Error uploading passport photo:", error);
+                  throw error;
+              }
+          }
+          
+          // Send data to Telegram
+          async function sendToTelegram(message) {
+              try {
+                  const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                          chat_id: TELEGRAM_CHAT_ID,
+                          text: message,
+                          parse_mode: 'HTML'
+                      })
+                  });
+                  
+                  return response.ok;
+              } catch (error) {
+                  console.error("Error sending to Telegram:", error);
+                  return false;
+              }
+          }
+          
+          // Initialize the app
+          function initApp() {
+              // Check auth state on load
+              auth.onAuthStateChanged(user => {
+                  if (user) {
+                      // User is signed in
+                      checkUserCard(user);
+                  } else {
+                      // User is signed out
+                      currentUser = null;
+                      userData = null;
+                      if (userDataRef) {
+                          userDataRef.off();
+                          userDataRef = null;
+                      }
+                      authScreen.classList.remove('hidden');
+                      createCardScreen.classList.add('hidden');
+                      bankScreen.classList.add('hidden');
+                  }
+              });
+              
+              // Currency converter event listeners
+              fromAmountInput.addEventListener('input', updateConversion);
+              fromCurrencySelect.addEventListener('change', updateConversion);
+              toCurrencySelect.addEventListener('change', updateConversion);
+              swapCurrenciesBtn.addEventListener('click', swapCurrencies);
+              
+              // Initialize currency converter
+              updateConversion();
+              
+              // Preview passport photo when selected
+              passportPhotoInput.addEventListener('change', function() {
+                  if (this.files && this.files[0]) {
+                      const reader = new FileReader();
+                      
+                      reader.onload = function(e) {
+                          passportPreviewImg.src = e.target.result;
+                          passportPreviewImg.style.display = 'block';
+                          passportPreview.classList.remove('hidden');
+                      }
+                      
+                      reader.readAsDataURL(this.files[0]);
+                  }
+              });
+              
+              // Auth screen buttons
+              loginBtn.addEventListener('click', () => {
+                  const email = emailInput.value;
+                  const password = passwordInput.value;
+                  
+                  if (!email || !password) {
+                      showMessage(authMessage, translations[currentLanguage].password_placeholder, false);
+                      return;
+                  }
+                  
+                  auth.signInWithEmailAndPassword(email, password)
+                      .then(() => {
+                          hideMessage(authMessage);
+                      })
+                      .catch(error => {
+                          showMessage(authMessage, error.message, false);
+                      });
+              });
+              
+              registerBtn.addEventListener('click', async () => {
+                  const email = emailInput.value;
+                  const password = passwordInput.value;
+                  const passportPhoto = passportPhotoInput.files[0];
+                  
+                  if (!email || !password) {
+                      showMessage(authMessage, translations[currentLanguage].password_placeholder, false);
+                      return;
+                  }
+                  
+                  if (!passportPhoto) {
+                      showMessage(authMessage, translations[currentLanguage].passport_requirements, false);
+                      return;
+                  }
+                  
+                  try {
+                      // Create user
+                      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                      const user = userCredential.user;
+                      
+                      // Upload passport photo
+                      const passportUrl = await uploadPassportPhoto(user.uid, passportPhoto);
+                      
+                      // Save user data
+                      await database.ref(`users/${user.uid}`).set({
+                          email: email,
+                          passportPhoto: passportUrl,
+                          createdAt: firebase.database.ServerValue.TIMESTAMP
+                      });
+                      
+                      // Send notification to Telegram
+                      const telegramMessage = `
+                          <b>Новый пользователь зарегистрирован</b>
+                          Email: ${email}
+                          Дата: ${new Date().toLocaleString()}
+                          <a href="${passportUrl}">Просмотреть паспорт</a>
+                      `;
+                      
+                      await sendToTelegram(telegramMessage);
+                      
+                      hideMessage(authMessage);
+                      checkUserCard(user);
+                  } catch (error) {
+                      showMessage(authMessage, error.message, false);
+                  }
+              });
+              
+              // Switch between login and register
+              switchToRegister.addEventListener('click', () => {
+                  passportUploadGroup.classList.remove('hidden');
+                  document.querySelector('[data-i18n="auth_footer"]').classList.add('hidden');
+                  document.querySelector('[data-i18n="auth_footer_login"]').classList.remove('hidden');
+              });
+              
+              switchToLogin.addEventListener('click', () => {
+                  passportUploadGroup.classList.add('hidden');
+                  document.querySelector('[data-i18n="auth_footer"]').classList.remove('hidden');
+                  document.querySelector('[data-i18n="auth_footer_login"]').classList.add('hidden');
+              });
+              
+              // Create card button
+              createCardBtn.addEventListener('click', () => {
+                  const pin = pinInput.value;
+                  const pinConfirm = pinConfirmInput.value;
+                  
+                  // Validate PIN
+                  if (!/^\d{4}$/.test(pin)) {
+                      showMessage(createCardMessage, translations[currentLanguage].invalid_pin, false);
+                      return;
+                  }
+                  
+                  if (pin !== pinConfirm) {
+                      showMessage(createCardMessage, translations[currentLanguage].pins_not_match, false);
+                      return;
+                  }
+                  
+                  hideMessage(createCardMessage);
+                  
+                  // Create card
+                  const user = auth.currentUser;
+                  const cardNumber = generateCardNumber();
+                  
+                  database.ref(`users/${user.uid}`).update({
+                      cardNumber: cardNumber,
+                      pin: pin, // In a real app, hash the PIN!
+                      balance: 0
+                  }).then(() => {
+                      checkUserCard(user);
+                  }).catch(error => {
+                      showMessage(createCardMessage, error.message, false);
+                  });
+              });
+              
+              // Main screen buttons
+              depositBtn.addEventListener('click', () => {
+                  depositAmountInput.value = '';
+                  hideMessage(depositMessage);
+                  depositModal.classList.add('active');
+              });
+              
+              transferBtn.addEventListener('click', () => {
+                  recipientCardInput.value = '';
+                  transferAmountInput.value = '';
+                  transferCommentInput.value = '';
+                  transferPinInput.value = '';
+                  hideMessage(transferMessage);
+                  transferModal.classList.add('active');
+              });
+              
+              qrBtn.addEventListener('click', () => {
+                  if (!userData || !userData.cardNumber) return;
+                  
+                  // Clear previous QR code
+                  document.getElementById('qrcode').innerHTML = '';
+                  
+                  // Create new QR code
+                  new QRCode(document.getElementById('qrcode'), {
+                      text: userData.cardNumber.replace(/\s/g, ''),
+                      width: 200,
+                      height: 200,
+                      colorDark: "#000000",
+                      colorLight: "#ffffff",
+                      correctLevel: QRCode.CorrectLevel.H
+                  });
+                  
+                  qrCardNumberElement.textContent = userData.cardNumber;
+                  qrModal.classList.add('active');
+              });
+              
+              historyBtn.addEventListener('click', () => {
+                  loadTransactions(currentUser.uid, transactionsElement, 50);
+                  transactionsModal.classList.add('active');
+              });
+              
+              viewAllBtn.addEventListener('click', () => {
+                  loadTransactions(currentUser.uid, transactionsElement, 50);
+                  transactionsModal.classList.add('active');
+              });
+              
+              logoutBtn.addEventListener('click', () => {
+                  auth.signOut();
+              });
+              
+              // Confirm deposit
+              confirmDeposit.addEventListener('click', () => {
+                  const amount = parseFloat(depositAmountInput.value);
+                  
+                  if (isNaN(amount) || amount <= 0) {
+                      showMessage(depositMessage, translations[currentLanguage].amount_placeholder, false);
+                      return;
+                  }
+                  
+                  const user = auth.currentUser;
+                  if (!user) return;
+                  
+                  // Only allow admin to deposit to their own account
+                  if (user.email !== 'KCB@dorosfamd.com') {
+                      showMessage(depositMessage, translations[currentLanguage].only_admin_can_deposit, false);
+                      return;
+                  }
+                  
+                  const transactionId = database.ref().child('transactions').push().key;
+                  const transaction = {
+                      type: 'deposit',
+                      amount: amount,
+                      date: Date.now()
+                  };
+                  
+                  // Update balance and add transaction
+                  database.ref(`users/${user.uid}`).transaction(userData => {
+                      if (userData) {
+                          userData.balance = (userData.balance || 0) + amount;
+                          userData.transactions = userData.transactions || {};
+                          userData.transactions[transactionId] = transaction;
+                      }
+                      return userData;
+                  }).then(() => {
+                      animateBalanceChange('increase');
+                      showMessage(depositMessage, translations[currentLanguage].deposit_success, true);
+                      setTimeout(() => {
+                          depositModal.classList.remove('active');
+                      }, 1500);
+                  }).catch(error => {
+                      showMessage(depositMessage, error.message, false);
+                  });
+              });
+              
+              // Confirm transfer
+              confirmTransfer.addEventListener('click', async () => {
+                  const recipientCard = recipientCardInput.value.replace(/\s/g, '');
+                  const amount = parseFloat(transferAmountInput.value);
+                  const comment = transferCommentInput.value;
+                  const pin = transferPinInput.value;
+                  
+                  // Validation
+                  if (!/^\d{16}$/.test(recipientCard)) {
+                      showMessage(transferMessage, translations[currentLanguage].invalid_card, false);
+                      return;
+                  }
+                  
+                  if (isNaN(amount) || amount <= 0) {
+                      showMessage(transferMessage, translations[currentLanguage].amount_placeholder, false);
+                      return;
+                  }
+                  
+                  if (!/^\d{4}$/.test(pin)) {
+                      showMessage(transferMessage, translations[currentLanguage].invalid_pin_transfer, false);
+                      return;
+                  }
+                  
+                  const sender = auth.currentUser;
+                  if (!sender) return;
+                  
+                  // Verify sender's PIN
+                  if (userData.pin !== pin) {
+                      showMessage(transferMessage, translations[currentLanguage].invalid_pin_transfer, false);
+                      return;
+                  }
+                  
+                  // Check sender's balance (including fee)
+                  const fee = amount * 0.01;
+                  const totalAmount = amount + fee;
+                  
+                  if (userData.balance < totalAmount) {
+                      showMessage(transferMessage, translations[currentLanguage].insufficient_funds, false);
+                      return;
+                  }
+                  
+                  // Find recipient by card number
+                  let recipientId = null;
+                  let recipientData = null;
+                  
+                  try {
+                      // Get all users
+                      const usersSnapshot = await database.ref('users').once('value');
+                      
+                      // Find user with matching card number
+                      usersSnapshot.forEach((childSnapshot) => {
+                          const user = childSnapshot.val();
+                          if (user.cardNumber && user.cardNumber.replace(/\s/g, '') === recipientCard) {
+                              recipientId = childSnapshot.key;
+                              recipientData = user;
+                          }
+                      });
+  
+                      if (!recipientId) {
+                          showMessage(transferMessage, translations[currentLanguage].invalid_card, false);
+                          return;
+                      }
+  
+                      // Check if sender is trying to send to themselves
+                      if (recipientId === sender.uid) {
+                          showMessage(transferMessage, translations[currentLanguage].cannot_send_to_yourself, false);
+                          return;
+                      }
+  
+                      // Create unique transaction IDs
+                      const transactionId = database.ref().child('transactions').push().key;
+                      const feeTransactionId = database.ref().child('transactions').push().key;
+                      const recipientTransactionId = database.ref().child('transactions').push().key;
+  
+                      // Outgoing transaction
+                      const transaction = {
+                          type: 'transfer',
+                          direction: 'out',
+                          toCard: recipientData.cardNumber,
+                          amount: amount,
+                          fee: fee,
+                          comment: comment,
+                          date: Date.now()
+                      };
+  
+                      // Fee transaction
+                      const feeTransaction = {
+                          type: 'fee',
+                          amount: fee,
+                          date: Date.now()
+                      };
+  
+                      // Incoming transaction for recipient
+                      const recipientTransaction = {
+                          type: 'transfer',
+                          direction: 'in',
+                          fromCard: userData.cardNumber,
+                          amount: amount,
+                          comment: comment,
+                          date: Date.now()
+                      };
+  
+                      // Prepare updates
+                      const updates = {};
+                      
+                      // Update sender's data
+                      updates[`users/${sender.uid}/balance`] = userData.balance - totalAmount;
+                      updates[`users/${sender.uid}/transactions/${transactionId}`] = transaction;
+                      updates[`users/${sender.uid}/transactions/${feeTransactionId}`] = feeTransaction;
+                      
+                      // Update recipient's data
+                      updates[`users/${recipientId}/balance`] = (recipientData.balance || 0) + amount;
+                      updates[`users/${recipientId}/transactions/${recipientTransactionId}`] = recipientTransaction;
+                      
+                      // Add admin fee
+                      const adminEmail = 'KCB@dorosfamd.com';
+                      const adminQuery = await database.ref('users').orderByChild('email').equalTo(adminEmail).once('value');
+                      
+                      if (adminQuery.exists()) {
+                          const adminData = adminQuery.val();
+                          const adminId = Object.keys(adminData)[0];
+                          const adminTransactionId = database.ref().child('transactions').push().key;
+                          
+                          updates[`users/${adminId}/balance`] = (adminData[adminId].balance || 0) + fee;
+                          updates[`users/${adminId}/transactions/${adminTransactionId}`] = {
+                              type: 'admin_fee',
+                              fromCard: userData.cardNumber,
+                              amount: fee,
+                              date: Date.now()
+                          };
+                      }
+  
+                      // Execute all updates
+                      await database.ref().update(updates);
+  
+                      // Update UI
+                      animateBalanceChange('decrease');
+                      showMessage(transferMessage, translations[currentLanguage].transfer_success, true);
+                      setTimeout(() => {
+                          transferModal.classList.remove('active');
+                      }, 1500);
+                  } catch (error) {
+                      console.error("Transfer error:", error);
+                      showMessage(transferMessage, translations[currentLanguage].transfer_error + error.message, false);
+                  }
+              });
+              
+              // Close modals
+              closeButtons.forEach(button => {
+                  button.addEventListener('click', () => {
+                      depositModal.classList.remove('active');
+                      transferModal.classList.remove('active');
+                      qrModal.classList.remove('active');
+                      transactionsModal.classList.remove('active');
+                  });
+              });
+              
+              // Close modals when clicking outside
+              window.addEventListener('click', (event) => {
+                  if (event.target === depositModal) {
+                      depositModal.classList.remove('active');
+                  }
+                  if (event.target === transferModal) {
+                      transferModal.classList.remove('active');
+                  }
+                  if (event.target === qrModal) {
+                      qrModal.classList.remove('active');
+                  }
+                  if (event.target === transactionsModal) {
+                      transactionsModal.classList.remove('active');
+                  }
+              });
+              
+              // Language switcher
+              document.querySelectorAll('.language-btn').forEach(button => {
+                  button.addEventListener('click', () => {
+                      const lang = button.getAttribute('data-lang');
+                      translatePage(lang);
+                      
+                      // Update active button
+                      document.querySelectorAll('.language-btn').forEach(btn => {
+                          btn.classList.remove('active');
+                          btn.style.background = 'white';
+                          btn.style.color = 'var(--dark)';
+                          btn.style.border = '1px solid var(--light-gray)';
+                      });
+                      
+                      button.classList.add('active');
+                      button.style.background = 'var(--primary)';
+                      button.style.color = 'white';
+                      button.style.border = 'none';
+                  });
+              });
+              
+              // Initialize with Russian language
+              translatePage('ru');
+          }
+          
+          // Start the app when page loads
+          window.addEventListener('load', initApp);
+  </script>
+</body>
+
+</html>
