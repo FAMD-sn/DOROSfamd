@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Трекер привычек | MAWORLD</title>
+  
+  <style>
+    :root {
+      --primary-color: #00ffc8;
+      --secondary-color: #00aaff;
+      --bg-color: #0d0d1a;
+      --card-bg: rgba(20, 20, 40, 0.5);
+      --card-border: 1px solid rgba(0, 255, 200, 0.2);
+      --success-color: #00ffc8;
+      --warning-color: #ffd93d;
+      --danger-color: #ff6b6b;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background-color: var(--bg-color);
+      color: #ffffff;
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(45deg, var(--bg-color) 0%, #1a0d1a 100%);
+      animation: background-glow 20s infinite alternate ease-in-out;
+    }
+    
+    @keyframes background-glow {
+      from { filter: hue-rotate(0deg); }
+      to { filter: hue-rotate(360deg); }
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      color: var(--primary-color);
+      text-shadow: 0 0 10px var(--primary-color);
+      margin-bottom: 10px;
+      animation: text-glow 2s infinite alternate;
+    }
+    
+    @keyframes text-glow {
+      from { text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color); }
+      to { text-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--primary-color); }
+    }
+    
+    .tagline {
+      font-size: 1.2em;
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stat-number {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 0.9em;
+      color: #ccc;
+    }
+    
+    .progress-ring {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 15px;
+    }
+    
+    .progress-bg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(var(--primary-color) 0%, transparent 0%);
+      position: relative;
+    }
+    
+    .progress-bg::before {
+      content: '';
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      background: var(--bg-color);
+      border-radius: 50%;
+      top: 15px;
+      left: 15px;
+    }
+    
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5em;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .habit-form {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 15px;
+      padding: 25px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: var(--card-border);
+      background-color: rgba(20, 20, 40, 0.7);
+      color: #fff;
+      font-size: 1em;
+      outline: none;
+      font-family: inherit;
+    }
+    
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    
+    .frequency-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .frequency-option {
+      padding: 10px;
+      text-align: center;
+      border: var(--card-border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .frequency-option.selected {
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+      border-color: var(--primary-color);
+    }
+    
+    .days-of-week {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .day-option {
+      flex: 1;
+      min-width: 40px;
+      padding: 8px 5px;
+      text-align: center;
+      border: var(--card-border);
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8em;
+      transition: all 0.3s ease;
+    }
+    
+    .day-option.selected {
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn {
+      padding: 12px 25px;
+      border-radius: 10px;
+      border: none;
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      font-size: 1em;
+    }
+    
+    .btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 255, 200, 0.5);
+    }
+    
+    .btn-full {
+      width: 100%;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+    }
+    
+    .habits-container {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 15px;
+      padding: 25px;
+    }
+    
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .calendar-nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+    
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: var(--card-border);
+      border-radius: 8px;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .calendar-day:hover {
+      background-color: rgba(0, 255, 200, 0.1);
+    }
+    
+    .calendar-day.today {
+      border-color: var(--primary-color);
+      background-color: rgba(0, 255, 200, 0.2);
+    }
+    
+    .calendar-day.selected {
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+    }
+    
+    .habits-list {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .habit-item {
+      background-color: rgba(20, 20, 40, 0.7);
+      border: var(--card-border);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    .habit-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 255, 200, 0.2);
+    }
+    
+    .habit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    
+    .habit-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .habit-category {
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 0.8em;
+      background-color: var(--secondary-color);
+    }
+    
+    .habit-description {
+      color: #ccc;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+    }
+    
+    .habit-streak {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+    }
+    
+    .streak-count {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    
+    .habit-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .habit-actions .btn {
+      padding: 8px 15px;
+      font-size: 0.8em;
+      flex: 1;
+    }
+    
+    .checkmark {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--primary-color);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .checkmark.checked {
+      background-color: var(--primary-color);
+    }
+    
+    .checkmark.checked::after {
+      content: '✓';
+      color: var(--bg-color);
+      font-weight: bold;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #888;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      color: var(--secondary-color);
+      text-decoration: none;
+      font-size: 1em;
+      text-align: center;
+      width: 100%;
+    }
+    
+    .back-link:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Трекер привычек</h1>
+      <p class="tagline">Формируй полезные привычки и отслеживай прогресс</p>
+      
+      <div class="stats">
+        <div class="stat-card">
+          <div class="progress-ring">
+            <div class="progress-bg" id="completion-progress"></div>
+            <div class="progress-text" id="completion-percent">0%</div>
+          </div>
+          <div class="stat-label">Выполнение сегодня</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="total-habits">0</div>
+          <div class="stat-label">Всего привычек</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="current-streak">0</div>
+          <div class="stat-label">Текущая серия</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="total-completed">0</div>
+          <div class="stat-label">Всего выполнено</div>
+        </div>
+      </div>
+    </header>
+    
+    <div class="main-content">
+      <div class="habit-form">
+        <h3>Добавить новую привычку</h3>
+        <form id="habit-form">
+          <div class="form-group">
+            <label for="habit-name">Название привычки</label>
+            <input type="text" id="habit-name" placeholder="Например: Утренняя зарядка" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="habit-description">Описание (необязательно)</label>
+            <textarea id="habit-description" placeholder="Опишите вашу привычку..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="habit-category">Категория</label>
+            <select id="habit-category">
+              <option value="health">Здоровье</option>
+              <option value="sport">Спорт</option>
+              <option value="study">Обучение</option>
+              <option value="work">Работа</option>
+              <option value="personal">Личное</option>
+              <option value="other">Другое</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Частота</label>
+            <div class="frequency-options">
+              <div class="frequency-option selected" data-frequency="daily">Ежедневно</div>
+              <div class="frequency-option" data-frequency="weekly">Еженедельно</div>
+              <div class="frequency-option" data-frequency="custom">Выборочно</div>
+            </div>
+          </div>
+          
+          <div class="form-group" id="custom-days" style="display: none;">
+            <label>Дни недели</label>
+            <div class="days-of-week">
+              <div class="day-option" data-day="0">Пн</div>
+              <div class="day-option" data-day="1">Вт</div>
+              <div class="day-option" data-day="2">Ср</div>
+              <div class="day-option" data-day="3">Чт</div>
+              <div class="day-option" data-day="4">Пт</div>
+              <div class="day-option" data-day="5">Сб</div>
+              <div class="day-option" data-day="6">Вс</div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="habit-goal">Цель (раз в неделю)</label>
+            <input type="number" id="habit-goal" min="1" max="7" value="7">
+          </div>
+          
+          <button type="submit" class="btn btn-full">Добавить привычку</button>
+        </form>
+      </div>
+      
+      <div class="habits-container">
+        <div class="calendar-header">
+          <h3 id="current-month">Июль 2024</h3>
+          <div class="calendar-nav">
+            <button class="btn" id="prev-month">←</button>
+            <button class="btn" id="today-btn">Сегодня</button>
+            <button class="btn" id="next-month">→</button>
+          </div>
+        </div>
+        
+        <div class="calendar-grid" id="calendar">
+          <!-- Календарь будет сгенерирован JavaScript -->
+        </div>
+        
+        <div class="habits-list" id="habits-list">
+          <div class="empty-state">
+            <p>Привычки отсутствуют. Добавьте первую привычку!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <a href="https://dorosfamd.com/" class="back-link">← Вернуться на главную</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Элементы DOM
+      const habitForm = document.getElementById('habit-form');
+      const habitsList = document.getElementById('habits-list');
+      const calendar = document.getElementById('calendar');
+      const currentMonthEl = document.getElementById('current-month');
+      
+      // Статистика
+      const totalHabitsEl = document.getElementById('total-habits');
+      const currentStreakEl = document.getElementById('current-streak');
+      const totalCompletedEl = document.getElementById('total-completed');
+      const completionPercentEl = document.getElementById('completion-percent');
+      const completionProgressEl = document.getElementById('completion-progress');
+      
+      // Календарь
+      const prevMonthBtn = document.getElementById('prev-month');
+      const nextMonthBtn = document.getElementById('next-month');
+      const todayBtn = document.getElementById('today-btn');
+      
+      // Настройки частоты
+      const frequencyOptions = document.querySelectorAll('.frequency-option');
+      const customDaysSection = document.getElementById('custom-days');
+      const dayOptions = document.querySelectorAll('.day-option');
+      
+      // Данные
+      let habits = JSON.parse(localStorage.getItem('maworld-habits')) || [];
+      let currentDate = new Date();
+      let selectedFrequency = 'daily';
+      let selectedDays = [0, 1, 2, 3, 4, 5, 6]; // Все дни по умолчанию
+      
+      // Инициализация
+      initCalendar();
+      updateStats();
+      renderHabits();
+      setupFrequencyOptions();
+      
+      // Обработчик формы
+      habitForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('habit-name').value;
+        const description = document.getElementById('habit-description').value;
+        const category = document.getElementById('habit-category').value;
+        const goal = parseInt(document.getElementById('habit-goal').value);
+        
+        const newHabit = {
+          id: Date.now(),
+          name,
+          description,
+          category,
+          frequency: selectedFrequency,
+          days: selectedFrequency === 'custom' ? selectedDays : [0,1,2,3,4,5,6],
+          goal,
+          streak: 0,
+          bestStreak: 0,
+          completions: {},
+          createdAt: new Date().toISOString()
+        };
+        
+        habits.push(newHabit);
+        saveHabits();
+        renderHabits();
+        updateStats();
+        
+        // Сброс формы
+        habitForm.reset();
+        document.getElementById('habit-category').value = 'health';
+        document.getElementById('habit-goal').value = '7';
+        
+        // Сброс частоты
+        selectedFrequency = 'daily';
+        frequencyOptions.forEach(opt => {
+          opt.classList.toggle('selected', opt.dataset.frequency === 'daily');
+        });
+        customDaysSection.style.display = 'none';
+      });
+      
+      // Навигация календаря
+      prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        initCalendar();
+      });
+      
+      nextMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        initCalendar();
+      });
+      
+      todayBtn.addEventListener('click', () => {
+        currentDate = new Date();
+        initCalendar();
+      });
+      
+      // Функции
+      function setupFrequencyOptions() {
+        frequencyOptions.forEach(option => {
+          option.addEventListener('click', function() {
+            frequencyOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedFrequency = this.dataset.frequency;
+            
+            if (selectedFrequency === 'custom') {
+              customDaysSection.style.display = 'block';
+            } else {
+              customDaysSection.style.display = 'none';
+            }
+          });
+        });
+        
+        dayOptions.forEach(day => {
+          day.addEventListener('click', function() {
+            this.classList.toggle('selected');
+            const dayIndex = parseInt(this.dataset.day);
+            
+            if (this.classList.contains('selected')) {
+              if (!selectedDays.includes(dayIndex)) {
+                selectedDays.push(dayIndex);
+              }
+            } else {
+              selectedDays = selectedDays.filter(d => d !== dayIndex);
+            }
+          });
+        });
+      }
+      
+      function initCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        // Обновляем заголовок
+        const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
+                           'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        currentMonthEl.textContent = `${monthNames[month]} ${year}`;
+        
+        // Очищаем календарь
+        calendar.innerHTML = '';
+        
+        // Добавляем заголовки дней недели
+        const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+        dayNames.forEach(day => {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'calendar-day';
+          dayEl.style.fontWeight = 'bold';
+          dayEl.textContent = day;
+          calendar.appendChild(dayEl);
+        });
+        
+        // Получаем первый день месяца
+        const firstDay = new Date(year, month, 1);
+        const startingDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+        
+        // Получаем последний день месяца
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        
+        // Добавляем пустые ячейки для начала месяца
+        for (let i = 0; i < startingDay; i++) {
+          const emptyDay = document.createElement('div');
+          emptyDay.className = 'calendar-day';
+          calendar.appendChild(emptyDay);
+        }
+        
+        // Добавляем дни месяца
+        const today = new Date();
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'calendar-day';
+          dayEl.textContent = day;
+          
+          // Проверяем, является ли день сегодняшним
+          if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            dayEl.classList.add('today');
+          }
+          
+          calendar.appendChild(dayEl);
+        }
+      }
+      
+      function saveHabits() {
+        localStorage.setItem('maworld-habits', JSON.stringify(habits));
+      }
+      
+      function updateStats() {
+        const total = habits.length;
+        const today = new Date().toDateString();
+        
+        // Вычисляем выполнение на сегодня
+        let completedToday = 0;
+        habits.forEach(habit => {
+          if (habit.completions && habit.completions[today]) {
+            completedToday++;
+          }
+        });
+        
+        const completionPercent = total > 0 ? Math.round((completedToday / total) * 100) : 0;
+        
+        // Обновляем прогресс-кольцо
+        completionProgressEl.style.background = `conic-gradient(var(--primary-color) ${completionPercent}%, transparent ${completionPercent}%)`;
+        completionPercentEl.textContent = completionPercent + '%';
+        
+        // Вычисляем самую длинную текущую серию
+        let maxStreak = 0;
+        habits.forEach(habit => {
+          if (habit.streak > maxStreak) {
+            maxStreak = habit.streak;
+          }
+        });
+        
+        // Общее количество выполненных привычек за все время
+        let totalCompletions = 0;
+        habits.forEach(habit => {
+          totalCompletions += Object.keys(habit.completions || {}).length;
+        });
+        
+        totalHabitsEl.textContent = total;
+        currentStreakEl.textContent = maxStreak;
+        totalCompletedEl.textContent = totalCompletions;
+      }
+      
+      function renderHabits() {
+        if (habits.length === 0) {
+          habitsList.innerHTML = `
+            <div class="empty-state">
+              <p>Привычки отсутствуют. Добавьте первую привычку!</p>
+            </div>
+          `;
+          return;
+        }
+        
+        const today = new Date().toDateString();
+        
+        habitsList.innerHTML = habits.map(habit => {
+          const isCompletedToday = habit.completions && habit.completions[today];
+          const categoryNames = {
+            health: 'Здоровье',
+            sport: 'Спорт', 
+            study: 'Обучение',
+            work: 'Работа',
+            personal: 'Личное',
+            other: 'Другое'
+          };
+          
+          return `
+            <div class="habit-item">
+              <div class="habit-header">
+                <div class="habit-title">
+                  <div class="checkmark ${isCompletedToday ? 'checked' : ''}" 
+                       onclick="toggleHabitCompletion(${habit.id})"></div>
+                  ${habit.name}
+                </div>
+                <div class="habit-category">${categoryNames[habit.category]}</div>
+              </div>
+              <div class="habit-description">${habit.description || 'Нет описания'}</div>
+              <div class="habit-streak">
+                <span>Серия: <span class="streak-count">${habit.streak} дней</span></span>
+                <span>Лучшая: <span class="streak-count">${habit.bestStreak} дней</span></span>
+              </div>
+              <div class="habit-actions">
+                <button class="btn" onclick="editHabit(${habit.id})">Редактировать</button>
+                <button class="btn btn-danger" onclick="deleteHabit(${habit.id})">Удалить</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      // Глобальные функции для обработки событий
+      window.toggleHabitCompletion = function(habitId) {
+        const today = new Date().toDateString();
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        
+        habits = habits.map(habit => {
+          if (habit.id === habitId) {
+            const completions = { ...habit.completions };
+            
+            if (completions[today]) {
+              // Отмечаем как невыполненное
+              delete completions[today];
+              
+              // Проверяем, прервалась ли серия
+              if (completions[yesterday]) {
+                // Серия продолжается с предыдущего дня
+                habit.streak = Object.keys(completions).length;
+              } else {
+                // Серия прервана
+                habit.streak = 0;
+              }
+            } else {
+              // Отмечаем как выполненное
+              completions[today] = true;
+              
+              // Обновляем серию
+              if (completions[yesterday]) {
+                habit.streak++;
+              } else {
+                habit.streak = 1;
+              }
+              
+              // Обновляем лучшую серию
+              if (habit.streak > habit.bestStreak) {
+                habit.bestStreak = habit.streak;
+              }
+            }
+            
+            return { ...habit, completions };
+          }
+          return habit;
+        });
+        
+        saveHabits();
+        renderHabits();
+        updateStats();
+      };
+      
+      window.editHabit = function(habitId) {
+        const habit = habits.find(h => h.id === habitId);
+        if (habit) {
+          document.getElementById('habit-name').value = habit.name;
+          document.getElementById('habit-description').value = habit.description || '';
+          document.getElementById('habit-category').value = habit.category;
+          document.getElementById('habit-goal').value = habit.goal;
+          
+          // Удаляем старую привычку
+          habits = habits.filter(h => h.id !== habitId);
+          saveHabits();
+          renderHabits();
+          updateStats();
+        }
+      };
+      
+      window.deleteHabit = function(habitId) {
+        if (confirm('Вы уверены, что хотите удалить эту привычку?')) {
+          habits = habits.filter(habit => habit.id !== habitId);
+          saveHabits();
+          renderHabits();
+          updateStats();
+        }
+      };
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,3933 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>DOROStrike Massacre: Multiplayer Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: #050505; 
+            font-family: 'Courier New', monospace; 
+            touch-action: none; 
+            user-select: none; 
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        #ui-layer { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            pointer-events: none; 
+            z-index: 10; 
+            top: 0;
+            left: 0;
+        }
+        
+        .interactive { 
+            pointer-events: auto; 
+        }
+
+        /* HUD */
+        #hud { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 20px; 
+            color: #0f0; 
+            text-shadow: 2px 2px 0 #000; 
+            font-weight: bold; 
+        }
+        
+        .bar-wrap { 
+            width: 220px; 
+            height: 18px; 
+            background: #222; 
+            border: 2px solid #555; 
+            margin-top: 5px; 
+            display: inline-block; 
+            vertical-align: middle; 
+        }
+        
+        #hp-bar { 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(90deg, #d00, #f44); 
+            transition: width 0.2s; 
+        }
+        
+        #armor-bar { 
+            width: 0%; 
+            height: 100%; 
+            background: linear-gradient(90deg, #00d, #44f); 
+            transition: width 0.2s; 
+        }
+        
+        #stamina-bar { 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(90deg, #dd0, #ff0); 
+            transition: width 0.1s; 
+        }
+        
+        /* WEAPON SELECTOR */
+        #weapon-selector {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #0f0;
+            z-index: 20;
+        }
+        
+        .weapon-slot {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #555;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+        
+        .weapon-slot:hover {
+            border-color: #0f0;
+            transform: scale(1.1);
+        }
+        
+        .weapon-slot.active {
+            border-color: gold;
+            background: rgba(255,215,0,0.1);
+        }
+        
+        .weapon-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* QUEST & BOSS UI */
+        #top-ui { 
+            position: absolute; 
+            top: 20px; 
+            width: 100%; 
+            text-align: center; 
+            pointer-events: none; 
+            z-index: 15;
+        }
+        
+        #kill-counter { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: bold; 
+            text-shadow: 0 0 5px #000; 
+            margin-bottom: 10px; 
+        }
+        
+        #quest-box { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background: rgba(0,0,0,0.8); 
+            border: 2px solid gold; 
+            padding: 15px; 
+            color: gold; 
+            text-align: right; 
+            width: 280px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            pointer-events: auto;
+            z-index: 15;
+        }
+        
+        #quest-timer-bar { 
+            width: 100%; 
+            height: 4px; 
+            background: #333; 
+            margin-top: 5px; 
+            display: none; 
+        }
+        
+        #quest-progress { 
+            width: 100%; 
+            height: 100%; 
+            background: gold; 
+        }
+
+        #boss-ui { 
+            display: none; 
+            width: 60%; 
+            margin: 0 auto; 
+        }
+        
+        #boss-name { 
+            color: red; 
+            font-size: 24px; 
+            font-weight: bold; 
+            text-shadow: 0 0 10px red; 
+            margin-bottom: 5px; 
+        }
+        
+        #boss-hp-wrap { 
+            width: 100%; 
+            height: 25px; 
+            background: #220000; 
+            border: 2px solid red; 
+        }
+        
+        #boss-hp-bar { 
+            width: 100%; 
+            height: 100%; 
+            background: red; 
+            transition: width 0.2s; 
+        }
+
+        #crosshair {
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            width: 24px; 
+            height: 24px;
+            transform: translate(-50%, -50%); 
+            opacity: 0.8;
+            z-index: 15;
+        }
+        
+        .crosshair-inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .crosshair-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: lime;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .crosshair-line {
+            position: absolute;
+            background: lime;
+        }
+        
+        .crosshair-horizontal {
+            width: 8px;
+            height: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .crosshair-horizontal.left {
+            left: 2px;
+        }
+        
+        .crosshair-horizontal.right {
+            right: 2px;
+        }
+        
+        .crosshair-vertical {
+            width: 2px;
+            height: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .crosshair-vertical.top {
+            top: 2px;
+        }
+        
+        .crosshair-vertical.bottom {
+            bottom: 2px;
+        }
+
+        #hit-overlay { 
+            position: absolute; 
+            top:0; 
+            left:0; 
+            width:100%; 
+            height:100%; 
+            box-shadow: inset 0 0 0 0 red; 
+            transition: box-shadow 0.1s; 
+            pointer-events: none; 
+            z-index: 5;
+        }
+        
+        #msg { 
+            position: absolute; 
+            top: 35%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            color: yellow; 
+            font-size: 28px; 
+            opacity: 0; 
+            transition: opacity 0.5s; 
+            text-align: center; 
+            text-shadow: 2px 2px 5px black; 
+            width: 100%; 
+            z-index: 20;
+        }
+        
+        #interact-hint { 
+            position: absolute; 
+            bottom: 35%; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            color: cyan; 
+            font-size: 20px; 
+            display: none; 
+            background: rgba(0,0,0,0.8); 
+            padding: 8px 15px; 
+            border: 1px solid cyan; 
+            border-radius: 5px; 
+            z-index: 20;
+        }
+
+        /* MENUS */
+        #shop-menu, #pause-menu, #win-screen, #settings-menu {
+            display: none; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            width: 500px; 
+            background: rgba(10, 20, 10, 0.98); 
+            border: 2px solid #0f0; 
+            padding: 20px; 
+            color: white; 
+            text-align: center; 
+            z-index: 100; 
+            box-shadow: 0 0 30px #0f0;
+            max-height: 80vh; 
+            overflow-y: auto;
+            pointer-events: auto;
+        }
+        
+        #pause-menu { 
+            cursor: auto; 
+            border-color: orange; 
+        }
+        
+        #pause-menu h1 { 
+            color: orange; 
+            margin-top: 0;
+        }
+        
+        #win-screen { 
+            border-color: gold; 
+            box-shadow: 0 0 50px gold; 
+        }
+        
+        #win-screen h1 { 
+            color: gold; 
+            font-size: 40px; 
+        }
+
+        .shop-item { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 10px 0; 
+            border-bottom: 1px solid #040; 
+            padding-bottom: 5px; 
+            font-size: 16px; 
+            align-items: center; 
+        }
+        
+        .shop-btn { 
+            background: #005500; 
+            color: #fff; 
+            border: 1px solid #0f0; 
+            cursor: pointer; 
+            padding: 5px 10px; 
+            font-family: monospace; 
+            font-size: 14px; 
+            transition: 0.2s; 
+        }
+        
+        .shop-btn:hover { 
+            background: #008800; 
+            box-shadow: 0 0 10px #0f0; 
+        }
+        
+        .discount { 
+            text-decoration: line-through; 
+            color: #777; 
+            font-size: 12px; 
+            margin-right: 5px; 
+        }
+        
+        .sale-tag { 
+            color: #ff00ff; 
+            font-weight: bold; 
+            animation: pulse 1s infinite; 
+        }
+        
+        .menu-btn { 
+            padding: 15px 40px; 
+            margin: 10px; 
+            font-size: 20px; 
+            background: #003300; 
+            color: white; 
+            border: 2px solid #0f0; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            pointer-events: auto;
+        }
+        
+        .menu-btn:hover { 
+            background: #006600; 
+            transform: scale(1.05); 
+        }
+        
+        .small-btn { 
+            padding: 8px 20px; 
+            font-size: 16px; 
+            margin-top: 10px; 
+        }
+
+        /* NEW: SETTINGS MENU */
+        #settings-menu { 
+            border-color: cyan; 
+        }
+        
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+        
+        .settings-row label {
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        .settings-row input[type="range"],
+        .settings-row input[type="number"],
+        .settings-row input[type="text"],
+        .settings-row select {
+            width: 150px;
+            background: #222;
+            border: 1px solid #0f0;
+            color: white;
+            padding: 5px;
+        }
+
+        #main-menu { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            background: #111; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            color: #0f0; 
+            z-index: 200; 
+            background-image: radial-gradient(circle, #222 1px, transparent 1px); 
+            background-size: 20px 20px; 
+            pointer-events: auto;
+        }
+        
+        .menu-box { 
+            border: 2px solid #0f0; 
+            padding: 30px; 
+            background: rgba(0,0,0,0.9); 
+            box-shadow: 0 0 50px #0f0; 
+            text-align: center; 
+            max-width: 600px;
+        }
+
+        /* CHECKBOX STYLE */
+        .check-opt { 
+            margin: 10px 0; 
+            font-size: 14px; 
+            color: #aaa; 
+            text-align: left; 
+            display: block; 
+        }
+        
+        input[type=checkbox] { 
+            transform: scale(1.5); 
+            margin-right: 10px; 
+            vertical-align: middle; 
+        }
+
+        /* ALLIES UI */
+        #allies-ui {
+            position: absolute;
+            top: 100px;
+            left: 20px;
+            color: #00ff00;
+            font-size: 12px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #0f0;
+            z-index: 15;
+        }
+        
+        .ally-status {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        
+        .ally-hp-bar {
+            width: 60px;
+            height: 8px;
+            background: #222;
+            margin-left: 10px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .ally-hp-fill {
+            height: 100%;
+            background: #0f0;
+            transition: width 0.3s;
+        }
+
+        /* MULTIPLAYER MENUS */
+        #multiplayer-menu {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            background: rgba(10, 20, 10, 0.98);
+            border: 2px solid #00ffff;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 0 30px #00ffff;
+            pointer-events: auto;
+        }
+        
+        #connection-status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(0,0,0,0.3);
+            font-size: 14px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .status-connected { color: #0f0; }
+        .status-connecting { color: #ff0; }
+        .status-disconnected { color: #f00; }
+        
+        #players-list {
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            margin: 5px 0;
+            background: rgba(0,100,0,0.3);
+            border-radius: 3px;
+        }
+        
+        .player-item.enemy {
+            background: rgba(100,0,0,0.3);
+        }
+        
+        #multiplayer-hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: cyan;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid cyan;
+            display: none;
+            z-index: 20;
+            pointer-events: none;
+        }
+        
+        #multiplayer-chat {
+            position: absolute;
+            bottom: 200px;
+            left: 20px;
+            width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 10px;
+            display: none;
+            pointer-events: auto;
+            z-index: 25;
+        }
+        
+        .chat-message {
+            color: #fff;
+            margin: 5px 0;
+            font-size: 12px;
+            word-wrap: break-word;
+        }
+        
+        .chat-message.system {
+            color: #ffaa00;
+            font-style: italic;
+        }
+        
+        .chat-message.player {
+            color: #00ff00;
+        }
+        
+        .chat-message.enemy {
+            color: #ff5555;
+        }
+        
+        #chat-input {
+            width: 100%;
+            background: #222;
+            border: 1px solid #555;
+            color: white;
+            padding: 5px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        #btn-chat {
+            position: absolute;
+            bottom: 150px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: cyan;
+            border: 1px solid cyan;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            z-index: 25;
+            pointer-events: auto;
+        }
+
+        /* BOT WEAPON SELECTION */
+        #bot-weapon-settings {
+            display: none;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+        
+        .bot-weapon-option {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+        
+        .bot-weapon-option:hover {
+            background: rgba(0,100,0,0.3);
+        }
+        
+        .bot-weapon-option.selected {
+            background: rgba(0,150,0,0.5);
+            border-left: 3px solid #0f0;
+        }
+        
+        /* MOBILE */
+        #mobile-ui { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            pointer-events: none; 
+            z-index: 50; 
+        }
+        
+        .touch-zone { 
+            position: absolute; 
+            bottom: 40px; 
+            width: 140px; 
+            height: 140px; 
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 50%; 
+            border: 2px solid rgba(255,255,255,0.1); 
+            pointer-events: auto; 
+        }
+        
+        #stick-l { 
+            left: 30px; 
+        }
+        
+        .mob-btn { 
+            position: absolute; 
+            width: 65px; 
+            height: 65px; 
+            background: rgba(0,0,0,0.6); 
+            border: 2px solid #aaa; 
+            border-radius: 50%; 
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 12px; 
+            pointer-events: auto; 
+            user-select: none; 
+            font-weight: bold; 
+        }
+        
+        #btn-fire { 
+            bottom: 90px; 
+            right: 30px; 
+            width: 85px; 
+            height: 85px; 
+            background: rgba(200,0,0,0.3); 
+            border-color: red; 
+            font-size: 16px; 
+        }
+        
+        #btn-jump { 
+            bottom: 190px; 
+            right: 20px; 
+        }
+        
+        #btn-reload { 
+            bottom: 190px; 
+            right: 100px; 
+        }
+        
+        #btn-nade { 
+            bottom: 270px; 
+            right: 50px; 
+            border-color: orange; 
+            color: orange; 
+        }
+        
+        #btn-swap { 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 120px; 
+            height: 50px; 
+            border-radius: 10px; 
+            border-color: yellow; 
+            color: yellow; 
+        }
+        
+        #btn-shop { 
+            bottom: 350px; 
+            right: 30px; 
+            border-color: cyan; 
+            color: cyan; 
+            display: none; 
+            background: rgba(0,255,255,0.2); 
+        }
+        
+        #btn-melee { 
+            bottom: 270px; 
+            right: 120px; 
+            border-color: #ff4444; 
+            color: #ff4444; 
+        }
+        
+        /* WEAPON ANIMATIONS */
+        @keyframes recoil {
+            0% { transform: translate(0, 0) rotate(0); }
+            50% { transform: translate(-10px, 5px) rotate(-1deg); }
+            100% { transform: translate(0, 0) rotate(0); }
+        }
+        
+        @keyframes meleeSwing {
+            0% { transform: rotate(0) translate(0, 0); }
+            50% { transform: rotate(-60deg) translate(20px, -10px); }
+            100% { transform: rotate(0) translate(0, 0); }
+        }
+        
+        @keyframes reloadAnim {
+            0% { transform: rotate(-5deg); opacity: 1; }
+            50% { transform: rotate(5deg); opacity: 0.8; }
+            100% { transform: rotate(0); opacity: 1; }
+        }
+        
+        .weapon-recoil { animation: recoil 0.1s ease-out; }
+        .melee-attack { animation: meleeSwing 0.3s ease-in-out; }
+        .reloading { animation: reloadAnim 0.5s ease-in-out; }
+
+        @keyframes pulse { 
+            0% { opacity: 0.5; } 
+            50% { opacity: 1; } 
+            100% { opacity: 0.5; } 
+        }
+        
+        @keyframes float { 
+            0%, 100% { transform: translateY(0); } 
+            50% { transform: translateY(-5px); } 
+        }
+        
+        /* ZOMBIE ANIMATIONS */
+        .zombie-walk .leg { animation: walkLeg 1s infinite alternate; }
+        
+        @keyframes walkLeg {
+            0% { transform: rotate(-20deg); }
+            100% { transform: rotate(20deg); }
+        }
+        
+        .zombie-attack { animation: attackAnim 0.5s; }
+        
+        @keyframes attackAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div id="hit-overlay"></div>
+
+    <div id="ui-layer">
+        <div id="crosshair">
+            <div class="crosshair-inner">
+                <div class="crosshair-dot"></div>
+                <div class="crosshair-line crosshair-horizontal left"></div>
+                <div class="crosshair-line crosshair-horizontal right"></div>
+                <div class="crosshair-line crosshair-vertical top"></div>
+                <div class="crosshair-line crosshair-vertical bottom"></div>
+            </div>
+        </div>
+        
+        <div id="quest-box">
+            <h3 style="margin:0; border-bottom:1px solid gold;">ЗАДАНИЕ ТОРГОВЦА</h3>
+            <div id="quest-desc" style="margin:10px 0; font-size: 14px;">Ожидание...</div>
+            <div id="quest-timer-bar"><div id="quest-progress"></div></div>
+            <div id="quest-reward" style="font-size:12px; color:#aaa;">Награда: 100 $</div>
+        </div>
+
+        <div id="top-ui">
+            <div id="kill-counter">УБИТО: 0 / <span id="max-enemies">20</span></div>
+            <div id="boss-ui">
+                <div id="boss-name">BOSS</div>
+                <div id="boss-hp-wrap"><div id="boss-hp-bar"></div></div>
+            </div>
+        </div>
+        
+        <div id="allies-ui">
+            <div style="color: cyan; border-bottom: 1px solid cyan; margin-bottom: 5px;">СОЮЗНИКИ</div>
+            <div id="allies-list"></div>
+        </div>
+        
+        <div id="msg"></div>
+        <div id="interact-hint">Нажми [F] для магазина</div>
+        
+        <div id="weapon-selector">
+            <!-- Weapons will be added dynamically -->
+        </div>
+        
+        <div id="hud">
+            <div style="font-size: 24px;">HP: <div class="bar-wrap"><div id="hp-bar"></div></div> <span id="hp-val">100</span></div>
+            <div>ARMOR: <div class="bar-wrap"><div id="armor-bar"></div></div> <span id="armor-val">0</span></div>
+            <div>STAMINA: <div class="bar-wrap"><div id="stamina-bar"></div></div></div>
+            <div style="color: gold; margin-top:8px; font-size: 22px;">МОНЕТЫ: <span id="coin-val">0</span> $</div>
+            <br>
+            <div id="wpn-name" style="font-size: 26px; color: yellow; text-transform: uppercase;">ПИСТОЛЕТ</div>
+            <div id="ammo-val" style="font-size: 24px;">12 / 48</div>
+            <div style="font-size: 18px; color: orange;">Гранаты: <span id="nade-val">2</span></div>
+        </div>
+    </div>
+
+    <div id="settings-menu" class="interactive">
+        <h2 style="color: cyan; margin-top: 0;">НАСТРОЙКИ ИГРЫ</h2>
+        
+        <div class="settings-row">
+            <label>Количество врагов:</label>
+            <input type="range" id="enemy-count" min="1" max="50" value="20" oninput="document.getElementById('enemy-count-val').innerText = this.value">
+            <span id="enemy-count-val" style="color: #0f0;">20</span>
+        </div>
+        
+        <div class="settings-row">
+            <label>Количество союзников:</label>
+            <input type="range" id="ally-count" min="0" max="10" value="3" oninput="document.getElementById('ally-count-val').innerText = this.value">
+            <span id="ally-count-val" style="color: #0f0;">3</span>
+        </div>
+        
+        <div class="settings-row">
+            <label>Оружие ботов:</label>
+            <select id="bot-weapon-type">
+                <option value="pistol">Пистолет (3 урона)</option>
+                <option value="ak47">AK-47 (3 урона)</option>
+                <option value="shotgun">Дробовик (3×8 урона)</option>
+                <option value="sniper">Винтовка (10 урона)</option>
+                <option value="random">Случайное</option>
+            </select>
+        </div>
+        
+        <div class="settings-row">
+            <label>Точность ботов:</label>
+            <input type="range" id="bot-accuracy" min="10" max="100" value="50" oninput="document.getElementById('bot-accuracy-val').innerText = this.value + '%'">
+            <span id="bot-accuracy-val" style="color: #0f0;">50%</span>
+        </div>
+        
+        <div class="settings-row">
+            <label>Скорость игры:</label>
+            <input type="range" id="game-speed" min="50" max="200" value="100" oninput="document.getElementById('game-speed-val').innerText = this.value + '%'">
+            <span id="game-speed-val" style="color: #0f0;">100%</span>
+        </div>
+        
+        <div class="settings-row">
+            <label>Скорость врагов:</label>
+            <select id="zombie-speed">
+                <option value="0.8">Медленнее (80%)</option>
+                <option value="1.0" selected>Стандартная (100%)</option>
+                <option value="1.2">Быстрее (120%)</option>
+                <option value="1.5">Очень быстро (150%)</option>
+            </select>
+        </div>
+        
+        <div class="settings-row">
+            <label>Громкость:</label>
+            <input type="range" id="vol" min="0" max="1" step="0.1" value="0.4">
+        </div>
+        
+        <label class="check-opt">
+            <input type="checkbox" id="no-vfx" checked> ВКЛЮЧИТЬ ЭФФЕКТЫ
+        </label>
+        
+        <label class="check-opt">
+            <input type="checkbox" id="blood-on" checked> ЭФФЕКТЫ КРОВИ
+        </label>
+        
+        <label class="check-opt">
+            <input type="checkbox" id="friendly-fire"> ДРУЖЕСТВЕННЫЙ ОГОНЬ
+        </label>
+        
+        <div style="margin-top: 20px;">
+            <button class="menu-btn" id="save-settings-btn">СОХРАНИТЬ И ИГРАТЬ</button>
+            <button class="menu-btn small-btn" id="back-to-menu-btn">НАЗАД</button>
+        </div>
+    </div>
+
+    <div id="pause-menu" class="interactive">
+        <h1>ПАУЗА</h1>
+        <button class="menu-btn" id="btn-music">МУЗЫКА: ВКЛ</button>
+        <br>
+        <button class="menu-btn small-btn" id="resume-btn">ПРОДОЛЖИТЬ</button>
+        <button class="menu-btn small-btn" id="settings-btn">НАСТРОЙКИ</button>
+        <button class="menu-btn small-btn" onclick="location.reload()">ВЫЙТИ В МЕНЮ</button>
+    </div>
+
+    <div id="win-screen" class="interactive">
+        <h1>ПОБЕДА!</h1>
+        <p>ВЫ УНИЧТОЖИЛИ ВСЕХ ЗОМБИ!</p>
+        <button class="menu-btn" onclick="location.reload()">МЕНЮ</button>
+    </div>
+
+    <div id="shop-menu" class="interactive">
+        <h2 style="color: cyan; border-bottom: 2px solid cyan; margin-top:0;">ЛАВКА ТОРГОВЦА</h2>
+        <div id="shop-list"></div>
+        <button id="close-shop" class="shop-btn" style="margin-top:15px; width:100%; padding: 10px;">ЗАКРЫТЬ</button>
+    </div>
+
+    <!-- MULTIPLAYER MENU -->
+    <div id="multiplayer-menu" class="interactive">
+        <h2 style="color: cyan; margin-top: 0;">МУЛЬТИПЛЕЕР (LAN)</h2>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button id="btn-create-room" class="menu-btn small-btn" style="flex: 1;">
+                <i class="fas fa-plus"></i> СОЗДАТЬ КОМНАТУ
+            </button>
+            <button id="btn-join-room" class="menu-btn small-btn" style="flex: 1;">
+                <i class="fas fa-sign-in-alt"></i> ПОДКЛЮЧИТЬСЯ
+            </button>
+        </div>
+        
+        <div id="create-room-panel" style="display: none;">
+            <div class="settings-row">
+                <label>Имя игрока:</label>
+                <input type="text" id="player-name" value="Игрок" style="width: 200px;">
+            </div>
+            
+            <div class="settings-row">
+                <label>Режим игры:</label>
+                <select id="game-mode">
+                    <option value="coop">PvE - Кооператив против зомби</option>
+                    <option value="pvp">PvP - Игрок против игрока</option>
+                    <option value="team">Команда против команды</option>
+                </select>
+            </div>
+            
+            <div class="settings-row">
+                <label>Макс. игроков:</label>
+                <input type="range" id="max-players" min="2" max="8" value="4" oninput="document.getElementById('max-players-val').innerText = this.value">
+                <span id="max-players-val" style="color: #0f0;">4</span>
+            </div>
+            
+            <div class="settings-row">
+                <label>Оружие ботов:</label>
+                <select id="multi-bot-weapon">
+                    <option value="pistol">Пистолет</option>
+                    <option value="ak47">AK-47</option>
+                    <option value="shotgun">Дробовик</option>
+                    <option value="sniper">Винтовка</option>
+                    <option value="random" selected>Случайное</option>
+                </select>
+            </div>
+            
+            <div id="room-id-display" style="margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 5px; display: none;">
+                <div style="color: #aaa; font-size: 12px;">ID КОМНАТЫ:</div>
+                <div id="room-id" style="color: #0f0; font-size: 18px; font-weight: bold; letter-spacing: 2px;"></div>
+                <div style="color: #aaa; font-size: 11px; margin-top: 5px;">Дайте этот код другу для подключения</div>
+            </div>
+            
+            <button id="btn-start-multiplayer" class="menu-btn" style="margin-top: 10px;">
+                <i class="fas fa-play"></i> НАЧАТЬ ИГРУ
+            </button>
+        </div>
+        
+        <div id="join-room-panel" style="display: none;">
+            <div class="settings-row">
+                <label>Имя игрока:</label>
+                <input type="text" id="join-player-name" value="Игрок2" style="width: 200px;">
+            </div>
+            
+            <div class="settings-row">
+                <label>ID комнаты:</label>
+                <input type="text" id="input-room-id" placeholder="Введите код комнаты" style="width: 200px;">
+            </div>
+            
+            <div id="connection-status">
+                <span class="status-disconnected">Не подключено</span>
+            </div>
+            
+            <button id="btn-connect" class="menu-btn small-btn">
+                <i class="fas fa-plug"></i> ПОДКЛЮЧИТЬСЯ
+            </button>
+            
+            <div id="players-list" style="display: none;">
+                <div style="color: #aaa; border-bottom: 1px solid #555; padding-bottom: 5px; margin-bottom: 5px;">Игроки в комнате:</div>
+            </div>
+        </div>
+        
+        <button id="btn-back-multiplayer" class="menu-btn small-btn" style="margin-top: 20px;">
+            <i class="fas fa-arrow-left"></i> НАЗАД В МЕНЮ
+        </button>
+    </div>
+    
+    <!-- MULTIPLAYER HUD -->
+    <div id="multiplayer-hud">
+        <div><i class="fas fa-users"></i> Игроков: <span id="player-count">1</span>/<span id="max-player-count">4</span></div>
+        <div id="game-mode-display" style="font-size: 12px; color: #aaa; margin-top: 5px;">Режим: Кооператив</div>
+        <div id="ping-display" style="font-size: 11px; color: #0f0; margin-top: 5px;">Пинг: 0мс</div>
+    </div>
+    
+    <!-- CHAT -->
+    <div id="multiplayer-chat"></div>
+    <input type="text" id="chat-input" placeholder="Напишите сообщение... (Enter для отправки, Esc для отмены)">
+    <button id="btn-chat"><i class="fas fa-comment"></i> ЧАТ</button>
+
+    <div id="main-menu" class="interactive">
+        <div class="menu-box">
+            <h1 style="font-size: 40px; margin-bottom: 10px; color: #0f0; text-shadow: 0 0 10px #0f0;">DOROStrike MASSACRE</h1>
+            <h3 style="color: #fff;">MULTIPLAYER EDITION</h3>
+            
+            <div style="margin: 30px 0;">
+                <button class="menu-btn" id="btn-settings">НАСТРОЙКИ И НАЧАТЬ</button>
+                <button class="menu-btn" id="btn-quick-start">БЫСТРЫЙ СТАРТ</button>
+                <button class="menu-btn" id="btn-multiplayer"><i class="fas fa-users"></i> МУЛЬТИПЛЕЕР (LAN)</button>
+            </div>
+            
+            <div style="color: #555; font-size: 12px; margin-top: 20px;">
+                <p>УПРАВЛЕНИЕ: WASD - движение, ЛКМ - огонь, R - перезарядка,<br>
+                1-9 - смена оружия, F - магазин, Shift - бег, Ctrl - присед, G - граната</p>
+                <p>Новые возможности: Мультиплеер, оружие у ботов, настройки игры</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobile-ui">
+        <div id="stick-l" class="touch-zone"></div>
+        <div id="btn-fire" class="mob-btn"><i class="fas fa-fire"></i></div>
+        <div id="btn-jump" class="mob-btn"><i class="fas fa-arrow-up"></i></div>
+        <div id="btn-reload" class="mob-btn"><i class="fas fa-redo"></i></div>
+        <div id="btn-nade" class="mob-btn"><i class="fas fa-bomb"></i></div>
+        <div id="btn-melee" class="mob-btn"><i class="fas fa-hand-fist"></i></div>
+        <div id="btn-swap" class="mob-btn"><i class="fas fa-exchange-alt"></i></div>
+        <div id="btn-shop" class="mob-btn"><i class="fas fa-store"></i></div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
+        import { PointerLockControls } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/PointerLockControls.js';
+
+        // --- GAME SETTINGS ---
+        const gameSettings = {
+            enemyCount: 20,
+            allyCount: 3,
+            gameSpeed: 1.0,
+            zombieSpeed: 1.0,
+            volume: 0.4,
+            vfx: true,
+            blood: true,
+            friendlyFire: false,
+            botWeapon: 'pistol', // pistol, ak47, shotgun, sniper, random
+            botAccuracy: 50,
+            bulletDamage: 3, // Урон от каждой пули
+            isMultiplayer: false,
+            gameMode: 'coop'
+        };
+
+        // --- MULTIPLAYER SETTINGS ---
+        const multiplayerSettings = {
+            isActive: false,
+            isHost: false,
+            playerId: generatePlayerId(),
+            playerName: "Игрок",
+            roomId: null,
+            maxPlayers: 4,
+            players: new Map(),
+            localPlayers: new Map(), // Для отображения других игроков
+            connections: new Map(),
+            dataChannels: new Map(),
+            lastPing: 0
+        };
+        
+        function generatePlayerId() {
+            return 'player_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        function generateRoomId() {
+            return Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+
+        // --- AUDIO SYSTEM ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx, masterGain, musicInterval;
+        let isMusicPlaying = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+                masterGain = audioCtx.createGain();
+                masterGain.gain.value = gameSettings.volume;
+                masterGain.connect(audioCtx.destination);
+                startLoFi();
+            }
+        }
+
+        function startLoFi() {
+            if (musicInterval) clearInterval(musicInterval);
+            let beat = 0;
+            const chords = [300, 260, 220, 260]; 
+            
+            musicInterval = setInterval(() => {
+                if(!isMusicPlaying || !audioCtx) return;
+                const t = audioCtx.currentTime;
+                
+                if(beat % 4 === 0 || beat % 4 === 2.5) {
+                    const osc = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    osc.frequency.setValueAtTime(120, t);
+                    osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.5);
+                    g.gain.setValueAtTime(0.3, t);
+                    g.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+                    osc.connect(g); g.connect(masterGain);
+                    osc.start(t); osc.stop(t + 0.5);
+                }
+
+                if(beat % 4 === 2 || beat % 4 === 0) { 
+                    const noise = audioCtx.createBufferSource();
+                    const b = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+                    const d = b.getChannelData(0);
+                    for(let i=0; i<d.length; i++) d[i] = Math.random()*2-1;
+                    noise.buffer = b;
+                    const g = audioCtx.createGain();
+                    const f = audioCtx.createBiquadFilter();
+                    f.type = "lowpass"; f.frequency.value = 1000;
+                    g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+                    noise.connect(f); f.connect(g); g.connect(masterGain);
+                    noise.start(t);
+                }
+
+                if(beat % 4 === 0) {
+                    const freq = chords[(beat/4) % chords.length];
+                    createChord(freq, t);
+                }
+
+                beat++;
+            }, 600);
+        }
+
+        function createChord(freq, t) {
+            for(let i=0; i<3; i++) {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                const f = audioCtx.createBiquadFilter();
+                
+                osc.type = 'triangle';
+                osc.frequency.value = freq * (1 + i * 0.25); 
+                f.type = 'lowpass';
+                f.frequency.setValueAtTime(400, t);
+                f.frequency.linearRampToValueAtTime(200, t+2);
+
+                g.gain.setValueAtTime(0.05, t);
+                g.gain.linearRampToValueAtTime(0, t+3); 
+
+                osc.connect(f); f.connect(g); g.connect(masterGain);
+                osc.start(t); osc.stop(t+3);
+            }
+        }
+
+        function toggleMusic() {
+            isMusicPlaying = !isMusicPlaying;
+            document.getElementById('btn-music').innerText = "МУЗЫКА: " + (isMusicPlaying ? "ВКЛ" : "ВЫКЛ");
+        }
+
+        function sfx(type, param) {
+            if(!audioCtx) return;
+            const t = audioCtx.currentTime;
+            
+            if(type === 'shoot') {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.frequency.setValueAtTime(param?.freq || 300, t);
+                osc.frequency.exponentialRampToValueAtTime(50, t + 0.1);
+                g.gain.setValueAtTime(param?.vol || 0.2, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+                osc.connect(g); g.connect(masterGain);
+                osc.start(t); osc.stop(t + 0.1);
+            }
+            else if(type === 'melee') {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(80, t);
+                osc.frequency.exponentialRampToValueAtTime(40, t + 0.3);
+                g.gain.setValueAtTime(0.3, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+                osc.connect(g); g.connect(masterGain);
+                osc.start(t); osc.stop(t + 0.3);
+            }
+            else if(type === 'buy' || type === 'coin' || type === 'quest') {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.type='sine';
+                osc.frequency.setValueAtTime(type==='quest'?880:1000, t);
+                g.gain.setValueAtTime(0.2, t);
+                g.gain.linearRampToValueAtTime(0, t+0.2);
+                osc.connect(g); g.connect(masterGain);
+                osc.start(t); osc.stop(t+0.2);
+            }
+            else if(type === 'boom') {
+                const noiseBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 1.5, audioCtx.sampleRate);
+                const noiseData = noiseBuf.getChannelData(0);
+                for(let i=0; i<noiseData.length; i++) noiseData[i] = Math.random() * 2 - 1;
+                const noiseSrc = audioCtx.createBufferSource();
+                noiseSrc.buffer = noiseBuf;
+                const g = audioCtx.createGain();
+                noiseSrc.connect(g); g.connect(masterGain);
+                g.gain.setValueAtTime(1.5, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t+1.5);
+                noiseSrc.start(t);
+            }
+        }
+
+        // --- GAME STATE ---
+        let camera, scene, renderer, controls;
+        let isMobile = false, isRunning = false, shopOpen = false, isPaused = false;
+        let moveF=0, moveB=0, moveL=0, moveR=0, canJump=false, isSprint=false, isCrouch=false;
+        let prevTime = performance.now();
+        const vel = new THREE.Vector3();
+        let keys = {};
+
+        // Player
+        const p = { 
+            hp: 100, armor: 0, coins: 500, 
+            baseSpeed: 12, speed: 12, 
+            stamina: 100, staminaMax: 100, staminaCooldown: 0,
+            nades: 2, h: 1.8, flashLevel: 1, turrets: 0,
+            kills: 0, totalKills: 0,
+            meleeCooldown: 0,
+            team: 'blue'
+        };
+        let flashLight;
+
+        // Quest System
+        let quest = { type: null, wpnIdx: 0, count: 0, goal: 0, active: false, timer: 0 };
+        let questCooldown = 0;
+
+        // Weapons with 3 damage per bullet
+        const wpns = [
+            { // 0 - Pistol
+                name:"ПИСТОЛЕТ", dmg:3, clip:12, maxClip:12, ammo:48, rate:300, 
+                auto:false, spread:0.03, reload:1200, color: 0x888888, 
+                range: 25, icon: "fas fa-gun", sound: {freq: 400, vol: 0.1},
+                botWeapon: true, botAccuracy: 70
+            },
+            { // 1 - AK-47
+                name:"AK-47", dmg:3, clip:30, maxClip:30, ammo:150, rate:90, 
+                auto:true, spread:0.02, reload:2000, color: 0xffff00, 
+                range: 30, icon: "fas fa-assault-rifle", sound: {freq: 300, vol: 0.2},
+                botWeapon: true, botAccuracy: 60
+            },
+            { // 2 - Shotgun
+                name:"ДРОБОВИК", dmg:3, pellets:8, clip:5, maxClip:5, ammo:20, 
+                rate:800, auto:false, spread:0.20, reload:2800, color: 0xffaa00, 
+                range: 20, icon: "fas fa-shotgun", sound: {freq: 150, vol: 0.5},
+                botWeapon: true, botAccuracy: 40, pelletDamage: true
+            },
+            { // 3 - Sniper Rifle
+                name:"ВИНТОВКА", dmg:10, clip:5, maxClip:5, ammo:25, rate:1500, 
+                auto:false, spread:0.005, reload:2500, color: 0x00ff00, 
+                range: 100, icon: "fas fa-crosshairs", sound: {freq: 600, vol: 0.3},
+                botWeapon: true, botAccuracy: 90
+            },
+            { // 4 - Grenade Launcher
+                name:"ГРАНАТОМЁТ", dmg:100, clip:1, maxClip:1, ammo:8, rate:2000, 
+                auto:false, spread:0.0, reload:3000, color: 0xff5500, 
+                range: 40, icon: "fas fa-rocket", sound: {freq: 200, vol: 0.4},
+                projectile: true, explosionRadius: 8,
+                botWeapon: false
+            },
+            { // 5 - Plasma Gun
+                name:"ПЛАЗМЕННЫЙ", dmg:3, clip:40, maxClip:40, ammo:120, rate:150, 
+                auto:true, spread:0.04, reload:1800, color: 0x00ffff, 
+                range: 35, icon: "fas fa-bolt", sound: {freq: 500, vol: 0.15},
+                botWeapon: false
+            },
+            { // 6 - Minigun
+                name:"МИНИГАН", dmg:3, clip:200, maxClip:200, ammo:400, rate:30, 
+                auto:true, spread:0.08, reload:4000, color: 0xff00ff, 
+                range: 40, icon: "fas fa-fire", sound: {freq: 350, vol: 0.25},
+                botWeapon: false
+            },
+            { // 7 - Knife (melee)
+                name:"НОЖ", dmg:50, clip:1, maxClip:1, ammo:0, rate:500, 
+                auto:false, spread:0, reload:0, color: 0xcccccc, 
+                range: 2, icon: "fas fa-knife", sound: {freq: 100, vol: 0.3},
+                melee: true,
+                botWeapon: false
+            },
+            { // 8 - Turret
+                name:"ТУРЕЛЬ", dmg:0, clip:1, maxClip:1, ammo:0, rate:500, 
+                auto:false, spread:0, reload:0, color: 0x00ff00, 
+                range: 5, icon: "fas fa-robot", sound: {freq: 300, vol: 0.2},
+                botWeapon: false
+            }
+        ];
+        
+        // Bot weapons configuration
+        const botWeapons = {
+            'pistol': {
+                wpnIndex: 0,
+                fireRate: 1000,
+                accuracy: 0.7,
+                range: 20
+            },
+            'ak47': {
+                wpnIndex: 1,
+                fireRate: 300,
+                accuracy: 0.6,
+                range: 25
+            },
+            'shotgun': {
+                wpnIndex: 2,
+                fireRate: 1500,
+                accuracy: 0.4,
+                range: 15
+            },
+            'sniper': {
+                wpnIndex: 3,
+                fireRate: 2000,
+                accuracy: 0.9,
+                range: 40
+            }
+        };
+        
+        let curWpn = 0, lastShot=0, reloading=false, wpnMesh;
+
+        // Entities
+        const zombies = [], corpses = [], turrets = [], nades = [], enemyNades = [];
+        const coins = [], colliders = [], tracers = [], particles = [], mapItems = [];
+        const allies = [], projectiles = [], botProjectiles = [];
+        let merchant, currentBoss = null;
+        let gameTime = 0;
+
+        // Shop System
+        const shopItems = [
+            {id:'hp', name:'Аптечка (100 HP)', cost:50, icon: "fas fa-heart"},
+            {id:'armor', name:'Броня (100 AP)', cost:80, icon: "fas fa-shield-alt"},
+            {id:'ammo', name:'Патроны (Все)', cost:30, icon: "fas fa-box"},
+            {id:'nade', name:'Граната (1 шт)', cost:60, icon: "fas fa-bomb"},
+            {id:'light', name:'Улучшить фонарь', cost:150, icon: "fas fa-lightbulb"},
+            {id:'pistol', name:'ПИСТОЛЕТ', cost:100, icon: "fas fa-gun"},
+            {id:'shotgun', name:'ДРОБОВИК', cost:300, icon: "fas fa-shotgun"},
+            {id:'sniper', name:'ВИНТОВКА', cost:500, icon: "fas fa-crosshairs"},
+            {id:'plasma', name:'ПЛАЗМЕННЫЙ', cost:800, icon: "fas fa-bolt"},
+            {id:'minigun', name:'МИНИГАН', cost:1200, icon: "fas fa-fire"},
+            {id:'turret', name:'ТУРЕЛЬ (Слот 9)', cost:370, icon: "fas fa-robot"}
+        ];
+        let shopDiscounts = {};
+
+        // --- UI FUNCTIONS ---
+        function showSettings() {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('settings-menu').style.display = 'block';
+        }
+
+        function showMainMenu() {
+            document.getElementById('settings-menu').style.display = 'none';
+            document.getElementById('pause-menu').style.display = 'none';
+            document.getElementById('multiplayer-menu').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+        }
+
+        function saveSettings() {
+            gameSettings.enemyCount = parseInt(document.getElementById('enemy-count').value);
+            gameSettings.allyCount = parseInt(document.getElementById('ally-count').value);
+            gameSettings.gameSpeed = parseInt(document.getElementById('game-speed').value) / 100;
+            gameSettings.zombieSpeed = parseFloat(document.getElementById('zombie-speed').value);
+            gameSettings.volume = parseFloat(document.getElementById('vol').value);
+            gameSettings.vfx = document.getElementById('no-vfx').checked;
+            gameSettings.blood = document.getElementById('blood-on').checked;
+            gameSettings.friendlyFire = document.getElementById('friendly-fire').checked;
+            gameSettings.botWeapon = document.getElementById('bot-weapon-type').value;
+            gameSettings.botAccuracy = parseInt(document.getElementById('bot-accuracy').value);
+            
+            // Update audio volume if initialized
+            if (masterGain) {
+                masterGain.gain.value = gameSettings.volume;
+            }
+            
+            document.getElementById('settings-menu').style.display = 'none';
+            startGame();
+        }
+
+        function startWithDefaults() {
+            gameSettings.enemyCount = 20;
+            gameSettings.allyCount = 3;
+            gameSettings.gameSpeed = 1.0;
+            gameSettings.zombieSpeed = 1.0;
+            gameSettings.volume = 0.4;
+            gameSettings.vfx = true;
+            gameSettings.blood = true;
+            gameSettings.friendlyFire = false;
+            gameSettings.botWeapon = 'pistol'; // По умолчанию пистолет в быстрой игре
+            gameSettings.botAccuracy = 50;
+            
+            document.getElementById('main-menu').style.display = 'none';
+            startGame();
+        }
+
+        // --- MULTIPLAYER FUNCTIONS ---
+        function showMultiplayerMenu() {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('multiplayer-menu').style.display = 'block';
+            document.getElementById('create-room-panel').style.display = 'none';
+            document.getElementById('join-room-panel').style.display = 'none';
+        }
+        
+        function showCreateRoomPanel() {
+            document.getElementById('create-room-panel').style.display = 'block';
+            document.getElementById('join-room-panel').style.display = 'none';
+            document.getElementById('room-id-display').style.display = 'none';
+        }
+        
+        function showJoinRoomPanel() {
+            document.getElementById('create-room-panel').style.display = 'none';
+            document.getElementById('join-room-panel').style.display = 'block';
+            updateConnectionStatus('disconnected');
+        }
+        
+        function createRoom() {
+            multiplayerSettings.isHost = true;
+            multiplayerSettings.isActive = true;
+            multiplayerSettings.playerName = document.getElementById('player-name').value || "Игрок";
+            gameSettings.gameMode = document.getElementById('game-mode').value;
+            multiplayerSettings.maxPlayers = parseInt(document.getElementById('max-players').value);
+            gameSettings.botWeapon = document.getElementById('multi-bot-weapon').value;
+            multiplayerSettings.roomId = generateRoomId();
+            
+            // Отображаем ID комнаты
+            document.getElementById('room-id').textContent = multiplayerSettings.roomId;
+            document.getElementById('room-id-display').style.display = 'block';
+            
+            // Добавляем себя в список игроков
+            addPlayer(multiplayerSettings.playerId, multiplayerSettings.playerName, true, 'blue');
+            
+            updateConnectionStatus('waiting');
+            
+            // Симуляция создания комнаты (в реальной игре здесь WebSocket сервер)
+            console.log(`Комната создана: ${multiplayerSettings.roomId}`);
+            console.log(`Режим игры: ${gameSettings.gameMode}`);
+            console.log(`Оружие ботов: ${gameSettings.botWeapon}`);
+            
+            // Добавляем симулированных игроков для демонстрации
+            setTimeout(() => {
+                if (multiplayerSettings.players.size < multiplayerSettings.maxPlayers) {
+                    const botNames = ['Бот_Алекс', 'Бот_Макс', 'Бот_Сэм', 'Бот_Райан'];
+                    const remainingSlots = multiplayerSettings.maxPlayers - multiplayerSettings.players.size;
+                    
+                    for (let i = 0; i < remainingSlots - 1; i++) {
+                        const botId = 'bot_' + Math.random().toString(36).substr(2, 9);
+                        const botName = botNames[i] || 'Бот_' + (i+1);
+                        const team = gameSettings.gameMode === 'team' ? (i % 2 === 0 ? 'blue' : 'red') : 'blue';
+                        addPlayer(botId, botName, false, team);
+                    }
+                }
+            }, 1000);
+        }
+        
+        function startMultiplayerGame() {
+            if (!multiplayerSettings.roomId) {
+                alert("Сначала создайте комнату!");
+                return;
+            }
+            
+            gameSettings.isMultiplayer = true;
+            multiplayerSettings.isActive = true;
+            
+            document.getElementById('multiplayer-menu').style.display = 'none';
+            document.getElementById('multiplayer-hud').style.display = 'block';
+            document.getElementById('btn-chat').style.display = 'block';
+            
+            // Обновляем HUD
+            updateMultiplayerHUD();
+            
+            // Начинаем игру
+            startGame();
+            
+            // Настраиваем чат
+            setupChat();
+            
+            // Симулируем других игроков
+            simulateOtherPlayers();
+        }
+        
+        function connectToRoom() {
+            const playerName = document.getElementById('join-player-name').value || "Игрок2";
+            const roomId = document.getElementById('input-room-id').value.trim().toUpperCase();
+            
+            if (!roomId) {
+                alert("Введите ID комнаты!");
+                return;
+            }
+            
+            multiplayerSettings.isHost = false;
+            multiplayerSettings.isActive = true;
+            multiplayerSettings.playerName = playerName;
+            multiplayerSettings.roomId = roomId;
+            
+            updateConnectionStatus('connecting');
+            
+            // Симуляция подключения к комнате
+            setTimeout(() => {
+                addPlayer(multiplayerSettings.playerId, playerName, false, 'red');
+                
+                // Симулируем других игроков в комнате
+                const hostId = 'host_player';
+                addPlayer(hostId, 'Хост', true, 'blue');
+                
+                const botNames = ['Бот_Иван', 'Бот_Дмитрий'];
+                for (let i = 0; i < 2; i++) {
+                    const botId = 'bot_' + i;
+                    addPlayer(botId, botNames[i] || 'Бот_' + (i+1), false, i % 2 === 0 ? 'blue' : 'red');
+                }
+                
+                updateConnectionStatus('connected');
+                document.getElementById('players-list').style.display = 'block';
+                
+                // Показываем кнопку присоединения
+                document.getElementById('btn-connect').style.display = 'none';
+                const joinBtn = document.createElement('button');
+                joinBtn.className = 'menu-btn small-btn';
+                joinBtn.innerHTML = '<i class="fas fa-play"></i> ПРИСОЕДИНИТЬСЯ';
+                joinBtn.onclick = joinMultiplayerGame;
+                document.getElementById('join-room-panel').appendChild(joinBtn);
+            }, 1500);
+        }
+        
+        function joinMultiplayerGame() {
+            gameSettings.isMultiplayer = true;
+            gameSettings.gameMode = 'pvp'; // При присоединении обычно PvP
+            
+            document.getElementById('multiplayer-menu').style.display = 'none';
+            document.getElementById('multiplayer-hud').style.display = 'block';
+            document.getElementById('btn-chat').style.display = 'block';
+            
+            updateMultiplayerHUD();
+            startGame();
+            setupChat();
+            simulateOtherPlayers();
+        }
+        
+        function addPlayer(playerId, playerName, isHost = false, team = 'blue') {
+            multiplayerSettings.players.set(playerId, {
+                id: playerId,
+                name: playerName,
+                isHost: isHost,
+                team: team,
+                position: { x: 0, y: 0, z: 0 },
+                rotation: { x: 0, y: 0, z: 0 },
+                hp: 100,
+                weapon: 0,
+                lastUpdate: Date.now()
+            });
+            
+            updatePlayersList();
+            updateMultiplayerHUD();
+        }
+        
+        function updatePlayersList() {
+            const list = document.getElementById('players-list');
+            if (!list) return;
+            
+            // Оставляем только заголовок
+            const header = list.querySelector('div:first-child') || 
+                document.createElement('div');
+            if (!header.textContent) {
+                header.style.cssText = 'color: #aaa; border-bottom: 1px solid #555; padding-bottom: 5px; margin-bottom: 5px;';
+                header.textContent = 'Игроки в комнате:';
+                list.appendChild(header);
+            }
+            
+            // Удаляем старые записи (кроме заголовка)
+            while (list.children.length > 1) {
+                list.removeChild(list.lastChild);
+            }
+            
+            // Добавляем текущих игроков
+            multiplayerSettings.players.forEach((player, id) => {
+                const div = document.createElement('div');
+                div.className = `player-item ${id === multiplayerSettings.playerId ? '' : 'enemy'}`;
+                
+                let teamIcon = '';
+                let teamColor = '';
+                if (player.team === 'blue') {
+                    teamIcon = '<i class="fas fa-circle" style="color: #55aaff;"></i>';
+                    teamColor = 'Синие';
+                } else {
+                    teamIcon = '<i class="fas fa-circle" style="color: #ff5555;"></i>';
+                    teamColor = 'Красные';
+                }
+                
+                div.innerHTML = `
+                    <div>${teamIcon} ${player.name} ${player.isHost ? '<i class="fas fa-crown" style="color: gold;"></i>' : ''}</div>
+                    <div style="color: ${player.team === 'blue' ? '#55aaff' : '#ff5555'}">${teamColor}</div>
+                `;
+                list.appendChild(div);
+            });
+        }
+        
+        function updateConnectionStatus(status) {
+            const statusEl = document.getElementById('connection-status');
+            if (!statusEl) return;
+            
+            let text = '';
+            let colorClass = '';
+            
+            switch(status) {
+                case 'connected':
+                    text = '✓ Подключено';
+                    colorClass = 'status-connected';
+                    break;
+                case 'connecting':
+                    text = '↻ Подключение...';
+                    colorClass = 'status-connecting';
+                    break;
+                case 'waiting':
+                    text = '⏳ Ожидание игроков...';
+                    colorClass = 'status-connecting';
+                    break;
+                case 'disconnected':
+                    text = '✗ Не подключено';
+                    colorClass = 'status-disconnected';
+                    break;
+            }
+            
+            statusEl.innerHTML = `<span class="${colorClass}">${text}</span>`;
+        }
+        
+        function updateMultiplayerHUD() {
+            document.getElementById('player-count').textContent = multiplayerSettings.players.size;
+            document.getElementById('max-player-count').textContent = multiplayerSettings.maxPlayers;
+            
+            let modeText = '';
+            switch(gameSettings.gameMode) {
+                case 'coop': modeText = 'Кооператив'; break;
+                case 'pvp': modeText = 'PvP'; break;
+                case 'team': modeText = 'Командный'; break;
+            }
+            document.getElementById('game-mode-display').textContent = `Режим: ${modeText}`;
+            
+            // Обновляем пинг (симуляция)
+            if (multiplayerSettings.isActive) {
+                multiplayerSettings.lastPing = Math.floor(Math.random() * 100);
+                document.getElementById('ping-display').textContent = `Пинг: ${multiplayerSettings.lastPing}мс`;
+            }
+        }
+        
+        function setupChat() {
+            const chatBtn = document.getElementById('btn-chat');
+            const chatWindow = document.getElementById('multiplayer-chat');
+            const chatInput = document.getElementById('chat-input');
+            
+            chatBtn.addEventListener('click', () => {
+                chatWindow.style.display = 'block';
+                chatInput.style.display = 'block';
+                chatInput.focus();
+            });
+            
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && chatInput.value.trim()) {
+                    sendChatMessage(chatInput.value.trim());
+                    chatInput.value = '';
+                } else if (e.key === 'Escape') {
+                    chatInput.style.display = 'none';
+                    chatWindow.style.display = 'none';
+                }
+            });
+            
+            // Приветственное сообщение
+            addChatMessage('system', 'Система', 'Добро пожаловать в мультиплеер! Нажмите T для чата.');
+        }
+        
+        function sendChatMessage(text) {
+            addChatMessage('player', multiplayerSettings.playerName, text);
+            
+            // Симуляция ответов других игроков
+            if (multiplayerSettings.players.size > 1) {
+                setTimeout(() => {
+                    const otherPlayers = Array.from(multiplayerSettings.players.values())
+                        .filter(p => p.id !== multiplayerSettings.playerId);
+                    if (otherPlayers.length > 0) {
+                        const randomPlayer = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
+                        const responses = ['Привет!', 'Идём в бой!', 'Нужна помощь!', 'Враг справа!', 'Следуй за мной!'];
+                        const response = responses[Math.floor(Math.random() * responses.length)];
+                        addChatMessage('enemy', randomPlayer.name, response);
+                    }
+                }, 500 + Math.random() * 1000);
+            }
+        }
+        
+        function addChatMessage(type, sender, text) {
+            const chatWindow = document.getElementById('multiplayer-chat');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+            
+            let senderColor = '#fff';
+            if (type === 'player') senderColor = '#0f0';
+            if (type === 'enemy') senderColor = '#f55';
+            if (type === 'system') senderColor = '#fa0';
+            
+            messageDiv.innerHTML = `<strong style="color: ${senderColor}">${sender}:</strong> ${text}`;
+            chatWindow.appendChild(messageDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+        
+        function simulateOtherPlayers() {
+            // Создаём 3D модели других игроков
+            multiplayerSettings.players.forEach((player, playerId) => {
+                if (playerId !== multiplayerSettings.playerId) {
+                    createOtherPlayerModel(player);
+                }
+            });
+            
+            // Симуляция движения других игроков
+            setInterval(() => {
+                multiplayerSettings.players.forEach((player, playerId) => {
+                    if (playerId !== multiplayerSettings.playerId && player.model) {
+                        // Движение к случайной точке
+                        if (!player.targetPos || Math.random() < 0.01) {
+                            player.targetPos = new THREE.Vector3(
+                                (Math.random() - 0.5) * 100,
+                                0,
+                                (Math.random() - 0.5) * 100
+                            );
+                        }
+                        
+                        // Двигаемся к цели
+                        const direction = new THREE.Vector3()
+                            .subVectors(player.targetPos, player.model.position)
+                            .normalize();
+                        
+                        const speed = 5 * gameSettings.gameSpeed;
+                        player.model.position.add(direction.multiplyScalar(speed * 0.016));
+                        
+                        // Поворачиваем модель
+                        player.model.lookAt(
+                            player.model.position.x + direction.x,
+                            player.model.position.y,
+                            player.model.position.z + direction.z
+                        );
+                        
+                        // Обновляем позицию в данных игрока
+                        player.position.x = player.model.position.x;
+                        player.position.y = player.model.position.y;
+                        player.position.z = player.model.position.z;
+                        
+                        // Симуляция стрельбы ботов
+                        if (playerId.includes('bot') && Math.random() < 0.02) {
+                            botShoot(player);
+                        }
+                        
+                        // Обновляем тег имени
+                        updateNameTagPosition(player);
+                    }
+                });
+            }, 16); // ~60 FPS
+        }
+        
+        function createOtherPlayerModel(player) {
+            if (player.model) return; // Модель уже существует
+            
+            const group = new THREE.Group();
+            
+            // Цвет в зависимости от команды
+            const bodyColor = player.team === 'blue' ? 0x0000ff : 0xff0000;
+            
+            // Тело
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(0.5, 1.0, 0.3),
+                new THREE.MeshStandardMaterial({ color: bodyColor })
+            );
+            body.position.y = 0.5;
+            body.castShadow = true;
+            
+            // Голова
+            const head = new THREE.Mesh(
+                new THREE.BoxGeometry(0.3, 0.3, 0.3),
+                new THREE.MeshStandardMaterial({ color: 0xffccaa })
+            );
+            head.position.y = 1.15;
+            head.castShadow = true;
+            
+            // Оружие (в зависимости от типа бота)
+            let weaponColor = 0x333333;
+            if (player.id.includes('bot')) {
+                if (gameSettings.botWeapon === 'ak47') weaponColor = 0xffff00;
+                else if (gameSettings.botWeapon === 'shotgun') weaponColor = 0xffaa00;
+                else if (gameSettings.botWeapon === 'sniper') weaponColor = 0x00ff00;
+            }
+            
+            const weapon = new THREE.Mesh(
+                new THREE.BoxGeometry(0.05, 0.05, 0.3),
+                new THREE.MeshStandardMaterial({ color: weaponColor })
+            );
+            weapon.position.set(0.2, 0.8, 0.2);
+            weapon.castShadow = true;
+            
+            group.add(body, head, weapon);
+            
+            // Начальная позиция
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 10 + Math.random() * 20;
+            group.position.set(
+                Math.cos(angle) * radius,
+                0,
+                Math.sin(angle) * radius
+            );
+            
+            // Тег имени
+            const nameTag = document.createElement('div');
+            nameTag.className = 'player-name-tag';
+            nameTag.textContent = player.name;
+            nameTag.style.position = 'absolute';
+            nameTag.style.color = player.team === 'blue' ? '#55aaff' : '#ff5555';
+            document.body.appendChild(nameTag);
+            
+            player.model = group;
+            player.nameTag = nameTag;
+            player.weaponMesh = weapon;
+            scene.add(group);
+            
+            // Начальное обновление позиции тега
+            updateNameTagPosition(player);
+        }
+        
+        function updateNameTagPosition(player) {
+            if (!player.model || !player.nameTag || !camera) return;
+            
+            const vector = new THREE.Vector3();
+            player.model.getWorldPosition(vector);
+            vector.project(camera);
+            
+            const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-(vector.y * 0.5) + 0.5) * window.innerHeight;
+            
+            // Проверяем, находится ли игрок в поле зрения
+            if (vector.z < 1 && x >= 0 && x <= window.innerWidth && y >= 0 && y <= window.innerHeight) {
+                player.nameTag.style.left = x + 'px';
+                player.nameTag.style.top = (y - 40) + 'px';
+                player.nameTag.style.display = 'block';
+            } else {
+                player.nameTag.style.display = 'none';
+            }
+        }
+        
+        function botShoot(bot) {
+            if (!bot.model || !bot.weaponMesh) return;
+            
+            // Определяем оружие бота
+            let botWpnConfig;
+            if (gameSettings.botWeapon === 'random') {
+                const weapons = ['pistol', 'ak47', 'shotgun', 'sniper'];
+                const randomWeapon = weapons[Math.floor(Math.random() * weapons.length)];
+                botWpnConfig = botWeapons[randomWeapon];
+            } else {
+                botWpnConfig = botWeapons[gameSettings.botWeapon] || botWeapons.pistol;
+            }
+            
+            // Точность зависит от настроек
+            const accuracy = gameSettings.botAccuracy / 100;
+            
+            // Стреляем в направлении игрока
+            const playerPos = controls.getObject().position;
+            const botPos = bot.model.position;
+            
+            // Направление к игроку
+            const direction = new THREE.Vector3()
+                .subVectors(playerPos, botPos)
+                .normalize();
+            
+            // Добавляем неточность в зависимости от настройки точности
+            const spread = (1 - accuracy) * 0.2;
+            direction.x += (Math.random() - 0.5) * spread;
+            direction.y += (Math.random() - 0.5) * spread;
+            direction.z += (Math.random() - 0.5) * spread;
+            direction.normalize();
+            
+            // Создаём снаряд
+            const bullet = new THREE.Mesh(
+                new THREE.SphereGeometry(0.05),
+                new THREE.MeshBasicMaterial({ color: 0xff0000 })
+            );
+            bullet.position.copy(botPos);
+            bullet.position.y += 1; // Высота стрельбы
+            
+            bullet.userData = {
+                velocity: direction.multiplyScalar(50),
+                damage: gameSettings.bulletDamage,
+                owner: bot.id,
+                life: 2.0
+            };
+            
+            scene.add(bullet);
+            botProjectiles.push(bullet);
+            
+            // Эффект выстрела
+            if (gameSettings.vfx) {
+                const muzzleFlash = new THREE.PointLight(0xffaa00, 2, 5);
+                muzzleFlash.position.copy(bullet.position);
+                scene.add(muzzleFlash);
+                setTimeout(() => scene.remove(muzzleFlash), 50);
+                
+                // Анимация оружия
+                if (bot.weaponMesh) {
+                    const originalPos = bot.weaponMesh.position.clone();
+                    bot.weaponMesh.position.x += 0.1;
+                    setTimeout(() => {
+                        if (bot.weaponMesh) {
+                            bot.weaponMesh.position.copy(originalPos);
+                        }
+                    }, 100);
+                }
+            }
+            
+            // Звук выстрела
+            sfx('shoot', { freq: 300, vol: 0.1 });
+        }
+
+        // --- INIT ---
+        function startGame() {
+            console.log('Starting game with settings:', gameSettings);
+            
+            isMobile = false;
+            
+            // Hide all menus
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('settings-menu').style.display = 'none';
+            document.getElementById('multiplayer-menu').style.display = 'none';
+            
+            // Update max enemies display
+            document.getElementById('max-enemies').innerText = gameSettings.enemyCount;
+            
+            // Initialize audio if not already
+            initAudio();
+            
+            // Initialize 3D
+            init3D();
+            setupPC();
+            
+            isRunning = true;
+            
+            // Spawn initial entities
+            spawnInitialEnemies();
+            spawnAllies();
+            
+            animate();
+            
+            // Shop updates
+            setInterval(updateShopPrices, 120000); 
+            updateShopPrices();
+            
+            // Enemy spawner
+            setInterval(() => {
+                if(isRunning && !isPaused && zombies.length < gameSettings.enemyCount) {
+                    spawnZombie(getRandomZombieType());
+                }
+            }, 3000);
+            
+            // Create weapon selector UI
+            createWeaponSelector();
+            
+            // Initial quest
+            generateQuest();
+            
+            console.log('Game started successfully');
+        }
+
+        function getRandomZombieType() {
+            const types = ['normal', 'fast', 'tank', 'shooter'];
+            const weights = [50, 20, 15, 15];
+            const r = Math.random() * 100;
+            let sum = 0;
+            
+            for(let i = 0; i < types.length; i++) {
+                sum += weights[i];
+                if(r <= sum) return types[i];
+            }
+            return 'normal';
+        }
+
+        function spawnInitialEnemies() {
+            zombies.length = 0;
+            for(let i = 0; i < gameSettings.enemyCount; i++) {
+                spawnZombie(getRandomZombieType());
+            }
+        }
+
+        function spawnAllies() {
+            allies.length = 0;
+            for(let i = 0; i < gameSettings.allyCount; i++) {
+                spawnAlly(i);
+            }
+            updateAlliesUI();
+        }
+
+        function spawnAlly(index) {
+            const group = new THREE.Group();
+            
+            // Body
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(0.5, 1.0, 0.3),
+                new THREE.MeshStandardMaterial({color: 0x0000ff})
+            );
+            body.position.y = 0.5;
+            body.castShadow = true;
+            
+            // Head
+            const head = new THREE.Mesh(
+                new THREE.BoxGeometry(0.3, 0.3, 0.3),
+                new THREE.MeshStandardMaterial({color: 0xffccaa})
+            );
+            head.position.y = 1.15;
+            head.castShadow = true;
+            
+            // Weapon
+            const weapon = new THREE.Mesh(
+                new THREE.BoxGeometry(0.05, 0.05, 0.3),
+                new THREE.MeshStandardMaterial({color: 0x333333})
+            );
+            weapon.position.set(0.2, 0.8, 0.2);
+            weapon.castShadow = true;
+            
+            group.add(body, head, weapon);
+            
+            // Position around player
+            const angle = (index / Math.max(1, gameSettings.allyCount)) * Math.PI * 2;
+            const radius = 5 + Math.random() * 10;
+            group.position.set(
+                Math.cos(angle) * radius,
+                0,
+                Math.sin(angle) * radius
+            );
+            
+            group.userData = {
+                type: 'ally',
+                hp: 100,
+                maxHp: 100,
+                attackCooldown: 0,
+                target: null,
+                weapon: weapon
+            };
+            
+            scene.add(group);
+            allies.push(group);
+        }
+
+        function updateAlliesUI() {
+            const list = document.getElementById('allies-list');
+            list.innerHTML = '';
+            
+            allies.forEach((ally, i) => {
+                const div = document.createElement('div');
+                div.className = 'ally-status';
+                div.innerHTML = `
+                    <span>Союзник ${i+1}</span>
+                    <div class="ally-hp-bar">
+                        <div class="ally-hp-fill" style="width: ${(ally.userData.hp / ally.userData.maxHp) * 100}%"></div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // --- QUEST LOGIC ---
+        function generateQuest() {
+            questCooldown = 0;
+            const types = ['kill', 'kill', 'kill', 'survival', 'no_sprint'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            quest = { type: type, active: true, count: 0, completed: false };
+
+            if(type === 'kill') {
+                const allowedWpns = [0, 1, 2, 3, 5, 6];
+                quest.wpnIdx = allowedWpns[Math.floor(Math.random() * allowedWpns.length)];
+                quest.goal = [5, 10, 15][Math.floor(Math.random()*3)];
+            } else if(type === 'survival') {
+                quest.goal = 60;
+                quest.timer = 60;
+            } else if(type === 'no_sprint') {
+                quest.goal = 60;
+                quest.timer = 60;
+            }
+            updateQuestUI();
+        }
+
+        function updateQuestUI() {
+            const desc = document.getElementById('quest-desc');
+            const box = document.getElementById('quest-box');
+            const bar = document.getElementById('quest-timer-bar');
+            const prog = document.getElementById('quest-progress');
+
+            if(questCooldown > 0) {
+                desc.innerText = `Новое задание через: ${Math.ceil(questCooldown)}с`;
+                desc.style.color = "#aaa";
+                box.style.borderColor = "#555";
+                bar.style.display = 'none';
+                return;
+            }
+
+            if(!quest.active) { 
+                desc.innerText = "Ожидание..."; 
+                box.style.borderColor = "#555";
+                return; 
+            }
+
+            box.style.borderColor = "gold";
+            desc.style.color = "gold";
+
+            if(quest.type === 'kill') {
+                desc.innerText = `Убить ${quest.goal} зомби с ${wpns[quest.wpnIdx].name} (${quest.count}/${quest.goal})`;
+                bar.style.display = 'none';
+            } else if(quest.type === 'survival') {
+                desc.innerText = `Не получать урон (${Math.ceil(quest.timer)}с)`;
+                bar.style.display = 'block';
+                prog.style.width = (quest.timer/60)*100 + '%';
+            } else if(quest.type === 'no_sprint') {
+                desc.innerText = `Не бегать (${Math.ceil(quest.timer)}с)`;
+                bar.style.display = 'block';
+                prog.style.width = (quest.timer/60)*100 + '%';
+            }
+        }
+
+        function finishQuest(success) {
+            quest.active = false;
+            if(success) {
+                p.coins += 100;
+                sfx('quest');
+                msg("КВЕСТ ВЫПОЛНЕН! +100$");
+            } else {
+                sfx('buy');
+                msg("КВЕСТ ПРОВАЛЕН!");
+            }
+            questCooldown = 60;
+            updateQuestUI();
+        }
+
+        // --- SETUP ---
+        function init3D() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x020205);
+            scene.fog = new THREE.Fog(0x020205, 0, 90);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.rotation.order = "YXZ"; 
+            camera.position.y = p.h;
+
+            flashLight = new THREE.SpotLight(0xffffff, 0.8, 40, 0.6, 0.5, 1);
+            flashLight.position.set(0, 0, 0); 
+            flashLight.target.position.set(0, 0, -1); 
+            camera.add(flashLight);
+            camera.add(flashLight.target);
+            scene.add(camera); 
+            scene.add(flashLight);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+            const moon = new THREE.DirectionalLight(0xaaccff, 0.3);
+            moon.position.set(-50, 100, -50);
+            moon.castShadow = true;
+            moon.shadow.mapSize.width = 2048;
+            moon.shadow.mapSize.height = 2048;
+            scene.add(moon);
+            
+            const fire = new THREE.PointLight(0xff6600, 2, 30);
+            fire.position.set(10, 2, 10);
+            scene.add(fire);
+
+            renderer = new THREE.WebGLRenderer({antialias:true, alpha: true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.body.appendChild(renderer.domElement);
+
+            if(!isMobile) {
+                controls = new PointerLockControls(camera, document.body);
+                scene.add(controls.getObject());
+            } else {
+                controls = { 
+                    getObject: () => camera, 
+                    isLocked: true,
+                    lock: () => {},
+                    unlock: () => {}
+                };
+            }
+
+            createLevel();
+            setWeapon();
+            spawnMerchant();
+            spawnVest();
+            
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function createLevel() {
+            // Ground
+            const gGeo = new THREE.PlaneGeometry(600, 600, 100, 100);
+            const gMat = new THREE.MeshStandardMaterial({ 
+                color: 0x151d15, 
+                roughness: 0.9,
+                side: THREE.DoubleSide
+            });
+            const ground = new THREE.Mesh(gGeo, gMat);
+            ground.rotation.x = -Math.PI/2;
+            ground.receiveShadow = true;
+            
+            // Add some terrain variation
+            const vertices = ground.geometry.attributes.position.array;
+            for(let i = 0; i < vertices.length; i += 3) {
+                if(Math.random() < 0.1) {
+                    vertices[i + 2] = (Math.random() - 0.5) * 0.5;
+                }
+            }
+            ground.geometry.attributes.position.needsUpdate = true;
+            
+            scene.add(ground);
+
+            // Trees
+            const tGeo = new THREE.CylinderGeometry(0.5, 0.9, 5, 7);
+            const tMat = new THREE.MeshStandardMaterial({color:0x2b1d0e, roughness: 0.8});
+            const lGeo = new THREE.ConeGeometry(3.5, 9, 7);
+            const lMat = new THREE.MeshStandardMaterial({color:0x0a240a, roughness: 0.9});
+            
+            for(let i=0; i<200; i++) {
+                const x = (Math.random()-0.5)*550;
+                const z = (Math.random()-0.5)*550;
+                if(Math.abs(x)<40 && Math.abs(z)<40) continue;
+                
+                const t = new THREE.Mesh(tGeo, tMat);
+                t.position.set(x, 2.5, z);
+                t.castShadow = true;
+                const l = new THREE.Mesh(lGeo, lMat);
+                l.position.y = 5;
+                l.castShadow = true;
+                t.add(l);
+                scene.add(t);
+                colliders.push(t);
+            }
+            
+            // Buildings
+            createHouse(-50, -50);
+            createCamp(10, 10);
+            
+            // Rocks and obstacles
+            for(let i=0; i<50; i++) {
+                const size = 1 + Math.random() * 3;
+                const rock = new THREE.Mesh(
+                    new THREE.DodecahedronGeometry(size, 0),
+                    new THREE.MeshStandardMaterial({color: 0x333333, roughness: 1})
+                );
+                const x = (Math.random()-0.5)*500;
+                const z = (Math.random()-0.5)*500;
+                rock.position.set(x, size/2, z);
+                rock.castShadow = true;
+                rock.receiveShadow = true;
+                scene.add(rock);
+                colliders.push(rock);
+            }
+        }
+
+        function createHouse(x, z) {
+            const mat = new THREE.MeshStandardMaterial({color:0x222222, roughness: 0.7});
+            const w1 = new THREE.Mesh(new THREE.BoxGeometry(25,10,1), mat); 
+            w1.position.set(x,5,z-12); 
+            w1.castShadow = true;
+            w1.receiveShadow = true;
+            scene.add(w1); 
+            colliders.push(w1);
+            
+            const w2 = new THREE.Mesh(new THREE.BoxGeometry(25,10,1), mat); 
+            w2.position.set(x,5,z+12); 
+            w2.castShadow = true;
+            w2.receiveShadow = true;
+            scene.add(w2); 
+            colliders.push(w2);
+            
+            const w3 = new THREE.Mesh(new THREE.BoxGeometry(1,10,25), mat); 
+            w3.position.set(x-12,5,z); 
+            w3.castShadow = true;
+            w3.receiveShadow = true;
+            scene.add(w3); 
+            colliders.push(w3);
+        }
+
+        function createCamp(x, z) {
+            const lg = new THREE.BoxGeometry(0.5, 0.3, 3);
+            const lm = new THREE.MeshStandardMaterial({color:0x331100, roughness: 0.8});
+            for(let i=0;i<3;i++) {
+                const l = new THREE.Mesh(lg, lm);
+                l.position.set(x, 0.15, z); 
+                l.rotation.y = i; 
+                l.castShadow = true;
+                scene.add(l);
+            }
+        }
+
+        function spawnMerchant() {
+            merchant = new THREE.Group();
+            
+            // Counter with custom texture
+            const counterGeo = new THREE.BoxGeometry(3, 1, 1);
+            const counterMat = new THREE.MeshStandardMaterial({
+                color: 0x553311,
+                roughness: 0.8
+            });
+            
+            const counter = new THREE.Mesh(counterGeo, counterMat);
+            counter.position.y = 0.5;
+            counter.castShadow = true;
+            counter.receiveShadow = true;
+            
+            // Tent structure
+            const pole1 = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.05,0.05,2.5), 
+                new THREE.MeshStandardMaterial({color:0x222, roughness: 0.7})
+            );
+            pole1.position.set(-1.4, 1.25, 0);
+            
+            const pole2 = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.05,0.05,2.5), 
+                new THREE.MeshStandardMaterial({color:0x222, roughness: 0.7})
+            );
+            pole2.position.set(1.4, 1.25, 0);
+            
+            const roof = new THREE.Mesh(
+                new THREE.BoxGeometry(3.2, 0.1, 2), 
+                new THREE.MeshStandardMaterial({color:0x333344, roughness: 0.6})
+            );
+            roof.position.set(0, 2.5, 0.5);
+            
+            // Seller
+            const seller = new THREE.Group();
+            seller.position.set(0, 1, 0.8);
+            const sBody = new THREE.Mesh(
+                new THREE.BoxGeometry(0.5, 0.8, 0.3), 
+                new THREE.MeshStandardMaterial({color:0x335533, roughness: 0.8})
+            );
+            sBody.position.y = 0.4;
+            const sHead = new THREE.Mesh(
+                new THREE.BoxGeometry(0.3,0.3,0.3), 
+                new THREE.MeshStandardMaterial({color:0xffccaa, roughness: 0.5})
+            );
+            sHead.position.y = 0.95;
+            seller.add(sBody, sHead);
+
+            merchant.add(counter, pole1, pole2, roof, seller);
+            merchant.position.set(5, 0, 20);
+            
+            const l = new THREE.PointLight(0xffffaa, 1, 10);
+            l.position.set(0, 2, 0);
+            merchant.add(l);
+            
+            scene.add(merchant);
+        }
+
+        function spawnVest() {
+            const group = new THREE.Group();
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(0.8, 1, 0.4), 
+                new THREE.MeshStandardMaterial({color:0x000088, roughness: 0.5})
+            );
+            group.add(body);
+            group.position.set(-50, 2, -50);
+            group.userData = { type: 'vest' };
+            const l = new THREE.PointLight(0x0000ff, 1, 5);
+            group.add(l);
+            scene.add(group);
+            mapItems.push(group);
+        }
+
+        function spawnZombie(type) {
+            const grp = new THREE.Group();
+            let scale = 1.0, hp = 100, speed = p.baseSpeed * 0.35 * gameSettings.zombieSpeed;
+            let color = 0x2e8b57, isBoss = false, name = "Зомби";
+            let specialAbility = null;
+
+            switch(type) {
+                case 'fast':
+                    scale = 0.8;
+                    hp = 70;
+                    speed *= 1.8;
+                    color = 0x00aa00;
+                    name = "Быстрый зомби";
+                    break;
+                case 'tank':
+                    scale = 1.5;
+                    hp = 300;
+                    speed *= 0.6;
+                    color = 0x555555;
+                    name = "Танк";
+                    break;
+                case 'shooter':
+                    scale = 1.0;
+                    hp = 120;
+                    speed *= 0.8;
+                    color = 0x800080;
+                    name = "Стрелок";
+                    specialAbility = 'shoot';
+                    break;
+                default: // normal
+                    scale = 1.0;
+                    hp = 100;
+                    color = 0x2e8b57;
+            }
+
+            const mat = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.8,
+                metalness: 0.2
+            });
+            const cMat = new THREE.MeshStandardMaterial({
+                color: 0x111111,
+                roughness: 0.9
+            });
+
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), mat);
+            head.position.y = 1.7 * scale; 
+            head.name = 'Head';
+            head.castShadow = true;
+            
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.9, 0.35), cMat);
+            body.position.y = 1.0 * scale; 
+            body.name = 'Body';
+            body.castShadow = true;
+            
+            const legL = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), cMat); 
+            legL.position.set(-0.15*scale, 0.4*scale, 0);
+            legL.castShadow = true;
+            
+            const legR = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), cMat); 
+            legR.position.set(0.15*scale, 0.4*scale, 0);
+            legR.castShadow = true;
+            
+            const armL = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.75, 0.15), mat); 
+            armL.position.set(-0.4*scale, 1.4*scale, 0);
+            armL.castShadow = true;
+            
+            const armR = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.75, 0.15), mat); 
+            armR.position.set(0.4*scale, 1.4*scale, 0);
+            armR.castShadow = true;
+
+            grp.add(head, body, legL, legR, armL, armR);
+            
+            const ang = Math.random() * Math.PI * 2;
+            const dist = 40 + Math.random() * 30;
+            grp.position.set(Math.cos(ang)*dist, 0, Math.sin(ang)*dist);
+            
+            grp.userData = {
+                type: type,
+                hp: hp,
+                maxHp: hp,
+                speed: speed,
+                dmg: type === 'tank' ? 25 : 15,
+                attackCd: 0,
+                limbs: { legL, legR, armL, armR },
+                isBoss: isBoss,
+                bossName: name,
+                specialAbility: specialAbility,
+                lastSpecial: 0,
+                walkAnim: 0
+            };
+            
+            scene.add(grp);
+            zombies.push(grp);
+            
+            if(isBoss) {
+                currentBoss = grp;
+                document.getElementById('boss-ui').style.display = 'block';
+                document.getElementById('boss-name').innerText = name;
+            }
+        }
+
+        function createWeaponSelector() {
+            const selector = document.getElementById('weapon-selector');
+            selector.innerHTML = '';
+            
+            wpns.forEach((wpn, index) => {
+                const slot = document.createElement('div');
+                slot.className = 'weapon-slot';
+                if(index === curWpn) slot.classList.add('active');
+                
+                slot.innerHTML = `
+                    <div class="weapon-icon"><i class="${wpn.icon}"></i></div>
+                    <div style="font-size: 10px;">${index + 1}</div>
+                `;
+                
+                slot.addEventListener('click', () => {
+                    if(!reloading && index !== curWpn) {
+                        curWpn = index;
+                        setWeapon();
+                        updateWeaponSelector();
+                    }
+                });
+                
+                selector.appendChild(slot);
+            });
+        }
+
+        function updateWeaponSelector() {
+            const slots = document.querySelectorAll('.weapon-slot');
+            slots.forEach((slot, index) => {
+                if(index === curWpn) {
+                    slot.classList.add('active');
+                } else {
+                    slot.classList.remove('active');
+                }
+            });
+        }
+
+        function setWeapon() {
+            if(wpnMesh) camera.remove(wpnMesh);
+            wpnMesh = new THREE.Group();
+            const w = wpns[curWpn];
+            
+            // Create detailed weapon model based on type
+            if(curWpn === 0) { // Pistol
+                const body = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.1, 0.05, 0.2),
+                    new THREE.MeshStandardMaterial({color: 0x333333})
+                );
+                const barrel = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.02, 0.02, 0.15),
+                    new THREE.MeshStandardMaterial({color: 0x666666})
+                );
+                barrel.position.z = -0.1;
+                barrel.rotation.x = Math.PI/2;
+                wpnMesh.add(body, barrel);
+            }
+            else if(curWpn === 1) { // AK-47
+                const body = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.08, 0.1, 0.6),
+                    new THREE.MeshStandardMaterial({color: 0x222222})
+                );
+                const barrel = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.015, 0.015, 0.3),
+                    new THREE.MeshStandardMaterial({color: 0x444444})
+                );
+                barrel.position.z = -0.35;
+                barrel.rotation.x = Math.PI/2;
+                wpnMesh.add(body, barrel);
+            }
+            else if(curWpn === 2) { // Shotgun
+                const body = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.1, 0.1, 0.5),
+                    new THREE.MeshStandardMaterial({color: 0x111111})
+                );
+                const barrel = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.04, 0.04, 0.25),
+                    new THREE.MeshStandardMaterial({color: 0x222222})
+                );
+                barrel.position.z = -0.35;
+                barrel.rotation.x = Math.PI/2;
+                wpnMesh.add(body, barrel);
+            }
+            else if(curWpn === 3) { // Sniper
+                const body = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.05, 0.08, 0.8),
+                    new THREE.MeshStandardMaterial({color: 0x006600})
+                );
+                const scope = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.03, 0.03, 0.05),
+                    new THREE.MeshStandardMaterial({color: 0x000000})
+                );
+                scope.position.set(0.05, 0.06, 0);
+                scope.rotation.x = Math.PI/2;
+                wpnMesh.add(body, scope);
+            }
+            else if(curWpn === 4) { // Grenade Launcher
+                const body = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.06, 0.06, 0.4),
+                    new THREE.MeshStandardMaterial({color: 0x553311})
+                );
+                body.rotation.x = Math.PI/2;
+                wpnMesh.add(body);
+            }
+            else if(curWpn === 5) { // Plasma Gun
+                const body = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.08, 0.06, 0.5),
+                    new THREE.MeshStandardMaterial({color: 0x00aaff, emissive: 0x0044aa, emissiveIntensity: 0.2})
+                );
+                const core = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.03),
+                    new THREE.MeshStandardMaterial({color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 0.5})
+                );
+                core.position.z = -0.2;
+                wpnMesh.add(body, core);
+            }
+            else if(curWpn === 6) { // Minigun
+                const body = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.08, 0.08, 0.6),
+                    new THREE.MeshStandardMaterial({color: 0x222222})
+                );
+                body.rotation.x = Math.PI/2;
+                const barrels = new THREE.Group();
+                for(let i = 0; i < 6; i++) {
+                    const angle = (i / 6) * Math.PI * 2;
+                    const barrel = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.01, 0.01, 0.2),
+                        new THREE.MeshStandardMaterial({color: 0x444444})
+                    );
+                    barrel.position.set(Math.cos(angle) * 0.05, Math.sin(angle) * 0.05, 0);
+                    barrel.rotation.x = Math.PI/2;
+                    barrels.add(barrel);
+                }
+                barrels.rotation.z = Date.now() * 0.001;
+                wpnMesh.add(body, barrels);
+            }
+            else if(curWpn === 7) { // Knife
+                const blade = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.02, 0.3, 0.05),
+                    new THREE.MeshStandardMaterial({color: 0xcccccc, metalness: 0.8})
+                );
+                const handle = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.03, 0.1, 0.03),
+                    new THREE.MeshStandardMaterial({color: 0x333333})
+                );
+                handle.position.y = -0.2;
+                wpnMesh.add(blade, handle);
+            }
+            else if(curWpn === 8) { // Turret
+                const turret = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.3, 0.3, 0.3),
+                    new THREE.MeshStandardMaterial({color: 0x00ff00, emissive: 0x004400})
+                );
+                wpnMesh.add(turret);
+            }
+            
+            wpnMesh.position.set(0.3, -0.3, -0.4);
+            wpnMesh.rotation.x = 0.1;
+            camera.add(wpnMesh);
+            updateUI();
+            updateWeaponSelector();
+        }
+
+        function shoot() {
+            const now = performance.now();
+            const w = wpns[curWpn];
+            
+            // Check cooldowns
+            if(now - lastShot < w.rate || reloading) return;
+            
+            // Handle special weapons
+            if(curWpn === 8) { // Turret
+                if(now - lastShot < 500) return;
+                if(p.turrets > 0) {
+                    spawnTurret();
+                    p.turrets--;
+                    sfx('shoot', w.sound);
+                    updateUI();
+                    lastShot = now;
+                } else {
+                    msg("НЕТ ТУРЕЛЕЙ!");
+                }
+                return;
+            }
+            
+            if(curWpn === 7) { // Melee attack
+                if(now - p.meleeCooldown < w.rate) return;
+                meleeAttack();
+                p.meleeCooldown = now;
+                return;
+            }
+            
+            // Check ammo
+            if(w.clip <= 0) { 
+                reload(); 
+                return; 
+            }
+            
+            // Deduct ammo
+            w.clip--;
+            lastShot = now;
+            updateUI();
+            
+            // Play sound
+            sfx('shoot', w.sound);
+            
+            // Weapon animation
+            if(gameSettings.vfx) {
+                if (wpnMesh) {
+                    wpnMesh.position.x = 0.3;
+                    wpnMesh.position.y = -0.3;
+                    wpnMesh.rotation.x = 0.1;
+                    
+                    // Simple recoil animation
+                    wpnMesh.position.x += 0.1;
+                    wpnMesh.position.y += 0.05;
+                    wpnMesh.rotation.x += 0.05;
+                    
+                    setTimeout(() => {
+                        if (wpnMesh) {
+                            wpnMesh.position.x = 0.3;
+                            wpnMesh.position.y = -0.3;
+                            wpnMesh.rotation.x = 0.1;
+                        }
+                    }, 50);
+                }
+                
+                // Muzzle flash
+                const flash = new THREE.PointLight(w.color, 2, 5);
+                flash.position.set(0, 0, -0.5);
+                if (wpnMesh) wpnMesh.add(flash);
+                setTimeout(() => {
+                    if (wpnMesh && flash.parent === wpnMesh) wpnMesh.remove(flash);
+                }, 50);
+            }
+            
+            // Handle projectile weapons
+            if(w.projectile) {
+                launchProjectile();
+                return;
+            }
+            
+            // Regular shooting
+            const rc = new THREE.Raycaster();
+            rc.far = w.range;
+            
+            const shots = w.pellets || 1;
+            const gunTip = new THREE.Vector3(); 
+            if (wpnMesh) wpnMesh.getWorldPosition(gunTip);
+            
+            for(let i = 0; i < shots; i++) {
+                const rx = (Math.random() - 0.5) * w.spread;
+                const ry = (Math.random() - 0.5) * w.spread;
+                rc.setFromCamera(new THREE.Vector2(rx, ry), camera);
+                
+                let hitObjs = [...colliders, ...zombies, ...corpses, ...allies];
+                
+                // В мультиплеере добавляем других игроков как цели
+                if (gameSettings.isMultiplayer && gameSettings.gameMode !== 'coop') {
+                    multiplayerSettings.players.forEach((otherPlayer, playerId) => {
+                        if (playerId !== multiplayerSettings.playerId && 
+                            otherPlayer.model && 
+                            otherPlayer.team !== p.team) {
+                            hitObjs.push(otherPlayer.model);
+                        }
+                    });
+                }
+                
+                let intersects = rc.intersectObjects(hitObjs, true);
+                let endPoint = rc.ray.at(w.range, new THREE.Vector3());
+                
+                for(let k = 0; k < intersects.length; k++) {
+                    let hitObj = intersects[k].object;
+                    let root = hitObj;
+                    while(root.parent && root.parent.type !== 'Scene') root = root.parent;
+                    
+                    // Hit wall
+                    if(colliders.includes(root)) {
+                        if(gameSettings.vfx) createImpact(intersects[k].point, intersects[k].face.normal, w.color);
+                        endPoint = intersects[k].point;
+                        break;
+                    }
+                    
+                    // Hit corpse
+                    if(corpses.includes(root)) {
+                        if(gameSettings.vfx) createBlood(intersects[k].point, intersects[k].face.normal);
+                        endPoint = intersects[k].point;
+                        continue;
+                    }
+                    
+                    // Hit zombie
+                    if(root.userData && root.userData.hp && root.userData.type !== 'ally') {
+                        endPoint = intersects[k].point;
+                        
+                        let dmg = w.dmg;
+                        let isHead = (hitObj.name === 'Head');
+                        let isBoss = root.userData.isBoss;
+                        
+                        // Для дробовика каждая дробинка наносит урон
+                        if(w.pellets && w.pelletDamage) {
+                            dmg = gameSettings.bulletDamage; // 3 урона за дробинку
+                        }
+                        
+                        if(w.pellets && isHead && !isBoss && Math.random() < 0.5) {
+                            dmg = 100;
+                            if(gameSettings.vfx) {
+                                hitObj.scale.set(0.01, 0.01, 0.01);
+                                createBlood(intersects[k].point, new THREE.Vector3(0,1,0), true);
+                            }
+                        } else if(isHead) {
+                            dmg *= 2;
+                        }
+                        
+                        root.userData.hp -= dmg;
+                        
+                        if(!isBoss) {
+                            root.position.add(rc.ray.direction.clone().multiplyScalar(0.2));
+                        }
+                        
+                        if(gameSettings.vfx && gameSettings.blood) {
+                            createBlood(intersects[k].point, intersects[k].face.normal, w.pellets > 1);
+                        }
+                        
+                        if(root.userData.hp <= 0 && !root.userData.isDead) {
+                            killZombie(root, curWpn);
+                        }
+                        break;
+                    }
+                    
+                    // Hit ally (friendly fire)
+                    if(root.userData && root.userData.type === 'ally' && gameSettings.friendlyFire) {
+                        root.userData.hp -= w.dmg * 0.5;
+                        if(root.userData.hp <= 0) {
+                            scene.remove(root);
+                            const idx = allies.indexOf(root);
+                            if(idx > -1) allies.splice(idx, 1);
+                            updateAlliesUI();
+                        }
+                        break;
+                    }
+                    
+                    // Hit other player in PvP
+                    if (gameSettings.isMultiplayer && gameSettings.gameMode !== 'coop') {
+                        let hitPlayer = null;
+                        multiplayerSettings.players.forEach((player, playerId) => {
+                            if (player.model === root && playerId !== multiplayerSettings.playerId) {
+                                hitPlayer = player;
+                            }
+                        });
+                        
+                        if (hitPlayer && hitPlayer.team !== p.team) {
+                            // Урон другому игроку
+                            hitPlayer.hp -= w.dmg;
+                            if (hitPlayer.hp <= 0) {
+                                // Игрок убит
+                                msg(`Вы убили ${hitPlayer.name}!`);
+                                if (hitPlayer.model) {
+                                    scene.remove(hitPlayer.model);
+                                }
+                                if (hitPlayer.nameTag) {
+                                    document.body.removeChild(hitPlayer.nameTag);
+                                }
+                                multiplayerSettings.players.delete(hitPlayer.id);
+                                updateMultiplayerHUD();
+                            }
+                            break;
+                        }
+                    }
+                }
+                
+                if(gameSettings.vfx) {
+                    createTracer(gunTip, endPoint, w.color);
+                }
+            }
+        }
+
+        function meleeAttack() {
+            const w = wpns[7];
+            sfx('melee');
+            
+            // Animation
+            if(gameSettings.vfx && wpnMesh) {
+                // Simple melee animation
+                const originalPos = wpnMesh.position.clone();
+                const originalRot = wpnMesh.rotation.clone();
+                
+                wpnMesh.position.x += 0.2;
+                wpnMesh.position.z -= 0.3;
+                wpnMesh.rotation.z -= 0.5;
+                
+                setTimeout(() => {
+                    if (wpnMesh) {
+                        wpnMesh.position.copy(originalPos);
+                        wpnMesh.rotation.copy(originalRot);
+                    }
+                }, 300);
+            }
+            
+            // Check for hits
+            const rc = new THREE.Raycaster();
+            rc.setFromCamera(new THREE.Vector2(0, 0), camera);
+            rc.far = w.range;
+            
+            const hitObjs = [...zombies];
+            const intersects = rc.intersectObjects(hitObjs, true);
+            
+            if(intersects.length > 0) {
+                const hitObj = intersects[0].object;
+                let root = hitObj;
+                while(root.parent && root.parent.type !== 'Scene') root = root.parent;
+                
+                if(root.userData && root.userData.hp) {
+                    root.userData.hp -= w.dmg;
+                    
+                    if(gameSettings.vfx && gameSettings.blood) {
+                        createBlood(intersects[0].point, intersects[0].face.normal, true);
+                    }
+                    
+                    if(root.userData.hp <= 0 && !root.userData.isDead) {
+                        killZombie(root, 7);
+                    }
+                }
+            }
+        }
+
+        function launchProjectile() {
+            const w = wpns[curWpn];
+            const projectile = new THREE.Mesh(
+                new THREE.SphereGeometry(0.1),
+                new THREE.MeshStandardMaterial({color: w.color, emissive: w.color, emissiveIntensity: 0.5})
+            );
+            
+            const startPos = new THREE.Vector3();
+            if (wpnMesh) wpnMesh.getWorldPosition(startPos);
+            projectile.position.copy(startPos);
+            
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            
+            projectile.userData = {
+                velocity: dir.multiplyScalar(30),
+                damage: w.dmg,
+                explosionRadius: w.explosionRadius,
+                life: 3.0
+            };
+            
+            scene.add(projectile);
+            projectiles.push(projectile);
+        }
+
+        function killZombie(z, wpnUsed) {
+            // Quest progress
+            if(quest.active && quest.type === 'kill' && quest.wpnIdx === wpnUsed) {
+                quest.count++;
+                updateQuestUI();
+                if(quest.count >= quest.goal) finishQuest(true);
+            }
+            
+            // Drop coins
+            dropCoin(z.position, z.userData.type === 'shooter');
+            p.kills++;
+            p.totalKills++;
+            updateKillCounter();
+            
+            // Remove from zombies array
+            const idx = zombies.indexOf(z);
+            if(idx > -1) zombies.splice(idx, 1);
+            
+            // Mark as dead
+            z.userData.isDead = true;
+            z.userData.deathTime = performance.now();
+            
+            // Death animation
+            z.rotation.set(-Math.PI/2, 0, Math.random() * Math.PI * 2);
+            z.position.y = 0.2;
+            
+            // Add to corpses
+            corpses.push(z);
+            
+            // Check win condition
+            if(p.kills >= gameSettings.enemyCount && zombies.length === 0) {
+                setTimeout(() => {
+                    if(zombies.length === 0) {
+                        isPaused = true;
+                        document.exitPointerLock();
+                        document.getElementById('win-screen').style.display = 'block';
+                    }
+                }, 1000);
+            }
+        }
+
+        function dropCoin(pos, double=false) {
+            const val = double ? 20 : 10;
+            const c = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.3, 0.3, 0.05, 10),
+                new THREE.MeshStandardMaterial({
+                    color: 0xffd700,
+                    metalness: 0.8,
+                    roughness: 0.2
+                })
+            );
+            c.position.copy(pos);
+            c.position.y = 1;
+            c.rotation.x = Math.PI/2;
+            c.userData = { val: val, spawnTime: performance.now() };
+            c.castShadow = true;
+            scene.add(c);
+            coins.push(c);
+        }
+
+        function updateKillCounter() {
+            document.getElementById('kill-counter').innerText = `УБИТО: ${p.kills} / ${gameSettings.enemyCount}`;
+        }
+
+        // --- GAME LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = performance.now();
+            const delta = Math.min((time - prevTime) / 1000, 0.1) * gameSettings.gameSpeed;
+            prevTime = time;
+            gameTime += delta;
+
+            if(!isRunning || shopOpen || isPaused) {
+                renderer.render(scene, camera);
+                return;
+            }
+
+            // Update quest
+            if(questCooldown > 0) {
+                questCooldown -= delta;
+                if(questCooldown <= 0) generateQuest();
+            }
+            
+            if(quest.active && (quest.type === 'survival' || quest.type === 'no_sprint')) {
+                quest.timer -= delta;
+                if(quest.timer <= 0) finishQuest(true);
+                updateQuestUI();
+            }
+
+            // Stamina
+            let moving = (moveF || moveB || moveL || moveR);
+            if(isSprint && moving) {
+                if(p.stamina > 0) {
+                    p.stamina -= delta * 33.3;
+                    if(p.stamina <= 0) {
+                        p.stamina = 0;
+                        isSprint = false;
+                        p.staminaCooldown = 1.0;
+                    }
+                    if(quest.active && quest.type === 'no_sprint') finishQuest(false);
+                }
+            } else {
+                if(p.staminaCooldown > 0) {
+                    p.staminaCooldown -= delta;
+                } else if(p.stamina < 100) {
+                    p.stamina += delta * 15;
+                }
+            }
+            document.getElementById('stamina-bar').style.width = Math.max(0, p.stamina) + '%';
+
+            // Movement
+            vel.y -= 25 * delta;
+            
+            let targetSpeed = p.baseSpeed;
+            if(isSprint && p.stamina > 0) targetSpeed *= 1.5;
+            if(isCrouch) { 
+                targetSpeed *= 0.5; 
+                camera.position.y = p.h * 0.6; 
+            } else { 
+                camera.position.y += (p.h - camera.position.y) * 0.1;
+            }
+
+            // Apply movement
+            let df = Number(moveF) - Number(moveB);
+            let dr = Number(moveR) - Number(moveL);
+            if((df !== 0 || dr !== 0) && controls && controls.getObject()) {
+                const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+                forward.y = 0;
+                forward.normalize();
+                const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+                right.y = 0;
+                right.normalize();
+                const moveVec = forward.multiplyScalar(df).add(right.multiplyScalar(dr))
+                    .normalize().multiplyScalar(targetSpeed * delta);
+                controls.getObject().position.add(moveVec);
+            }
+            
+            if (controls && controls.getObject()) {
+                controls.getObject().position.y += vel.y * delta;
+                if(controls.getObject().position.y < (isCrouch ? p.h*0.6 : p.h)) {
+                    vel.y = 0;
+                    controls.getObject().position.y = (isCrouch ? p.h*0.6 : p.h);
+                    canJump = true;
+                }
+            }
+            
+            const pPos = controls && controls.getObject() ? controls.getObject().position : new THREE.Vector3(0, 0, 0);
+
+            // Update zombies
+            zombies.forEach(z => {
+                const dist = z.position.distanceTo(pPos);
+                const limbs = z.userData.limbs;
+                
+                // Walking animation
+                z.userData.walkAnim += delta * 5;
+                if (limbs.legL) limbs.legL.rotation.x = Math.sin(z.userData.walkAnim) * 0.5;
+                if (limbs.legR) limbs.legR.rotation.x = -Math.sin(z.userData.walkAnim) * 0.5;
+                if (limbs.armL) limbs.armL.rotation.x = -1.5 + Math.sin(z.userData.walkAnim) * 0.3;
+                if (limbs.armR) limbs.armR.rotation.x = -1.5 - Math.sin(z.userData.walkAnim) * 0.3;
+                
+                let targetPos = pPos;
+                let currentSpeed = z.userData.speed;
+                
+                // Detection range
+                let detectRange = isCrouch ? 30 : 80;
+                if(z.userData.type === 'shooter') detectRange = 50;
+                
+                if(dist < detectRange) {
+                    // Special abilities
+                    if(z.userData.specialAbility === 'shoot' && dist < 30 && dist > 10) {
+                        if(time - z.userData.lastSpecial > 3000) {
+                            z.userData.lastSpecial = time;
+                            // Shoot at player
+                            const nade = new THREE.Mesh(
+                                new THREE.SphereGeometry(0.15),
+                                new THREE.MeshStandardMaterial({color: 0xff0000})
+                            );
+                            nade.position.copy(z.position);
+                            nade.position.y += 1.5;
+                            const dir = pPos.clone().sub(z.position).normalize();
+                            nade.userData = { 
+                                vel: dir.multiplyScalar(15).add(new THREE.Vector3(0, 5, 0)), 
+                                life: 2.0 
+                            };
+                            scene.add(nade);
+                            enemyNades.push(nade);
+                        }
+                    }
+                    
+                    z.lookAt(targetPos.x, z.position.y, targetPos.z);
+                    if(dist > 2.5 || z.userData.type === 'shooter') {
+                        z.translateZ(currentSpeed * delta);
+                    }
+                    
+                    // Attack if close
+                    if(dist <= 2.5 && time - z.userData.attackCd > 1000 && z.userData.type !== 'shooter') {
+                        z.userData.attackCd = time;
+                        takeDmg(z.userData.dmg);
+                    }
+                }
+            });
+
+            // Update projectiles
+            for(let i = projectiles.length - 1; i >= 0; i--) {
+                const proj = projectiles[i];
+                proj.position.add(proj.userData.velocity.clone().multiplyScalar(delta));
+                proj.userData.life -= delta;
+                
+                // Check collision
+                const projPos = proj.position;
+                for(let z of zombies) {
+                    if(z.position.distanceTo(projPos) < 1) {
+                        explode(projPos, proj.userData.explosionRadius, proj.userData.damage);
+                        scene.remove(proj);
+                        projectiles.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                // Remove if lifetime expired
+                if(proj.userData.life <= 0) {
+                    explode(projPos, proj.userData.explosionRadius, proj.userData.damage);
+                    scene.remove(proj);
+                    projectiles.splice(i, 1);
+                }
+            }
+            
+            // Update bot projectiles
+            for(let i = botProjectiles.length - 1; i >= 0; i--) {
+                const proj = botProjectiles[i];
+                proj.position.add(proj.userData.velocity.clone().multiplyScalar(delta));
+                proj.userData.life -= delta;
+                
+                // Check collision with player
+                if (controls && controls.getObject()) {
+                    const playerPos = controls.getObject().position;
+                    if (proj.position.distanceTo(playerPos) < 0.5) {
+                        // Player hit by bot
+                        takeDmg(proj.userData.damage);
+                        scene.remove(proj);
+                        botProjectiles.splice(i, 1);
+                        continue;
+                    }
+                }
+                
+                // Remove if lifetime expired
+                if(proj.userData.life <= 0) {
+                    scene.remove(proj);
+                    botProjectiles.splice(i, 1);
+                }
+            }
+
+            // Update allies
+            allies.forEach(ally => {
+                // Find closest zombie
+                let closestZombie = null;
+                let minDist = Infinity;
+                
+                zombies.forEach(z => {
+                    const dist = ally.position.distanceTo(z.position);
+                    if(dist < minDist && dist < 20) {
+                        minDist = dist;
+                        closestZombie = z;
+                    }
+                });
+                
+                if(closestZombie) {
+                    ally.lookAt(closestZombie.position.x, ally.position.y, closestZombie.position.z);
+                    
+                    // Move towards zombie
+                    if(minDist > 5) {
+                        const dir = closestZombie.position.clone().sub(ally.position).normalize();
+                        ally.position.add(dir.multiplyScalar(p.baseSpeed * 0.3 * delta));
+                    }
+                    
+                    // Shoot at zombie
+                    if(time - ally.userData.attackCooldown > 1000 && minDist < 15) {
+                        ally.userData.attackCooldown = time;
+                        
+                        // Create bullet trace
+                        if(gameSettings.vfx && ally.userData.weapon) {
+                            const start = new THREE.Vector3();
+                            ally.userData.weapon.getWorldPosition(start);
+                            createTracer(start, closestZombie.position.clone().add(new THREE.Vector3(0,1,0)), 0x0000ff);
+                        }
+                        
+                        // Damage zombie (3 урона за пулю)
+                        closestZombie.userData.hp -= gameSettings.bulletDamage;
+                        if(closestZombie.userData.hp <= 0) {
+                            killZombie(closestZombie, -1);
+                        }
+                    }
+                }
+            });
+
+            // Update coins
+            for(let i = coins.length - 1; i >= 0; i--) {
+                coins[i].rotation.y += delta * 3;
+                coins[i].position.y += Math.sin(gameTime * 2 + i) * 0.01;
+                
+                if(time - coins[i].userData.spawnTime > 30000) {
+                    scene.remove(coins[i]);
+                    coins.splice(i, 1);
+                    continue;
+                }
+                
+                if(coins[i].position.distanceTo(pPos) < 2) {
+                    p.coins += coins[i].userData.val || 10;
+                    sfx('coin');
+                    scene.remove(coins[i]);
+                    coins.splice(i, 1);
+                    updateUI();
+                }
+            }
+
+            // Update items
+            for(let i = mapItems.length - 1; i >= 0; i--) {
+                if(mapItems[i].position.distanceTo(pPos) < 2) {
+                    if(mapItems[i].userData.type === 'vest') {
+                        p.armor = 100;
+                        sfx('buy');
+                        updateUI();
+                    }
+                    scene.remove(mapItems[i]);
+                    mapItems.splice(i, 1);
+                }
+            }
+
+            // Update particles
+            if(gameSettings.vfx) {
+                tracers.forEach((t, i) => {
+                    t.age += delta;
+                    t.mesh.material.opacity = 1 - t.age * 5;
+                    if(t.age > 0.2) {
+                        scene.remove(t.mesh);
+                        tracers.splice(i, 1);
+                    }
+                });
+                
+                particles.forEach((part, i) => {
+                    part.life -= delta;
+                    part.mesh.position.add(part.vel.clone().multiplyScalar(delta));
+                    if(part.type === 'blood') part.vel.y -= 9.8 * delta;
+                    if(part.life <= 0) {
+                        scene.remove(part.mesh);
+                        particles.splice(i, 1);
+                    }
+                });
+            }
+
+            // Update other players' name tags
+            if (multiplayerSettings.isActive) {
+                multiplayerSettings.players.forEach((player) => {
+                    if (player.id !== multiplayerSettings.playerId && player.nameTag) {
+                        updateNameTagPosition(player);
+                    }
+                });
+            }
+
+            // Shop interaction
+            const dShop = pPos.distanceTo(merchant.position);
+            document.getElementById('interact-hint').style.display = (dShop < 5) ? 'block' : 'none';
+
+            renderer.render(scene, camera);
+        }
+
+        function explode(pos, radius = 8, damage = 60) {
+            sfx('boom');
+            
+            if(gameSettings.vfx) {
+                const flash = new THREE.PointLight(0xffaa00, 10, 20);
+                flash.position.copy(pos);
+                scene.add(flash);
+                setTimeout(() => scene.remove(flash), 150);
+                
+                // Explosion particles
+                for(let i = 0; i < 20; i++) {
+                    const particle = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.1),
+                        new THREE.MeshBasicMaterial({color: 0xff5500})
+                    );
+                    particle.position.copy(pos);
+                    const vel = new THREE.Vector3(
+                        (Math.random() - 0.5) * 10,
+                        Math.random() * 10,
+                        (Math.random() - 0.5) * 10
+                    );
+                    scene.add(particle);
+                    particles.push({
+                        mesh: particle,
+                        vel: vel,
+                        life: 1.0,
+                        type: 'explosion'
+                    });
+                }
+            }
+            
+            // Damage zombies
+            zombies.forEach(z => {
+                if(z.position.distanceTo(pos) < radius && !z.userData.isDead) {
+                    z.userData.hp -= damage * (1 - z.position.distanceTo(pos) / radius);
+                    if(z.userData.hp <= 0) killZombie(z, -1);
+                }
+            });
+            
+            // Damage player
+            const pPos = controls && controls.getObject() ? controls.getObject().position : new THREE.Vector3(0,0,0);
+            const dToP = pPos.distanceTo(pos);
+            if(dToP < radius) {
+                takeDmg(Math.floor(damage * 0.5 * (1 - dToP / radius)));
+            }
+        }
+
+        function createTracer(start, end, color) {
+            const dist = start.distanceTo(end);
+            const geo = new THREE.CylinderGeometry(0.02, 0.02, dist, 4);
+            geo.rotateX(-Math.PI/2);
+            geo.translate(0, 0, dist/2);
+            const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.6
+            }));
+            m.position.copy(start);
+            m.lookAt(end);
+            scene.add(m);
+            tracers.push({mesh: m, age: 0});
+        }
+
+        function createImpact(pos, normal, color = 0xffff00) {
+            const m = new THREE.Mesh(
+                new THREE.BoxGeometry(0.05, 0.05, 0.05),
+                new THREE.MeshBasicMaterial({color: color})
+            );
+            m.position.copy(pos);
+            scene.add(m);
+            particles.push({
+                mesh: m,
+                vel: normal.multiplyScalar(2),
+                life: 0.2,
+                type: 'spark'
+            });
+        }
+
+        function createBlood(pos, normal, explosive = false) {
+            if(!gameSettings.blood) return;
+            
+            const count = explosive ? 8 : 2;
+            for(let i = 0; i < count; i++) {
+                const m = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.1, 0.1, 0.1),
+                    new THREE.MeshBasicMaterial({color: 0x880000})
+                );
+                m.position.copy(pos);
+                const v = new THREE.Vector3(
+                    (Math.random() - 0.5),
+                    Math.random(),
+                    (Math.random() - 0.5)
+                ).normalize().multiplyScalar(explosive ? 5 : 2);
+                scene.add(m);
+                particles.push({
+                    mesh: m,
+                    vel: v,
+                    life: 0.8,
+                    type: 'blood'
+                });
+            }
+        }
+
+        function takeDmg(am) {
+            if(quest.active && quest.type === 'survival') finishQuest(false);
+            
+            if(p.armor > 0) {
+                p.armor -= am;
+                if(p.armor < 0) {
+                    p.hp += p.armor;
+                    p.armor = 0;
+                }
+            } else {
+                p.hp -= am;
+            }
+            
+            updateUI();
+            
+            if(gameSettings.vfx) {
+                document.getElementById('hit-overlay').style.boxShadow = "inset 0 0 100px red";
+                setTimeout(() => {
+                    document.getElementById('hit-overlay').style.boxShadow = "none";
+                }, 200);
+            }
+            
+            if(p.hp <= 0) {
+                alert("GAME OVER");
+                location.reload();
+            }
+        }
+
+        function reload() {
+            if(reloading || curWpn >= 7) return; // No reload for melee or turret
+            const w = wpns[curWpn];
+            if(w.clip >= w.maxClip || w.ammo <= 0) {
+                msg("НЕТ ПАТРОНОВ");
+                return;
+            }
+            
+            reloading = true;
+            msg("ПЕРЕЗАРЯДКА...");
+            
+            if(gameSettings.vfx && wpnMesh) {
+                // Simple reload animation
+                const originalPos = wpnMesh.position.clone();
+                wpnMesh.position.x += 0.2;
+                wpnMesh.position.y -= 0.1;
+                wpnMesh.rotation.z += 0.3;
+            }
+            
+            setTimeout(() => {
+                const n = Math.min(w.maxClip - w.clip, w.ammo);
+                w.clip += n;
+                w.ammo -= n;
+                reloading = false;
+                msg("");
+                
+                if(gameSettings.vfx && wpnMesh) {
+                    wpnMesh.position.set(0.3, -0.3, -0.4);
+                    wpnMesh.rotation.x = 0.1;
+                    wpnMesh.rotation.z = 0;
+                }
+                
+                updateUI();
+            }, w.reload);
+        }
+
+        function throwNade() {
+            if(p.nades <= 0) return;
+            p.nades--;
+            updateUI();
+            
+            const nade = new THREE.Mesh(
+                new THREE.SphereGeometry(0.2),
+                new THREE.MeshStandardMaterial({color: 0x00ff00})
+            );
+            nade.position.copy(camera.position);
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            nade.userData = {
+                vel: dir.multiplyScalar(22),
+                life: 2.0
+            };
+            scene.add(nade);
+            nades.push(nade);
+        }
+
+        function msg(txt) {
+            const m = document.getElementById('msg');
+            m.innerText = txt;
+            m.style.opacity = 1;
+            setTimeout(() => m.style.opacity = 0, 2000);
+        }
+
+        function updateUI() {
+            document.getElementById('hp-bar').style.width = Math.max(0, p.hp) + '%';
+            document.getElementById('hp-val').innerText = Math.ceil(p.hp);
+            document.getElementById('armor-bar').style.width = Math.max(0, p.armor) + '%';
+            document.getElementById('armor-val').innerText = Math.ceil(p.armor);
+            document.getElementById('coin-val').innerText = p.coins;
+            
+            const w = wpns[curWpn];
+            let name = w.name;
+            if(curWpn === 8) name += ` (x${p.turrets})`;
+            document.getElementById('wpn-name').innerText = name;
+            
+            if(curWpn < 7) {
+                document.getElementById('ammo-val').innerText = w.clip + " / " + w.ammo;
+            } else if(curWpn === 7) {
+                document.getElementById('ammo-val').innerText = "БЛИЖНИЙ БОЙ";
+            } else {
+                document.getElementById('ammo-val').innerText = "ТУРЕЛЬ";
+            }
+            
+            document.getElementById('nade-val').innerText = p.nades;
+        }
+
+        // --- SHOP FUNCTIONS ---
+        function updateShopPrices() {
+            shopDiscounts = {};
+            const chances = [0.05, 0.10, 0.15, 0.25];
+            const count = Math.floor(Math.random() * 3);
+            for(let i = 0; i < count; i++) {
+                const item = shopItems[Math.floor(Math.random() * shopItems.length)];
+                const discount = chances[Math.floor(Math.random() * chances.length)];
+                shopDiscounts[item.id] = discount;
+            }
+            renderShop();
+        }
+
+        function renderShop() {
+            const list = document.getElementById('shop-list');
+            list.innerHTML = '';
+            shopItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'shop-item';
+                let price = item.cost;
+                let label = `<span><i class="${item.icon}"></i> ${item.name}</span>`;
+                let btnLabel = `${price} $`;
+                
+                if(shopDiscounts[item.id]) {
+                    const disc = shopDiscounts[item.id];
+                    const newPrice = Math.floor(price * (1 - disc));
+                    label += ` <span class="sale-tag">-${(disc*100).toFixed(0)}%</span>`;
+                    btnLabel = `<span class="discount">${price}</span> ${newPrice} $`;
+                    price = newPrice;
+                }
+                
+                div.innerHTML = `${label}<button class="shop-btn" data-id="${item.id}" data-price="${price}">${btnLabel}</button>`;
+                list.appendChild(div);
+            });
+            
+            // Add event listeners to shop buttons
+            document.querySelectorAll('#shop-list .shop-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const price = parseInt(this.getAttribute('data-price'));
+                    buy(id, price);
+                });
+            });
+        }
+
+        function toggleShop() {
+            if(!isRunning) return;
+            if(shopOpen) {
+                shopOpen = false;
+                if(!isMobile && controls) controls.lock();
+                document.getElementById('shop-menu').style.display = 'none';
+            } else {
+                const pPos = controls && controls.getObject() ? controls.getObject().position : new THREE.Vector3(0,0,0);
+                const d = pPos.distanceTo(merchant.position);
+                if(d < 5) {
+                    shopOpen = true;
+                    document.exitPointerLock();
+                    document.getElementById('shop-menu').style.display = 'block';
+                    renderShop();
+                }
+            }
+        }
+
+        function buy(id, cost) {
+            if(p.coins >= cost) {
+                p.coins -= cost;
+                sfx('buy');
+                
+                switch(id) {
+                    case 'hp':
+                        p.hp = Math.min(100, p.hp + 100);
+                        break;
+                    case 'armor':
+                        p.armor = 100;
+                        break;
+                    case 'ammo':
+                        wpns[0].ammo += 48;
+                        wpns[1].ammo += 90;
+                        wpns[2].ammo += 20;
+                        wpns[3].ammo += 25;
+                        wpns[4].ammo += 8;
+                        wpns[5].ammo += 120;
+                        wpns[6].ammo += 400;
+                        break;
+                    case 'nade':
+                        p.nades++;
+                        break;
+                    case 'turret':
+                        p.turrets++;
+                        break;
+                    case 'light':
+                        p.flashLevel++;
+                        if(p.flashLevel == 2) {
+                            flashLight.intensity = 1.5;
+                            flashLight.distance = 60;
+                        }
+                        if(p.flashLevel >= 3) {
+                            flashLight.intensity = 2.5;
+                            flashLight.distance = 100;
+                            flashLight.angle = 0.8;
+                        }
+                        break;
+                    case 'pistol':
+                        wpns[0].ammo += 48;
+                        break;
+                    case 'shotgun':
+                        wpns[2].ammo += 30;
+                        break;
+                    case 'sniper':
+                        wpns[3].ammo += 25;
+                        break;
+                    case 'plasma':
+                        wpns[5].ammo += 120;
+                        break;
+                    case 'minigun':
+                        wpns[6].ammo += 400;
+                        break;
+                }
+                
+                updateUI();
+                renderShop();
+            } else {
+                msg("НЕТ ДЕНЕГ!");
+            }
+        }
+
+        // --- INPUT HANDLING ---
+        function setupPC() {
+            document.addEventListener('keydown', e => {
+                keys[e.code] = true;
+                
+                if(e.code === 'KeyW') moveF = 1;
+                if(e.code === 'KeyS') moveB = 1;
+                if(e.code === 'KeyA') moveL = 1;
+                if(e.code === 'KeyD') moveR = 1;
+                if(e.code === 'ShiftLeft') isSprint = true;
+                if(e.code === 'ControlLeft') isCrouch = true;
+                if(e.code === 'Space' && canJump) {
+                    vel.y = 8;
+                    canJump = false;
+                }
+                if(e.code === 'KeyR') reload();
+                if(e.code === 'KeyG') throwNade();
+                if(e.code === 'KeyF') toggleShop();
+                if(e.code === 'KeyT') {
+                    // Открыть чат в мультиплеере
+                    if (multiplayerSettings.isActive) {
+                        const chatInput = document.getElementById('chat-input');
+                        const chatWindow = document.getElementById('multiplayer-chat');
+                        chatWindow.style.display = 'block';
+                        chatInput.style.display = 'block';
+                        chatInput.focus();
+                    }
+                }
+                
+                // Weapon switching
+                if(e.code === 'Digit1') { curWpn = 0; setWeapon(); }
+                if(e.code === 'Digit2') { curWpn = 1; setWeapon(); }
+                if(e.code === 'Digit3') { curWpn = 2; setWeapon(); }
+                if(e.code === 'Digit4') { curWpn = 3; setWeapon(); }
+                if(e.code === 'Digit5') { curWpn = 4; setWeapon(); }
+                if(e.code === 'Digit6') { curWpn = 5; setWeapon(); }
+                if(e.code === 'Digit7') { curWpn = 6; setWeapon(); }
+                if(e.code === 'Digit8') { curWpn = 7; setWeapon(); }
+                if(e.code === 'Digit9') { curWpn = 8; setWeapon(); }
+                
+                // Pause with Escape
+                if(e.code === 'Escape') {
+                    if(shopOpen) {
+                        toggleShop();
+                    } else if(!isPaused) {
+                        isPaused = true;
+                        document.exitPointerLock();
+                        document.getElementById('pause-menu').style.display = 'block';
+                    } else {
+                        resumeGame();
+                    }
+                }
+            });
+            
+            document.addEventListener('keyup', e => {
+                keys[e.code] = false;
+                
+                if(e.code === 'KeyW') moveF = 0;
+                if(e.code === 'KeyS') moveB = 0;
+                if(e.code === 'KeyA') moveL = 0;
+                if(e.code === 'KeyD') moveR = 0;
+                if(e.code === 'ShiftLeft') {
+                    isSprint = false;
+                    p.staminaCooldown = 1.0;
+                }
+                if(e.code === 'ControlLeft') isCrouch = false;
+            });
+            
+            // Mouse controls
+            let isMouseDown = false;
+            let autoFireInterval = null;
+            
+            document.addEventListener('mousedown', (e) => {
+                if(e.button === 0) {
+                    isMouseDown = true;
+                    
+                    if(!shopOpen && !isPaused && controls && !controls.isLocked && !isMobile) {
+                        controls.lock();
+                    } else if(controls && controls.isLocked && !shopOpen && !isPaused) {
+                        const w = wpns[curWpn];
+                        
+                        if(w.auto && curWpn !== 8) {
+                            shoot();
+                            autoFireInterval = setInterval(() => {
+                                if(!isMouseDown || !controls.isLocked || shopOpen || isPaused) {
+                                    clearInterval(autoFireInterval);
+                                    return;
+                                }
+                                shoot();
+                            }, w.rate);
+                        } else {
+                            shoot();
+                        }
+                    }
+                }
+            });
+            
+            document.addEventListener('mouseup', (e) => {
+                if(e.button === 0) {
+                    isMouseDown = false;
+                    if(autoFireInterval) {
+                        clearInterval(autoFireInterval);
+                        autoFireInterval = null;
+                    }
+                }
+            });
+            
+            document.addEventListener('pointerlockchange', () => {
+                if(!document.pointerLockElement && !shopOpen && isRunning) {
+                    isPaused = true;
+                    document.getElementById('pause-menu').style.display = 'block';
+                } else if(document.pointerLockElement && isPaused) {
+                    isPaused = false;
+                    document.getElementById('pause-menu').style.display = 'none';
+                }
+            });
+        }
+
+        function resumeGame() {
+            isPaused = false;
+            document.getElementById('pause-menu').style.display = 'none';
+            if(!isMobile && controls) {
+                document.body.requestPointerLock();
+            }
+        }
+
+        // --- TURRET SPAWNING ---
+        function spawnTurret() {
+            const pPos = controls.getObject().position.clone();
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            const spawnPos = pPos.add(dir.multiplyScalar(2));
+            spawnPos.y = 0;
+
+            const tGroup = new THREE.Group();
+            tGroup.position.copy(spawnPos);
+            
+            const leg = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.1, 0.3, 1),
+                new THREE.MeshStandardMaterial({color: 0x333})
+            );
+            leg.position.y = 0.5;
+            leg.castShadow = true;
+            
+            const head = new THREE.Group();
+            head.position.y = 1;
+            const gun = new THREE.Mesh(
+                new THREE.BoxGeometry(0.2, 0.2, 0.8),
+                new THREE.MeshStandardMaterial({color: 0x555})
+            );
+            gun.position.z = 0.2;
+            head.add(gun);
+
+            tGroup.add(leg, head);
+            tGroup.castShadow = true;
+
+            tGroup.userData = {
+                head: head,
+                life: 30,
+                lastShot: 0,
+                rate: 100,
+                dmg: 22
+            };
+            
+            scene.add(tGroup);
+            turrets.push(tGroup);
+        }
+
+        // Initialize main menu
+        document.getElementById('main-menu').style.display = 'flex';
+
+        // --- INITIALIZE BUTTONS AFTER PAGE LOAD ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get buttons and add event listeners
+            document.getElementById('btn-settings').addEventListener('click', showSettings);
+            document.getElementById('btn-quick-start').addEventListener('click', startWithDefaults);
+            document.getElementById('btn-multiplayer').addEventListener('click', showMultiplayerMenu);
+            document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+            document.getElementById('back-to-menu-btn').addEventListener('click', showMainMenu);
+            document.getElementById('resume-btn').addEventListener('click', resumeGame);
+            document.getElementById('settings-btn').addEventListener('click', showSettings);
+            document.getElementById('btn-music').addEventListener('click', toggleMusic);
+            document.getElementById('close-shop').addEventListener('click', toggleShop);
+            
+            // Multiplayer buttons
+            document.getElementById('btn-create-room').addEventListener('click', showCreateRoomPanel);
+            document.getElementById('btn-join-room').addEventListener('click', showJoinRoomPanel);
+            document.getElementById('btn-start-multiplayer').addEventListener('click', startMultiplayerGame);
+            document.getElementById('btn-connect').addEventListener('click', connectToRoom);
+            document.getElementById('btn-back-multiplayer').addEventListener('click', showMainMenu);
+            
+            // Chat button
+            document.getElementById('btn-chat').addEventListener('click', function() {
+                const chatInput = document.getElementById('chat-input');
+                const chatWindow = document.getElementById('multiplayer-chat');
+                chatWindow.style.display = 'block';
+                chatInput.style.display = 'block';
+                chatInput.focus();
+            });
+            
+            // Volume control
+            const volSlider = document.getElementById('vol');
+            volSlider.addEventListener('input', function() {
+                if (masterGain) {
+                    masterGain.gain.value = parseFloat(this.value);
+                }
+            });
+            
+            // Make functions available globally
+            window.showSettings = showSettings;
+            window.showMainMenu = showMainMenu;
+            window.saveSettings = saveSettings;
+            window.startWithDefaults = startWithDefaults;
+            window.resumeGame = resumeGame;
+            window.toggleShop = toggleShop;
+            window.buy = buy;
+            window.toggleMusic = toggleMusic;
+            window.showMultiplayerMenu = showMultiplayerMenu;
+            
+            console.log('Game initialized - all buttons are ready');
+        });
+
+        // Make sure functions are available globally
+        window.showSettings = showSettings;
+        window.showMainMenu = showMainMenu;
+        window.saveSettings = saveSettings;
+        window.startWithDefaults = startWithDefaults;
+        window.resumeGame = resumeGame;
+        window.toggleShop = toggleShop;
+        window.buy = buy;
+        window.toggleMusic = toggleMusic;
+        window.showMultiplayerMenu = showMultiplayerMenu;
+
+    </script>
+</body>
+</html>

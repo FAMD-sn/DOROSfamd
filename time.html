@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мировое время - время в городах мира</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            display: flex;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+        
+        #cityInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        #searchBtn {
+            padding: 0 25px;
+            background: #4a54e1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        #searchBtn:hover {
+            background: #3a44d1;
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        select {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            outline: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .current-time {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .current-time h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        #localTime {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        #localDate {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .city-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .city-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .city-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .city-country {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .city-time {
+            font-size: 1.8rem;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .city-date {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .popular-cities {
+            margin-top: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .pagination button {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .pagination button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .pagination button.active {
+            background: #4a54e1;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            #localTime {
+                font-size: 2.2rem;
+            }
+            
+            .city-time {
+                font-size: 1.5rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .filter-container {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            select {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1> DOROStime Мировое время</h1>
+            <p class="subtitle">Узнайте текущее время в любом городе мира</p>
+            
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="cityInput" placeholder="Введите название города...">
+                    <button id="searchBtn">Найти</button>
+                </div>
+                
+                <div class="filter-container">
+                    <select id="regionFilter">
+                        <option value="all">Все регионы</option>
+                        <option value="europe">Европа</option>
+                        <option value="asia">Азия</option>
+                        <option value="africa">Африка</option>
+                        <option value="north-america">Северная Америка</option>
+                        <option value="south-america">Южная Америка</option>
+                        <option value="oceania">Океания</option>
+                        <option value="middle-east">Ближний Восток</option>
+                    </select>
+                    
+                    <select id="sortFilter">
+                        <option value="name">Сортировка по имени</option>
+                        <option value="time">Сортировка по времени</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+        
+        <div class="current-time">
+            <h2>Ваше местное время</h2>
+            <div id="localTime">--:--:--</div>
+            <div id="localDate">-- -- ----</div>
+        </div>
+        
+        <div class="popular-cities">
+            <h2 class="section-title">Время в городах мира</h2>
+            <div class="cities-grid" id="citiesGrid">
+                <!-- Города будут добавлены через JavaScript -->
+            </div>
+            
+            <div class="pagination" id="pagination">
+                <!-- Пагинация будет добавлена через JavaScript -->
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 DOROStime Мировое время. Все права защищены.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Расширенный список городов со всех континентов
+        const allCities = [
+            // Европа
+            { name: "Москва", country: "Россия", timezone: "Europe/Moscow", region: "europe" },
+            { name: "Лондон", country: "Великобритания", timezone: "Europe/London", region: "europe" },
+            { name: "Париж", country: "Франция", timezone: "Europe/Paris", region: "europe" },
+            { name: "Берлин", country: "Германия", timezone: "Europe/Berlin", region: "europe" },
+            { name: "Мадрид", country: "Испания", timezone: "Europe/Madrid", region: "europe" },
+            { name: "Рим", country: "Италия", timezone: "Europe/Rome", region: "europe" },
+            { name: "Амстердам", country: "Нидерланды", timezone: "Europe/Amsterdam", region: "europe" },
+            { name: "Прага", country: "Чехия", timezone: "Europe/Prague", region: "europe" },
+            { name: "Варшава", country: "Польша", timezone: "Europe/Warsaw", region: "europe" },
+            { name: "Стокгольм", country: "Швеция", timezone: "Europe/Stockholm", region: "europe" },
+            { name: "Вена", country: "Австрия", timezone: "Europe/Vienna", region: "europe" },
+            { name: "Брюссель", country: "Бельгия", timezone: "Europe/Brussels", region: "europe" },
+            { name: "Будапешт", country: "Венгрия", timezone: "Europe/Budapest", region: "europe" },
+            { name: "Афины", country: "Греция", timezone: "Europe/Athens", region: "europe" },
+            { name: "Лиссабон", country: "Португалия", timezone: "Europe/Lisbon", region: "europe" },
+            { name: "Киев", country: "Украина", timezone: "Europe/Kiev", region: "europe" },
+            { name: "Минск", country: "Беларусь", timezone: "Europe/Minsk", region: "europe" },
+            
+            // Азия
+            { name: "Токио", country: "Япония", timezone: "Asia/Tokyo", region: "asia" },
+            { name: "Пекин", country: "Китай", timezone: "Asia/Shanghai", region: "asia" },
+            { name: "Сеул", country: "Южная Корея", timezone: "Asia/Seoul", region: "asia" },
+            { name: "Дели", country: "Индия", timezone: "Asia/Kolkata", region: "asia" },
+            { name: "Сингапур", country: "Сингапур", timezone: "Asia/Singapore", region: "asia" },
+            { name: "Бангкок", country: "Таиланд", timezone: "Asia/Bangkok", region: "asia" },
+            { name: "Джакарта", country: "Индонезия", timezone: "Asia/Jakarta", region: "asia" },
+            { name: "Куала-Лумпур", country: "Малайзия", timezone: "Asia/Kuala_Lumpur", region: "asia" },
+            { name: "Манила", country: "Филиппины", timezone: "Asia/Manila", region: "asia" },
+            { name: "Ханой", country: "Вьетнам", timezone: "Asia/Ho_Chi_Minh", region: "asia" },
+            { name: "Тайбэй", country: "Тайвань", timezone: "Asia/Taipei", region: "asia" },
+            { name: "Гонконг", country: "Гонконг", timezone: "Asia/Hong_Kong", region: "asia" },
+            { name: "Карачи", country: "Пакистан", timezone: "Asia/Karachi", region: "asia" },
+            { name: "Дакка", country: "Бангладеш", timezone: "Asia/Dhaka", region: "asia" },
+            { name: "Коломбо", country: "Шри-Ланка", timezone: "Asia/Colombo", region: "asia" },
+            { name: "Катманду", country: "Непал", timezone: "Asia/Kathmandu", region: "asia" },
+            { name: "Улан-Батор", country: "Монголия", timezone: "Asia/Ulaanbaatar", region: "asia" },
+            { name: "Ереван", country: "Армения", timezone: "Asia/Yerevan", region: "asia" },
+            { name: "Баку", country: "Азербайджан", timezone: "Asia/Baku", region: "asia" },
+            { name: "Тбилиси", country: "Грузия", timezone: "Asia/Tbilisi", region: "asia" },
+            { name: "Астана", country: "Казахстан", timezone: "Asia/Almaty", region: "asia" },
+            { name: "Ташкент", country: "Узбекистан", timezone: "Asia/Tashkent", region: "asia" },
+            
+            // Ближний Восток
+            { name: "Дубай", country: "ОАЭ", timezone: "Asia/Dubai", region: "middle-east" },
+            { name: "Мекка", country: "Саудовская Аравия", timezone: "Asia/Riyadh", region: "middle-east" },
+            { name: "Эр-Рияд", country: "Саудовская Аравия", timezone: "Asia/Riyadh", region: "middle-east" },
+            { name: "Тегеран", country: "Иран", timezone: "Asia/Tehran", region: "middle-east" },
+            { name: "Багдад", country: "Ирак", timezone: "Asia/Baghdad", region: "middle-east" },
+            { name: "Анкара", country: "Турция", timezone: "Europe/Istanbul", region: "middle-east" },
+            { name: "Каир", country: "Египет", timezone: "Africa/Cairo", region: "middle-east" },
+            { name: "Иерусалим", country: "Израиль", timezone: "Asia/Jerusalem", region: "middle-east" },
+            { name: "Амман", country: "Иордания", timezone: "Asia/Amman", region: "middle-east" },
+            { name: "Бейрут", country: "Ливан", timezone: "Asia/Beirut", region: "middle-east" },
+            { name: "Дамаск", country: "Сирия", timezone: "Asia/Damascus", region: "middle-east" },
+            { name: "Доха", country: "Катар", timezone: "Asia/Qatar", region: "middle-east" },
+            { name: "Манама", country: "Бахрейн", timezone: "Asia/Bahrain", region: "middle-east" },
+            { name: "Маскат", country: "Оман", timezone: "Asia/Muscat", region: "middle-east" },
+            { name: "Саana", country: "Йемен", timezone: "Asia/Aden", region: "middle-east" },
+            { name: "Кувейт", country: "Кувейт", timezone: "Asia/Kuwait", region: "middle-east" },
+            
+            // Северная Америка
+            { name: "Нью-Йорк", country: "США", timezone: "America/New_York", region: "north-america" },
+            { name: "Лос-Анджелес", country: "США", timezone: "America/Los_Angeles", region: "north-america" },
+            { name: "Чикаго", country: "США", timezone: "America/Chicago", region: "north-america" },
+            { name: "Торонто", country: "Канада", timezone: "America/Toronto", region: "north-america" },
+            { name: "Мехико", country: "Мексика", timezone: "America/Mexico_City", region: "north-america" },
+            { name: "Ванкувер", country: "Канада", timezone: "America/Vancouver", region: "north-america" },
+            { name: "Майами", country: "США", timezone: "America/New_York", region: "north-america" },
+            { name: "Гавана", country: "Куба", timezone: "America/Havana", region: "north-america" },
+            { name: "Вашингтон", country: "США", timezone: "America/New_York", region: "north-america" },
+            { name: "Бостон", country: "США", timezone: "America/New_York", region: "north-america" },
+            { name: "Атланта", country: "США", timezone: "America/New_York", region: "north-america" },
+            { name: "Даллас", country: "США", timezone: "America/Chicago", region: "north-america" },
+            { name: "Денвер", country: "США", timezone: "America/Denver", region: "north-america" },
+            { name: "Финикс", country: "США", timezone: "America/Phoenix", region: "north-america" },
+            { name: "Сиэтл", country: "США", timezone: "America/Los_Angeles", region: "north-america" },
+            { name: "Монреаль", country: "Канада", timezone: "America/Toronto", region: "north-america" },
+            
+            // Южная Америка
+            { name: "Сан-Паулу", country: "Бразилия", timezone: "America/Sao_Paulo", region: "south-america" },
+            { name: "Буэнос-Айрес", country: "Аргентина", timezone: "America/Argentina/Buenos_Aires", region: "south-america" },
+            { name: "Лима", country: "Перу", timezone: "America/Lima", region: "south-america" },
+            { name: "Богота", country: "Колумбия", timezone: "America/Bogota", region: "south-america" },
+            { name: "Сантьяго", country: "Чили", timezone: "America/Santiago", region: "south-america" },
+            { name: "Каракас", country: "Венесуэла", timezone: "America/Caracas", region: "south-america" },
+            { name: "Рио-де-Жанейро", country: "Бразилия", timezone: "America/Sao_Paulo", region: "south-america" },
+            { name: "Кито", country: "Эквадор", timezone: "America/Guayaquil", region: "south-america" },
+            { name: "Монтевидео", country: "Уругвай", timezone: "America/Montevideo", region: "south-america" },
+            { name: "Ла-Пас", country: "Боливия", timezone: "America/La_Paz", region: "south-america" },
+            { name: "Асунсьон", country: "Парагвай", timezone: "America/Asuncion", region: "south-america" },
+            { name: "Ресифи", country: "Бразилия", timezone: "America/Recife", region: "south-america" },
+            
+            // Африка
+            { name: "Каир", country: "Египет", timezone: "Africa/Cairo", region: "africa" },
+            { name: "Йоханнесбург", country: "ЮАР", timezone: "Africa/Johannesburg", region: "africa" },
+            { name: "Лагос", country: "Нигерия", timezone: "Africa/Lagos", region: "africa" },
+            { name: "Найроби", country: "Кения", timezone: "Africa/Nairobi", region: "africa" },
+            { name: "Касабланка", country: "Марокко", timezone: "Africa/Casablanca", region: "africa" },
+            { name: "Аккра", country: "Гана", timezone: "Africa/Accra", region: "africa" },
+            { name: "Адис-Абеба", country: "Эфиопия", timezone: "Africa/Addis_Ababa", region: "africa" },
+            { name: "Кейптаун", country: "ЮАР", timezone: "Africa/Johannesburg", region: "africa" },
+            { name: "Дар-эс-Салам", country: "Танзания", timezone: "Africa/Dar_es_Salaam", region: "africa" },
+            { name: "Алжир", country: "Алжир", timezone: "Africa/Algiers", region: "africa" },
+            { name: "Триполи", country: "Ливия", timezone: "Africa/Tripoli", region: "africa" },
+            { name: "Тунис", country: "Тунис", timezone: "Africa/Tunis", region: "africa" },
+            { name: "Луанда", country: "Ангола", timezone: "Africa/Luanda", region: "africa" },
+            { name: "Киншаса", country: "ДР Конго", timezone: "Africa/Kinshasa", region: "africa" },
+            { name: "Хартум", country: "Судан", timezone: "Africa/Khartoum", region: "africa" },
+            { name: "Абиджан", country: "Кот-д'Ивуар", timezone: "Africa/Abidjan", region: "africa" },
+            { name: "Дакар", country: "Сенегал", timezone: "Africa/Dakar", region: "africa" },
+            { name: "Рабат", country: "Марокко", timezone: "Africa/Casablanca", region: "africa" },
+            
+            // Океания
+            { name: "Сидней", country: "Австралия", timezone: "Australia/Sydney", region: "oceania" },
+            { name: "Мельбурн", country: "Австралия", timezone: "Australia/Melbourne", region: "oceania" },
+            { name: "Окленд", country: "Новая Зеландия", timezone: "Pacific/Auckland", region: "oceania" },
+            { name: "Порт-Морсби", country: "Папуа-Новая Гвинея", timezone: "Pacific/Port_Moresby", region: "oceania" },
+            { name: "Сува", country: "Фиджи", timezone: "Pacific/Fiji", region: "oceania" },
+            { name: "Брисбен", country: "Австралия", timezone: "Australia/Brisbane", region: "oceania" },
+            { name: "Перт", country: "Австралия", timezone: "Australia/Perth", region: "oceania" },
+            { name: "Аделаида", country: "Австралия", timezone: "Australia/Adelaide", region: "oceania" },
+            { name: "Веллингтон", country: "Новая Зеландия", timezone: "Pacific/Auckland", region: "oceania" },
+            { name: "Хониара", country: "Соломоновы Острова", timezone: "Pacific/Guadalcanal", region: "oceania" },
+            { name: "Нумеа", country: "Новая Каледония", timezone: "Pacific/Noumea", region: "oceania" }
+        ];
+
+        // Переменные для пагинации
+        let currentPage = 1;
+        const citiesPerPage = 12;
+        let filteredCities = [...allCities];
+
+        // Обновление времени для местного времени
+        function updateLocalTime() {
+            const now = new Date();
+            const timeElement = document.getElementById('localTime');
+            const dateElement = document.getElementById('localDate');
+            
+            const timeString = now.toLocaleTimeString('ru-RU');
+            const dateString = now.toLocaleDateString('ru-RU', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            timeElement.textContent = timeString;
+            dateElement.textContent = dateString;
+        }
+
+        // Получение времени для определенного города
+        function getCityTime(cityName, timezone) {
+            const now = new Date();
+            const options = { 
+                timeZone: timezone, 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            
+            const timeString = now.toLocaleTimeString('ru-RU', options);
+            
+            const dateOptions = {
+                timeZone: timezone,
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            
+            const dateString = now.toLocaleDateString('ru-RU', dateOptions);
+            
+            return { time: timeString, date: dateString };
+        }
+
+        // Создание карточки города
+        function createCityCard(city) {
+            const cityTime = getCityTime(city.name, city.timezone);
+            
+            return `
+                <div class="city-card">
+                    <div class="city-name">${city.name}</div>
+                    <div class="city-country">${city.country}</div>
+                    <div class="city-time">${cityTime.time}</div>
+                    <div class="city-date">${cityTime.date}</div>
+                </div>
+            `;
+        }
+
+        // Фильтрация городов по региону
+        function filterCities() {
+            const regionFilter = document.getElementById('regionFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            if (regionFilter === 'all') {
+                filteredCities = [...allCities];
+            } else {
+                filteredCities = allCities.filter(city => city.region === regionFilter);
+            }
+            
+            // Сортировка
+            if (sortFilter === 'name') {
+                filteredCities.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortFilter === 'time') {
+                // Сортировка по времени (примерная, на основе часового пояса)
+                filteredCities.sort((a, b) => {
+                    const timeA = getCityTime(a.name, a.timezone).time;
+                    const timeB = getCityTime(b.name, b.timezone).time;
+                    return timeA.localeCompare(timeB);
+                });
+            }
+            
+            currentPage = 1;
+            renderCities();
+            renderPagination();
+        }
+
+        // Отображение городов на текущей странице
+        function renderCities() {
+            const citiesGrid = document.getElementById('citiesGrid');
+            citiesGrid.innerHTML = '';
+            
+            const startIndex = (currentPage - 1) * citiesPerPage;
+            const endIndex = startIndex + citiesPerPage;
+            const citiesToShow = filteredCities.slice(startIndex, endIndex);
+            
+            citiesToShow.forEach(city => {
+                citiesGrid.innerHTML += createCityCard(city);
+            });
+        }
+
+        // Отображение пагинации
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            
+            const totalPages = Math.ceil(filteredCities.length / citiesPerPage);
+            
+            if (totalPages <= 1) return;
+            
+            // Кнопка "Назад"
+            const prevButton = document.createElement('button');
+            prevButton.textContent = '←';
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderCities();
+                    renderPagination();
+                }
+            });
+            pagination.appendChild(prevButton);
+            
+            // Номера страниц
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.classList.toggle('active', i === currentPage);
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    renderCities();
+                    renderPagination();
+                });
+                pagination.appendChild(pageButton);
+            }
+            
+            // Кнопка "Вперед"
+            const nextButton = document.createElement('button');
+            nextButton.textContent = '→';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderCities();
+                    renderPagination();
+                }
+            });
+            pagination.appendChild(nextButton);
+        }
+
+        // Поиск города
+        function searchCity() {
+            const cityInput = document.getElementById('cityInput');
+            const cityName = cityInput.value.trim().toLowerCase();
+            
+            if (cityName === '') {
+                alert('Пожалуйста, введите название города');
+                return;
+            }
+            
+            // Поиск города в списке
+            const foundCity = allCities.find(city => 
+                city.name.toLowerCase().includes(cityName) || 
+                city.country.toLowerCase().includes(cityName)
+            );
+            
+            if (foundCity) {
+                // Показываем только найденный город
+                filteredCities = [foundCity];
+                currentPage = 1;
+                renderCities();
+                renderPagination();
+                
+                // Прокручиваем к началу списка
+                document.querySelector('.popular-cities').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+            } else {
+                alert(`Город "${cityInput.value}" не найден в базе данных. Попробуйте другой город.`);
+            }
+            
+            // Очистка поля ввода
+            cityInput.value = '';
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLocalTime();
+            filterCities();
+            
+            // Обновление времени каждую секунду
+            setInterval(updateLocalTime, 1000);
+            setInterval(renderCities, 1000);
+            
+            // Обработчики для фильтров
+            document.getElementById('regionFilter').addEventListener('change', filterCities);
+            document.getElementById('sortFilter').addEventListener('change', filterCities);
+            
+            // Обработчик для кнопки поиска
+            document.getElementById('searchBtn').addEventListener('click', searchCity);
+            
+            // Обработчик для нажатия Enter в поле ввода
+            document.getElementById('cityInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchCity();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

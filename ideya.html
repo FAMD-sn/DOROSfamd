@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DOROSida | MAFAMD</title>
+  
+  <style>
+    :root {
+      --primary-color: #00ffc8;
+      --secondary-color: #00aaff;
+      --bg-color: #0d0d1a;
+      --card-bg: rgba(20, 20, 40, 0.5);
+      --card-border: 1px solid rgba(0, 255, 200, 0.2);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background-color: var(--bg-color);
+      color: #ffffff;
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(45deg, var(--bg-color) 0%, #1a0d1a 100%);
+      animation: background-glow 20s infinite alternate ease-in-out;
+    }
+    
+    @keyframes background-glow {
+      from { filter: hue-rotate(0deg); }
+      to { filter: hue-rotate(360deg); }
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      color: var(--primary-color);
+      text-shadow: 0 0 10px var(--primary-color);
+      margin-bottom: 10px;
+      animation: text-glow 2s infinite alternate;
+    }
+    
+    @keyframes text-glow {
+      from { text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color); }
+      to { text-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--primary-color); }
+    }
+    
+    .tagline {
+      font-size: 1.2em;
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+    }
+    
+    .main-content {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .control-panel {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 15px;
+      padding: 25px;
+    }
+    
+    .section {
+      margin-bottom: 25px;
+    }
+    
+    .section-title {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+    
+    .category-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .category-btn {
+      padding: 12px 15px;
+      border: var(--card-border);
+      border-radius: 8px;
+      background-color: rgba(20, 20, 40, 0.7);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      font-family: inherit;
+    }
+    
+    .category-btn:hover {
+      background-color: rgba(0, 255, 200, 0.2);
+      transform: translateX(5px);
+    }
+    
+    .category-btn.active {
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+    }
+    
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
+    
+    .option-item input {
+      width: auto;
+    }
+    
+    .option-item label {
+      color: #ccc;
+      cursor: pointer;
+    }
+    
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      font-size: 1em;
+      width: 100%;
+    }
+    
+    .btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 255, 200, 0.3);
+    }
+    
+    .results-panel {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 15px;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .results-title {
+      color: var(--primary-color);
+      font-size: 1.3em;
+    }
+    
+    .results-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .results-content {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    
+    .idea-card {
+      background-color: rgba(20, 20, 40, 0.7);
+      border: var(--card-border);
+      border-radius: 10px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .idea-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 255, 200, 0.2);
+    }
+    
+    .idea-card.favorite {
+      border-color: var(--primary-color);
+      background-color: rgba(0, 255, 200, 0.1);
+    }
+    
+    .idea-title {
+      color: var(--primary-color);
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .favorite-btn {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 1.2em;
+      transition: all 0.3s ease;
+    }
+    
+    .favorite-btn.active {
+      color: #ffd93d;
+    }
+    
+    .idea-description {
+      color: #ccc;
+      font-size: 0.9em;
+      line-height: 1.4;
+      margin-bottom: 15px;
+    }
+    
+    .idea-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    
+    .tag {
+      padding: 3px 8px;
+      background-color: rgba(0, 170, 255, 0.2);
+      border-radius: 12px;
+      font-size: 0.8em;
+      color: var(--secondary-color);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+      grid-column: 1 / -1;
+    }
+    
+    .saved-ideas {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: var(--card-border);
+    }
+    
+    .saved-title {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+    
+    .saved-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .saved-item {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .saved-item:hover {
+      background-color: rgba(0, 255, 200, 0.1);
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      color: var(--secondary-color);
+      text-decoration: none;
+      font-size: 1em;
+      text-align: center;
+      width: 100%;
+    }
+    
+    .back-link:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Генератор идей</h1>
+      <p class="tagline">Находи вдохновение для новых проектов и контента</p>
+    </header>
+    
+    <div class="main-content">
+      <div class="control-panel">
+        <div class="section">
+          <div class="section-title">Категории идей</div>
+          <div class="category-buttons">
+            <button class="category-btn active" data-category="business">💼 Бизнес-идеи</button>
+            <button class="category-btn" data-category="content">🎬 Контент для соцсетей</button>
+            <button class="category-btn" data-category="programming">💻 IT проекты</button>
+            <button class="category-btn" data-category="creative">🎨 Креативные проекты</button>
+            <button class="category-btn" data-category="blogging">✍️ Темы для блога</button>
+            <button class="category-btn" data-category="video">🎥 Идеи для видео</button>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">Настройки генерации</div>
+          <div class="options-grid">
+            <div class="option-item">
+              <input type="number" id="ideas-count" min="1" max="20" value="6">
+              <label for="ideas-count">Количество идей</label>
+            </div>
+            <div class="option-item">
+              <input type="checkbox" id="include-tags" checked>
+              <label for="include-tags">Добавлять теги</label>
+            </div>
+            <div class="option-item">
+              <input type="checkbox" id="detailed-description" checked>
+              <label for="detailed-description">Подробное описание</label>
+            </div>
+          </div>
+        </div>
+        
+        <button class="btn" id="generate-btn">Сгенерировать идеи</button>
+        
+        <div class="saved-ideas">
+          <div class="saved-title">Сохраненные идеи</div>
+          <div class="saved-list" id="saved-list">
+            <div class="empty-state">Нет сохраненных идей</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="results-panel">
+        <div class="results-header">
+          <div class="results-title">Сгенерированные идеи</div>
+          <div class="results-actions">
+            <button class="btn" id="save-all-btn" style="width: auto;">Сохранить все</button>
+            <button class="btn" id="export-btn" style="width: auto;">Экспорт</button>
+          </div>
+        </div>
+        
+        <div class="results-content" id="results-content">
+          <div class="empty-state">
+            <p>Нажмите "Сгенерировать идеи" чтобы получить вдохновение!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <a href="https://dorosfamd.com/" class="back-link">← Вернуться на главную</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Элементы DOM
+      const categoryBtns = document.querySelectorAll('.category-btn');
+      const generateBtn = document.getElementById('generate-btn');
+      const saveAllBtn = document.getElementById('save-all-btn');
+      const exportBtn = document.getElementById('export-btn');
+      const resultsContent = document.getElementById('results-content');
+      const savedList = document.getElementById('saved-list');
+      
+      // Данные
+      let currentCategory = 'business';
+      let savedIdeas = JSON.parse(localStorage.getItem('saved-ideas')) || [];
+      
+      // Базы данных идей
+      const ideasDatabase = {
+        business: [
+          {
+            title: "Онлайн-школа программирования для детей",
+            description: "Интерактивная платформа для обучения детей основам программирования через игры и проекты.",
+            tags: ["образование", "IT", "дети", "онлайн"]
+          },
+          {
+            title: "Эко-доставка продуктов",
+            description: "Сервис доставки фермерских продуктов в экологичной упаковке с нулевыми отходами.",
+            tags: ["экология", "еда", "доставка", "здоровье"]
+          },
+          {
+            title: "Платформа для аренды оборудования",
+            description: "Marketplace для аренды профессионального оборудования между частными лицами и компаниями.",
+            tags: ["шеринг", "техника", "бизнес"]
+          }
+        ],
+        content: [
+          {
+            title: "Челлендж '30 дней продуктивности'",
+            description: "Ежедневные задания и советы по повышению личной эффективности с интерактивным трекером.",
+            tags: ["мотивация", "продуктивность", "челлендж"]
+          },
+          {
+            title: "Серия постов 'Мифы о программировании'",
+            description: "Разоблачение популярных стереотипов о работе программистов с реальными примерами.",
+            tags: ["IT", "мифы", "образование"]
+          },
+          {
+            title: "Интерактивные опросы про технологии",
+            description: "Серия интерактивных опросов о технологических трендах с последующим разбором результатов.",
+            tags: ["технологии", "опросы", "интерактив"]
+          }
+        ],
+        programming: [
+          {
+            title: "AI-помощник для изучения языков",
+            description: "Приложение с искусственным интеллектом для персонализированного изучения иностранных языков.",
+            tags: ["AI", "образование", "языки", "мобильное"]
+          },
+          {
+            title: "Браузерное расширение для управления временем",
+            description: "Расширение, которое помогает контролировать время проведенное в соцсетях и повышать продуктивность.",
+            tags: ["расширение", "продуктивность", "браузер"]
+          },
+          {
+            title: "Платформа для совместного кодинга",
+            description: "Онлайн-среда для реального времени совместной работы над кодом с встроенным менторством.",
+            tags: ["коллаборация", "обучение", "реальное время"]
+          }
+        ],
+        creative: [
+          {
+            title: "Интерактивный цифровой арт-проект",
+            description: "Веб-приложение, создающее уникальные генеративные artworks на основе пользовательского ввода.",
+            tags: ["искусство", "генеративный", "интерактив"]
+          },
+          {
+            title: "AR-приложение для виртуальных граффити",
+            description: "Мобильное приложение, позволяющее создавать AR-граффити в реальном мире через камеру телефона.",
+            tags: ["AR", "искусство", "мобильное"]
+          },
+          {
+            title: "Цифровой дневник с шифрованием",
+            description: "Приложение для ведения личного дневника с end-to-end шифрованием и облачным хранением.",
+            tags: ["приватность", "письмо", "безопасность"]
+          }
+        ],
+        blogging: [
+          {
+            title: "Как начать карьеру в IT без опыта",
+            description: "Подробное руководство по входу в IT-сферу с нуля: от выбора направления до первого трудоустройства.",
+            tags: ["карьера", "IT", "обучение"]
+          },
+          {
+            title: "Тренды веб-разработки 2024",
+            description: "Обзор самых перспективных технологий и подходов в современной веб-разработке.",
+            tags: ["тренды", "веб-разработка", "технологии"]
+          },
+          {
+            title: "Личный опыт: запуск стартапа в одиночку",
+            description: "Реальная история создания и развития IT-проекта силами одного человека.",
+            tags: ["стартап", "опыт", "мотивация"]
+          }
+        ],
+        video: [
+          {
+            title: "Создание игры за 24 часа",
+            description: "Таймлапс-видео процесса создания полноценной игры с нуля за одни сутки.",
+            tags: ["геймдев", "таймлапс", "челлендж"]
+          },
+          {
+            title: "Обзор необычных IT-инструментов",
+            description: "Подборка малоизвестных, но полезных инструментов для разработчиков и дизайнеров.",
+            tags: ["обзор", "инструменты", "IT"]
+          },
+          {
+            title: "Интервью с успешными IT-специалистами",
+            description: "Серия интервью с разработчиками, которые добились значительных успехов в карьере.",
+            tags: ["интервью", "карьера", "вдохновение"]
+          }
+        ]
+      };
+      
+      // Дополнительные идеи для каждой категории (чтобы было больше вариантов)
+      const additionalIdeas = {
+        business: [
+          "Сервис подписки на локальные продукты",
+          "Платформа для микро-обучения",
+          "Эко-консалтинг для бизнеса",
+          "Приложение для mental health"
+        ],
+        content: [
+          "Инфографика про цифровую безопасность",
+          "Серия сторис 'День из жизни программиста'",
+          "Обзор новых технологий в коротком формате"
+        ],
+        programming: [
+          "API для анализа настроений в тексте",
+          "Blockchain-приложение для верификации документов",
+          "IoT система для умного дома"
+        ],
+        creative: [
+          "Генератор поэзии на основе AI",
+          "Интерактивная музыкальная платформа",
+          "Цифровой сад для медитации"
+        ],
+        blogging: [
+          "Сравнение фреймворков для веб-разработки",
+          "Как поддерживать work-life balance в IT",
+          "Обзор лучших ресурсов для самообразования"
+        ],
+        video: [
+          "Туториал по созданию AI-ассистента",
+          "Разбор сложных алгоритмов простым языком",
+          "Создание дизайн-системы с нуля"
+        ]
+      };
+      
+      // Инициализация
+      updateSavedList();
+      
+      // Обработчики событий
+      categoryBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          categoryBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentCategory = this.dataset.category;
+        });
+      });
+      
+      generateBtn.addEventListener('click', generateIdeas);
+      saveAllBtn.addEventListener('click', saveAllIdeas);
+      exportBtn.addEventListener('click', exportIdeas);
+      
+      // Функции
+      function generateIdeas() {
+        const count = parseInt(document.getElementById('ideas-count').value) || 6;
+        const includeTags = document.getElementById('include-tags').checked;
+        const detailedDescription = document.getElementById('detailed-description').checked;
+        
+        resultsContent.innerHTML = '';
+        
+        // Берем основные идеи из базы
+        const mainIdeas = [...ideasDatabase[currentCategory]];
+        
+        // Добавляем дополнительные идеи
+        const additional = additionalIdeas[currentCategory].map(title => ({
+          title,
+          description: detailedDescription ? generateDescription(title, currentCategory) : "Интересная идея для реализации",
+          tags: includeTags ? generateTags(title, currentCategory) : []
+        }));
+        
+        const allIdeas = [...mainIdeas, ...additional];
+        
+        // Перемешиваем и выбираем нужное количество
+        const shuffled = allIdeas.sort(() => 0.5 - Math.random());
+        const selectedIdeas = shuffled.slice(0, count);
+        
+        // Отображаем идеи
+        selectedIdeas.forEach((idea, index) => {
+          const ideaCard = createIdeaCard(idea, index);
+          resultsContent.appendChild(ideaCard);
+        });
+      }
+      
+      function createIdeaCard(idea, id) {
+        const card = document.createElement('div');
+        card.className = 'idea-card';
+        card.innerHTML = `
+          <div class="idea-title">
+            ${idea.title}
+            <button class="favorite-btn" data-id="${id}">☆</button>
+          </div>
+          <div class="idea-description">${idea.description}</div>
+          ${idea.tags && idea.tags.length > 0 ? `
+            <div class="idea-tags">
+              ${idea.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+          ` : ''}
+        `;
+        
+        // Обработчик для кнопки избранного
+        const favoriteBtn = card.querySelector('.favorite-btn');
+        favoriteBtn.addEventListener('click', function() {
+          this.classList.toggle('active');
+          this.textContent = this.classList.contains('active') ? '★' : '☆';
+          card.classList.toggle('favorite');
+        });
+        
+        return card;
+      }
+      
+      function generateDescription(title, category) {
+        const descriptions = {
+          business: [
+            `Инновационный подход к решению проблемы через ${title.toLowerCase()}.`,
+            `Перспективный бизнес-проект в сфере ${category} с высоким потенциалом роста.`,
+            `Уникальное решение, сочетающее современные технологии и актуальные рыночные потребности.`
+          ],
+          content: [
+            `Эффективный контент-план для привлечения аудитории в теме ${title.toLowerCase()}.`,
+            `Креативный подход к подаче материала, который гарантированно привлечет внимание.`,
+            `Актуальный контент, отвечающий текущим трендам и интересам целевой аудитории.`
+          ],
+          programming: [
+            `Технически сложный, но перспективный проект с использованием современных технологий.`,
+            `Инновационное решение, сочетающее практическую пользу и технологическую элегантность.`,
+            `Масштабируемый IT-проект с четкой архитектурой и продуманным UX.`
+          ]
+        };
+        
+        const defaultDescs = [
+          "Интересный проект с большим потенциалом для развития и монетизации.",
+          "Креативная идея, сочетающая практическую пользу и оригинальность подхода.",
+          "Перспективное направление с возможностью быстрого старта и масштабирования."
+        ];
+        
+        const categoryDescs = descriptions[category] || defaultDescs;
+        return categoryDescs[Math.floor(Math.random() * categoryDescs.length)];
+      }
+      
+      function generateTags(title, category) {
+        const baseTags = {
+          business: ["стартап", "бизнес", "инновации"],
+          content: ["контент", "соцсети", "маркетинг"],
+          programming: ["программирование", "IT", "технологии"],
+          creative: ["креатив", "искусство", "дизайн"],
+          blogging: ["блог", "письмо", "контент"],
+          video: ["видео", "production", "медиа"]
+        };
+        
+        const tags = [...(baseTags[category] || [])];
+        
+        // Добавляем случайные теги
+        const allTags = ["веб", "мобильное", "AI", "блокчейн", "UI/UX", "аналитика", "data", "cloud"];
+        const randomTags = allTags.sort(() => 0.5 - Math.random()).slice(0, 2);
+        
+        return [...tags, ...randomTags];
+      }
+      
+      function saveAllIdeas() {
+        const ideaCards = resultsContent.querySelectorAll('.idea-card');
+        const ideasToSave = [];
+        
+        ideaCards.forEach(card => {
+          const title = card.querySelector('.idea-title').firstChild.textContent.trim();
+          const description = card.querySelector('.idea-description').textContent;
+          const tags = Array.from(card.querySelectorAll('.tag')).map(tag => tag.textContent);
+          const isFavorite = card.classList.contains('favorite');
+          
+          ideasToSave.push({
+            title,
+            description,
+            tags,
+            category: currentCategory,
+            favorite: isFavorite,
+            savedAt: new Date().toISOString()
+          });
+        });
+        
+        savedIdeas = [...savedIdeas, ...ideasToSave];
+        localStorage.setItem('saved-ideas', JSON.stringify(savedIdeas));
+        updateSavedList();
+        
+        alert(`Сохранено ${ideasToSave.length} идей!`);
+      }
+      
+      function updateSavedList() {
+        if (savedIdeas.length === 0) {
+          savedList.innerHTML = '<div class="empty-state">Нет сохраненных идей</div>';
+          return;
+        }
+        
+        savedList.innerHTML = savedIdeas.map((idea, index) => `
+          <div class="saved-item" onclick="loadSavedIdea(${index})">
+            <strong>${idea.title}</strong>
+            <div style="font-size: 0.8em; color: #888;">${idea.category} • ${new Date(idea.savedAt).toLocaleDateString()}</div>
+          </div>
+        `).join('');
+      }
+      
+      function exportIdeas() {
+        const ideasToExport = resultsContent.querySelectorAll('.idea-card');
+        if (ideasToExport.length === 0) {
+          alert('Нет идей для экспорта!');
+          return;
+        }
+        
+        let exportText = 'Сгенерированные идеи:\n\n';
+        
+        ideasToExport.forEach((card, index) => {
+          const title = card.querySelector('.idea-title').firstChild.textContent.trim();
+          const description = card.querySelector('.idea-description').textContent;
+          const tags = Array.from(card.querySelectorAll('.tag')).map(tag => tag.textContent);
+          
+          exportText += `${index + 1}. ${title}\n`;
+          exportText += `Описание: ${description}\n`;
+          if (tags.length > 0) {
+            exportText += `Теги: ${tags.join(', ')}\n`;
+          }
+          exportText += `Категория: ${currentCategory}\n\n`;
+        });
+        
+        // Создаем blob и скачиваем
+        const blob = new Blob([exportText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ideas-${currentCategory}-${new Date().toISOString().split('T')[0]}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      
+      // Глобальные функции
+      window.loadSavedIdea = function(index) {
+        const idea = savedIdeas[index];
+        if (idea) {
+          // Можно реализовать загрузку идеи в редактор
+          alert(`Загружена идея: ${idea.title}\n\n${idea.description}`);
+        }
+      };
+    });
+  </script>
+</body>
+</html>

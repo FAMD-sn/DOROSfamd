@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обучение Исламу с DOROSmus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+        /* Общие стили */
+        body {
+            font-family: 'Cinzel', serif;
+            margin: 0;
+            padding: 0;
+            background: #0f0f0f;
+            color: white;
+            text-align: center;
+        }
+
+        /* Заголовок */
+        header {
+            background: linear-gradient(90deg, #B8860B, #DAA520);
+            padding: 30px 0;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            border-bottom: 5px solid #8B7500;
+            position: relative;
+            box-shadow: 0px 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        header::before {
+            content: "﴾ بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ﴿";
+            font-size: 1.2rem;
+            display: block;
+            font-weight: bold;
+            color: #8B7500;
+            margin-bottom: 5px;
+        }
+
+        /* Поиск */
+        .search-container {
+            margin: 30px auto;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            border: 2px solid #DAA520;
+            outline: none;
+            background: #111;
+            color: white;
+            box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+            transition: 0.3s ease-in-out;
+        }
+
+        .search-container input:focus {
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        }
+
+        /* Результаты поиска */
+        .search-results {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(218, 165, 32, 0.3);
+            width: 80%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-results h3 {
+            color: #DAA520;
+            cursor: pointer;
+            text-shadow: 0px 0px 8px rgba(255, 215, 0, 0.5);
+        }
+
+        .search-results p {
+            font-size: 1.1em;
+            color: #ddd;
+        }
+
+        /* Блок статьи */
+        .article-content {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(218, 165, 32, 0.4);
+            width: 80%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(15px);
+            display: none;
+        }
+
+        .article-content h2 {
+            color: #FFD700;
+            text-shadow: 0px 0px 10px rgba(255, 215, 0, 0.7);
+        }
+
+        .article-content p {
+            font-size: 1.1em;
+            color: #eee;
+        }
+
+        /* Нижняя часть */
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            background: linear-gradient(90deg, #8B7500, #B8860B);
+            font-size: 1.1em;
+            border-top: 3px solid #DAA520;
+            box-shadow: 0 -10px 20px rgba(218, 165, 32, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    Обучение Исламу с DOROSmus
+</header>
+
+<!-- Поиск по Википедии -->
+<div class="search-container">
+    <input type="text" id="search" placeholder="Введите запрос..." oninput="searchWikipedia()">
+</div>
+
+<!-- Результаты поиска -->
+<div id="search-results" class="search-results"></div>
+
+<!-- Контейнер для загрузки полной статьи -->
+<div id="article-content" class="article-content"></div>
+
+<script>
+    function searchWikipedia() {
+        let query = document.getElementById("search").value;
+        if (query.length < 3) {
+            document.getElementById("search-results").innerHTML = "";
+            return;
+        }
+
+        let url = `https://ru.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                let results = data.query.search;
+                let output = "";
+                let foundIslam = false;
+                let islamKeywords = ["ислам", "мусульман", "коран", "шариат", "хадис", "мечеть", "пророк", "сунна", "халяль"];
+
+                results.forEach(result => {
+                    let snippet = result.snippet.toLowerCase();
+                    let isIslamic = islamKeywords.some(keyword => snippet.includes(keyword));
+
+                    if (isIslamic) {
+                        foundIslam = true;
+                        output += `
+                            <div>
+                                <h3 onclick="loadArticle('${result.title}')">${result.title}</h3>
+                                <p>${result.snippet}...</p>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (!foundIslam) {
+                    output = "<p>Информация не про Ислам</p>";
+                }
+
+                document.getElementById("search-results").innerHTML = output;
+            })
+            .catch(() => {
+                document.getElementById("search-results").innerHTML = "<p>Ошибка загрузки данных</p>";
+            });
+    }
+
+    function loadArticle(title) {
+        let url = `https://ru.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&titles=${encodeURIComponent(title)}&format=json&origin=*`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                let pages = data.query.pages;
+                let pageId = Object.keys(pages)[0];
+                let article = pages[pageId];
+
+                document.getElementById("article-content").innerHTML = `
+                    <h2>${article.title}</h2>
+                    <p>${article.extract}</p>
+                `;
+                document.getElementById("article-content").style.display = "block";
+            })
+            .catch(() => {
+                document.getElementById("article-content").innerHTML = "<p>Ошибка загрузки статьи</p>";
+            });
+    }
+</script>
+
+<footer>
+    &copy; 2025 Обучение Исламу с DOROSmus | Все права защищены
+</footer>
+
+</body>
+</html>

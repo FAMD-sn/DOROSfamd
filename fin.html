@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOROSfinance — Финансовый помощник</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #2b3d63;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      width: 90%;
+      max-width: 900px;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #2b3d63;
+    }
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    input, select, button {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #2b3d63;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #3e5993;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #2b3d63;
+      color: white;
+    }
+    .balance {
+      font-size: 1.4em;
+      text-align: center;
+      margin-top: 20px;
+      color: #2b3d63;
+    }
+    canvas {
+      margin-top: 30px;
+      width: 100%;
+      height: 300px;
+    }
+    .goal-card {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fafafa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .progress-bar {
+      background:#eee;
+      width:100%;
+      border-radius:10px;
+      margin-top:5px;
+    }
+    .progress-inner {
+      background:#4caf50;
+      height:10px;
+      border-radius:10px;
+    }
+    .goal-info {
+      flex-grow: 1;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>💰 DOROSfinance — Личный финансовый помощник</h1>
+  </header>
+
+  <div class="container">
+    <h2>Добавить запись</h2>
+    <form id="finance-form">
+      <input type="text" id="desc" placeholder="Описание" required />
+      <input type="number" id="amount" placeholder="Сумма" required />
+      <select id="type">
+        <option value="income">Доход</option>
+        <option value="expense">Расход</option>
+      </select>
+      <select id="category">
+        <option value="Работа">Работа</option>
+        <option value="Еда">Еда</option>
+        <option value="Транспорт">Транспорт</option>
+        <option value="Инвестиции">Инвестиции</option>
+        <option value="Другое">Другое</option>
+      </select>
+      <button type="submit">Добавить</button>
+    </form>
+
+    <div class="balance" id="balance">Баланс: 0 ₽</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Описание</th>
+          <th>Сумма</th>
+          <th>Тип</th>
+          <th>Категория</th>
+          <th>Удалить</th>
+        </tr>
+      </thead>
+      <tbody id="records"></tbody>
+    </table>
+
+    <h2>🎯 Мои финансовые цели</h2>
+    <form id="goal-form">
+      <input type="text" id="goal-name" placeholder="Название цели" required>
+      <input type="number" id="goal-amount" placeholder="Сумма цели (₽)" required>
+      <button type="submit">Добавить цель</button>
+    </form>
+    <div id="goals"></div>
+
+    <canvas id="chart"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const form = document.getElementById('finance-form');
+    const recordsTable = document.getElementById('records');
+    const balanceDisplay = document.getElementById('balance');
+    const chartCtx = document.getElementById('chart').getContext('2d');
+
+    let records = JSON.parse(localStorage.getItem('muzaFinance')) || [];
+
+    function saveData() {
+      localStorage.setItem('muzaFinance', JSON.stringify(records));
+      render();
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const desc = document.getElementById('desc').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const type = document.getElementById('type').value;
+      const category = document.getElementById('category').value;
+
+      if (!desc || !amount) return alert('Заполните все поля!');
+      records.push({ desc, amount, type, category });
+      saveData();
+      form.reset();
+    });
+
+    function deleteRecord(index) {
+      records.splice(index, 1);
+      saveData();
+    }
+
+    function render() {
+      recordsTable.innerHTML = '';
+      let balance = 0;
+      records.forEach((r, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${r.desc}</td>
+          <td>${r.amount.toFixed(2)} ₽</td>
+          <td style="color:${r.type === 'income' ? 'green' : 'red'}">
+            ${r.type === 'income' ? 'Доход' : 'Расход'}
+          </td>
+          <td>${r.category}</td>
+          <td><button onclick="deleteRecord(${i})">❌</button></td>
+        `;
+        recordsTable.appendChild(row);
+        balance += r.type === 'income' ? r.amount : -r.amount;
+      });
+      balanceDisplay.textContent = `Баланс: ${balance.toFixed(2)} ₽`;
+      updateChart();
+    }
+
+    function updateChart() {
+      const expensesByCategory = {};
+      records.forEach(r => {
+        if (r.type === 'expense') {
+          expensesByCategory[r.category] = (expensesByCategory[r.category] || 0) + r.amount;
+        }
+      });
+      new Chart(chartCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(expensesByCategory),
+          datasets: [{
+            data: Object.values(expensesByCategory),
+            backgroundColor: ['#f44336', '#ff9800', '#2196f3', '#4caf50', '#9c27b0']
+          }]
+        },
+        options: { responsive: true }
+      });
+    }
+
+    // === Финансовые цели ===
+    const goalForm = document.getElementById('goal-form');
+    const goalsDiv = document.getElementById('goals');
+    let goals = JSON.parse(localStorage.getItem('muzaGoals')) || [];
+
+    goalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('goal-name').value;
+      const amount = parseFloat(document.getElementById('goal-amount').value);
+      goals.push({ name, amount, saved: 0 });
+      localStorage.setItem('muzaGoals', JSON.stringify(goals));
+      goalForm.reset();
+      renderGoals();
+    });
+
+    function addToGoal(index) {
+      const add = parseFloat(prompt('Введите сумму, которую хотите добавить:'));
+      if (!isNaN(add)) {
+        goals[index].saved += add;
+        localStorage.setItem('muzaGoals', JSON.stringify(goals));
+        renderGoals();
+      }
+    }
+
+    function deleteGoal(index) {
+      goals.splice(index, 1);
+      localStorage.setItem('muzaGoals', JSON.stringify(goals));
+      renderGoals();
+    }
+
+    function renderGoals() {
+      goalsDiv.innerHTML = '';
+      goals.forEach((g, i) => {
+        const progress = Math.min((g.saved / g.amount) * 100, 100);
+        const goalCard = document.createElement('div');
+        goalCard.classList.add('goal-card');
+        goalCard.innerHTML = `
+          <div class="goal-info">
+            <strong>${g.name}</strong> — ${g.saved}₽ из ${g.amount}₽
+            <div class="progress-bar">
+              <div class="progress-inner" style="width:${progress}%;"></div>
+            </div>
+          </div>
+          <div>
+            <button onclick="addToGoal(${i})">➕ Добавить</button>
+            <button onclick="deleteGoal(${i})">❌ Удалить</button>
+          </div>
+        `;
+        goalsDiv.appendChild(goalCard);
+      });
+    }
+
+    render();
+    renderGoals();
+  </script>
+</body>
+</html>

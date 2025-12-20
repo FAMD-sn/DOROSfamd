@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Продвинутый Фоторедактор - DOROSizo</title>
+  
+  <!-- Иконки Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #00ffc8;
+      --secondary-color: #00aaff;
+      --accent-color: #ff00aa;
+      --warning-color: #ffaa00;
+      --bg-color: #0d0d1a;
+      --card-bg: rgba(20, 20, 40, 0.5);
+      --card-border: 1px solid rgba(0, 255, 200, 0.2);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background-color: var(--bg-color);
+      color: #ffffff;
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+      background: radial-gradient(circle at 20% 30%, #1a0d2a 0%, var(--bg-color) 40%);
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(0, 255, 200, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(0, 170, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(255, 0, 170, 0.05) 0%, transparent 30%);
+      z-index: -1;
+      animation: background-pulse 15s infinite alternate;
+    }
+    
+    @keyframes background-pulse {
+      0% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 255, 200, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3em;
+      font-weight: 900;
+      color: var(--primary-color);
+      text-shadow: 
+        0 0 10px var(--primary-color),
+        0 0 20px var(--primary-color);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+      animation: title-glow 3s infinite alternate;
+    }
+    
+    @keyframes title-glow {
+      0% { 
+        text-shadow: 
+          0 0 10px var(--primary-color),
+          0 0 20px var(--primary-color);
+      }
+      100% { 
+        text-shadow: 
+          0 0 15px var(--primary-color),
+          0 0 30px var(--primary-color);
+      }
+    }
+    
+    .tagline {
+      font-size: 1.2em;
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+    }
+    
+    .editor-container {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    @media (max-width: 1100px) {
+      .editor-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .image-area {
+      background: linear-gradient(145deg, rgba(30, 30, 60, 0.7), rgba(15, 15, 35, 0.7));
+      border-radius: 20px;
+      padding: 20px;
+      border: var(--card-border);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 600px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .image-area::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, var(--primary-color) 0%, transparent 70%);
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.5s ease;
+      z-index: -1;
+    }
+    
+    .image-area:hover::before {
+      opacity: 0.1;
+      transform: scale(1);
+    }
+    
+    .upload-area {
+      text-align: center;
+      padding: 40px;
+      border: 2px dashed var(--primary-color);
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    
+    .upload-area:hover {
+      background-color: rgba(0, 255, 200, 0.1);
+      transform: translateY(-5px);
+    }
+    
+    .upload-icon {
+      font-size: 4em;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+    
+    .tools-panel {
+      background: linear-gradient(145deg, rgba(30, 30, 60, 0.7), rgba(15, 15, 35, 0.7));
+      border-radius: 20px;
+      padding: 20px;
+      border: var(--card-border);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-height: 800px;
+      overflow-y: auto;
+    }
+    
+    .tools-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .tools-panel::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    
+    .tools-panel::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 10px;
+    }
+    
+    .tool-section {
+      background: rgba(10, 10, 25, 0.5);
+      border-radius: 15px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .tool-title {
+      font-size: 1.2em;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .tool-title i {
+      font-size: 1.1em;
+    }
+    
+    .slider-container {
+      margin-bottom: 15px;
+    }
+    
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 0.9em;
+    }
+    
+    .slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      -webkit-appearance: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--primary-color);
+    }
+    
+    .filter-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    
+    .filter-btn {
+      background: rgba(20, 20, 40, 0.7);
+      border: 1px solid rgba(0, 255, 200, 0.3);
+      color: #fff;
+      padding: 8px 5px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 0.8em;
+    }
+    
+    .filter-btn:hover {
+      background: rgba(0, 255, 200, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .filter-btn.active {
+      background: var(--primary-color);
+      color: var(--bg-color);
+      font-weight: 600;
+    }
+    
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .btn {
+      padding: 12px 15px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.9em;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      color: var(--bg-color);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 255, 200, 0.4);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+    }
+    
+    .btn-warning {
+      background: linear-gradient(90deg, var(--warning-color), #ff6b00);
+      color: var(--bg-color);
+    }
+    
+    .btn-warning:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255, 170, 0, 0.4);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #777;
+      font-size: 0.9em;
+    }
+    
+    .footer a {
+      color: var(--secondary-color);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .footer a:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .canvas-container {
+      position: relative;
+      display: inline-block;
+    }
+    
+    #imageCanvas {
+      max-width: 100%;
+      max-height: 500px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .tool-tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+    }
+    
+    .tab-btn {
+      padding: 8px 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Exo 2', sans-serif;
+    }
+    
+    .tab-btn.active {
+      background: var(--primary-color);
+      color: var(--bg-color);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .color-picker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .color-input {
+      width: 50px;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    .brush-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .history-item {
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 5px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.8em;
+    }
+    
+    .history-item:hover {
+      background: rgba(0, 255, 200, 0.1);
+    }
+    
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    
+    .preset-btn {
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .preset-btn:hover {
+      background: rgba(0, 255, 200, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .export-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .export-btn {
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.8em;
+    }
+    
+    .export-btn:hover {
+      background: rgba(0, 255, 200, 0.1);
+    }
+
+    #drawingCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: crosshair;
+    }
+
+    .sticker-btn {
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.8em;
+      margin: 2px;
+    }
+
+    .sticker-btn:hover {
+      background: rgba(0, 255, 200, 0.2);
+    }
+
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .crop-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-camera"></i> ПРОДВИНУТЫЙ ФОТОРЕДАКТОР</h1>
+      <p class="tagline">Профессиональные инструменты для редактирования фотографий</p>
+    </div>
+    
+    <div class="editor-container">
+      <div class="image-area">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <h3>Загрузите изображение</h3>
+          <p>Перетащите файл или кликните для выбора</p>
+          <input type="file" id="imageInput" accept="image/*" class="hidden">
+        </div>
+        <div class="canvas-container">
+          <canvas id="imageCanvas"></canvas>
+          <canvas id="drawingCanvas"></canvas>
+        </div>
+      </div>
+      
+      <div class="tools-panel">
+        <div class="tool-tabs">
+          <button class="tab-btn active" data-tab="adjust">Коррекция</button>
+          <button class="tab-btn" data-tab="filters">Фильтры</button>
+          <button class="tab-btn" data-tab="draw">Рисование</button>
+          <button class="tab-btn" data-tab="effects">Эффекты</button>
+        </div>
+        
+        <!-- Вкладка Коррекция -->
+        <div class="tab-content active" id="adjust-tab">
+          <div class="tool-section">
+            <div class="tool-title">
+              <i class="fas fa-sliders-h"></i> Основные настройки
+            </div>
+            
+            <div class="slider-container">
+              <div class="slider-label">
+                <span>Яркость</span>
+                <span id="brightnessValue">100%</span>
+              </div>
+              <input type="range" min="0" max="200" value="100" class="slider" id="brightness">
+            </div>
+            
+            <div class="slider-container">
+              <div class="slider-label">
+                <span>Контраст</span>
+                <span id="contrastValue">100%</span>
+              </div>
+              <input type="range" min="0" max="200" value="100" class="slider" id="contrast">
+            </div>
+            
+            <div class="slider-container">
+              <div class="slider-label">
+                <span>Насыщенность</span>
+                <span id="saturationValue">100%</span>
+              </div>
+              <input type="range" min="0" max="200" value="100" class="slider" id="saturation">
+            </div>
+            
+            <div class="slider-container">
+              <div class="slider-label">
+                <span>Резкость</span>
+                <span id="sharpnessValue">0%</span>
+              </div>
+              <input type="range" min="0" max="100" value="0" class="slider" id="sharpness">
+            </div>
+          </div>
+          
+          <div class="tool-section">
+            <div class="tool-title">
+              <i class="fas fa-tint"></i> Цветовой баланс
+            </div>
+            
+            <div class="slider-container">
+              <div class="slider-label">
+                <span>Красный</span>
+                <span id="redValue">0%</span>
+              </div>
+              <input type="range" min="-100" max="100" value="0" class="slider" id="red">
+            </div>
+            
+            <div class="slider-container">
+              <div class="slider-label">
+                <span>Зеленый</span>
+                <span id="greenValue">0%</span>
+              </div>
+              <input type="range" min="-100" max="100" value="0" class="slider" id="green">
+            </div>
+            
+            <div class="slider-container">
+              <div class="slider-label">
+                <span>Синий</span>
+                <span id="blueValue">0%</span>
+              </div>
+              <input type="range" min="-100" max="100" value="0" class="slider" id="blue">
+            </div>
+          </div>
+          
+          <div class="tool-section">
+            <div class="tool-title">
+              <i class="fas fa-crop-alt"></i> Обрезка и поворот
+            </div>
+            <div class="slider-container">
+              <div class="slider-label">
+                <span>Поворот</span>
+                <span id="rotateValue">0°</span>
+              </div>
+              <input type="range" min="0" max="360" value="0" class="slider" id="rotate">
+            </div>
+            
+            <div class="crop-controls">
+              <button class="btn btn-secondary" id="cropBtn">
+                <i class="fas fa-crop"></i> Обрезать
+              </button>
+              <button class="btn btn-secondary" id="flipHorizontal">
+                <i class="fas fa-arrows-alt-h"></i> Отразить
+              </button>
+              <button class="btn btn-secondary" id="flipVertical">
+                <i class="fas fa-arrows-alt-v"></i> Отразить
+              </button>
+              <button class="btn btn-secondary" id="autoEnhance">
+                <i class="fas fa-magic"></i> Автоулучшение
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Вкладка Фильтры -->
+        <div class="tab-content" id="filters-tab">
+          <div class="tool-section">
+            <div class="tool-title">
+              <i class="fas fa-adjust"></i> Цветовые фильтры
+            </div>
+            <div class="filter-buttons">
+              <button class="filter-btn" data-filter="none">Оригинал</button>
+              <button class="filter-btn" data-filter="grayscale">Ч/Б</button>
+              <button class="filter-btn" data-filter="sepia">Сепия</button>
+              <button class="filter-btn" data-filter="invert">Инверт</button>
+              <button class="filter-btn" data-filter="hue-rotate">Оттенок</button>
+              <button class="filter-btn" data-filter="vintage">Винтаж</button>
+              <button class="filter-btn" data-filter="cool">Холодный</button>
+              <button class="filter-btn" data-filter="warm">Теплый</button>
+              <button class="filter-btn" data-filter="dramatic">Драматичный</button>
+            </div>
+          </div>
+          
+          <div class="tool-section">
+            <div class="tool-title">
+              <i class="fas fa-magic"></i> Пресеты
+            </div>
+            <div class="preset-grid">
+              <button class="preset-btn" data-preset="portrait">Портрет</button>
+              <button class="preset-btn" data-preset="landscape">Пейзаж</button>
+              <button class="preset-btn" data-preset="dramatic-bw">Драма Ч/Б</button>
+              <button class="preset-btn" data-preset="vibrant">Яркие цвета</button>
+              <button class="preset-btn" data-preset="moody">Настроение</button>
+              <button class="preset-btn" data-preset="cinematic">Кино</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Вкладка Рисование -->
+        <div class="tab-content" id="draw-tab">
+          <div class="tool-section">
+            <div class="tool-title">
+              <i class="fas fa-paint-brush"></i> Инструменты рисования
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-secondary active" id="brushTool">
+                <i class="fas fa-paint-brush"></i> Кисть
+              </button>
+              <button class="btn btn-secondary" id="stickerTool">
+                <i class="fas fa-smile"></i> Стикеры
+              </button>
+            </div>
+            
+            <div class="color-picker">
+              <span>Цвет:</span>
+              <input type="color" id="drawColor" class="color-input" value="#00ffc8">
+            </div>
+            
+            <div class="brush-controls">
+              <div class="slider-container">
+                <div class="slider-label">
+                  <span>Размер кисти</span>
+                  <span id="brushSizeValue">5px</span>
+                </div>
+                <input type="range" min="1" max="50" value="5" class="slider" id="brushSize">
+              </div>
+              
+              <div class="slider-container">
+                <div class="slider-label">
+                  <span>Прозрачность</span>
+                  <span id="brushOpacityValue">100%</span>
+                </div>
+                <input type="range" min="1" max="100" value="100" class="slider" id="brushOpacity">
+              </div>
+            </div>
+
+            <div class="tool-title">
+              <i class="fas fa-stars"></i> Стикеры
+            </div>
+            <div class="sticker-grid" id="stickerGrid">
+              <button class="sticker-btn" data-sticker="❤️">❤️</button>
+              <button class="sticker-btn" data-sticker="⭐">⭐</button>
+              <button class="sticker-btn" data-sticker="🔥">🔥</button>
+              <button class="sticker-btn" data-sticker="👍">👍</button>
+              <button class="sticker-btn" data-sticker="🎯">🎯</button>
+              <button class="sticker-btn" data-sticker="💎">💎</button>
+              <button class="sticker-btn" data-sticker="🚀">🚀</button>
+              <button class="sticker-btn" data-sticker="🌈">🌈</button>
+            </div>
+            
+            <div class="action-buttons">
+              <button class="btn btn-warning" id="clearDrawing">
+                <i class="fas fa-eraser"></i> Очистить рисунок
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Вкладка Эффекты -->
+        <div class="tab-content" id="effects-tab">
+          <div class="tool-section">
+            <div class="tool-title">
+              <i class="fas fa-star"></i> Спецэффекты
+            </div>
+            <div class="filter-buttons">
+              <button class="filter-btn" data-effect="blur">Размытие</button>
+              <button class="filter-btn" data-effect="vignette">Виньетка</button>
+              <button class="filter-btn" data-effect="noise">Шум</button>
+              <button class="filter-btn" data-effect="pixelate">Пикселизация</button>
+            </div>
+          </div>
+          
+          <div class="tool-section">
+            <div class="tool-title">
+              <i class="fas fa-history"></i> История изменений
+            </div>
+            <div id="historyList">
+              <!-- История будет добавляться сюда -->
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-secondary" id="undoBtn">
+                <i class="fas fa-undo"></i> Отменить
+              </button>
+              <button class="btn btn-secondary" id="redoBtn">
+                <i class="fas fa-redo"></i> Вернуть
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tool-section">
+          <div class="tool-title">
+            <i class="fas fa-download"></i> Экспорт
+          </div>
+          <div class="export-options">
+            <button class="export-btn" data-format="png">PNG</button>
+            <button class="export-btn" data-format="jpg">JPG</button>
+            <button class="export-btn" data-format="webp">WEBP</button>
+          </div>
+          <div class="action-buttons">
+            <button class="btn btn-primary" id="saveImage">
+              <i class="fas fa-download"></i> Сохранить изображение
+            </button>
+            <button class="btn btn-secondary" id="resetImage">
+              <i class="fas fa-redo"></i> Сбросить всё
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      DOROSfamd © 2025 | 
+      <a href="https://dorosfamd.com/">Вернуться в DOROSfamd</a>
+    </div>
+  </div>
+
+  <script>
+    // Элементы DOM
+    const imageInput = document.getElementById('imageInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const imageCanvas = document.getElementById('imageCanvas');
+    const drawingCanvas = document.getElementById('drawingCanvas');
+    const ctx = imageCanvas.getContext('2d');
+    const drawCtx = drawingCanvas.getContext('2d');
+    
+    // Слайдеры
+    const brightnessSlider = document.getElementById('brightness');
+    const contrastSlider = document.getElementById('contrast');
+    const saturationSlider = document.getElementById('saturation');
+    const sharpnessSlider = document.getElementById('sharpness');
+    const rotateSlider = document.getElementById('rotate');
+    const redSlider = document.getElementById('red');
+    const greenSlider = document.getElementById('green');
+    const blueSlider = document.getElementById('blue');
+    const brushSizeSlider = document.getElementById('brushSize');
+    const brushOpacitySlider = document.getElementById('brushOpacity');
+    
+    // Значения слайдеров
+    const brightnessValue = document.getElementById('brightnessValue');
+    const contrastValue = document.getElementById('contrastValue');
+    const saturationValue = document.getElementById('saturationValue');
+    const sharpnessValue = document.getElementById('sharpnessValue');
+    const rotateValue = document.getElementById('rotateValue');
+    const redValue = document.getElementById('redValue');
+    const greenValue = document.getElementById('greenValue');
+    const blueValue = document.getElementById('blueValue');
+    const brushSizeValue = document.getElementById('brushSizeValue');
+    const brushOpacityValue = document.getElementById('brushOpacityValue');
+    
+    // Кнопки и элементы управления
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const presetButtons = document.querySelectorAll('.preset-btn');
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const exportButtons = document.querySelectorAll('.export-btn');
+    const flipHorizontalBtn = document.getElementById('flipHorizontal');
+    const flipVerticalBtn = document.getElementById('flipVertical');
+    const saveImageBtn = document.getElementById('saveImage');
+    const resetImageBtn = document.getElementById('resetImage');
+    const brushToolBtn = document.getElementById('brushTool');
+    const stickerToolBtn = document.getElementById('stickerTool');
+    const clearDrawingBtn = document.getElementById('clearDrawing');
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    const drawColorInput = document.getElementById('drawColor');
+    const cropBtn = document.getElementById('cropBtn');
+    const autoEnhanceBtn = document.getElementById('autoEnhance');
+    const stickerButtons = document.querySelectorAll('.sticker-btn');
+    
+    // Переменные состояния
+    let originalImage = null;
+    let currentFilter = 'none';
+    let currentEffect = null;
+    let flipH = false;
+    let flipV = false;
+    let isDrawing = false;
+    let currentTool = 'brush';
+    let history = [];
+    let historyIndex = -1;
+    let selectedSticker = null;
+    
+    // Инициализация
+    function init() {
+      setupEventListeners();
+      setupDrawingCanvas();
+    }
+    
+    function setupEventListeners() {
+      // Загрузка изображения
+      uploadArea.addEventListener('click', () => imageInput.click());
+      imageInput.addEventListener('change', handleImageUpload);
+      
+      // Слайдеры
+      brightnessSlider.addEventListener('input', () => {
+        brightnessValue.textContent = `${brightnessSlider.value}%`;
+        applyFilters();
+      });
+      
+      contrastSlider.addEventListener('input', () => {
+        contrastValue.textContent = `${contrastSlider.value}%`;
+        applyFilters();
+      });
+      
+      saturationSlider.addEventListener('input', () => {
+        saturationValue.textContent = `${saturationSlider.value}%`;
+        applyFilters();
+      });
+      
+      sharpnessSlider.addEventListener('input', () => {
+        sharpnessValue.textContent = `${sharpnessSlider.value}%`;
+        applyFilters();
+      });
+      
+      rotateSlider.addEventListener('input', () => {
+        rotateValue.textContent = `${rotateSlider.value}°`;
+        applyFilters();
+      });
+      
+      redSlider.addEventListener('input', () => {
+        redValue.textContent = `${redSlider.value}%`;
+        applyFilters();
+      });
+      
+      greenSlider.addEventListener('input', () => {
+        greenValue.textContent = `${greenSlider.value}%`;
+        applyFilters();
+      });
+      
+      blueSlider.addEventListener('input', () => {
+        blueValue.textContent = `${blueSlider.value}%`;
+        applyFilters();
+      });
+      
+      brushSizeSlider.addEventListener('input', () => {
+        brushSizeValue.textContent = `${brushSizeSlider.value}px`;
+      });
+      
+      brushOpacitySlider.addEventListener('input', () => {
+        brushOpacityValue.textContent = `${brushOpacitySlider.value}%`;
+        drawCtx.globalAlpha = brushOpacitySlider.value / 100;
+      });
+      
+      // Фильтры
+      filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          if (button.parentElement.closest('#filters-tab')) {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            currentFilter = button.getAttribute('data-filter');
+            applyFilters();
+          } else if (button.parentElement.closest('#effects-tab')) {
+            currentEffect = button.getAttribute('data-effect');
+            applyFilters();
+          }
+        });
+      });
+      
+      // Пресеты
+      presetButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          applyPreset(button.getAttribute('data-preset'));
+        });
+      });
+      
+      // Вкладки
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          
+          document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+          });
+          
+          const tabId = button.getAttribute('data-tab') + '-tab';
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Экспорт
+      exportButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const format = button.getAttribute('data-format');
+          saveImage(format);
+        });
+      });
+      
+      // Другие кнопки
+      flipHorizontalBtn.addEventListener('click', () => {
+        flipH = !flipH;
+        applyFilters();
+      });
+      
+      flipVerticalBtn.addEventListener('click', () => {
+        flipV = !flipV;
+        applyFilters();
+      });
+      
+      resetImageBtn.addEventListener('click', resetAll);
+      brushToolBtn.addEventListener('click', () => setTool('brush'));
+      stickerToolBtn.addEventListener('click', () => setTool('sticker'));
+      clearDrawingBtn.addEventListener('click', clearDrawing);
+      undoBtn.addEventListener('click', undo);
+      redoBtn.addEventListener('click', redo);
+      cropBtn.addEventListener('click', cropImage);
+      autoEnhanceBtn.addEventListener('click', autoEnhance);
+      
+      // Стикеры
+      stickerButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          selectedSticker = button.getAttribute('data-sticker');
+        });
+      });
+      
+      // Рисование
+      drawingCanvas.addEventListener('mousedown', startDrawing);
+      drawingCanvas.addEventListener('mousemove', draw);
+      drawingCanvas.addEventListener('mouseup', stopDrawing);
+      drawingCanvas.addEventListener('mouseout', stopDrawing);
+      drawingCanvas.addEventListener('click', handleStickerClick);
+      
+      // Drag and Drop
+      uploadArea.addEventListener('dragover', handleDragOver);
+      uploadArea.addEventListener('dragleave', handleDragLeave);
+      uploadArea.addEventListener('drop', handleDrop);
+
+      // Цвет рисования
+      drawColorInput.addEventListener('input', () => {
+        drawCtx.strokeStyle = drawColorInput.value;
+      });
+    }
+    
+    function setupDrawingCanvas() {
+      drawingCanvas.width = imageCanvas.width;
+      drawingCanvas.height = imageCanvas.height;
+      drawCtx.lineJoin = 'round';
+      drawCtx.lineCap = 'round';
+      drawCtx.strokeStyle = drawColorInput.value;
+      drawCtx.lineWidth = brushSizeSlider.value;
+      drawCtx.globalAlpha = brushOpacitySlider.value / 100;
+      drawingCanvas.style.cursor = 'crosshair';
+    }
+    
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            originalImage = img;
+            setupCanvas(img);
+            uploadArea.style.display = 'none';
+            setupDrawingCanvas();
+            saveToHistory();
+            applyFilters();
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+    
+    function setupCanvas(img) {
+      const maxWidth = 600;
+      const maxHeight = 500;
+      
+      let { width, height } = calculateAspectRatioFit(
+        img.width, 
+        img.height, 
+        maxWidth, 
+        maxHeight
+      );
+      
+      imageCanvas.width = width;
+      imageCanvas.height = height;
+      drawingCanvas.width = width;
+      drawingCanvas.height = height;
+      drawingCanvas.style.width = width + 'px';
+      drawingCanvas.style.height = height + 'px';
+      
+      ctx.drawImage(img, 0, 0, width, height);
+    }
+    
+    function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
+      const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+      return {
+        width: srcWidth * ratio,
+        height: srcHeight * ratio
+      };
+    }
+    
+    function applyFilters() {
+      if (!originalImage) return;
+      
+      const brightness = parseInt(brightnessSlider.value);
+      const contrast = parseInt(contrastSlider.value);
+      const saturation = parseInt(saturationSlider.value);
+      const rotation = parseInt(rotateSlider.value);
+      const red = parseInt(redSlider.value);
+      const green = parseInt(greenSlider.value);
+      const blue = parseInt(blueSlider.value);
+      
+      ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+      ctx.save();
+      
+      // Поворот и отражение
+      ctx.translate(imageCanvas.width / 2, imageCanvas.height / 2);
+      ctx.rotate(rotation * Math.PI / 180);
+      
+      if (flipH || flipV) {
+        ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+      }
+      
+      // Применение фильтров
+      let filterString = '';
+      
+      // Базовые фильтры
+      filterString += `brightness(${brightness}%) `;
+      filterString += `contrast(${contrast}%) `;
+      filterString += `saturate(${saturation}%) `;
+      
+      // Дополнительные фильтры
+      switch(currentFilter) {
+        case 'grayscale':
+          filterString += 'grayscale(100%) ';
+          break;
+        case 'sepia':
+          filterString += 'sepia(100%) ';
+          break;
+        case 'invert':
+          filterString += 'invert(100%) ';
+          break;
+        case 'hue-rotate':
+          filterString += 'hue-rotate(90deg) ';
+          break;
+        case 'vintage':
+          filterString += 'sepia(70%) hue-rotate(300deg) saturate(150%) ';
+          break;
+        case 'cool':
+          filterString += 'hue-rotate(180deg) saturate(150%) ';
+          break;
+        case 'warm':
+          filterString += 'sepia(50%) hue-rotate(330deg) saturate(150%) ';
+          break;
+        case 'dramatic':
+          filterString += 'contrast(150%) saturate(120%) brightness(90%) ';
+          break;
+      }
+      
+      // Спецэффекты
+      switch(currentEffect) {
+        case 'blur':
+          filterString += 'blur(2px) ';
+          break;
+        case 'vignette':
+          // Виньетка будет применена отдельно
+          break;
+        case 'noise':
+          // Шум будет применен отдельно
+          break;
+      }
+      
+      ctx.filter = filterString;
+      ctx.drawImage(originalImage, -imageCanvas.width/2, -imageCanvas.height/2, imageCanvas.width, imageCanvas.height);
+      
+      // Применение цветового баланса
+      if (red !== 0 || green !== 0 || blue !== 0) {
+        applyColorBalance(red, green, blue);
+      }
+      
+      // Применение спецэффектов
+      if (currentEffect === 'vignette') {
+        applyVignette();
+      } else if (currentEffect === 'noise') {
+        applyNoise();
+      } else if (currentEffect === 'pixelate') {
+        applyPixelate();
+      }
+      
+      ctx.restore();
+    }
+    
+    function applyColorBalance(red, green, blue) {
+      const imageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+      const data = imageData.data;
+      
+      for (let i = 0; i < data.length; i += 4) {
+        data[i] = clamp(data[i] + red * 2.55);     // Красный
+        data[i + 1] = clamp(data[i + 1] + green * 2.55); // Зеленый
+        data[i + 2] = clamp(data[i + 2] + blue * 2.55);  // Синий
+      }
+      
+      ctx.putImageData(imageData, 0, 0);
+    }
+    
+    function applyVignette() {
+      const centerX = imageCanvas.width / 2;
+      const centerY = imageCanvas.height / 2;
+      const maxDist = Math.sqrt(centerX * centerX + centerY * centerY);
+      
+      const imageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+      const data = imageData.data;
+      
+      for (let i = 0; i < data.length; i += 4) {
+        const x = (i / 4) % imageCanvas.width;
+        const y = Math.floor(i / 4 / imageCanvas.width);
+        
+        const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+        const intensity = 1 - (dist / maxDist) * 0.7;
+        
+        data[i] *= intensity;     // Красный
+        data[i + 1] *= intensity; // Зеленый
+        data[i + 2] *= intensity; // Синий
+      }
+      
+      ctx.putImageData(imageData, 0, 0);
+    }
+    
+    function applyNoise() {
+      const imageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+      const data = imageData.data;
+      
+      for (let i = 0; i < data.length; i += 4) {
+        const noise = (Math.random() - 0.5) * 40;
+        data[i] = clamp(data[i] + noise);     // Красный
+        data[i + 1] = clamp(data[i + 1] + noise); // Зеленый
+        data[i + 2] = clamp(data[i + 2] + noise);  // Синий
+      }
+      
+      ctx.putImageData(imageData, 0, 0);
+    }
+    
+    function applyPixelate() {
+      const size = 8;
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      
+      tempCanvas.width = imageCanvas.width;
+      tempCanvas.height = imageCanvas.height;
+      
+      // Уменьшаем изображение
+      tempCtx.drawImage(imageCanvas, 0, 0, imageCanvas.width / size, imageCanvas.height / size);
+      // Увеличиваем обратно
+      ctx.drawImage(tempCanvas, 0, 0, imageCanvas.width / size, imageCanvas.height / size, 
+                   0, 0, imageCanvas.width, imageCanvas.height);
+    }
+    
+    function applyPreset(preset) {
+      switch(preset) {
+        case 'portrait':
+          brightnessSlider.value = 110;
+          contrastSlider.value = 110;
+          saturationSlider.value = 90;
+          redSlider.value = 10;
+          break;
+        case 'landscape':
+          brightnessSlider.value = 105;
+          contrastSlider.value = 120;
+          saturationSlider.value = 130;
+          blueSlider.value = 5;
+          break;
+        case 'dramatic-bw':
+          currentFilter = 'grayscale';
+          contrastSlider.value = 150;
+          brightnessSlider.value = 90;
+          break;
+        case 'vibrant':
+          saturationSlider.value = 150;
+          contrastSlider.value = 120;
+          break;
+        case 'moody':
+          brightnessSlider.value = 80;
+          contrastSlider.value = 130;
+          saturationSlider.value = 80;
+          break;
+        case 'cinematic':
+          brightnessSlider.value = 95;
+          contrastSlider.value = 140;
+          saturationSlider.value = 110;
+          redSlider.value = 15;
+          blueSlider.value = -10;
+          break;
+      }
+      
+      updateSliderValues();
+      applyFilters();
+    }
+    
+    function updateSliderValues() {
+      brightnessValue.textContent = `${brightnessSlider.value}%`;
+      contrastValue.textContent = `${contrastSlider.value}%`;
+      saturationValue.textContent = `${saturationSlider.value}%`;
+      redValue.textContent = `${redSlider.value}%`;
+      greenValue.textContent = `${greenSlider.value}%`;
+      blueValue.textContent = `${blueSlider.value}%`;
+    }
+    
+    function setTool(tool) {
+      currentTool = tool;
+      if (tool === 'brush') {
+        drawingCanvas.style.cursor = 'crosshair';
+        brushToolBtn.classList.add('active');
+        stickerToolBtn.classList.remove('active');
+      } else {
+        drawingCanvas.style.cursor = 'pointer';
+        stickerToolBtn.classList.add('active');
+        brushToolBtn.classList.remove('active');
+      }
+    }
+    
+    function startDrawing(e) {
+      if (currentTool !== 'brush') return;
+      
+      isDrawing = true;
+      drawCtx.beginPath();
+      drawCtx.moveTo(e.offsetX, e.offsetY);
+    }
+    
+    function draw(e) {
+      if (!isDrawing || currentTool !== 'brush') return;
+      
+      drawCtx.lineTo(e.offsetX, e.offsetY);
+      drawCtx.stroke();
+    }
+    
+    function stopDrawing() {
+      if (!isDrawing) return;
+      isDrawing = false;
+      drawCtx.closePath();
+    }
+    
+    function handleStickerClick(e) {
+      if (currentTool !== 'sticker' || !selectedSticker) return;
+      
+      const x = e.offsetX;
+      const y = e.offsetY;
+      
+      drawCtx.font = '40px Arial';
+      drawCtx.textAlign = 'center';
+      drawCtx.textBaseline = 'middle';
+      drawCtx.fillText(selectedSticker, x, y);
+    }
+    
+    function clearDrawing() {
+      drawCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+    }
+    
+    function cropImage() {
+      // Простая обрезка - уменьшаем изображение на 10%
+      const cropWidth = imageCanvas.width * 0.9;
+      const cropHeight = imageCanvas.height * 0.9;
+      const x = (imageCanvas.width - cropWidth) / 2;
+      const y = (imageCanvas.height - cropHeight) / 2;
+      
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCanvas.width = cropWidth;
+      tempCanvas.height = cropHeight;
+      
+      tempCtx.drawImage(imageCanvas, x, y, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+      
+      imageCanvas.width = cropWidth;
+      imageCanvas.height = cropHeight;
+      drawingCanvas.width = cropWidth;
+      drawingCanvas.height = cropHeight;
+      
+      ctx.drawImage(tempCanvas, 0, 0);
+      applyFilters();
+    }
+    
+    function autoEnhance() {
+      // Автоматическое улучшение - увеличиваем контраст и насыщенность
+      contrastSlider.value = 120;
+      saturationSlider.value = 115;
+      brightnessSlider.value = 105;
+      updateSliderValues();
+      applyFilters();
+    }
+    
+    function saveToHistory() {
+      history = history.slice(0, historyIndex + 1);
+      history.push(imageCanvas.toDataURL());
+      historyIndex = history.length - 1;
+      updateHistoryUI();
+    }
+    
+    function undo() {
+      if (historyIndex > 0) {
+        historyIndex--;
+        restoreFromHistory();
+      }
+    }
+    
+    function redo() {
+      if (historyIndex < history.length - 1) {
+        historyIndex++;
+        restoreFromHistory();
+      }
+    }
+    
+    function restoreFromHistory() {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        applyFilters();
+      };
+      img.src = history[historyIndex];
+    }
+    
+    function updateHistoryUI() {
+      const historyList = document.getElementById('historyList');
+      historyList.innerHTML = '';
+      
+      for (let i = history.length - 1; i >= 0; i--) {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.textContent = `Состояние ${i + 1}`;
+        item.addEventListener('click', () => {
+          historyIndex = i;
+          restoreFromHistory();
+        });
+        historyList.appendChild(item);
+      }
+    }
+    
+    function saveImage(format = 'png') {
+      if (!originalImage) return;
+      
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = imageCanvas.width;
+      finalCanvas.height = imageCanvas.height;
+      const finalCtx = finalCanvas.getContext('2d');
+      
+      finalCtx.drawImage(imageCanvas, 0, 0);
+      finalCtx.drawImage(drawingCanvas, 0, 0);
+      
+      const link = document.createElement('a');
+      link.download = `edited-image.${format}`;
+      
+      let mimeType, quality;
+      switch(format) {
+        case 'jpg':
+          mimeType = 'image/jpeg';
+          quality = 0.9;
+          break;
+        case 'webp':
+          mimeType = 'image/webp';
+          quality = 0.8;
+          break;
+        default:
+          mimeType = 'image/png';
+          quality = 1;
+      }
+      
+      link.href = finalCanvas.toDataURL(mimeType, quality);
+      link.click();
+    }
+    
+    function resetAll() {
+      brightnessSlider.value = 100;
+      contrastSlider.value = 100;
+      saturationSlider.value = 100;
+      sharpnessSlider.value = 0;
+      rotateSlider.value = 0;
+      redSlider.value = 0;
+      greenSlider.value = 0;
+      blueSlider.value = 0;
+      brushSizeSlider.value = 5;
+      brushOpacitySlider.value = 100;
+      
+      updateSliderValues();
+      brushSizeValue.textContent = '5px';
+      brushOpacityValue.textContent = '100%';
+      
+      currentFilter = 'none';
+      currentEffect = null;
+      flipH = false;
+      flipV = false;
+      selectedSticker = null;
+      
+      filterButtons.forEach(btn => {
+        if (btn.getAttribute('data-filter') === 'none') {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      
+      clearDrawing();
+      applyFilters();
+    }
+    
+    function clamp(value) {
+      return Math.max(0, Math.min(255, value));
+    }
+    
+    function handleDragOver(e) {
+      e.preventDefault();
+      uploadArea.style.backgroundColor = 'rgba(0, 255, 200, 0.2)';
+    }
+    
+    function handleDragLeave() {
+      uploadArea.style.backgroundColor = '';
+    }
+    
+    function handleDrop(e) {
+      e.preventDefault();
+      uploadArea.style.backgroundColor = '';
+      
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            originalImage = img;
+            setupCanvas(img);
+            uploadArea.style.display = 'none';
+            setupDrawingCanvas();
+            saveToHistory();
+            applyFilters();
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+    
+    // Запуск приложения
+    init();
+  </script>
+</body>
+</html>

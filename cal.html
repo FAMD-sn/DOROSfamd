@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DOROScal | MAFAMD</title>
+  
+  <style>
+    :root {
+      --primary-color: #00ffc8;
+      --secondary-color: #00aaff;
+      --bg-color: #0d0d1a;
+      --card-bg: rgba(20, 20, 40, 0.5);
+      --card-border: 1px solid rgba(0, 255, 200, 0.2);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background-color: var(--bg-color);
+      color: #ffffff;
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(45deg, var(--bg-color) 0%, #1a0d1a 100%);
+      animation: background-glow 20s infinite alternate ease-in-out;
+    }
+    
+    @keyframes background-glow {
+      from { filter: hue-rotate(0deg); }
+      to { filter: hue-rotate(360deg); }
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      color: var(--primary-color);
+      text-shadow: 0 0 10px var(--primary-color);
+      margin-bottom: 10px;
+      animation: text-glow 2s infinite alternate;
+    }
+    
+    @keyframes text-glow {
+      from { text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color); }
+      to { text-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--primary-color); }
+    }
+    
+    .tagline {
+      font-size: 1.2em;
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+    }
+    
+    .calculator-container {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    @media (max-width: 768px) {
+      .calculator-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .calculator {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 15px;
+      padding: 25px;
+    }
+    
+    .display {
+      background-color: rgba(20, 20, 40, 0.7);
+      border: var(--card-border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: right;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .previous-operation {
+      font-size: 1em;
+      color: #888;
+      min-height: 25px;
+      word-break: break-all;
+    }
+    
+    .current-operation {
+      font-size: 2em;
+      color: var(--primary-color);
+      word-break: break-all;
+    }
+    
+    .buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    
+    .btn {
+      padding: 20px 10px;
+      border: var(--card-border);
+      border-radius: 10px;
+      background-color: rgba(20, 20, 40, 0.7);
+      color: #fff;
+      font-size: 1.2em;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+      background-color: rgba(0, 255, 200, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn-operation {
+      background-color: rgba(0, 170, 255, 0.3);
+      color: var(--secondary-color);
+    }
+    
+    .btn-equals {
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+      font-weight: bold;
+    }
+    
+    .btn-clear {
+      background-color: rgba(255, 107, 107, 0.3);
+      color: #ff6b6b;
+    }
+    
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .history-panel {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 15px;
+      padding: 20px;
+      flex: 1;
+    }
+    
+    .history-title {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .history-item {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .history-item:hover {
+      background-color: rgba(0, 255, 200, 0.1);
+    }
+    
+    .history-expression {
+      color: #888;
+      font-size: 0.9em;
+    }
+    
+    .history-result {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    
+    .converter-panel {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 15px;
+      padding: 20px;
+    }
+    
+    .converter-title {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+    
+    .converter-type {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .converter-tab {
+      padding: 8px 15px;
+      border: var(--card-border);
+      border-radius: 8px;
+      background-color: rgba(20, 20, 40, 0.7);
+      color: #ccc;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+    }
+    
+    .converter-tab.active {
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+    }
+    
+    .converter-form {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .converter-input {
+      padding: 12px;
+      border: var(--card-border);
+      border-radius: 8px;
+      background-color: rgba(20, 20, 40, 0.7);
+      color: #fff;
+      font-family: inherit;
+    }
+    
+    .converter-select {
+      padding: 12px;
+      border: var(--card-border);
+      border-radius: 8px;
+      background-color: rgba(20, 20, 40, 0.7);
+      color: #fff;
+      font-family: inherit;
+    }
+    
+    .converter-result {
+      padding: 12px;
+      border: var(--card-border);
+      border-radius: 8px;
+      background-color: rgba(0, 255, 200, 0.1);
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    
+    .memory-panel {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 15px;
+      padding: 20px;
+    }
+    
+    .memory-title {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .memory-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    
+    .memory-value {
+      text-align: center;
+      padding: 10px;
+      background-color: rgba(0, 255, 200, 0.1);
+      border-radius: 8px;
+      margin-top: 10px;
+      color: var(--primary-color);
+      font-weight: bold;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      color: var(--secondary-color);
+      text-decoration: none;
+      font-size: 1em;
+      text-align: center;
+      width: 100%;
+    }
+    
+    .back-link:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+    
+    .empty-history {
+      text-align: center;
+      color: #888;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Умный калькулятор</h1>
+      <p class="tagline">Мощные вычисления с историей и конвертацией</p>
+    </header>
+    
+    <div class="calculator-container">
+      <div class="calculator">
+        <div class="display">
+          <div class="previous-operation" id="previous-operation"></div>
+          <div class="current-operation" id="current-operation">0</div>
+        </div>
+        
+        <div class="buttons-grid">
+          <button class="btn btn-clear" data-action="clear">C</button>
+          <button class="btn btn-clear" data-action="clear-entry">CE</button>
+          <button class="btn btn-clear" data-action="backspace">⌫</button>
+          <button class="btn btn-operation" data-action="divide">/</button>
+          
+          <button class="btn" data-number="7">7</button>
+          <button class="btn" data-number="8">8</button>
+          <button class="btn" data-number="9">9</button>
+          <button class="btn btn-operation" data-action="multiply">×</button>
+          
+          <button class="btn" data-number="4">4</button>
+          <button class="btn" data-number="5">5</button>
+          <button class="btn" data-number="6">6</button>
+          <button class="btn btn-operation" data-action="subtract">−</button>
+          
+          <button class="btn" data-number="1">1</button>
+          <button class="btn" data-number="2">2</button>
+          <button class="btn" data-number="3">3</button>
+          <button class="btn btn-operation" data-action="add">+</button>
+          
+          <button class="btn" data-action="plus-minus">±</button>
+          <button class="btn" data-number="0">0</button>
+          <button class="btn" data-action="decimal">.</button>
+          <button class="btn btn-equals" data-action="equals">=</button>
+          
+          <button class="btn btn-operation" data-action="power">x²</button>
+          <button class="btn btn-operation" data-action="sqrt">√</button>
+          <button class="btn btn-operation" data-action="percent">%</button>
+          <button class="btn btn-operation" data-action="inverse">1/x</button>
+        </div>
+      </div>
+      
+      <div class="sidebar">
+        <div class="history-panel">
+          <div class="history-title">
+            <span>История вычислений</span>
+            <button class="btn" data-action="clear-history" style="padding: 5px 10px; font-size: 0.8em;">Очистить</button>
+          </div>
+          <div class="history-list" id="history-list">
+            <div class="empty-history">История пуста</div>
+          </div>
+        </div>
+        
+        <div class="converter-panel">
+          <div class="converter-title">Конвертер единиц</div>
+          <div class="converter-type">
+            <div class="converter-tab active" data-type="length">Длина</div>
+            <div class="converter-tab" data-type="weight">Вес</div>
+            <div class="converter-tab" data-type="temperature">Температура</div>
+            <div class="converter-tab" data-type="area">Площадь</div>
+          </div>
+          <div class="converter-form">
+            <input type="number" class="converter-input" id="converter-amount" value="1" step="0.01">
+            <select class="converter-select" id="converter-from">
+              <option value="meter">Метры</option>
+              <option value="centimeter">Сантиметры</option>
+              <option value="millimeter">Миллиметры</option>
+              <option value="kilometer">Километры</option>
+              <option value="inch">Дюймы</option>
+              <option value="foot">Футы</option>
+            </select>
+            <span>→</span>
+            <div class="converter-result" id="converter-result">1.00</div>
+            <select class="converter-select" id="converter-to">
+              <option value="centimeter">Сантиметры</option>
+              <option value="meter">Метры</option>
+              <option value="millimeter">Миллиметры</option>
+              <option value="kilometer">Километры</option>
+              <option value="inch">Дюймы</option>
+              <option value="foot">Футы</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="memory-panel">
+          <div class="memory-title">
+            <span>Память</span>
+          </div>
+          <div class="memory-buttons">
+            <button class="btn" data-action="memory-clear">MC</button>
+            <button class="btn" data-action="memory-recall">MR</button>
+            <button class="btn" data-action="memory-add">M+</button>
+            <button class="btn" data-action="memory-subtract">M-</button>
+            <button class="btn" data-action="memory-save">MS</button>
+          </div>
+          <div class="memory-value" id="memory-value">Память пуста</div>
+        </div>
+      </div>
+    </div>
+    
+    <a href="https://dorosfamd.com/ class="back-link">← Вернуться на главную</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Элементы DOM
+      const currentOperationEl = document.getElementById('current-operation');
+      const previousOperationEl = document.getElementById('previous-operation');
+      const historyListEl = document.getElementById('history-list');
+      const memoryValueEl = document.getElementById('memory-value');
+      const converterResultEl = document.getElementById('converter-result');
+      const converterTabs = document.querySelectorAll('.converter-tab');
+      
+      // Данные калькулятора
+      let currentOperation = '0';
+      let previousOperation = '';
+      let operation = null;
+      let shouldResetScreen = false;
+      let memory = 0;
+      let currentConverterType = 'length';
+      
+      // История вычислений
+      let calculationHistory = JSON.parse(localStorage.getItem('calculator-history')) || [];
+      
+      // Коэффициенты конвертации для разных типов единиц
+      const conversionRates = {
+        length: {
+          meter: 1,
+          centimeter: 100,
+          millimeter: 1000,
+          kilometer: 0.001,
+          inch: 39.3701,
+          foot: 3.28084
+        },
+        weight: {
+          kilogram: 1,
+          gram: 1000,
+          milligram: 1000000,
+          pound: 2.20462,
+          ounce: 35.274
+        },
+        temperature: {
+          celsius: 1,
+          fahrenheit: 1,
+          kelvin: 1
+        },
+        area: {
+          'square-meter': 1,
+          'square-kilometer': 0.000001,
+          'square-centimeter': 10000,
+          hectare: 0.0001,
+          acre: 0.000247105
+        }
+      };
+      
+      // Опции для разных типов конвертеров
+      const converterOptions = {
+        length: [
+          { value: 'meter', label: 'Метры' },
+          { value: 'centimeter', label: 'Сантиметры' },
+          { value: 'millimeter', label: 'Миллиметры' },
+          { value: 'kilometer', label: 'Километры' },
+          { value: 'inch', label: 'Дюймы' },
+          { value: 'foot', label: 'Футы' }
+        ],
+        weight: [
+          { value: 'kilogram', label: 'Килограммы' },
+          { value: 'gram', label: 'Граммы' },
+          { value: 'milligram', label: 'Миллиграммы' },
+          { value: 'pound', label: 'Фунты' },
+          { value: 'ounce', label: 'Унции' }
+        ],
+        temperature: [
+          { value: 'celsius', label: 'Цельсий' },
+          { value: 'fahrenheit', label: 'Фаренгейт' },
+          { value: 'kelvin', label: 'Кельвин' }
+        ],
+        area: [
+          { value: 'square-meter', label: 'Кв. метры' },
+          { value: 'square-kilometer', label: 'Кв. километры' },
+          { value: 'square-centimeter', label: 'Кв. сантиметры' },
+          { value: 'hectare', label: 'Гектары' },
+          { value: 'acre', label: 'Акры' }
+        ]
+      };
+      
+      // Инициализация
+      updateHistoryDisplay();
+      updateConverterOptions();
+      updateConversion();
+      
+      // Обработчики кнопок
+      document.querySelectorAll('.btn').forEach(button => {
+        button.addEventListener('click', () => {
+          if (button.dataset.number !== undefined) {
+            appendNumber(button.dataset.number);
+          } else if (button.dataset.action !== undefined) {
+            handleAction(button.dataset.action);
+          }
+        });
+      });
+      
+      // Обработчики конвертера
+      document.getElementById('converter-amount').addEventListener('input', updateConversion);
+      document.getElementById('converter-from').addEventListener('change', updateConversion);
+      document.getElementById('converter-to').addEventListener('change', updateConversion);
+      
+      // Обработчики вкладок конвертера
+      converterTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          converterTabs.forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          currentConverterType = this.dataset.type;
+          updateConverterOptions();
+          updateConversion();
+        });
+      });
+      
+      // Функции калькулятора
+      function appendNumber(number) {
+        if (currentOperation === '0' || shouldResetScreen) {
+          currentOperation = number;
+          shouldResetScreen = false;
+        } else {
+          currentOperation += number;
+        }
+        updateDisplay();
+      }
+      
+      function handleAction(action) {
+        switch(action) {
+          case 'clear':
+            clear();
+            break;
+          case 'clear-entry':
+            clearEntry();
+            break;
+          case 'backspace':
+            backspace();
+            break;
+          case 'decimal':
+            addDecimal();
+            break;
+          case 'plus-minus':
+            plusMinus();
+            break;
+          case 'add':
+          case 'subtract':
+          case 'multiply':
+          case 'divide':
+            chooseOperation(action);
+            break;
+          case 'equals':
+            compute();
+            break;
+          case 'power':
+            power();
+            break;
+          case 'sqrt':
+            squareRoot();
+            break;
+          case 'percent':
+            percent();
+            break;
+          case 'inverse':
+            inverse();
+            break;
+          case 'memory-clear':
+            memoryClear();
+            break;
+          case 'memory-recall':
+            memoryRecall();
+            break;
+          case 'memory-add':
+            memoryAdd();
+            break;
+          case 'memory-subtract':
+            memorySubtract();
+            break;
+          case 'memory-save':
+            memorySave();
+            break;
+          case 'clear-history':
+            clearHistory();
+            break;
+        }
+      }
+      
+      function clear() {
+        currentOperation = '0';
+        previousOperation = '';
+        operation = null;
+        updateDisplay();
+      }
+      
+      function clearEntry() {
+        currentOperation = '0';
+        updateDisplay();
+      }
+      
+      function backspace() {
+        if (currentOperation.length === 1) {
+          currentOperation = '0';
+        } else {
+          currentOperation = currentOperation.slice(0, -1);
+        }
+        updateDisplay();
+      }
+      
+      function addDecimal() {
+        if (shouldResetScreen) {
+          currentOperation = '0.';
+          shouldResetScreen = false;
+        } else if (!currentOperation.includes('.')) {
+          currentOperation += '.';
+        }
+        updateDisplay();
+      }
+      
+      function plusMinus() {
+        currentOperation = (parseFloat(currentOperation) * -1).toString();
+        updateDisplay();
+      }
+      
+      function chooseOperation(selectedOperation) {
+        if (currentOperation === '0') return;
+        
+        if (previousOperation !== '') {
+          compute();
+        }
+        
+        operation = selectedOperation;
+        previousOperation = currentOperation;
+        shouldResetScreen = true;
+        updateDisplay();
+      }
+      
+      function compute() {
+        let computation;
+        const prev = parseFloat(previousOperation);
+        const current = parseFloat(currentOperation);
+        
+        if (isNaN(prev) || isNaN(current)) return;
+        
+        switch(operation) {
+          case 'add':
+            computation = prev + current;
+            break;
+          case 'subtract':
+            computation = prev - current;
+            break;
+          case 'multiply':
+            computation = prev * current;
+            break;
+          case 'divide':
+            computation = current !== 0 ? prev / current : 'Error';
+            break;
+          default:
+            return;
+        }
+        
+        if (computation !== 'Error') {
+          // Сохраняем в историю
+          const historyItem = {
+            expression: `${previousOperation} ${getOperationSymbol(operation)} ${currentOperation}`,
+            result: computation.toString()
+          };
+          
+          calculationHistory.unshift(historyItem);
+          if (calculationHistory.length > 10) {
+            calculationHistory = calculationHistory.slice(0, 10);
+          }
+          
+          localStorage.setItem('calculator-history', JSON.stringify(calculationHistory));
+          updateHistoryDisplay();
+        }
+        
+        currentOperation = computation.toString();
+        operation = null;
+        previousOperation = '';
+        shouldResetScreen = true;
+        updateDisplay();
+      }
+      
+      function power() {
+        const current = parseFloat(currentOperation);
+        currentOperation = (current * current).toString();
+        shouldResetScreen = true;
+        updateDisplay();
+      }
+      
+      function squareRoot() {
+        const current = parseFloat(currentOperation);
+        if (current < 0) {
+          currentOperation = 'Error';
+        } else {
+          currentOperation = Math.sqrt(current).toString();
+        }
+        shouldResetScreen = true;
+        updateDisplay();
+      }
+      
+      function percent() {
+        const current = parseFloat(currentOperation);
+        currentOperation = (current / 100).toString();
+        updateDisplay();
+      }
+      
+      function inverse() {
+        const current = parseFloat(currentOperation);
+        if (current === 0) {
+          currentOperation = 'Error';
+        } else {
+          currentOperation = (1 / current).toString();
+        }
+        shouldResetScreen = true;
+        updateDisplay();
+      }
+      
+      // Функции памяти
+      function memoryClear() {
+        memory = 0;
+        updateMemoryDisplay();
+      }
+      
+      function memoryRecall() {
+        currentOperation = memory.toString();
+        updateDisplay();
+      }
+      
+      function memoryAdd() {
+        memory += parseFloat(currentOperation);
+        updateMemoryDisplay();
+      }
+      
+      function memorySubtract() {
+        memory -= parseFloat(currentOperation);
+        updateMemoryDisplay();
+      }
+      
+      function memorySave() {
+        memory = parseFloat(currentOperation);
+        updateMemoryDisplay();
+      }
+      
+      function updateMemoryDisplay() {
+        if (memory === 0) {
+          memoryValueEl.textContent = 'Память пуста';
+        } else {
+          memoryValueEl.textContent = memory.toString();
+        }
+      }
+      
+      // Функции истории
+      function updateHistoryDisplay() {
+        if (calculationHistory.length === 0) {
+          historyListEl.innerHTML = '<div class="empty-history">История пуста</div>';
+          return;
+        }
+        
+        historyListEl.innerHTML = calculationHistory.map(item => `
+          <div class="history-item" onclick="useHistoryResult('${item.result}')">
+            <div class="history-expression">${item.expression}</div>
+            <div class="history-result">= ${item.result}</div>
+          </div>
+        `).join('');
+      }
+      
+      function clearHistory() {
+        calculationHistory = [];
+        localStorage.setItem('calculator-history', JSON.stringify(calculationHistory));
+        updateHistoryDisplay();
+      }
+      
+      window.useHistoryResult = function(result) {
+        currentOperation = result;
+        updateDisplay();
+      };
+      
+      // Функции конвертера единиц
+      function updateConverterOptions() {
+        const options = converterOptions[currentConverterType];
+        const fromSelect = document.getElementById('converter-from');
+        const toSelect = document.getElementById('converter-to');
+        
+        fromSelect.innerHTML = '';
+        toSelect.innerHTML = '';
+        
+        options.forEach(option => {
+          const fromOption = document.createElement('option');
+          fromOption.value = option.value;
+          fromOption.textContent = option.label;
+          fromSelect.appendChild(fromOption);
+          
+          const toOption = document.createElement('option');
+          toOption.value = option.value;
+          toOption.textContent = option.label;
+          toSelect.appendChild(toOption);
+        });
+        
+        // Устанавливаем разумные значения по умолчанию
+        if (currentConverterType === 'length') {
+          fromSelect.value = 'meter';
+          toSelect.value = 'centimeter';
+        } else if (currentConverterType === 'weight') {
+          fromSelect.value = 'kilogram';
+          toSelect.value = 'gram';
+        } else if (currentConverterType === 'temperature') {
+          fromSelect.value = 'celsius';
+          toSelect.value = 'fahrenheit';
+        } else if (currentConverterType === 'area') {
+          fromSelect.value = 'square-meter';
+          toSelect.value = 'square-centimeter';
+        }
+      }
+      
+      function updateConversion() {
+        const amount = parseFloat(document.getElementById('converter-amount').value) || 0;
+        const from = document.getElementById('converter-from').value;
+        const to = document.getElementById('converter-to').value;
+        
+        if (from === to) {
+          converterResultEl.textContent = amount.toFixed(2);
+          return;
+        }
+        
+        let result;
+        
+        if (currentConverterType === 'temperature') {
+          // Особые формулы для температуры
+          result = convertTemperature(amount, from, to);
+        } else {
+          // Обычная конвертация через коэффициенты
+          const fromRate = conversionRates[currentConverterType][from];
+          const toRate = conversionRates[currentConverterType][to];
+          result = amount * (toRate / fromRate);
+        }
+        
+        converterResultEl.textContent = result.toFixed(2);
+      }
+      
+      function convertTemperature(value, from, to) {
+        // Конвертация через Цельсий как базовую единицу
+        let celsius;
+        
+        // Конвертируем в Цельсий
+        switch(from) {
+          case 'celsius':
+            celsius = value;
+            break;
+          case 'fahrenheit':
+            celsius = (value - 32) * 5/9;
+            break;
+          case 'kelvin':
+            celsius = value - 273.15;
+            break;
+        }
+        
+        // Конвертируем из Цельсия в нужную единицу
+        switch(to) {
+          case 'celsius':
+            return celsius;
+          case 'fahrenheit':
+            return (celsius * 9/5) + 32;
+          case 'kelvin':
+            return celsius + 273.15;
+        }
+      }
+      
+      // Вспомогательные функции
+      function getOperationSymbol(operation) {
+        const symbols = {
+          'add': '+',
+          'subtract': '−',
+          'multiply': '×',
+          'divide': '÷'
+        };
+        return symbols[operation] || '';
+      }
+      
+      function updateDisplay() {
+        currentOperationEl.textContent = currentOperation;
+        if (operation != null) {
+          previousOperationEl.textContent = `${previousOperation} ${getOperationSymbol(operation)}`;
+        } else {
+          previousOperationEl.textContent = '';
+        }
+      }
+      
+      // Обработка клавиатуры
+      document.addEventListener('keydown', (event) => {
+        if (event.key >= '0' && event.key <= '9') {
+          appendNumber(event.key);
+        } else if (event.key === '.') {
+          addDecimal();
+        } else if (event.key === '+') {
+          chooseOperation('add');
+        } else if (event.key === '-') {
+          chooseOperation('subtract');
+        } else if (event.key === '*') {
+          chooseOperation('multiply');
+        } else if (event.key === '/') {
+          chooseOperation('divide');
+        } else if (event.key === 'Enter' || event.key === '=') {
+          compute();
+        } else if (event.key === 'Escape') {
+          clear();
+        } else if (event.key === 'Backspace') {
+          backspace();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

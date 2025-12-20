@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>♾️ DOROSdata - Бесконечное локальное облоко</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: #1a1a2e;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #00b4db, #0083b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .storage-info {
+            background: #0c2461;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .infinite-badge {
+            background: linear-gradient(45deg, #00b4db, #0083b0);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px auto;
+            display: inline-block;
+        }
+
+        .main-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            min-height: 700px;
+        }
+
+        .upload-section {
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 180, 219, 0.4);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 180, 219, 0.4);
+        }
+
+        .btn-large {
+            padding: 20px;
+            font-size: 1.2rem;
+        }
+
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .file-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            border: 2px solid #f0f0f0;
+            cursor: pointer;
+        }
+
+        .file-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            border-color: #00b4db;
+        }
+
+        .file-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+
+        .file-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .download-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: #219653;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Модальное окно просмотра */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-header {
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(90vh - 100px);
+            overflow-y: auto;
+            text-align: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: #00b4db;
+        }
+
+        /* Стили для контента файлов */
+        .file-preview {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-player {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 10px;
+        }
+
+        .audio-player {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px 0;
+        }
+
+        .text-content {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+
+        .unsupported-file {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .unsupported-file-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .progress-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .progress-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .modal-content {
+                max-width: 95%;
+                max-height: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>♾️ DOROSdata Локальное Облоко</h1>
+            <p>IndexedDB - храните ГИГАБАЙТЫ данных в браузере!</p>
+            <div class="infinite-badge">♾️ Нажмите на файл для просмотра</div>
+        </header>
+
+        <div class="storage-info">
+            <h3>🚀 Нажмите на любой файл чтобы открыть его</h3>
+            <p>Поддержка изображений, видео, аудио, текстовых файлов и много другого!</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="upload-section" id="uploadArea">
+                    <div style="font-size: 4rem;">♾️</div>
+                    <h3>Загрузите ЛЮБЫЕ файлы</h3>
+                    <p>Перетащите сюда или нажмите</p>
+                    <p><small>Файлы до 2GB каждый!</small></p>
+                    <input type="file" id="fileInput" class="file-input" multiple>
+                </div>
+
+                <button class="btn btn-large" onclick="document.getElementById('fileInput').click()">
+                    📎 Выбрать файлы
+                </button>
+
+                <button class="btn" onclick="showStats()">
+                    📊 Статистика
+                </button>
+
+                <button class="btn" onclick="exportAll()">
+                    📤 Экспорт всех файлов
+                </button>
+
+                <button class="btn" style="background: linear-gradient(135deg, #e74c3c, #c0392b);" 
+                        onclick="clearDatabase()">
+                    🗑️ Очистить ВСЁ
+                </button>
+
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                    <h4>💡 Поддерживаемые форматы:</h4>
+                    <ul style="text-align: left; margin-top: 10px; font-size: 0.9rem;">
+                        <li>🖼️ Изображения: JPG, PNG, GIF, WebP</li>
+                        <li>🎥 Видео: MP4, WebM, MOV</li>
+                        <li>🎵 Аудио: MP3, WAV, OGG</li>
+                        <li>📄 Текст: TXT, PDF, DOC, DOCX</li>
+                        <li>📦 Архивы: ZIP, RAR</li>
+                        <li>📁 И многое другое!</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content">
+                <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+                    <input type="text" id="searchInput" placeholder="🔍 Поиск файлов..." 
+                           style="flex: 1; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.1rem;">
+                    <select id="sortSelect" style="padding: 15px; border: 2px solid #ddd; border-radius: 10px;">
+                        <option value="name">По имени</option>
+                        <option value="date">По дате</option>
+                        <option value="size">По размеру</option>
+                        <option value="type">По типу</option>
+                    </select>
+                </div>
+
+                <div class="files-grid" id="filesGrid">
+                    <!-- Файлы из IndexedDB -->
+                </div>
+
+                <div id="emptyState" style="text-align: center; padding: 80px; color: #7f8c8d;">
+                    <div style="font-size: 6rem; margin-bottom: 20px;">♾️</div>
+                    <h3>Бесконечное пространство ждет!</h3>
+                    <p>Добавьте первые файлы в ваше безграничное хранилище</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно просмотра файла -->
+    <div class="modal" id="fileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalFileName">Просмотр файла</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalFileContent">
+                <!-- Содержимое файла будет здесь -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Прогресс загрузки -->
+    <div class="progress-overlay" id="progressOverlay">
+        <div class="progress-content">
+            <h3>Загрузка файлов...</h3>
+            <div id="progressBar" style="width: 100%; height: 20px; background: #f0f0f0; border-radius: 10px; margin: 20px 0;">
+                <div id="progressFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00b4db, #0083b0); border-radius: 10px; transition: width 0.3s;"></div>
+            </div>
+            <div id="progressText">0%</div>
+            <div id="fileInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        // IndexedDB база данных
+        let db;
+        const DB_NAME = 'InfiniteCloudDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'files';
+
+        // Инициализация IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains(STORE_NAME)) {
+                        const store = database.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        store.createIndex('name', 'name', { unique: false });
+                        store.createIndex('type', 'type', { unique: false });
+                        store.createIndex('size', 'size', { unique: false });
+                        store.createIndex('date', 'uploadDate', { unique: false });
+                    }
+                };
+            });
+        }
+
+        // Сохранение файла в IndexedDB
+        async function saveFile(file) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                
+                const fileData = {
+                    id: generateFileId(),
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: file,
+                    uploadDate: new Date().toISOString()
+                };
+                
+                const request = store.add(fileData);
+                
+                request.onsuccess = () => resolve(fileData.id);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Получение всех файлов
+        async function getAllFiles() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.getAll();
+                
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Удаление файла
+        async function deleteFile(fileId) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(fileId);
+                
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Очистка всей базы
+        async function clearAllFiles() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.clear();
+                
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Генерация ID файла
+        function generateFileId() {
+            return 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Основная логика приложения
+        let allFiles = [];
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await initDB();
+                await loadFiles();
+                setupEventListeners();
+                console.log('♾️ IndexedDB инициализирована!');
+            } catch (error) {
+                console.error('Ошибка инициализации:', error);
+                alert('Ошибка загрузки базы данных');
+            }
+        });
+
+        async function loadFiles() {
+            allFiles = await getAllFiles();
+            renderFiles();
+        }
+
+        function setupEventListeners() {
+            // Загрузка файлов
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+            
+            // Drag and drop
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.addEventListener('dragover', (e) => e.preventDefault());
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                handleDroppedFiles(e.dataTransfer.files);
+            });
+
+            // Поиск
+            document.getElementById('searchInput').addEventListener('input', renderFiles);
+            document.getElementById('sortSelect').addEventListener('change', renderFiles);
+
+            // Закрытие модального окна по ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        }
+
+        async function handleFileUpload(e) {
+            const files = Array.from(e.target.files);
+            await processFiles(files);
+        }
+
+        async function handleDroppedFiles(droppedFiles) {
+            const files = Array.from(droppedFiles);
+            await processFiles(files);
+        }
+
+        async function processFiles(fileList) {
+            const progressOverlay = document.getElementById('progressOverlay');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const fileInfo = document.getElementById('fileInfo');
+            
+            progressOverlay.style.display = 'flex';
+            
+            for (let i = 0; i < fileList.length; i++) {
+                const file = fileList[i];
+                const progress = ((i + 1) / fileList.length) * 100;
+                
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${Math.round(progress)}%`;
+                fileInfo.textContent = `Обработка: ${file.name}`;
+                
+                try {
+                    await saveFile(file);
+                    console.log(`✅ Файл сохранен: ${file.name}`);
+                } catch (error) {
+                    console.error(`❌ Ошибка сохранения: ${file.name}`, error);
+                }
+                
+                // Даем интерфейсу обновиться
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            progressOverlay.style.display = 'none';
+            await loadFiles();
+            showNotification(`✅ Добавлено ${fileList.length} файлов`);
+        }
+
+        function renderFiles() {
+            const filesGrid = document.getElementById('filesGrid');
+            const emptyState = document.getElementById('emptyState');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const sortBy = document.getElementById('sortSelect').value;
+            
+            let filteredFiles = allFiles.filter(file => 
+                file.name.toLowerCase().includes(searchTerm)
+            );
+            
+            // Сортировка
+            filteredFiles.sort((a, b) => {
+                switch(sortBy) {
+                    case 'name': return a.name.localeCompare(b.name);
+                    case 'date': return new Date(b.uploadDate) - new Date(a.uploadDate);
+                    case 'size': return b.size - a.size;
+                    case 'type': return a.type.localeCompare(b.type);
+                    default: return 0;
+                }
+            });
+            
+            if (filteredFiles.length === 0) {
+                filesGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+            } else {
+                filesGrid.style.display = 'grid';
+                emptyState.style.display = 'none';
+                
+                filesGrid.innerHTML = filteredFiles.map(file => `
+                    <div class="file-card" onclick="openFile('${file.id}')">
+                        <div class="file-icon">${getFileIcon(file)}</div>
+                        <div class="file-name">${truncateFileName(file.name, 20)}</div>
+                        <div class="file-meta">
+                            ${formatFileSize(file.size)} • ${new Date(file.uploadDate).toLocaleDateString('ru-RU')}
+                        </div>
+                        <div class="file-actions">
+                            <button class="action-btn download-btn" onclick="event.stopPropagation(); downloadFile('${file.id}')">
+                                📥 Скачать
+                            </button>
+                            <button class="action-btn delete-btn" onclick="event.stopPropagation(); deleteFileFromDB('${file.id}')">
+                                🗑️ Удалить
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ОТКРЫТИЕ ФАЙЛА ПРИ КЛИКЕ
+        async function openFile(fileId) {
+            const fileObj = allFiles.find(f => f.id === fileId);
+            if (!fileObj) return;
+
+            const modal = document.getElementById('fileModal');
+            const fileName = document.getElementById('modalFileName');
+            const fileContent = document.getElementById('modalFileContent');
+
+            fileName.textContent = fileObj.name;
+            
+            // Создаем URL для файла
+            const fileUrl = URL.createObjectURL(fileObj.data);
+            
+            // Определяем тип файла и показываем соответствующий контент
+            if (fileObj.type.startsWith('image/')) {
+                fileContent.innerHTML = `
+                    <img src="${fileUrl}" class="file-preview" alt="${fileObj.name}">
+                    <div style="margin-top: 20px;">
+                        <p><strong>Размер:</strong> ${formatFileSize(fileObj.size)}</p>
+                        <p><strong>Тип:</strong> ${fileObj.type}</p>
+                        <p><strong>Загружен:</strong> ${new Date(fileObj.uploadDate).toLocaleString('ru-RU')}</p>
+                    </div>
+                `;
+            } else if (fileObj.type.startsWith('video/')) {
+                fileContent.innerHTML = `
+                    <video controls class="video-player">
+                        <source src="${fileUrl}" type="${fileObj.type}">
+                        Ваш браузер не поддерживает видео.
+                    </video>
+                    <div style="margin-top: 20px;">
+                        <p><strong>Размер:</strong> ${formatFileSize(fileObj.size)}</p>
+                        <p><strong>Тип:</strong> ${fileObj.type}</p>
+                    </div>
+                `;
+            } else if (fileObj.type.startsWith('audio/')) {
+                fileContent.innerHTML = `
+                    <audio controls class="audio-player">
+                        <source src="${fileUrl}" type="${fileObj.type}">
+                        Ваш браузер не поддерживает аудио.
+                    </audio>
+                    <div style="margin-top: 20px;">
+                        <p><strong>Размер:</strong> ${formatFileSize(fileObj.size)}</p>
+                        <p><strong>Тип:</strong> ${fileObj.type}</p>
+                        <p><strong>Название:</strong> ${fileObj.name}</p>
+                    </div>
+                `;
+            } else if (fileObj.type.startsWith('text/') || fileObj.name.endsWith('.txt')) {
+                // Чтение текстового файла
+                try {
+                    const text = await readFileAsText(fileObj.data);
+                    fileContent.innerHTML = `
+                        <div class="text-content">${escapeHtml(text)}</div>
+                        <div style="margin-top: 20px;">
+                            <p><strong>Размер:</strong> ${formatFileSize(fileObj.size)}</p>
+                            <p><strong>Символов:</strong> ${text.length}</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    showUnsupportedFile(fileObj, fileUrl);
+                }
+            } else if (fileObj.type.includes('pdf')) {
+                fileContent.innerHTML = `
+                    <div class="unsupported-file">
+                        <div class="unsupported-file-icon">📄</div>
+                        <h3>PDF файл</h3>
+                        <p>Для просмотра PDF скачайте файл</p>
+                        <p><strong>${fileObj.name}</strong></p>
+                        <p>Размер: ${formatFileSize(fileObj.size)}</p>
+                        <button class="btn" onclick="downloadFile('${fileObj.id}')" style="margin-top: 20px;">
+                            📥 Скачать PDF
+                        </button>
+                    </div>
+                `;
+            } else {
+                showUnsupportedFile(fileObj, fileUrl);
+            }
+
+            modal.style.display = 'flex';
+
+            // Очистка URL при закрытии модального окна
+            modal._fileUrl = fileUrl;
+        }
+
+        function showUnsupportedFile(fileObj, fileUrl) {
+            const fileContent = document.getElementById('modalFileContent');
+            fileContent.innerHTML = `
+                <div class="unsupported-file">
+                    <div class="unsupported-file-icon">📁</div>
+                    <h3>${getFileIcon(fileObj)} ${getFileTypeName(fileObj.type)}</h3>
+                    <p>Файл: <strong>${fileObj.name}</strong></p>
+                    <p>Размер: ${formatFileSize(fileObj.size)}</p>
+                    <p>Тип: ${fileObj.type || 'неизвестен'}</p>
+                    <p>Загружен: ${new Date(fileObj.uploadDate).toLocaleString('ru-RU')}</p>
+                    <div style="margin-top: 20px;">
+                        <button class="btn download-btn" onclick="downloadFile('${fileObj.id}')">
+                            📥 Скачать файл
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('fileModal');
+            modal.style.display = 'none';
+            
+            // Очищаем URL объекта
+            if (modal._fileUrl) {
+                URL.revokeObjectURL(modal._fileUrl);
+                modal._fileUrl = null;
+            }
+        }
+
+        // Чтение файла как текст
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = e => reject(e);
+                reader.readAsText(file);
+            });
+        }
+
+        // Экранирование HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function downloadFile(fileId) {
+            const fileObj = allFiles.find(f => f.id === fileId);
+            if (!fileObj) return;
+            
+            const url = URL.createObjectURL(fileObj.data);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileObj.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification(`📥 Скачивание: ${fileObj.name}`);
+        }
+
+        async function deleteFileFromDB(fileId) {
+            if (!confirm('Удалить этот файл?')) return;
+            
+            try {
+                await deleteFile(fileId);
+                await loadFiles();
+                showNotification('🗑️ Файл удален');
+                closeModal();
+            } catch (error) {
+                console.error('Ошибка удаления:', error);
+                alert('Ошибка удаления файла');
+            }
+        }
+
+        async function clearDatabase() {
+            if (!confirm('❌ УДАЛИТЬ ВСЕ ФАЙЛЫ?\nЭто действие нельзя отменить!')) return;
+            
+            try {
+                await clearAllFiles();
+                await loadFiles();
+                showNotification('🗑️ Все файлы удалены');
+                closeModal();
+            } catch (error) {
+                console.error('Ошибка очистки:', error);
+                alert('Ошибка очистки базы данных');
+            }
+        }
+
+        async function showStats() {
+            const totalSize = allFiles.reduce((sum, file) => sum + file.size, 0);
+            const statsText = `
+                📊 Статистика хранилища:
+                • Файлов: ${allFiles.length}
+                • Общий размер: ${formatFileSize(totalSize)}
+                • Средний размер: ${formatFileSize(totalSize / allFiles.length || 0)}
+                • Технология: IndexedDB ♾️
+            `;
+            alert(statsText);
+        }
+
+        async function exportAll() {
+            if (allFiles.length === 0) {
+                alert('Нет файлов для экспорта');
+                return;
+            }
+            
+            showNotification('📤 Начинаем экспорт всех файлов...');
+            
+            for (const fileObj of allFiles) {
+                await downloadFile(fileObj.id);
+                // Задержка между скачиваниями
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        // Вспомогательные функции
+        function getFileIcon(file) {
+            const type = file.type;
+            if (type.startsWith('image/')) return '🖼️';
+            if (type.startsWith('video/')) return '🎥';
+            if (type.startsWith('audio/')) return '🎵';
+            if (type.includes('pdf')) return '📄';
+            if (file.name.match(/\.(doc|docx)$/)) return '📝';
+            if (file.name.match(/\.(xls|xlsx)$/)) return '📊';
+            if (file.name.match(/\.(zip|rar|7z)$/)) return '📦';
+            if (type.startsWith('text/') || file.name.endsWith('.txt')) return '📄';
+            return '📁';
+        }
+
+        function getFileTypeName(type) {
+            if (type.startsWith('image/')) return 'Изображение';
+            if (type.startsWith('video/')) return 'Видео';
+            if (type.startsWith('audio/')) return 'Аудио';
+            if (type.includes('pdf')) return 'PDF документ';
+            if (type.includes('word')) return 'Word документ';
+            if (type.includes('excel')) return 'Excel таблица';
+            if (type.startsWith('text/')) return 'Текстовый файл';
+            return 'Файл';
+        }
+
+        function truncateFileName(name, maxLength) {
+            return name.length > maxLength ? name.substring(0, maxLength - 3) + '...' : name;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #27ae60;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 10000;
+                font-weight: 600;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

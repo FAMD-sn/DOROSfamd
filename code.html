@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Frontend Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #00adb5;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00adb5, #eeeeee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #bbbbbb;
+            font-size: 1.1rem;
+        }
+
+        .editor-container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            height: 60vh;
+        }
+
+        .editor-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #222831;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .editor-header {
+            background: #393e46;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-title {
+            font-weight: 600;
+            color: #00adb5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .editor-title i {
+            font-size: 1.2rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #00adb5;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #00969c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #393e46;
+        }
+
+        .btn-secondary:hover {
+            background: #4a4f57;
+        }
+
+        .editor-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .preview-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #222831;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .preview-content {
+            flex: 1;
+            border: none;
+            background: white;
+        }
+
+        .console-wrapper {
+            height: 25vh;
+            background: #222831;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .console-header {
+            background: #393e46;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .console-title {
+            font-weight: 600;
+            color: #ff5722;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .console-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #eeeeee;
+            background: #1a1a2e;
+        }
+
+        .error {
+            color: #ff5252;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .error::before {
+            content: "✗";
+            color: #ff5252;
+        }
+
+        .warning {
+            color: #ffb74d;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning::before {
+            content: "⚠";
+            color: #ffb74d;
+        }
+
+        .success {
+            color: #69f0ae;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .success::before {
+            content: "✓";
+            color: #69f0ae;
+        }
+
+        .info {
+            color: #29b6f6;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .code-snippets {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .snippet-btn {
+            background: #393e46;
+            color: #eeeeee;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .snippet-btn:hover {
+            background: #00adb5;
+            transform: translateY(-2px);
+        }
+
+        .status-bar {
+            background: #393e46;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #bbbbbb;
+            border-top: 1px solid #222831;
+        }
+
+        @media (max-width: 1024px) {
+            .editor-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .editor-wrapper, .preview-wrapper {
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Live Frontend Editor</h1>
+            <p>Пишите HTML, CSS и JavaScript код и сразу же смотрите результат</p>
+            <div class="code-snippets">
+                <button class="snippet-btn" onclick="loadSnippet('basic')">Базовый HTML</button>
+                <button class="snippet-btn" onclick="loadSnippet('css-grid')">CSS Grid</button>
+                <button class="snippet-btn" onclick="loadSnippet('js-interactive')">JS Интерактив</button>
+                <button class="snippet-btn" onclick="loadSnippet('bootstrap')">Bootstrap</button>
+                <button class="snippet-btn" onclick="loadSnippet('animation')">CSS Анимация</button>
+            </div>
+        </div>
+
+        <div class="editor-container">
+            <div class="editor-wrapper">
+                <div class="editor-header">
+                    <div class="editor-title">
+                        <span>📝 Редактор кода</span>
+                    </div>
+                    <div class="controls">
+                        <button class="btn" onclick="runCode()">▶ Запустить</button>
+                        <button class="btn btn-secondary" onclick="formatCode()">✨ Форматировать</button>
+                        <button class="btn btn-secondary" onclick="clearCode()">🗑 Очистить</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+                    <textarea id="codeEditor"></textarea>
+                </div>
+            </div>
+
+            <div class="preview-wrapper">
+                <div class="editor-header">
+                    <div class="editor-title">
+                        <span>👁 Предпросмотр</span>
+                    </div>
+                    <div class="controls">
+                        <button class="btn btn-secondary" onclick="toggleFullscreen()">📺 Полный экран</button>
+                    </div>
+                </div>
+                <iframe id="previewFrame" class="preview-content"></iframe>
+            </div>
+        </div>
+
+        <div class="console-wrapper">
+            <div class="console-header">
+                <div class="console-title">
+                    <span>📊 Консоль и ошибки</span>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-secondary" onclick="clearConsole()">Очистить консоль</button>
+                </div>
+            </div>
+            <div id="console" class="console-content">
+                <div class="info">Готов к работе. Начните писать код!</div>
+            </div>
+            <div class="status-bar">
+                <div id="status">Статус: Ожидание ввода...</div>
+                <div id="suggestions">Подсказки: Включены ✓</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Библиотеки -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/css-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/anyword-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/javascript-lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-html.min.js"></script>
+
+    <script>
+        // Инициализация редактора
+        const editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+            mode: 'htmlmixed',
+            theme: 'material-darker',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            autoCloseTags: true,
+            matchBrackets: true,
+            lineWrapping: true,
+            extraKeys: {
+                "Ctrl-Space": "autocomplete",
+                "Ctrl-S": function() {
+                    runCode();
+                    return false;
+                },
+                "Tab": function(cm) {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection('add');
+                    } else {
+                        cm.replaceSelection('  ', 'end');
+                    }
+                }
+            },
+            hintOptions: {
+                completeSingle: false,
+                alignWithWord: true
+            }
+        });
+
+        // Автодополнение
+        editor.on('inputRead', function(cm, change) {
+            if (change.text[0].length > 0 && change.text[0] !== ' ' && change.text[0] !== '\n') {
+                CodeMirror.commands.autocomplete(cm);
+            }
+        });
+
+        // Начальный код
+        const initialCode = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Мой сайт</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        header {
+            text-align: center;
+            padding: 50px 0;
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Добро пожаловать!</h1>
+        <p>Это живой редактор фронтенд-кода. Попробуйте изменить что-нибудь!</p>
+        <button onclick="showMessage()">Нажми меня</button>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>HTML5</h2>
+            <p>Семантическая разметка и современные возможности</p>
+        </div>
+        <div class="card">
+            <h2>CSS3</h2>
+            <p>Анимации, grid, flexbox и многое другое</p>
+        </div>
+        <div class="card">
+            <h2>JavaScript</h2>
+            <p>Интерактивность и динамическое обновление контента</p>
+        </div>
+    </div>
+
+    <script>
+        function showMessage() {
+            alert('Привет! Вы изменили этот сайт с помощью редактора!');
+        }
+        
+        // Динамическое обновление времени
+        function updateTime() {
+            const timeElement = document.createElement('div');
+            timeElement.innerHTML = 'Текущее время: ' + new Date().toLocaleTimeString();
+            timeElement.style.textAlign = 'center';
+            timeElement.style.marginTop = '30px';
+            timeElement.style.padding = '20px';
+            timeElement.style.background = 'rgba(255,255,255,0.1)';
+            timeElement.style.borderRadius = '10px';
+            
+            const oldTime = document.querySelector('.time-display');
+            if (oldTime) oldTime.remove();
+            timeElement.className = 'time-display';
+            document.body.appendChild(timeElement);
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+    <\/script>
+</body>
+</html>`;
+
+        editor.setValue(initialCode);
+        runCode();
+
+        // Запуск кода
+        function runCode() {
+            const code = editor.getValue();
+            const iframe = document.getElementById('previewFrame');
+            const consoleElement = document.getElementById('console');
+            
+            try {
+                // Очистка консоли
+                consoleElement.innerHTML = '';
+                
+                // Создание документа для iframe
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(code);
+                iframeDoc.close();
+                
+                // Перехват ошибок из iframe
+                iframe.contentWindow.onerror = function(msg, url, line, col, error) {
+                    addToConsole('error', `Ошибка: ${msg} (строка ${line}, колонка ${col})`);
+                };
+                
+                // Перехват console.log из iframe
+                const originalLog = iframe.contentWindow.console.log;
+                iframe.contentWindow.console.log = function(...args) {
+                    addToConsole('info', args.join(' '));
+                    originalLog.apply(iframe.contentWindow.console, args);
+                };
+                
+                addToConsole('success', '✅ Код успешно выполнен!');
+                updateStatus('Код выполнен успешно');
+                
+            } catch (error) {
+                addToConsole('error', `❌ Ошибка выполнения: ${error.message}`);
+                updateStatus(`Ошибка: ${error.message}`);
+            }
+        }
+
+        // Форматирование кода
+        function formatCode() {
+            const code = editor.getValue();
+            try {
+                const formatted = html_beautify(code, {
+                    indent_size: 2,
+                    indent_char: ' ',
+                    max_preserve_newlines: 1,
+                    preserve_newlines: true,
+                    indent_inner_html: true
+                });
+                editor.setValue(formatted);
+                addToConsole('success', '✨ Код отформатирован');
+            } catch (error) {
+                addToConsole('error', 'Ошибка форматирования');
+            }
+        }
+
+        // Очистка кода
+        function clearCode() {
+            if (confirm('Вы уверены, что хотите очистить редактор?')) {
+                editor.setValue('');
+                addToConsole('warning', '📝 Редактор очищен');
+            }
+        }
+
+        // Очистка консоли
+        function clearConsole() {
+            document.getElementById('console').innerHTML = 
+                '<div class="info">Консоль очищена</div>';
+        }
+
+        // Полноэкранный режим
+        function toggleFullscreen() {
+            const iframe = document.getElementById('previewFrame');
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.webkitRequestFullscreen) {
+                iframe.webkitRequestFullscreen();
+            }
+        }
+
+        // Добавление сообщений в консоль
+        function addToConsole(type, message) {
+            const consoleElement = document.getElementById('console');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = message;
+            consoleElement.appendChild(div);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+
+        // Обновление статуса
+        function updateStatus(message) {
+            document.getElementById('status').textContent = `Статус: ${message}`;
+        }
+
+        // Загрузка сниппетов
+        const snippets = {
+            'basic': `<!DOCTYPE html>
+<html>
+<head>
+    <title>Базовый шаблон</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Привет, мир!</h1>
+    <p>Это базовый HTML шаблон.</p>
+</body>
+</html>`,
+
+            'css-grid': `<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS Grid</title>
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+        .grid-item {
+            background: #4CAF50;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-container">
+        <div class="grid-item">1</div>
+        <div class="grid-item">2</div>
+        <div class="grid-item">3</div>
+        <div class="grid-item">4</div>
+        <div class="grid-item">5</div>
+        <div class="grid-item">6</div>
+    </div>
+</body>
+</html>`,
+
+            'js-interactive': `<!DOCTYPE html>
+<html>
+<head>
+    <title>JS Интерактив</title>
+    <style>
+        body {
+            text-align: center;
+            padding: 50px;
+        }
+        #counter {
+            font-size: 48px;
+            margin: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Счётчик: <span id="counter">0</span></h1>
+    <button onclick="increment()">Увеличить</button>
+    <button onclick="decrement()">Уменьшить</button>
+    <button onclick="reset()">Сбросить</button>
+    
+    <script>
+        let count = 0;
+        const counter = document.getElementById('counter');
+        
+        function increment() {
+            count++;
+            updateCounter();
+        }
+        
+        function decrement() {
+            count--;
+            updateCounter();
+        }
+        
+        function reset() {
+            count = 0;
+            updateCounter();
+        }
+        
+        function updateCounter() {
+            counter.textContent = count;
+            counter.style.color = count > 0 ? 'green' : count < 0 ? 'red' : 'black';
+        }
+    <\/script>
+</body>
+</html>`
+        };
+
+        function loadSnippet(snippetName) {
+            if (snippets[snippetName]) {
+                editor.setValue(snippets[snippetName]);
+                runCode();
+                addToConsole('success', `Загружен шаблон: ${snippetName}`);
+            }
+        }
+
+        // Автозапуск при изменении (с задержкой)
+        let timeout;
+        editor.on('change', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(runCode, 1000);
+            updateStatus('Изменения сохранены...');
+        });
+
+        // Инициализация
+        runCode();
+        addToConsole('success', 'Редактор инициализирован. Начните писать код!');
+    </script>
+</body>
+</html>

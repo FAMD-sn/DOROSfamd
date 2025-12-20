@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DOROSqr - Генератор QR-кодов | DOROSfamd</title>
+  
+  <!-- Используем другую библиотеку -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  
+  <style>
+    :root {
+      --primary-color: #00ffc8;
+      --secondary-color: #00aaff;
+      --bg-color: #0d0d1a;
+      --card-bg: rgba(20, 20, 40, 0.5);
+      --card-border: 1px solid rgba(0, 255, 200, 0.2);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background-color: var(--bg-color);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      background: linear-gradient(45deg, var(--bg-color) 0%, #1a0d1a 100%);
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 255, 200, 0.2);
+      margin-top: 30px;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      color: var(--primary-color);
+      text-shadow: 0 0 10px var(--primary-color);
+      margin-bottom: 10px;
+    }
+    
+    .tagline {
+      font-size: 1.2em;
+      color: var(--secondary-color);
+      margin-bottom: 30px;
+    }
+    
+    .input-group {
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    
+    .url-input {
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      border: var(--card-border);
+      background-color: rgba(20, 20, 40, 0.7);
+      color: #fff;
+      font-size: 1em;
+      outline: none;
+      box-shadow: 0 0 10px rgba(0, 255, 200, 0.3);
+      transition: box-shadow 0.3s ease;
+      font-family: inherit;
+    }
+    
+    .url-input:focus {
+      box-shadow: 0 0 20px rgba(0, 255, 200, 0.6);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 12px 25px;
+      border-radius: 10px;
+      border: none;
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      font-size: 1em;
+    }
+    
+    .btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-3px);
+    }
+    
+    .btn:disabled {
+      background-color: #666;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .qr-container {
+      margin: 30px 0;
+      padding: 20px;
+      background-color: var(--card-bg);
+      border-radius: 15px;
+      border: var(--card-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+    }
+    
+    #qrcode {
+      margin: 20px 0;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 255, 200, 0.3);
+      padding: 10px;
+    }
+    
+    .error-message {
+      color: #ff6b6b;
+      margin-top: 10px;
+      font-size: 0.9em;
+      display: none;
+    }
+    
+    .success-message {
+      color: var(--primary-color);
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      color: var(--secondary-color);
+      text-decoration: none;
+      font-size: 1em;
+    }
+    
+    .back-link:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>DOROSqr Генератор QR-кодов</h1>
+    <p class="tagline">Создавайте QR-коды для любых ссылок</p>
+    
+    <div class="input-group">
+      <label for="url-input">Введите URL или текст:</label>
+      <input type="text" id="url-input" class="url-input" placeholder="https://example.com или любой текст" value="https://DOROSfamd.com">
+    </div>
+    
+    <div class="button-group">
+      <button id="generate-btn" class="btn">Сгенерировать QR-код</button>
+      <button id="download-btn" class="btn" disabled>Скачать QR-код</button>
+    </div>
+    
+    <div class="qr-container">
+      <div id="qrcode"></div>
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+    </div>
+    
+    <a href="https://dorosfamd.com" class="back-link">← Вернуться на главную</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlInput = document.getElementById('url-input');
+      const generateBtn = document.getElementById('generate-btn');
+      const downloadBtn = document.getElementById('download-btn');
+      const qrcodeDiv = document.getElementById('qrcode');
+      const errorMessage = document.getElementById('error-message');
+      const successMessage = document.getElementById('success-message');
+      
+      // Генерация QR-кода
+      generateBtn.addEventListener('click', function() {
+        const text = urlInput.value.trim();
+        
+        if (!text) {
+          showError("Пожалуйста, введите текст или URL");
+          return;
+        }
+        
+        // Очищаем предыдущий QR-код
+        qrcodeDiv.innerHTML = '';
+        hideMessages();
+        
+        try {
+          // Создаем QR-код
+          const qr = qrcode(0, 'M');
+          qr.addData(text);
+          qr.make();
+          
+          // Создаем canvas для отображения
+          const canvas = document.createElement('canvas');
+          const size = 256;
+          const scale = 8;
+          const cells = qr.getModuleCount();
+          
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          
+          // Очищаем canvas
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, size, size);
+          
+          // Рисуем QR-код
+          ctx.fillStyle = '#000000';
+          const cellSize = size / cells;
+          
+          for (let row = 0; row < cells; row++) {
+            for (let col = 0; col < cells; col++) {
+              if (qr.isDark(row, col)) {
+                ctx.fillRect(
+                  col * cellSize,
+                  row * cellSize,
+                  cellSize,
+                  cellSize
+                );
+              }
+            }
+          }
+          
+          qrcodeDiv.appendChild(canvas);
+          downloadBtn.disabled = false;
+          showSuccess("QR-код успешно создан! Нажмите 'Скачать' для сохранения.");
+          
+          // Сохраняем canvas для скачивания
+          qrcodeDiv._currentCanvas = canvas;
+          
+        } catch (error) {
+          console.error('Ошибка генерации QR-кода:', error);
+          showError("Ошибка при генерации QR-кода. Попробуйте другой текст.");
+        }
+      });
+      
+      // Скачивание QR-кода
+      downloadBtn.addEventListener('click', function() {
+        if (!qrcodeDiv._currentCanvas) {
+          showError("Сначала сгенерируйте QR-код");
+          return;
+        }
+        
+        try {
+          const link = document.createElement('a');
+          link.download = 'qrcode-dorosfamd.png';
+          link.href = qrcodeDiv._currentCanvas.toDataURL('image/png');
+          link.click();
+          showSuccess("QR-код успешно скачан!");
+        } catch (error) {
+          console.error('Ошибка скачивания:', error);
+          showError("Ошибка при скачивании QR-кода");
+        }
+      });
+      
+      // Генерация при нажатии Enter
+      urlInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          generateBtn.click();
+        }
+      });
+      
+      // Автогенерация при загрузке
+      setTimeout(() => {
+        if (urlInput.value.trim()) {
+          generateBtn.click();
+        }
+      }, 500);
+      
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        successMessage.style.display = 'none';
+      }
+      
+      function showSuccess(message) {
+        successMessage.textContent = message;
+        successMessage.style.display = 'block';
+        errorMessage.style.display = 'none';
+      }
+      
+      function hideMessages() {
+        errorMessage.style.display = 'none';
+        successMessage.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

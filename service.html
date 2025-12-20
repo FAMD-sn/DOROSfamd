@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOROServices — Реестр Услуг: люди предлагают помощь</title>
+    <meta name="description" content="DOROServices — реестр локальных нужд и помощи. Подайте свою просьбу или поддержите чужую.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-auth-compat.js"></script> 
+    
+    <style>
+        :root {
+            --primary: #f1c40f; 
+            --secondary: #e67e22; 
+            --dark: #1a1a1a;
+            --darker: #111;
+            --light: #f5f5f5;
+            --gray: #333;
+            --lighter-gray: #444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--darker);
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px; 
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .add-wish-btn {
+            background-color: var(--primary);
+            color: var(--darker); 
+        }
+
+        .add-wish-btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .admin-btn {
+            background-color: #c0392b; 
+            color: var(--light);
+        }
+
+        .admin-btn:hover {
+            background-color: #e74c3c;
+            transform: translateY(-2px);
+        }
+
+        /* МОДАЛЬНЫЕ ОКНА */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--darker);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            color: var(--light);
+            /* ИСПРАВЛЕНИЕ: Обеспечивает прокрутку содержимого модального окна */
+            max-height: 90vh; 
+            overflow-y: auto; 
+            /* Конец ИСПРАВЛЕНИЯ */
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--light);
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--primary);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--gray);
+            border: 1px solid var(--lighter-gray);
+            border-radius: 5px;
+            color: var(--light);
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: var(--darker);
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--secondary);
+        }
+        
+        .admin-submit-btn {
+            background-color: #c0392b !important;
+            color: var(--light) !important;
+        }
+        .admin-submit-btn:hover {
+            background-color: #e74c3c !important;
+        }
+
+        /* ФИЛЬТРЫ */
+        .filters {
+            background-color: var(--darker);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--gray);
+            border: 1px solid var(--lighter-gray);
+            border-radius: 5px;
+            color: var(--light);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 2;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 10px 10px 40px;
+            background-color: var(--gray);
+            border: 1px solid var(--lighter-gray);
+            border-radius: 5px;
+            color: var(--light);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light);
+        }
+
+        .apply-filters {
+            background-color: var(--secondary);
+            color: var(--darker);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .apply-filters:hover {
+            background-color: #d68910;
+        }
+
+        /* КАРТОЧКИ УСЛУГ */
+        .wishes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 768px) {
+            .wishes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .wish-card {
+            background-color: var(--darker);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .wish-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .wish-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray);
+            position: relative;
+        }
+
+        .wish-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .wish-category {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--gray);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--light);
+        }
+
+        .wish-body {
+            padding: 20px;
+        }
+
+        .wish-description {
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .wish-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .wish-bank {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+
+        .wish-bank i {
+            color: var(--primary);
+        }
+        
+        .wish-video-link {
+            display: block;
+            margin-top: 10px;
+            color: #ccc;
+        }
+        .wish-video-link i {
+            margin-right: 5px;
+        }
+
+        .wish-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; 
+            gap: 10px;
+        }
+
+        .copy-card-btn {
+            background-color: var(--primary);
+            color: var(--darker);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .copy-card-btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .delete-wish-btn {
+            background-color: #c0392b; 
+            color: var(--light);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none; 
+        }
+
+        .delete-wish-btn.visible {
+            display: flex;
+        }
+
+        .delete-wish-btn:hover {
+            background-color: #e74c3c;
+        }
+
+        /* ТОСТ И ПУСТОЕ СОСТОЯНИЕ */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary);
+            color: var(--darker);
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #aaa;
+            grid-column: 1 / -1; 
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--lighter-gray);
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ФУТЕР И ЗАГРУЗКА */
+        footer {
+            background-color: var(--darker);
+            padding: 30px 0;
+            margin-top: 50px;
+            text-align: center;
+            color: #aaa;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 50px;
+            grid-column: 1 / -1;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--lighter-gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <i class="fas fa-tools"></i>
+                    <h1>DOROServices</h1>
+                </a>
+                <div class="header-buttons">
+                    <button class="btn add-wish-btn" id="openModalBtn">
+                        <i class="fas fa-plus"></i>
+                        Подать **УСЛУГУ**
+                    </button>
+                    <button class="btn admin-btn" id="openAdminModalBtn">
+                        <i class="fas fa-user-shield"></i>
+                        Админ Вход
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="modal" id="wishModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModalBtn">&times;</span>
+            <h2><i class="fas fa-tools"></i> Предложить **Услугу** (Помощь)</h2>
+            <form id="wishForm">
+                <div class="form-group">
+                    <label for="name">Ваше имя (или название услуги)</label>
+                    <input type="text" id="name" required placeholder="Например: Мастер по ремонту кранов">
+                </div>
+                <div class="form-group">
+                    <label for="wish">Описание услуги / помощи</label>
+                    <textarea id="wish" required placeholder="Например: Выполняю мелкий ремонт сантехники, электрики."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="price">Примерная стоимость услуги / Цена (₽)</label>
+                    <input type="number" id="price" required placeholder="Например: 1000 (цена за вызов)">
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Номер для связи (Контакты)</label>
+                    <input type="text" id="cardNumber" required placeholder="Номер телефона или Telegram/WhatsApp">
+                </div>
+                <div class="form-group">
+                    <label for="bank">Способ связи</label>
+                    <select id="bank" required>
+                        <option value="">Выберите основной способ связи</option>
+                        <option value="Телефон">Телефон</option>
+                        <option value="Telegram">Telegram</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="other">Другой</option>
+                    </select>
+                </div>
+                <div class="form-group" id="otherBankGroup" style="display: none;">
+                    <label for="otherBank">Укажите ваш способ/приложение</label>
+                    <input type="text" id="otherBank" placeholder="Уточните">
+                </div>
+                <div class="form-group">
+                    <label for="category">Категория услуги</label>
+                    <select id="category" required>
+                        <option value="">Выберите категорию</option>
+                        <option value="Ремонт">Ремонт</option>
+                        <option value="Садоводство">Садоводство</option>
+                        <option value="Переезд/Транспорт">Переезд/Транспорт</option>
+                        <option value="Медпомощь/Лекарства">Медпомощь/Лекарства</option>
+                        <option value="Продукты/Еда">Продукты/Еда</option>
+                        <option value="Животные">Животные</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="videoLink">Ссылка на Видео/Фото (портфолио, примеры)</label>
+                    <input type="text" id="videoLink" placeholder="Вставьте URL здесь (необязательно)">
+                </div>
+                <button type="submit" class="submit-btn" id="submitWishBtn">
+                    <i class="fas fa-paper-plane"></i> Предложить услугу
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeAdminModalBtn">&times;</span>
+            <h2><i class="fas fa-lock"></i> Вход для Администратора</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail">Email</label>
+                    <input type="email" id="adminEmail" required placeholder="Введите email">
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Пароль</label>
+                    <input type="password" id="adminPassword" required placeholder="Введите пароль">
+                </div>
+                <button type="submit" class="submit-btn admin-submit-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="filters">
+            <div class="filter-row">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск по услугам...">
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="bankFilter">Способ связи</label>
+                    <select id="bankFilter">
+                        <option value="">Все</option>
+                        <option value="Телефон">Телефон</option>
+                        <option value="Telegram">Telegram</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="categoryFilter">Категория</label>
+                    <select id="categoryFilter">
+                        <option value="">Все категории</option>
+                        <option value="Ремонт">Ремонт</option>
+                        <option value="Садоводство">Садоводство</option>
+                        <option value="Переезд/Транспорт">Переезд/Транспорт</option>
+                        <option value="Медпомощь/Лекарства">Медпомощь/Лекарства</option>
+                        <option value="Продукты/Еда">Продукты/Еда</option>
+                        <option value="Животные">Животные</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="minPrice">Цена от (₽)</label>
+                    <input type="number" id="minPrice" placeholder="Мин. сумма">
+                </div>
+                <div class="filter-group">
+                    <label for="maxPrice">Цена до (₽)</label>
+                    <input type="number" id="maxPrice" placeholder="Макс. сумма">
+                </div>
+            </div>
+            <div class="filter-row">
+                <button class="apply-filters" id="applyFiltersBtn">
+                    <i class="fas fa-filter"></i> Применить фильтры
+                </button>
+            </div>
+        </div>
+
+        <div class="wishes-grid" id="wishesContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Контакты скопированы!</div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <i class="fas fa-tools"></i>
+                    <h1>DOROServices</h1>
+                </div>
+                <div class="footer-links">
+                    <a href="dorosfamd.com">DOROSfamd</a>
+                    <a href="#">Правила: имейте человечность!</a>
+                    <a href="#">Контакты: +992 876619999</a>
+                    <a href="dorosfamd.com">Владелец: DOROSfamd</a>
+                </div>
+                <p>© 2025 DOROServices. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // =========================================================================
+        //                          НАСТРОЙКИ (КОНФИГУРАЦИЯ)
+        // =========================================================================
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAE4zNwMJynqso1XTS1612Kri5RMgVCGmw",
+            authDomain: "dreamfamd.firebaseapp.com",
+            projectId: "dreamfamd",
+            storageBucket: "dreamfamd.appspot.com",
+            messagingSenderId: "15878889443",
+            appId: "1:15878889443:web:62abeaebbf7220ccd14ad6",
+            databaseURL: "https://dreamfamd-default-rtdb.firebaseio.com/"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth(); 
+        
+        // --- АДМИН ---
+        const ADMIN_NAME = "Doriush dream";
+        const ADMIN_EMAIL = "Doriush@dreamfamd.com"; 
+        const ADMIN_PASSWORD = "test123";
+
+        // =========================================================================
+        //                          DOM ЭЛЕМЕНТЫ И СОСТОЯНИЕ
+        // =========================================================================
+
+        let isAdminLoggedIn = localStorage.getItem('isAdmin') === 'true';
+        let wishes = [];
+        let filteredWishes = [];
+
+        const wishForm = document.getElementById('wishForm');
+        const bankSelect = document.getElementById('bank');
+        const otherBankGroup = document.getElementById('otherBankGroup');
+        const otherBankInput = document.getElementById('otherBank');
+        const wishesContainer = document.getElementById('wishesContainer');
+        const toast = document.getElementById('toast');
+        const submitWishBtn = document.getElementById('submitWishBtn');
+        const wishModal = document.getElementById('wishModal');
+
+        const searchInput = document.getElementById('searchInput');
+        const bankFilter = document.getElementById('bankFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        
+        const openAdminModalBtn = document.getElementById('openAdminModalBtn');
+        const closeAdminModalBtn = document.getElementById('closeAdminModalBtn');
+        const adminModal = document.getElementById('adminModal');
+        const adminLoginForm = document.getElementById('adminLoginForm');
+
+        // =========================================================================
+        //                          УТИЛИТЫ И АДМИН-ЛОГИКА
+        // =========================================================================
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function formatPrice(price) {
+            if (price === undefined || price === null) return 'По договоренности';
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽';
+        }
+
+        function closeModal(modalElement) {
+            modalElement.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function deleteWish(wishId) {
+            if (!isAdminLoggedIn) { 
+                showToast('У вас нет прав для удаления!');
+                return;
+            }
+            if (!confirm('Вы уверены, что хотите удалить эту услугу из базы?')) {
+                return;
+            }
+
+            database.ref('wishes/' + wishId).remove()
+                .then(() => {
+                    showToast('Услуга удалена.');
+                })
+                .catch((error) => {
+                    console.error('Ошибка при удалении:', error);
+                    showToast('Ошибка при удалении услуги.');
+                });
+        }
+
+        function updateAdminUI() {
+            const deleteButtons = document.querySelectorAll('.delete-wish-btn');
+            
+            if (isAdminLoggedIn) {
+                openAdminModalBtn.textContent = `${ADMIN_NAME} (Выход)`;
+                openAdminModalBtn.style.backgroundColor = 'var(--secondary)';
+                openAdminModalBtn.style.color = 'var(--darker)';
+                deleteButtons.forEach(btn => btn.classList.add('visible'));
+            } else {
+                openAdminModalBtn.textContent = 'Админ Вход';
+                openAdminModalBtn.style.backgroundColor = '#c0392b';
+                openAdminModalBtn.style.color = 'var(--light)';
+                deleteButtons.forEach(btn => btn.classList.remove('visible'));
+            }
+        }
+        
+        // --- Логика Админ-панели ---
+        openAdminModalBtn.addEventListener('click', () => {
+            if (isAdminLoggedIn) {
+                localStorage.removeItem('isAdmin');
+                isAdminLoggedIn = false;
+                updateAdminUI();
+                showToast('Выход выполнен.');
+                return;
+            }
+            adminModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            // Очищаем поля
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminPassword').value = '';
+        });
+
+        closeAdminModalBtn.addEventListener('click', () => {
+            closeModal(adminModal);
+        });
+
+        adminLoginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                isAdminLoggedIn = true;
+                localStorage.setItem('isAdmin', 'true');
+                showToast(`Вход выполнен как Администратор ${ADMIN_NAME}!`);
+                closeModal(adminModal);
+                updateAdminUI();
+            } else {
+                showToast('Неверный Email или Пароль для Администратора.');
+            }
+        });
+
+        // =========================================================================
+        //                          ЧТЕНИЕ ДАННЫХ ИЗ FIREBASE
+        // =========================================================================
+
+        function loadWishes() {
+            wishesContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            
+            database.ref('wishes').on('value', (snapshot) => {
+                wishes = [];
+                snapshot.forEach((childSnapshot) => {
+                    const wish = childSnapshot.val();
+                    
+                    // !!! КЛЮЧЕВОЙ ФИЛЬТР: ПОКАЗЫВАЕМ ТОЛЬКО ЗАПИСИ ТИПА 'Service' !!!
+                    if (wish.type !== 'Service') {
+                        return; 
+                    }
+                    
+                    wish.id = childSnapshot.key;
+                    wishes.push(wish);
+                });
+
+                wishes.sort((a, b) => b.createdAt - a.createdAt);
+                applyFilters();
+                updateAdminUI();
+            });
+        }
+
+        // Отрисовка услуг
+        function renderWishes(wishesToRender) {
+            wishesContainer.innerHTML = '';
+            
+            if (wishesToRender.length === 0) {
+                wishesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-tools"></i>
+                        <p>Пока нет услуг, соответствующих вашим фильтрам. Попробуйте изменить параметры поиска или <a href="#" id="openModalBtnEmptyState" style="color: var(--primary);">предложите свою услугу</a>.</p>
+                    </div>
+                `;
+                document.getElementById('openModalBtnEmptyState')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('openModalBtn').click();
+                });
+                return;
+            }
+
+            wishesToRender.forEach(wish => {
+                const wishCard = document.createElement('div');
+                wishCard.className = 'wish-card';
+
+                const adminButtonClass = isAdminLoggedIn ? 'visible' : '';
+                const videoHtml = wish.videoLink ? 
+                    `<a class="wish-video-link" href="${wish.videoLink}" target="_blank"><i class="fas fa-video"></i> Портфолио/Видео</a>` : 
+                    '';
+
+                wishCard.innerHTML = `
+                    <div class="wish-header">
+                        <h3 class="wish-name">${wish.name}</h3>
+                        <span class="wish-category">${wish.category}</span>
+                    </div>
+                    <div class="wish-body">
+                        <p class="wish-description">${wish.wish}</p>
+                        <div class="wish-price">Цена: ${formatPrice(wish.price)}</div>
+                        <div class="wish-bank">
+                            <i class="fas fa-phone"></i>
+                            <span>Связь: ${wish.bank}</span>
+                        </div>
+                        ${videoHtml}
+                        <div class="wish-actions" style="margin-top: 20px;">
+                            <button class="copy-card-btn" data-card="${wish.cardNumber}">
+                                <i class="far fa-copy"></i>
+                                Скопировать контакты
+                            </button>
+                            <button class="delete-wish-btn ${adminButtonClass}" data-id="${wish.id}">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                        </div>
+                    </div>
+                `;
+                wishesContainer.appendChild(wishCard);
+            });
+
+            document.querySelectorAll('.copy-card-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cardNumber = btn.getAttribute('data-card');
+                    navigator.clipboard.writeText(cardNumber).then(() => {
+                        showToast('Контакты скопированы');
+                    });
+                });
+            });
+            
+            document.querySelectorAll('.delete-wish-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const wishId = btn.getAttribute('data-id');
+                    deleteWish(wishId);
+                });
+            });
+            updateAdminUI(); // Обновляем видимость кнопок удаления после рендера
+        }
+
+        // Применение фильтров
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedBank = bankFilter.value;
+            const selectedCategory = categoryFilter.value;
+            const minPriceValue = minPrice.value ? parseInt(minPrice.value) : 0;
+            const maxPriceValue = maxPrice.value ? parseInt(maxPrice.value) : Infinity;
+
+            filteredWishes = wishes.filter(wish => {
+                const matchesSearch = (wish.name && wish.name.toLowerCase().includes(searchTerm)) ||
+                                     (wish.wish && wish.wish.toLowerCase().includes(searchTerm));
+                
+                const matchesBank = !selectedBank || selectedBank === 'other' || wish.bank === selectedBank || (selectedBank === 'other' && !['Телефон', 'Telegram', 'WhatsApp'].includes(wish.bank));
+                const matchesCategory = !selectedCategory || wish.category === selectedCategory;
+                
+                const price = wish.price ? parseInt(wish.price) : 0;
+                const matchesPrice = price >= minPriceValue && price <= maxPriceValue;
+
+                return matchesSearch && matchesBank && matchesCategory && matchesPrice;
+            });
+
+            renderWishes(filteredWishes);
+        }
+
+        // =========================================================================
+        //                          ЗАПИСЬ ДАННЫХ В FIREBASE
+        // =========================================================================
+
+        wishForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            submitWishBtn.disabled = true;
+            submitWishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+
+            // 1. Сбор данных
+            const name = document.getElementById('name').value;
+            const wishText = document.getElementById('wish').value;
+            const price = document.getElementById('price').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            const category = document.getElementById('category').value;
+            const videoLink = document.getElementById('videoLink').value;
+            
+            let bank = bankSelect.value;
+            if (bank === 'other') {
+                bank = otherBankInput.value || 'Другой (уточнять)';
+            }
+            
+            const newWish = {
+                // !!! ГЛАВНОЕ: ОТМЕЧАЕМ ЭТУ ЗАПИСЬ КАК 'Service' !!!
+                type: 'Service', 
+                name: name,
+                wish: wishText,
+                price: price,
+                cardNumber: cardNumber, 
+                bank: bank,
+                category: category,
+                videoLink: videoLink,
+                createdAt: firebase.database.ServerValue.TIMESTAMP 
+            };
+
+            // 2. Отправка в Firebase
+            database.ref('wishes').push(newWish)
+                .then(() => {
+                    showToast('✅ Услуга успешно добавлена!');
+                    wishForm.reset();
+                    closeModal(wishModal);
+                })
+                .catch((error) => {
+                    console.error('Ошибка записи в базу данных:', error);
+                    showToast('❌ Ошибка при добавлении услуги.');
+                })
+                .finally(() => {
+                    submitWishBtn.disabled = false;
+                    submitWishBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Предложить услугу';
+                });
+        });
+
+        // --- Обработчики форм и фильтров ---
+        document.getElementById('openModalBtn').addEventListener('click', () => {
+            wishModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+
+        document.getElementById('closeModalBtn').addEventListener('click', () => {
+            closeModal(wishModal);
+        });
+        
+        bankSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'other') {
+                document.getElementById('otherBankGroup').style.display = 'block';
+                document.getElementById('otherBank').setAttribute('required', 'required');
+            } else {
+                document.getElementById('otherBankGroup').style.display = 'none';
+                document.getElementById('otherBank').removeAttribute('required');
+            }
+        });
+
+        searchInput.addEventListener('input', applyFilters);
+        applyFiltersBtn.addEventListener('click', applyFilters);
+        bankFilter.addEventListener('change', applyFilters);
+        categoryFilter.addEventListener('change', applyFilters);
+        minPrice.addEventListener('input', applyFilters);
+        maxPrice.addEventListener('input', applyFilters);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === wishModal) {
+                closeModal(wishModal);
+            }
+            if (e.target === adminModal) {
+                closeModal(adminModal);
+            }
+        });
+
+
+        // --- Загрузка при старте ---
+        window.addEventListener('DOMContentLoaded', loadWishes);
+    </script>
+</body>
+</html>

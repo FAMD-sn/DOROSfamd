@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Школьная система</title>
+
+  <style>
+    body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+    .block { background: #fff; padding: 20px; margin: 20px auto; width: 90%; max-width: 700px; border-radius: 10px; box-shadow: 0 0 8px #bbb; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #aaa; padding: 10px; text-align: center; }
+    button { cursor: pointer; }
+
+    #addBtn {
+      width: 200px;
+      padding: 15px;
+      background: #28a745;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .btn-small { padding: 6px 10px; margin: 2px; font-size: 14px; border-radius: 5px; cursor: pointer; }
+    .edit { background: #ffc107; }
+    .delete { background: #dc3545; color: white; }
+
+    .price { font-weight: bold; color: #d9534f; }
+
+    #totalBlock {
+      font-size: 20px;
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    /* ВСПЛЫВАЮЩЕЕ ОКНО */
+    .modal-bg {
+      position: fixed;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal {
+      background: #fff;
+      width: 90%;
+      max-width: 450px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+      animation: show .3s ease;
+    }
+
+    @keyframes show {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal input, .modal select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+
+    .modal button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #28a745;
+      color: white;
+      font-size: 17px;
+    }
+
+    .closeBtn {
+      background: #dc3545 !important;
+    }
+
+  </style>
+</head>
+<body>
+
+<h1 style="text-align:center;">📚 ПЛАТЕЖИ УЧЕНИКОВ</h1>
+
+<button id="addBtn" onclick="openModal()">➕ Добавить платёж</button>
+
+<div class="block">
+  <h2>🔍 Выбрать класс</h2>
+  <select id="searchClass" onchange="renderTable()"></select>
+</div>
+
+<div class="block">
+  <h2>📋 Список платежей</h2>
+  <table id="studentsTable">
+    <tr>
+      <th>Имя</th>
+      <th>Дата оплаты</th>
+      <th>Стоимость</th>
+      <th>Заплатил</th>
+      <th>Осталось</th>
+      <th>Действия</th>
+    </tr>
+  </table>
+
+  <div id="totalBlock">Итого: 0 сомони</div>
+</div>
+
+<!-- ВСПЛЫВАЮЩЕЕ ОКНО -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 id="modalTitle">Добавить платёж</h2>
+
+    <input id="studentName" placeholder="Имя ученика">
+
+    <label>Класс</label>
+    <select id="studentClass"></select>
+
+    <label>Стоимость (сомони)</label>
+    <input id="studentPrice" type="number" value="1500">
+
+    <label>Дата оплаты</label>
+    <input id="payDate" type="date">
+
+    <label>Заплатил (сомони)</label>
+    <input id="paidAmount" type="number" value="0">
+
+    <button onclick="saveStudent()" id="saveBtn">Сохранить</button>
+    <button class="closeBtn" onclick="closeModal()">Отмена</button>
+  </div>
+</div>
+
+<script>
+let students = [];
+let editIndex = null;
+
+const classes = ["1А","1Б","2А","2Б","3А","3Б","4А","4Б","5А","5Б","6А","6Б","7А","7Б","8А","8Б","9А","9Б","10А","10Б","11А","11Б"];
+
+function initClasses() {
+  let classSelect1 = document.getElementById("studentClass");
+  let classSelect2 = document.getElementById("searchClass");
+
+  classes.forEach(c => {
+    let opt1 = document.createElement("option");
+    let opt2 = document.createElement("option");
+
+    opt1.textContent = opt2.textContent = c;
+
+    classSelect1.appendChild(opt1);
+    classSelect2.appendChild(opt2);
+  });
+}
+initClasses();
+
+function openModal() {
+  document.getElementById("modalBg").style.display = "flex";
+  document.getElementById("modalTitle").innerText = "Добавить платёж";
+  editIndex = null;
+}
+
+function closeModal() {
+  document.getElementById("modalBg").style.display = "none";
+  clearInputs();
+}
+
+function clearInputs() {
+  studentName.value = "";
+  studentPrice.value = 1500;
+  payDate.value = "";
+  paidAmount.value = 0;
+}
+
+function loadData() {
+  let data = localStorage.getItem("students");
+  if (data) students = JSON.parse(data);
+}
+loadData();
+
+function saveData() {
+  localStorage.setItem("students", JSON.stringify(students));
+}
+
+function saveStudent() {
+  let name = studentName.value;
+  if (name.trim() === "") return alert("Введите имя!");
+
+  let sclass = studentClass.value;
+  let price = Number(studentPrice.value);
+  let paid = Number(paidAmount.value);
+  let date = payDate.value;
+  let remain = price - paid;
+
+  let student = { name, class: sclass, price, date, paid, remain };
+
+  if (editIndex === null) {
+    students.push(student);
+  } else {
+    students[editIndex] = student;
+  }
+
+  saveData();
+  closeModal();
+  renderTable();
+}
+
+function editStudent(i) {
+  let s = students[i];
+
+  openModal();
+  modalTitle.innerText = "Редактировать платёж";
+
+  studentName.value = s.name;
+  studentClass.value = s.class;
+  studentPrice.value = s.price;
+  payDate.value = s.date;
+  paidAmount.value = s.paid;
+
+  editIndex = i;
+}
+
+function deleteStudent(i) {
+  if (confirm("Удалить платёж?")) {
+    students.splice(i, 1);
+    saveData();
+    renderTable();
+  }
+}
+
+function renderTable() {
+  let filter = searchClass.value;
+  let table = document.getElementById("studentsTable");
+
+  table.innerHTML = `
+    <tr>
+      <th>Имя</th>
+      <th>Дата оплаты</th>
+      <th>Стоимость</th>
+      <th>Заплатил</th>
+      <th>Осталось</th>
+      <th>Действия</th>
+    </tr>
+  `;
+
+  let total = 0;
+
+  students.forEach((s, i) => {
+    if (s.class === filter) {
+      total += s.paid;
+
+      let row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${s.name}</td>
+        <td>${s.date || "-"}</td>
+        <td class="price">${s.price}</td>
+        <td>${s.paid}</td>
+        <td>${s.remain}</td>
+        <td>
+          <button class="btn-small edit" onclick="editStudent(${i})">✏</button>
+          <button class="btn-small delete" onclick="deleteStudent(${i})">🗑</button>
+        </td>
+      `;
+
+      table.appendChild(row);
+    }
+  });
+
+  totalBlock.innerText = "Итого оплат: " + total + " сомони";
+}
+
+renderTable();
+</script>
+
+</body>
+</html>
