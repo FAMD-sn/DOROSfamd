@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Музыкальный Поисковик | Свой видеоплеер</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #ff4e50;
+            --secondary: #1a1a2e;
+            --accent: #00adb5;
+            --light: #eeeeee;
+            --dark: #16213e;
+            --gradient: linear-gradient(135deg, #ff4e50 0%, #f9d423 100%);
+        }
+
+        body {
+            background-color: var(--secondary);
+            color: var(--light);
+            min-height: 100vh;
+            background: linear-gradient(rgba(22, 33, 62, 0.9), rgba(22, 33, 62, 0.9)),
+                        url('https://images.unsplash.com/photo-1518609878373-06d740f60d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 25px 0;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+
+        .logo i {
+            color: var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Custom Player Overlay */
+        .player-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+            padding: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .custom-player-container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(30, 30, 46, 0.98);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            transform: scale(0.9);
+            animation: scaleIn 0.4s ease forwards;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes scaleIn {
+            to { transform: scale(1); }
+        }
+
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--light);
+            max-width: 80%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .close-player {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-player:hover {
+            background: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        /* Custom Video Container */
+        .custom-video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background: #000;
+        }
+
+        #customVideoPlayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .custom-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .custom-video-container:hover .custom-controls {
+            opacity: 1;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        .time-display {
+            color: white;
+            font-size: 0.9rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .volume-level {
+            height: 100%;
+            background: var(--accent);
+            width: 100%;
+            border-radius: 2px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 0 40px;
+            animation: fadeIn 1s ease;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Search Section */
+        .search-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            animation: slideUp 0.8s ease;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 18px 25px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 4px rgba(0, 173, 181, 0.2);
+        }
+
+        .search-btn {
+            padding: 18px 35px;
+            background: var(--gradient);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 78, 80, 0.3);
+        }
+
+        /* Categories */
+        .categories {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .category-btn {
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: var(--gradient);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(255, 78, 80, 0.2);
+        }
+
+        .category-btn i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Results */
+        .results-section {
+            padding: 20px 0 60px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .section-title i {
+            color: var(--accent);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            animation: fadeInGrid 0.5s ease;
+        }
+
+        @keyframes fadeInGrid {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .music-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+
+        .music-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .thumbnail {
+            height: 180px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .music-card:hover .thumbnail img {
+            transform: scale(1.1);
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .music-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .music-info {
+            padding: 20px;
+        }
+
+        .music-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .music-channel {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .music-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .music-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Now Playing */
+        .now-playing {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        .now-playing.active {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        .now-playing-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        .now-playing-title {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .now-playing-channel {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .control-btn-small {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .control-btn-small:hover {
+            background: var(--accent);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .search-box { flex-direction: column; }
+            .search-input, .search-btn { width: 100%; }
+            .results-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+            .custom-player-container { margin: 10px; }
+            .player-title { font-size: 1rem; }
+            .control-btn { width: 40px; height: 40px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Player Overlay -->
+    <div class="player-overlay" id="playerOverlay">
+        <div class="custom-player-container">
+            <div class="player-header">
+                <div class="player-title" id="playerTitle">Загрузка видео...</div>
+                <button class="close-player" id="closePlayer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="custom-video-container">
+                <video id="customVideoPlayer" preload="metadata" playsinline>
+                    <source id="videoSource" type="video/mp4">
+                    Ваш браузер не поддерживает видео тег.
+                </video>
+                <div class="custom-controls">
+                    <button class="control-btn" id="playPauseBtn">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+                    <div class="volume-control">
+                        <button class="control-btn" id="muteBtn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="volume-slider" id="volumeSlider">
+                            <div class="volume-level" id="volumeLevel"></div>
+                        </div>
+                    </div>
+                    <button class="control-btn" id="fullscreenBtn">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-music"></i>
+                <span>Музыкальный Поисковик</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Слушайте музыку через наш плеер</h1>
+            <p>Ищите и смотрите музыкальные клипы через наш собственный видеоплеер. Никаких ограничений YouTube!</p>
+        </section>
+
+        <div class="main-layout">
+            <div class="results-section">
+                <h2 class="section-title">
+                    <i class="fas fa-list-ol"></i> Результаты поиска
+                </h2>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Идет поиск музыки...</p>
+                </div>
+
+                <div class="results-grid" id="resultsGrid">
+                    <div class="no-results" id="noResults" style="grid-column: 1 / -1; text-align: center; padding: 60px; color: #888;">
+                        <i class="fas fa-music" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h3>Начните поиск музыки</h3>
+                        <p>Введите запрос в поле выше или выберите категорию</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="search-section">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Введите название песни, артиста или альбома...">
+                        <button class="search-btn" id="searchBtn">
+                            <i class="fas fa-search"></i> Поиск
+                        </button>
+                    </div>
+
+                    <div class="categories">
+                        <button class="category-btn active" data-category="all">
+                            <i class="fas fa-globe"></i> Все
+                        </button>
+                        <button class="category-btn" data-category="pop">
+                            <i class="fas fa-star"></i> Поп
+                        </button>
+                        <button class="category-btn" data-category="rock">
+                            <i class="fas fa-guitar"></i> Рок
+                        </button>
+                        <button class="category-btn" data-category="hiphop">
+                            <i class="fas fa-microphone"></i> Хип-хоп
+                        </button>
+                        <button class="category-btn" data-category="electronic">
+                            <i class="fas fa-sync-alt"></i> Электроника
+                        </button>
+                        <button class="category-btn" data-category="classical">
+                            <i class="fas fa-music"></i> Классика
+                        </button>
+                        <button class="category-btn" data-category="jazz">
+                            <i class="fas fa-headphones"></i> Джаз
+                        </button>
+                        <button class="category-btn" data-category="reggae">
+                            <i class="fas fa-sun"></i> Регги
+                        </button>
+                    </div>
+
+                    <div class="now-playing" id="nowPlaying">
+                        <div class="now-playing-header">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Сейчас играет</span>
+                        </div>
+                        <div class="now-playing-title" id="nowPlayingTitle"></div>
+                        <div class="now-playing-channel" id="nowPlayingChannel"></div>
+                        <div class="player-controls">
+                            <button class="control-btn-small" id="miniPlayPauseBtn">
+                                <i class="fas fa-pause"></i> Пауза
+                            </button>
+                            <button class="control-btn-small" id="miniStopBtn">
+                                <i class="fas fa-stop"></i> Стоп
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2023 Музыкальный Поисковик | Использует YouTube Data API v3</p>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: #666;">
+                Собственный видеоплеер без ограничений YouTube
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // КОНФИГУРАЦИЯ
+        const YOUTUBE_API_KEY = 'AIzaSyBZM-ojpK4wDfE0tvtLWnhtIZFx3Q1sqxU';
+        const BASE_URL = 'https://www.googleapis.com/youtube/v3/search';
+        
+        // Глобальные переменные для плеера
+        let videoPlayer;
+        let isPlaying = false;
+        let currentVideoId = '';
+        let currentVideoTitle = '';
+        let currentVideoChannel = '';
+        
+        // Элементы DOM
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const loading = document.getElementById('loading');
+        const noResults = document.getElementById('noResults');
+        const playerOverlay = document.getElementById('playerOverlay');
+        const closePlayer = document.getElementById('closePlayer');
+        const playerTitle = document.getElementById('playerTitle');
+        const customVideoPlayer = document.getElementById('customVideoPlayer');
+        const videoSource = document.getElementById('videoSource');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeLevel = document.getElementById('volumeLevel');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const nowPlaying = document.getElementById('nowPlaying');
+        const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+        const nowPlayingChannel = document.getElementById('nowPlayingChannel');
+        const miniPlayPauseBtn = document.getElementById('miniPlayPauseBtn');
+        const miniStopBtn = document.getElementById('miniStopBtn');
+        
+        // Категории для поиска
+        const categories = {
+            all: 'музыка',
+            pop: 'поп музыка 2023',
+            rock: 'рок музыка',
+            hiphop: 'хип хоп музыка',
+            electronic: 'электронная музыка',
+            classical: 'классическая музыка',
+            jazz: 'джаз музыка',
+            reggae: 'регги музыка'
+        };
+        
+        let currentCategory = 'all';
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            // Инициализация видеоплеера
+            videoPlayer = customVideoPlayer;
+            videoPlayer.volume = 0.7;
+            
+            // Установка начального уровня громкости
+            volumeLevel.style.width = '70%';
+            
+            // События для элементов управления
+            initPlayerControls();
+            
+            // Фокус на поле поиска
+            searchInput.focus();
+            
+            // Загрузка популярной музыки при старте
+            searchMusic('музыка 2023');
+        });
+        
+        // Инициализация элементов управления плеером
+        function initPlayerControls() {
+            // Воспроизведение/пауза
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            miniPlayPauseBtn.addEventListener('click', togglePlayPause);
+            
+            // Прогресс
+            progressContainer.addEventListener('click', seekVideo);
+            videoPlayer.addEventListener('timeupdate', updateProgress);
+            
+            // Громкость
+            muteBtn.addEventListener('click', toggleMute);
+            volumeSlider.addEventListener('click', changeVolume);
+            
+            // Полный экран
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // Стоп
+            miniStopBtn.addEventListener('click', stopVideo);
+            
+            // Закрытие плеера
+            closePlayer.addEventListener('click', closeVideoPlayer);
+            
+            // Закрытие по клику вне области
+            playerOverlay.addEventListener('click', (e) => {
+                if (e.target === playerOverlay) {
+                    closeVideoPlayer();
+                }
+            });
+            
+            // Закрытие по Esc
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                    } else {
+                        closeVideoPlayer();
+                    }
+                }
+                
+                // Пробел для паузы/воспроизведения
+                if (e.code === 'Space' && playerOverlay.style.display === 'flex') {
+                    e.preventDefault();
+                    togglePlayPause();
+                }
+            });
+            
+            // Событие окончания видео
+            videoPlayer.addEventListener('ended', () => {
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                isPlaying = false;
+            });
+        }
+        
+        // Событие поиска
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+        
+        // События категорий
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+                const query = categories[currentCategory];
+                searchInput.value = query;
+                searchMusic(query);
+            });
+        });
+        
+        // Функция поиска
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (query) {
+                searchMusic(query);
+            }
+        }
+        
+        // Основная функция поиска музыки
+        async function searchMusic(query) {
+            if (!YOUTUBE_API_KEY) {
+                alert('API ключ не найден!');
+                showMockResults();
+                return;
+            }
+            
+            loading.style.display = 'block';
+            resultsGrid.innerHTML = '';
+            
+            // Используем только поиск, без получения видео файлов напрямую
+            const url = `${BASE_URL}?part=snippet&type=video&videoCategoryId=10&maxResults=15&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                
+                if (data.items && data.items.length > 0) {
+                    displayResults(data.items);
+                } else {
+                    showNoResults();
+                }
+            } catch (error) {
+                console.error('Ошибка при поиске:', error);
+                loading.style.display = 'none';
+                showMockResults();
+                alert('Ошибка при загрузке данных. Проверьте API ключ или подключение к интернету.');
+            }
+        }
+        
+        // Отображение результатов
+        function displayResults(videos) {
+            noResults.style.display = 'none';
+            resultsGrid.innerHTML = '';
+            
+            videos.forEach(video => {
+                const videoId = video.id.videoId;
+                const title = video.snippet.title;
+                const channel = video.snippet.channelTitle;
+                const thumbnail = video.snippet.thumbnails.medium.url;
+                
+                const card = document.createElement('div');
+                card.className = 'music-card';
+                card.dataset.videoId = videoId;
+                card.dataset.title = title;
+                card.dataset.channel = channel;
+                
+                card.innerHTML = `
+                    <div class="thumbnail">
+                        <img src="${thumbnail}" alt="${title}" loading="lazy">
+                        <div class="play-overlay">
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="music-info">
+                        <h3 class="music-title">${title}</h3>
+                        <p class="music-channel">
+                            <i class="fas fa-user"></i> ${channel}
+                        </p>
+                        <div class="music-stats">
+                            <span><i class="fas fa-play-circle"></i> Воспроизвести</span>
+                            <span><i class="fas fa-clock"></i> Смотреть</span>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    playVideo(videoId, title, channel);
+                });
+                
+                resultsGrid.appendChild(card);
+            });
+            
+            const cards = document.querySelectorAll('.music-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.05}s`;
+            });
+        }
+        
+        // Функция воспроизведения видео
+        async function playVideo(videoId, title, channel) {
+            currentVideoId = videoId;
+            currentVideoTitle = title;
+            currentVideoChannel = channel;
+            
+            // Обновляем информацию
+            playerTitle.textContent = title;
+            nowPlayingTitle.textContent = title;
+            nowPlayingChannel.textContent = channel;
+            
+            // Показываем блок "Сейчас играет"
+            nowPlaying.classList.add('active');
+            
+            // Создаем ссылку на видео через proxy для обхода ограничений
+            // ВНИМАНИЕ: Это демо-реализация. В продакшене нужен собственный proxy сервер
+            const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            
+            // Для демо используем альтернативный источник
+            // В реальном проекте нужно использовать YouTube Data API для получения прямых ссылок
+            // или настроить собственный proxy сервер
+            
+            try {
+                // Показываем сообщение о загрузке
+                videoSource.src = '';
+                videoPlayer.load();
+                
+                // Открываем плеер
+                playerOverlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+                // Для демо используем тестовое видео (замените на реальную логику)
+                // В продакшене: получите прямую ссылку через YouTube Data API или свой сервер
+                await loadVideoViaProxy(videoId);
+                
+            } catch (error) {
+                console.error('Ошибка загрузки видео:', error);
+                alert('Не удалось загрузить видео. Видео будет открыто на YouTube.');
+                window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+                closeVideoPlayer();
+            }
+        }
+        
+        // Демо-функция загрузки видео (замените на реальную реализацию)
+        async function loadVideoViaProxy(videoId) {
+            // В демо используем тестовое видео
+            // В реальном проекте нужно:
+            // 1. Создать backend сервер, который будет получать прямые ссылки на видео
+            // 2. Использовать YouTube Data API для получения информации о видео
+            // 3. Настроить CORS на сервере
+            
+            const demoVideos = {
+                'dQw4w9WgXcQ': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                '9bZkp7q19f0': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                'JGwWNGJdvx8': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+            };
+            
+            // Если это демо-видео, используем тестовые источники
+            if (demoVideos[videoId]) {
+                videoSource.src = demoVideos[videoId];
+                videoPlayer.load();
+                videoPlayer.play();
+                isPlaying = true;
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                return;
+            }
+            
+            // Для других видео показываем сообщение
+            playerTitle.textContent = `${title} (требуется настройка сервера)`;
+            alert('Для воспроизведения этого видео требуется настройка серверной части. Открываю на YouTube...');
+            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+            closeVideoPlayer();
+        }
+        
+        // Управление плеером
+        function togglePlayPause() {
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                miniPlayPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Пауза';
+                isPlaying = true;
+            } else {
+                videoPlayer.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                miniPlayPauseBtn.innerHTML = '<i class="fas fa-play"></i> Воспроизвести';
+                isPlaying = false;
+            }
+        }
+        
+        function stopVideo() {
+            videoPlayer.pause();
+            videoPlayer.currentTime = 0;
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            miniPlayPauseBtn.innerHTML = '<i class="fas fa-play"></i> Воспроизвести';
+            isPlaying = false;
+            nowPlaying.classList.remove('active');
+        }
+        
+        function updateProgress() {
+            const progress = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            const currentTime = formatTime(videoPlayer.currentTime);
+            const duration = formatTime(videoPlayer.duration);
+            timeDisplay.textContent = `${currentTime} / ${duration}`;
+        }
+        
+        function seekVideo(e) {
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            videoPlayer.currentTime = pos * videoPlayer.duration;
+        }
+        
+        function toggleMute() {
+            videoPlayer.muted = !videoPlayer.muted;
+            muteBtn.innerHTML = videoPlayer.muted ? 
+                '<i class="fas fa-volume-mute"></i>' : 
+                '<i class="fas fa-volume-up"></i>';
+        }
+        
+        function changeVolume(e) {
+            const rect = volumeSlider.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            const volume = Math.max(0, Math.min(1, pos));
+            
+            videoPlayer.volume = volume;
+            volumeLevel.style.width = `${volume * 100}%`;
+            
+            if (volume === 0) {
+                videoPlayer.muted = true;
+                muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            } else if (videoPlayer.muted) {
+                videoPlayer.muted = false;
+                muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+            }
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Ошибка при переходе в полноэкранный режим: ${err.message}`);
+                });
+                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                }
+            }
+        }
+        
+        function closeVideoPlayer() {
+            playerOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            if (videoPlayer && !videoPlayer.paused) {
+                videoPlayer.pause();
+            }
+            
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        }
+        
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        
+        function showNoResults() {
+            resultsGrid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: #888;">
+                    <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                    <h3>Ничего не найдено</h3>
+                    <p>Попробуйте другой запрос или выберите другую категорию</p>
+                </div>
+            `;
+        }
+        
+        function showMockResults() {
+            loading.style.display = 'none';
+            
+            const mockVideos = [
+                {
+                    id: { videoId: 'dQw4w9WgXcQ' },
+                    snippet: {
+                        title: 'Rick Astley - Never Gonna Give You Up (Демо)',
+                        channelTitle: 'Official Rick Astley',
+                        thumbnails: {
+                            medium: { url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg' }
+                        }
+                    }
+                },
+                {
+                    id: { videoId: '9bZkp7q19f0' },
+                    snippet: {
+                        title: 'PSY - GANGNAM STYLE (Демо)',
+                        channelTitle: 'officialpsy',
+                        thumbnails: {
+                            medium: { url: 'https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg' }
+                        }
+                    }
+                },
+                {
+                    id: { videoId: 'JGwWNGJdvx8' },
+                    snippet: {
+                        title: 'Ed Sheeran - Shape of You (Демо)',
+                        channelTitle: 'Ed Sheeran',
+                        thumbnails: {
+                            medium: { url: 'https://img.youtube.com/vi/JGwWNGJdvx8/mqdefault.jpg' }
+                        }
+                    }
+                },
+                {
+                    id: { videoId: 'k2qgadSvNyU' },
+                    snippet: {
+                        title: 'Imagine Dragons - Believer (Демо)',
+                        channelTitle: 'ImagineDragons',
+                        thumbnails: {
+                            medium: { url: 'https://img.youtube.com/vi/k2qgadSvNyU/mqdefault.jpg' }
+                        }
+                    }
+                },
+                {
+                    id: { videoId: '7wtfhZwyrcc' },
+                    snippet: {
+                        title: 'Miley Cyrus - Flowers (Демо)',
+                        channelTitle: 'MileyCyrus',
+                        thumbnails: {
+                            medium: { url: 'https://img.youtube.com/vi/7wtfhZwyrcc/mqdefault.jpg' }
+                        }
+                    }
+                }
+            ];
+            
+            displayResults(mockVideos);
+        }
+    </script>
+</body>
+</html>
