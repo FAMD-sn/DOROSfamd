@@ -1,0 +1,207 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styler — Liquid Glass Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f2f2f7;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --text-main: #000000;
+            --text-muted: #8e8e93;
+            --input-bg: #ffffff;
+            --accent: #007aff;
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000000; /* Глубокий черный */
+                --glass-bg: rgba(28, 28, 30, 0.7);
+                --glass-border: rgba(255, 255, 255, 0.1);
+                --text-main: #ffffff;
+                --text-muted: #8e8e93;
+                --input-bg: #1c1c1e;
+                --accent: #0a84ff;
+                --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            }
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            transition: background-color 0.5s ease;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .liquid-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+            border-radius: 24px;
+            transition: transform 0.2s cubic-bezier(0.33, 1, 0.68, 1);
+        }
+
+        .liquid-glass:active {
+            transform: scale(0.97);
+        }
+
+        .input-area {
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .copy-toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: rgba(44, 44, 46, 0.95);
+            color: white;
+            backdrop-filter: blur(10px);
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .copy-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        ::-webkit-scrollbar { width: 0; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="max-w-xl mx-auto px-6 py-12">
+        <header class="text-center mb-10">
+            <h1 id="h1" class="text-4xl font-bold tracking-tight mb-3">Генератор Шрифтов</h1>
+            <p id="h2" class="text-lg opacity-50">Быстрый и мощный генератор с большой базой шрифтов!</p>
+        </header>
+
+        <div class="mb-12">
+            <textarea 
+                id="userInput" 
+                rows="1" 
+                class="w-full input-area p-5 text-xl outline-none focus:ring-2 focus:ring-blue-500/40 transition-all resize-none overflow-hidden"
+                placeholder="..."
+            ></textarea>
+        </div>
+
+        <div id="results" class="space-y-4"></div>
+    </div>
+
+    <div id="toast" class="copy-toast">Скопировано!</div>
+
+    <script>
+        const input = document.getElementById('userInput');
+        const results = document.getElementById('results');
+        const toast = document.getElementById('toast');
+
+        const isRu = navigator.language.startsWith('ru');
+        const lang = {
+            placeholder: isRu ? "Введите что-нибудь..." : "Type something...",
+            copied: isRu ? "Скопировано!" : "Copied!",
+            empty: isRu ? "Пример текста" : "Sample Text"
+        };
+        input.placeholder = lang.placeholder;
+        toast.innerText = lang.copied;
+
+        // Zalgo Logic
+        const zalgoChars = [
+            '\u030d', '\u030e', '\u0304', '\u0305', '\u033f', '\u0311', '\u0306', '\u0310', '\u0352', '\u033c', '\u0344', '\u034a', '\u0342', '\u0343', '\u0318', '\u0319', '\u031c', '\u031d', '\u031e', '\u031f', '\u0320', '\u0324', '\u0325', '\u0326', '\u0329', '\u032a', '\u032b', '\u032c', '\u032d', '\u032e', '\u032f', '\u0330', '\u0331', '\u0332', '\u0333', '\u0339', '\u033a', '\u033b', '\u033c', '\u0345', '\u0347', '\u0348', '\u0349', '\u034d', '\u034e', '\u0353', '\u0354', '\u0355', '\u0356', '\u0359', '\u035a', '\u0323'
+        ];
+        function makeZalgo(text) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                result += text[i];
+                for (let j = 0; j < 3; j++) {
+                    result += zalgoChars[Math.floor(Math.random() * zalgoChars.length)];
+                }
+            }
+            return result;
+        }
+
+        // Map definitions
+        const maps = {
+            "Fraktur": c => ({'a':'𝔞','b':'𝔟','c':'𝔠','d':'𝔡','e':'ℯ','f':'𝔣','g':'𝔤','h':'𝔥','i':'𝔦','j':'𝔧','k':'𝔨','l':'𝔩','m':'𝔪','n':'𝔫','o':'𝔬','p':'𝔭','q':'𝔮','r':'𝔯','s':'𝔰','t':'𝔱','u':'𝔲','v':'𝔳','w':'𝔴','x':'𝔵','y':'𝔶','z':'𝔷','A':'𝔄','B':'𝔅','C':'ℭ','D':'𝔇','E':'𝔈','F':'𝔉','G':'𝔊','H':'ℌ','I':'ℑ','J':'𝔍','K':'𝔎','L':'𝔏','M':'𝔐','N':'𝔑','O':'𝔒','P':'𝔓','Q':'𝔔','R':'ℜ','S':'𝔖','T':'𝔗','U':'𝔘','V':'𝔙','W':'𝔚','X':'𝔛','Y':'𝔜','Z':'ℨ'}[c]||c),
+            "Sans Bold": c => ({'a':'𝗮','b':'𝗯','c':'𝗰','d':'𝗱','e':'𝗲','f':'𝗳','g':'𝗴','h':'𝗵','i':'𝗶','j':'𝗷','k':'𝗸','l':'𝗹','m':'𝗺','n':'𝗻','o':'𝗼','p':'𝗽','q':'𝗾','r':'𝗿','s':'𝘀','t':'𝘁','u':'𝘂','v':'𝘃','w':'𝘄','x':'𝘅','y':'𝘆','z':'𝘇','A':'𝗔','B':'𝗕','C':'𝗖','D':'𝗗','E':'𝗘','F':'𝗙','G':'𝗚','H':'𝗛','I':'𝗜','J':'𝗝','K':'𝗞','L':'𝗟','M':'𝗠','N':'𝗡','O':'𝗢','P':'𝗣','Q':'𝗤','R':'𝗥','S':'𝗦','T':'𝗧','U':'𝗨','V':'𝗩','W':'𝗪','X':'𝗫','Y':'𝗬','Z':'𝗭'}[c]||c),
+            "Script": c => ({'a':'𝓪','b':'𝓫','c':'𝓬','d':'𝓭','e':'𝓮','f':'𝓯','g':'𝓰','h':'𝓱','i':'𝓲','j':'𝓳','k':'𝓴','l':'𝓵','m':'𝓶','n':'𝓷','o':'𝓸','p':'𝓹','q':'𝓺','r':'𝓻','s':'𝓼','t':'𝓽','u':'𝓾','v':'𝓿','w':'𝔀','x':'𝔁','y':'𝔂','z':'𝔃','A':'𝓐','B':'𝓑','C':'𝓒','D':'𝓓','E':'𝓔','F':'𝓕','G':'𝓖','H':'𝓗','I':'𝓘','J':'𝓙','K':'𝓚','L':'𝓛','M':'𝓜','N':'𝓝','O':'𝓞','P':'𝓟','Q':'𝓠','R':'𝓡','S':'𝓢','T':'𝓣','U':'𝓤','V':'𝓥','W':'𝓦','X':'𝓧','Y':'𝓨','Z':'𝓩'}[c]||c),
+            "Double Struck": c => ({'a':'𝕒','b':'𝕓','c':'𝕔','d':'𝕕','e':'𝕖','f':'𝕗','g':'𝕘','h':'𝕙','i':'𝕚','j':'𝕛','k':'𝕜','l':'𝕝','m':'𝕞','n':'𝕟','o':'𝕠','p':'𝕡','q':'𝕢','r':'𝕣','s':'𝕤','t':'𝕥','u':'𝕦','v':'𝕧','w':'𝕨','x':'𝕩','y':'𝕪','z':'𝕫','A':'𝔸','B':'𝔹','C':'ℂ','D':'𝔻','E':'𝔼','F':'𝔽','G':'𝔾','H':'ℍ','I':'𝕀','J':'𝕁','K':'𝕂','L':'𝕃','M':'𝕄','N':'ℕ','O':'𝕆','P':'ℙ','Q':'ℚ','R':'ℝ','S':'𝕊','T':'𝕋','U':'𝕌','V':'𝕍','W':'𝕎','X':'𝕏','Y':'𝕐','Z':'ℤ'}[c]||c),
+            "Bubble Black": c => ({'a':'🅐','b':'🅑','c':'🅒','d':'🅓','e':'🅔','f':'🅕','g':'🅖','h':'🅗','i':'🅘','j':'🅙','k':'🅚','l':'🅛','m':'🅜','n':'🅝','o':'🅞','p':'🅟','q':'🅠','r':'🅡','s':'🅢','t':'🅣','u':'🅤','v':'🅥','w':'🅦','x':'🅧','y':'🅨','z':'🅩','A':'🅐','B':'🅑','C':'🅒','D':'🅓','E':'🅔','F':'🅕','G':'🅖','H':'🅗','I':'🅘','J':'🅙','K':'🅚','L':'🅛','M':'🅜','N':'🅝','O':'🅞','P':'🅟','Q':'🅠','R':'🅡','S':'🅢','T':'🅣','U':'🅤','V':'🅥','W':'🅦','X':'🅧','Y':'🅨','Z':'🅩'}[c]||c),
+            "Monospace": c => ({'a':'𝚊','b':'𝚋','c':'𝚌','d':'𝚍','e':'𝚎','f':'𝚏','g':'𝚐','h':'𝚑','i':'𝚒','j':'𝚓','k':'𝚔','l':'𝚕','m':'𝚖','n':'𝚗','o':'𝚘','p':'𝚙','q':'𝚚','r':'𝚛','s':'𝚜','t':'𝚝','u':'𝚞','v':'𝚟','w':'𝚠','x':'𝚡','y':'𝚢','z':'𝚣','A':'𝙰','B':'𝙱','C':'𝙲','D':'𝙳','E':'𝙴','F':'𝙵','G':'𝙶','H':'𝙷','I':'𝙸','J':'𝙹','K':'𝙺','L':'𝙻','M':'𝙼','N':'𝙽','O':'𝙾','P':'𝙿','Q':'𝚀','R':'𝚁','S':'𝚂','T':'𝚃','U':'𝚄','V':'𝚅','W':'𝚆','X':'𝚇','Y':'𝚈','Z':'𝚉'}[c]||c),
+            "Mini Caps": c => ({'a':'ᴀ','b':'ʙ','c':'ᴄ','d':'ᴅ','e':'ᴇ','f':'ꜰ','g':'ɢ','h':'ʜ','i':'ɪ','j':'ᴊ','k':'ᴋ','l':'ʟ','m':'ᴍ','n':'ɴ','o':'ᴏ','p':'ᴘ','q':'ǫ','r':'ʀ','s':'s','t':'ᴛ','u':'ᴜ','v':'ᴠ','w':'ᴡ','x':'x','y':'ʏ','z':'ᴢ'}[c]||c),
+            "Zalgo": t => makeZalgo(t),
+            "Upside Down": t => {
+                const map = {'a':'ɐ','b':'q','c':'ɔ','d':'p','e':'ǝ','f':'ɟ','g':'ƃ','h':'ɥ','i':'ᴉ','j':'ɾ','k':'ʞ','l':'l','m':'ɯ','n':'u','o':'o','p':'d','q':'b','r':'ɹ','s':'s','t':'ʇ','u':'n','v':'ʌ','w':'ʍ','x':'x','y':'ʎ','z':'z','A':'∀','B':'q','C':'Ɔ','D':'p','E':'Ǝ','F':'Ⅎ','G':'פ','H':'H','I':'I','J':'ɾ','K':'ʞ','L':'˥','M':'W','N':'N','O':'O','P':'Ԁ','Q':'Ό','R':'ᴚ','S':'S','T':'┴','U':'∩','V':'Λ','W':'M','X':'X','Y':'⅄','Z':'Z'};
+                return t.split('').reverse().map(c => map[c] || c).join('');
+            },
+            "Mirror": t => {
+                const map = {'a':'ɒ','b':'d','c':'ɔ','d':'b','e':'ɘ','f':'Ꮈ','g':'ǫ','h':'ʜ','i':'i','j':'ꞁ','k':'ʞ','l':'|','m':'m','n':'n','o':'o','p':'q','q':'p','r':'я','s':'ꙅ','t':'ƚ','u':'υ','v':'v','w':'w','x':'x','y':'y','z':'ƹ','A':'A','B':'ᙀ','C':'Ɔ','D':'ᗡ','E':'Ǝ','F':'ㅋ','G':'Ꭾ','H':'H','I':'I','J':'Ꞁ','K':'⋊','L':'⅃','M':'M','N':'ᴎ','O':'O','P':'ꟼ','Q':'Ϙ','R':'Я','S':'Ꙅ','T':'T','U':'U','V':'V','W':'W','X':'X','Y':'Y','Z':'Ƶ'};
+                return t.split('').reverse().map(c => map[c] || c).join('');
+            },
+            "Squares Black": c => ({'a':'🅰','b':'🅱','c':'🅲','d':'🅳','e':'🅴','f':'🅵','g':'🅶','h':'🅷','i':'🅸','j':'🅹','k':'🅺','l':'🅻','m':'🅼','n':'🅽','o':'🅾','p':'🅿','q':'🆀','r':'🆁','s':'🆂','t':'🆃','u':'🆄','v':'🆅','w':'🆆','x':'🆇','y':'🆈','z':'🆉','A':'🅰','B':'🅱','C':'🅲','D':'🅳','E':'🅴','F':'🅵','G':'🅶','H':'🅷','I':'🅸','J':'🅹','K':'🅺','L':'🅻','M':'🅼','N':'🅽','O':'🅾','P':'🅿','Q':'🆀','R':'🆁','S':'🆂','T':'🆃','U':'🆄','V':'🆅','W':'🆆','X':'🆇','Y':'🆈','Z':'🆉'}[c]||c),
+            "Thai Style": c => ({'a':'ค','b':'๒','c':'ς','d':'๔','e':'є','f':'Ŧ','g':'ﻮ','h':'ђ','i':'เ','j':'ן','k':'к','l':'ɭ','m':'๓','n':'ภ','o':'๏','p':'ק','q':'ợ','r':'г','s':'ร','t':'т','u':'ย','v':'ש','w':'ฬ','x':'א','y':'ץ','z':'z'}[c]||c),
+            "Strikethrough": t => t.split('').map(c => c + '\u0336').join('')
+        };
+
+        function copy(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function updateList() {
+            const val = input.value || lang.empty;
+            results.innerHTML = '';
+
+            Object.entries(maps).forEach(([name, transform]) => {
+                let styled = "";
+                if (typeof transform === 'function' && transform.length === 1 && !["Zalgo", "Upside Down", "Mirror", "Strikethrough"].includes(name)) {
+                    styled = val.split('').map(transform).join('');
+                } else {
+                    styled = transform(val);
+                }
+
+                const card = document.createElement('div');
+                card.className = 'liquid-glass p-5 cursor-pointer flex justify-between items-center group overflow-hidden';
+                card.innerHTML = `
+                    <div class="flex-1 overflow-hidden">
+                        <div class="text-[10px] font-bold opacity-40 uppercase tracking-[2px] mb-2">${name}</div>
+                        <div class="text-xl md:text-2xl break-words">${styled}</div>
+                    </div>
+                `;
+                card.onclick = () => copy(styled);
+                results.appendChild(card);
+            });
+        }
+
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            updateList();
+        });
+
+        window.onload = updateList;
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,389 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Древний Свиток Рифм</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Marck+Script&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #2c1e14;
+            --paper: #e9dcc0;
+            --wood: #5d3a1a;
+        }
+
+        body {
+            background-color: #120f0d;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-leather.png');
+            font-family: 'EB Garamond', serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 50px 20px;
+            color: var(--ink);
+            overflow-x: hidden;
+        }
+
+        .scroll-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-top: 20px;
+        }
+
+        .wood-handle {
+            position: absolute;
+            left: -5%;
+            width: 110%;
+            height: 40px;
+            background: linear-gradient(to bottom, #3e2712, #7d522e, #3e2712);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            z-index: 20;
+        }
+        .wood-handle::before, .wood-handle::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            background: #2b1d0e;
+            top: -5px;
+            border-radius: 5px;
+        }
+        .wood-handle::before { left: 0; }
+        .wood-handle::after { right: 0; }
+
+        .handle-top { top: -20px; }
+        .handle-bottom { bottom: -20px; }
+
+        .parchment {
+            background: var(--paper);
+            background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+            padding: 80px 60px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            min-height: 800px;
+            position: relative;
+            filter: url(#rough-edge);
+            border-left: 1px solid rgba(0,0,0,0.1);
+            border-right: 1px solid rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-family: 'Marck Script', cursive;
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: 0;
+            color: #5a3e2b;
+        }
+
+        .decorative-line {
+            width: 100%;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0 10 Q 25 0, 50 10 T 100 10" fill="none" stroke="%235a3e2b" stroke-width="1"/></svg>') repeat-x;
+            margin: 10px 0 40px;
+            opacity: 0.5;
+        }
+
+        .input-area {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(90, 62, 43, 0.3);
+            font-family: 'Bad Script', cursive;
+            font-size: 1.8rem;
+            width: 80%;
+            text-align: center;
+            outline: none;
+            padding: 10px;
+            color: var(--ink);
+            transition: border-bottom 0.5s;
+        }
+        input:focus {
+            border-bottom: 2px solid var(--wood);
+        }
+
+        .magic-btn {
+            margin-top: 30px;
+            font-family: 'Marck Script', cursive;
+            font-size: 1.5rem;
+            background: transparent;
+            border: 1px solid var(--wood);
+            padding: 10px 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 50% 50% 50% 50% / 10% 10% 10% 10%;
+        }
+        .magic-btn:hover {
+            background: rgba(93, 58, 26, 0.1);
+            transform: scale(1.05);
+        }
+
+        #rhyme-results {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            font-family: 'Bad Script', cursive;
+            font-size: 1.6rem;
+            line-height: 1.2;
+        }
+
+        .rhyme-word {
+            opacity: 0;
+            transform: rotate(-2deg);
+            transition: opacity 1s, transform 0.5s;
+        }
+        .rhyme-word:nth-child(even) {
+            transform: rotate(2deg);
+        }
+
+        .ink-blot {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(44, 30, 20, 0.05);
+            border-radius: 50%;
+            filter: blur(20px);
+            pointer-events: none;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--wood); }
+    </style>
+</head>
+<body>
+
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="rough-edge">
+            <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+        </filter>
+    </svg>
+
+    <div class="scroll-container">
+        <div class="wood-handle handle-top"></div>
+        
+        <div class="parchment">
+            <div class="ink-blot" style="top: 10%; left: 5%;"></div>
+            <div class="ink-blot" style="bottom: 15%; right: 10%;"></div>
+
+            <h1>Свиток Рифм</h1>
+            <div class="decorative-line"></div>
+
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Начертайте слово..." autocomplete="off">
+                <br>
+                <button class="magic-btn" onclick="revealRhymes()">Проявить созвучия</button>
+            </div>
+
+            <div id="rhyme-results"></div>
+
+            <div style="margin-top: 100px; text-align: center; font-style: italic; opacity: 0.5;">
+                «Слова -- тени мыслей, рифмы -- тени слов...»
+            </div>
+        </div>
+
+        <div class="wood-handle handle-bottom"></div>
+    </div>
+
+    <script>
+        /**
+         * База знаний с учетом ударений (разметка слогов).
+         * Формат: 'окончание': [ { word: 'слово', stressIndex: индекс_гласной_с_конца } ]
+         */
+        const library = {
+            "а": [
+                {w: "звезда", s: 0}, {w: "орда", s: 0}, {w: "вода", s: 0}, {w: "всегда", s: 0}, {w: "борода", s: 0}, 
+                {w: "города", s: 0}, {w: "высота", s: 0}, {w: "красота", s: 0}, {w: "пустота", s: 0}, {w: "мечта", s: 0},
+                {w: "лада", s: 1}, {w: "награда", s: 1}, {w: "отрада", s: 1}, {w: "блокада", s: 1}, {w: "засада", s: 1},
+                {w: "правда", s: 1}, {w: "жажда", s: 1}, {w: "однажды", s: 1}
+            ],
+            "ай": [
+                {w: "край", s: 0}, {w: "сарай", s: 0}, {w: "трамвай", "s": 0}, {w: "играй", s: 0}, {w: "отдай", s: 0},
+                {w: "прощай", s: 0}, {w: "каравай", s: 0}, {w: "урожай", s: 0}, {w: "невзначай", s: 0}, {w: "попугай", s: 0},
+                {w: "девай", s: 0}, {w: "банзай", s: 0}, {w: "лай", s: 0}, {w: "бай", s: 0}, {w: "май", s: 0}
+            ],
+            "ан": [
+                {w: "туман", s: 0}, {w: "обман", s: 0}, {w: "океан", s: 0}, {w: "карман", s: 0}, {w: "тиран", s: 0},
+                {w: "шаман", s: 0}, {w: "капкан", s: 0}, {w: "кальян", s: 0}, {w: "банан", s: 0}, {w: "пацан", s: 0},
+                {w: "стакан", s: 0}, {w: "сарафан", s: 0}, {w: "чемодан", s: 0}, {w: "истукан", s: 0}
+            ],
+            "ар": [
+                {w: "дар", s: 0}, {w: "жар", s: 0}, {w: "удар", s: 0}, {w: "кошмар", s: 0}, {w: "базар", s: 0},
+                {w: "товар", s: 0}, {w: "пожар", s: 0}, {w: "шар", s: 0}, {w: "нектар", s: 0}, {w: "футляр", s: 0},
+                {w: "январь", s: 0}, {w: "сухарь", s: 0}, {w: "алтарь", s: 0}, {w: "государь", s: 0}
+            ],
+            "ать": [
+                {w: "мечтать", s: 0}, {w: "летать", s: 0}, {w: "молчать", s: 0}, {w: "кричать", s: 0}, {w: "дышать", s: 0},
+                {w: "писать", s: 0}, {w: "искать", s: 0}, {w: "страдать", s: 0}, {w: "обнять", s: 0}, {w: "сиять", s: 0},
+                {w: "взять", s: 0}, {w: "дать", s: 0}, {w: "знать", s: 0}, {w: "стать", s: 0}, {w: "мать", s: 0},
+                {w: "хайповать", s: 0}, {w: "кайфовать", s: 0}, {w: "флексить-ать", s: 0}, {w: "баттлить", s: 1}
+            ],
+            "ей": [
+                {w: "ручей", s: 0}, {w: "лучей", s: 0}, {w: "ночей", s: 0}, {w: "очей", s: 0}, {w: "мечей", s: 0},
+                {w: "врачей", s: 0}, {w: "грачей", s: 0}, {w: "ничей", s: 0}, {w: "быстрей", s: 0}, {w: "смелей", s: 0},
+                {w: "диджей", s: 0}, {w: "музей", s: 0}, {w: "хоккей", s: 0}, {w: "бродячей", s: 1}, {w: "горячей", s: 1}
+            ],
+            "ень": [
+                {w: "день", s: 0}, {w: "тень", s: 0}, {w: "пень", s: 0}, {w: "олень", s: 0}, {w: "лень", s: 0},
+                {w: "мишень", s: 0}, {w: "ступень", s: 0}, {w: "сирень", s: 0}, {w: "ремень", s: 0}, {w: "осень", s: 1}
+            ],
+            "ет": [
+                {w: "привет", s: 0}, {w: "ответ", s: 0}, {w: "рассвет", s: 0}, {w: "совет", s: 0}, {w: "портрет", s: 0},
+                {w: "букет", s: 0}, {w: "интернет", s: 0}, {w: "сюжет", s: 0}, {w: "скелет", s: 0}, {w: "бюджет", s: 0},
+                {w: "ветер", s: 1}, {w: "пепел", s: 1}, {w: "свет", s: 0}, {w: "лет", s: 0}, {w: "нет", s: 0}
+            ],
+            "и": [
+                {w: "огни", s: 0}, {w: "дни", s: 0}, {w: "храни", s: 0}, {w: "тяни", s: 0}, {w: "гони", s: 0},
+                {w: "тени", s: 1}, {w: "колени", s: 1}, {w: "ступени", s: 1}, {w: "мишени", s: 1}, {w: "чертями", s: 1}
+            ],
+            "ить": [
+                {w: "любить", s: 0}, {w: "хранить", s: 0}, {w: "творить", s: 0}, {w: "дарить", s: 0}, {w: "забыть", s: 0},
+                {w: "плыть", s: 0}, {w: "жить", s: 0}, {w: "пить", s: 0}, {w: "шить", s: 0}, {w: "быть", s: 0},
+                {w: "верить", s: 1}, {w: "мерить", s: 1}, {w: "спорить", s: 1}, {w: "строить", s: 1}
+            ],
+            "ик": [
+                {w: "мужик", s: 0}, {w: "язык", s: 0}, {w: "старик", s: 0}, {w: "крик", s: 0}, {w: "блик", s: 0},
+                {w: "пик", s: 0}, {w: "вжик", s: 0}, {w: "столик", s: 1}, {w: "рофлик", s: 1}, {w: "паблик", s: 1},
+                {w: "гелик", s: 1}, {w: "велик", s: 1}, {w: "нолик", s: 1}, {w: "шизик", s: 1}, {w: "лирик", s: 1}
+            ],
+            "о": [
+                {w: "окно", s: 0}, {w: "давно", s: 0}, {w: "кино", s: 0}, {w: "вино", s: 0}, {w: "зерно", s: 0},
+                {w: "пятно", s: 0}, {w: "оно", s: 0}, {w: "равно", s: 0}, {w: "небо", s: 1}, {w: "древо", s: 1},
+                {w: "слово", s: 1}, {w: "дело", s: 1}, {w: "тело", s: 1}
+            ],
+            "ок": [
+                {w: "поток", s: 0}, {w: "росток", s: 0}, {w: "цветок", s: 0}, {w: "глоток", s: 0}, {w: "урок", s: 0},
+                {w: "замок", s: 0}, {w: "песок", s: 0}, {w: "дружок", s: 0}, {w: "прыжок", s: 0}, {w: "срок", s: 0},
+                {w: "адресок", s: 0}, {w: "кусок", s: 0}, {w: "висок", s: 0}, {w: "чеснок", s: 0}
+            ],
+            "ой": [
+                {w: "герой", s: 0}, {w: "покой", s: 0}, {w: "прибой", s: 0}, {w: "стеной", s: 0}, {w: "рекой", s: 0},
+                {w: "живой", s: 0}, {w: "чужой", s: 0}, {w: "родной", s: 0}, {w: "золотой", s: 0}, {w: "постой", s: 0},
+                {w: "отстой", s: 0}, {w: "ковбой", s: 0}, {w: "мой", s: 0}, {w: "твой", s: 0}, {w: "свой", s: 0}
+            ],
+            "ор": [
+                {w: "взор", s: 0}, {w: "узор", s: 0}, {w: "простор", s: 0}, {w: "топор", s: 0}, {w: "хор", s: 0},
+                {w: "приговор", s: 0}, {w: "дозор", s: 0}, {w: "забор", s: 0}, {w: "позор", s: 0}, {w: "мажор", s: 0},
+                {w: "город", s: 1}, {w: "ворон", s: 1}, {w: "морок", s: 1}, {w: "повод", s: 1}
+            ],
+            "ость": [
+                {w: "радость", s: 1}, {w: "сладость", s: 1}, {w: "младость", s: 1}, {w: "старость", s: 1}, {w: "верность", s: 1},
+                {w: "нежность", s: 1}, {w: "скорость", s: 1}, {w: "ярость", s: 1}, {w: "совесть", s: 1}, {w: "новость", s: 1}
+            ],
+            "у": [
+                {w: "иду", s: 0}, {w: "найду", s: 0}, {w: "веду", s: 0}, {w: "в саду", s: 0}, {w: "звезду", s: 0},
+                {w: "дугу", s: 0}, {w: "бегу", s: 0}, {w: "врагу", s: 0}, {w: "трубу", s: 0}, {w: "табу", s: 0},
+                {w: "утру", s: 1}, {w: "ветру", s: 1}, {w: "миру", s: 1}, {w: "сердцу", s: 1}
+            ],
+            "ус": [
+                {w: "арбуз", s: 0}, {w: "союз", s: 0}, {w: "груз", s: 0}, {w: "вкус", s: 0}, {w: "статус", s: 1},
+                {w: "ракурс", s: 1}, {w: "фокус", s: 1}, {w: "кактус", s: 1}, {w: "глобус", s: 1}, {w: "минус", s: 1}
+            ],
+            "я": [
+                {w: "заря", s: 0}, {w: "моря", s: 0}, {w: "даря", s: 0}, {w: "меня", s: 0}, {w: "тебя", s: 0},
+                {w: "огня", s: 0}, {w: "дня", s: 0}, {w: "броня", s: 0}, {w: "судья", s: 0}, {w: "друзья", s: 0},
+                {w: "пуля", s: 1}, {w: "воля", s: 1}, {w: "доля", s: 1}, {w: "буря", s: 1}, {w: "моя", s: 0}
+            ],
+            "иб": [
+                {w: "вайб", s: 0}, {w: "хайп", s: 0}, {w: "скайп", s: 0}, {w: "байт", s: 0}, {w: "сайт", s: 0},
+                {w: "тайп", s: 0}, {w: "лайт", s: 0}, {w: "страйк", s: 0}, {w: "драйв", s: 0}
+            ],
+            "ер": [
+                {w: "рэпер", s: 1}, {w: "блогер", s: 1}, {w: "джокер", s: 1}, {w: "скутер", s: 1}, {w: "мастер", s: 1},
+                {w: "вечер", s: 1}, {w: "ветер", s: 1}, {w: "клипер", s: 1}, {w: "триллер", s: 1}, {w: "двойник-ер", s: 0}
+            ]
+        };
+
+        // Русские гласные для поиска ударного слога
+        const VOWELS = "аеёиоуыэюя";
+
+        /**
+         * Определяет примерную позицию ударной гласной с конца слова (0 - последний слог, 1 - предпоследний и т.д.)
+         */
+        function detectStress(word) {
+            let vowelsFound = 0;
+            for (let i = word.length - 1; i >= 0; i--) {
+                if (VOWELS.includes(word[i])) {
+                    // Это очень упрощенная эвристика. В реальности нужно знать ударение.
+                    // Примем, что пользователь чаще всего вводит слова с ударением на последний (0) или предпоследний (1) слог.
+                    // Если в слове 1 слог - индекс 0.
+                    // Если 2 и более - мы не знаем, но попробуем найти совпадения.
+                    return vowelsFound; 
+                }
+            }
+            return 0;
+        }
+
+        function revealRhymes() {
+            const input = document.getElementById('userInput');
+            const output = document.getElementById('rhyme-results');
+            const word = input.value.toLowerCase().trim().replace(/[^а-яё]/g, '');
+
+            output.innerHTML = '';
+            if (!word) return;
+
+            // Определяем "слоговость" (ударение) вводимого слова
+            // Считаем гласные с конца до предполагаемого ударения (упрощенно)
+            const inputStress = detectStress(word);
+
+            let matches = [];
+            const suffixes = [word.slice(-4), word.slice(-3), word.slice(-2), word.slice(-1)];
+
+            // Ищем по суффиксам
+            for (let s of suffixes) {
+                if (library[s]) {
+                    // Фильтруем по ударению
+                    const exactStress = library[s].filter(item => item.s === inputStress && item.w !== word);
+                    const anyStress = library[s].filter(item => item.w !== word);
+                    
+                    // Если есть точные по ударению - берем их, иначе берем любые
+                    matches = exactStress.length > 0 ? exactStress : anyStress;
+                    break;
+                }
+            }
+
+            // Если всё еще нет слов, ищем по последней гласной
+            if (matches.length === 0) {
+                const vowelsInWord = word.split('').filter(c => VOWELS.includes(c));
+                const lastV = vowelsInWord[vowelsInWord.length - 1];
+                if (library[lastV]) {
+                    matches = library[lastV].filter(item => item.w !== word).slice(0, 15);
+                }
+            }
+
+            if (matches.length > 0) {
+                // Перемешиваем
+                const selection = matches.sort(() => Math.random() - 0.5).slice(0, 25);
+                
+                selection.forEach((item, i) => {
+                    const r = typeof item === 'string' ? item : item.w;
+                    const span = document.createElement('div');
+                    span.className = 'rhyme-word';
+                    span.innerText = r + (i < selection.length - 1 ? ',' : '.');
+                    output.appendChild(span);
+                    
+                    setTimeout(() => {
+                        span.style.opacity = '1';
+                    }, i * 80);
+                });
+            } else {
+                output.innerHTML = '<p style="opacity: 0.5;">Свиток не ведает созвучий для сего слова...</p>';
+            }
+        }
+
+        document.getElementById('userInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') revealRhymes();
+        });
+    </script>
+</body>
+</html>
+
