@@ -1,0 +1,392 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Grid Beat Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body {
+            background-color: #0a0a0c;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .sequencer-container {
+            display: grid;
+            grid-template-columns: 180px repeat(16, 1fr);
+            gap: 6px;
+            background: #16161a;
+            padding: 15px;
+            border-radius: 20px;
+            border: 1px solid #27272a;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .cell {
+            height: 54px;
+            background: #1f1f23;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        /* Исправленный баг: активное состояние теперь приоритетнее фона доли */
+        .cell.active {
+            background: #3b82f6 !important;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            border-color: #60a5fa !important;
+        }
+
+        /* Подсветка сильных долей (каждая 4-я) */
+        .cell.beat-marker {
+            background: #2d2d33;
+        }
+
+        .cell.playing {
+            filter: brightness(1.6);
+            transform: scale(0.92);
+            border-color: #ffffff;
+        }
+
+        .track-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 12px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #3f3f46;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .playhead-bar {
+            height: 4px;
+            background: #1f1f23;
+            border-radius: 2px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playhead-progress {
+            position: absolute;
+            height: 100%;
+            width: 6.25%;
+            background: #3b82f6;
+            border-radius: 2px;
+            transition: transform 0.1s linear;
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header & Top Controls -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+            <div>
+                <h1 class="text-3xl font-black tracking-tighter text-white">BEAT<span class="text-blue-500">LAB</span></h1>
+                <p class="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold">Synchronous Grid Engine</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-6 bg-zinc-900/50 p-5 rounded-3xl border border-zinc-800 backdrop-blur-md">
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-zinc-500 mb-1 uppercase">Темп (BPM)</label>
+                    <input id="bpm-control" type="number" value="120" min="40" max="240" class="bg-black border border-zinc-700 rounded-lg px-3 py-1.5 w-24 text-blue-400 font-bold focus:ring-1 focus:ring-blue-500 outline-none">
+                </div>
+
+                <div class="flex gap-3">
+                    <button id="play-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 rounded-2xl font-black transition-all active:scale-95 flex items-center gap-2">
+                        <span id="play-text">PLAY</span>
+                    </button>
+                    <button id="record-btn" class="bg-zinc-800 hover:bg-rose-600 text-rose-500 hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center transition-all active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sequencer Table -->
+        <div id="grid-root" class="sequencer-container">
+            <!-- JS generates rows here -->
+        </div>
+
+        <!-- Playhead Visual -->
+        <div class="sequencer-container" style="background: transparent; border: none; padding: 0 15px; margin-top: -5px;">
+            <div style="width: 180px;"></div>
+            <div class="col-span-16">
+                <div class="playhead-bar">
+                    <div id="playhead" class="playhead-progress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="mt-10 flex justify-between items-center">
+            <label class="group flex items-center gap-4 bg-zinc-900/40 hover:bg-zinc-800/60 border border-zinc-800 border-dashed border-2 rounded-2xl px-6 py-4 cursor-pointer transition-all">
+                <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-blue-400 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+                </div>
+                <span class="text-sm font-bold text-zinc-300">Загрузить свой WAV/MP3</span>
+                <input type="file" id="sample-upload" class="hidden" accept="audio/*">
+            </label>
+            
+            <div id="status-indicator" class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+                Engine Ready
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const masterGain = audioCtx.createGain();
+        const recDest = audioCtx.createMediaStreamDestination();
+        masterGain.connect(audioCtx.destination);
+        masterGain.connect(recDest);
+
+        let tracks = [
+            { id: 'kick', name: 'Kick Drum', pitch: 1, type: 'synth', pattern: Array(16).fill(false) },
+            { id: 'snare', name: 'Snare Drum', pitch: 1, type: 'synth', pattern: Array(16).fill(false) },
+            { id: 'hihat', name: 'Hi-Hat', pitch: 1, type: 'synth', pattern: Array(16).fill(false) },
+            { id: 'clap', name: 'Hand Clap', pitch: 1, type: 'synth', pattern: Array(16).fill(false) }
+        ];
+
+        const customSamples = {};
+        let isPlaying = false;
+        let currentStep = 0;
+        let bpm = 120;
+        let nextStepTime = 0;
+        let timerId;
+
+        // Синтезаторы звуков
+        const engine = {
+            kick: (t, p) => {
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.connect(g); g.connect(masterGain);
+                o.frequency.setValueAtTime(150 * p, t);
+                o.frequency.exponentialRampToValueAtTime(0.01, t + 0.4);
+                g.gain.setValueAtTime(1, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+                o.start(t); o.stop(t + 0.4);
+            },
+            snare: (t, p) => {
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.type = 'triangle'; o.connect(g); g.connect(masterGain);
+                o.frequency.setValueAtTime(220 * p, t);
+                g.gain.setValueAtTime(0.5, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+                o.start(t); o.stop(t + 0.1);
+                const b = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+                const d = b.getChannelData(0);
+                for(let i=0; i<d.length; i++) d[i] = Math.random() * 2 - 1;
+                const s = audioCtx.createBufferSource(); s.buffer = b;
+                const ng = audioCtx.createGain();
+                ng.gain.setValueAtTime(0.3, t);
+                ng.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+                s.connect(ng); ng.connect(masterGain);
+                s.start(t);
+            },
+            hihat: (t, p) => {
+                const b = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.04, audioCtx.sampleRate);
+                const d = b.getChannelData(0);
+                for(let i=0; i<d.length; i++) d[i] = Math.random() * 2 - 1;
+                const s = audioCtx.createBufferSource(); s.buffer = b;
+                const f = audioCtx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 8000 * p;
+                const g = audioCtx.createGain(); g.gain.setValueAtTime(0.2, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.04);
+                s.connect(f); f.connect(g); g.connect(masterGain);
+                s.start(t);
+            },
+            clap: (t, p) => {
+                const b = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.15, audioCtx.sampleRate);
+                const d = b.getChannelData(0);
+                for(let i=0; i<d.length; i++) d[i] = Math.random() * 2 - 1;
+                const s = audioCtx.createBufferSource(); s.buffer = b;
+                const f = audioCtx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1100 * p;
+                const g = audioCtx.createGain(); g.gain.setValueAtTime(0.4, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+                s.connect(f); f.connect(g); g.connect(masterGain);
+                s.start(t);
+            }
+        };
+
+        function renderGrid() {
+            const grid = document.getElementById('grid-root');
+            grid.innerHTML = '';
+
+            tracks.forEach((track, tIdx) => {
+                // Левая колонка: Инфо и Pitch
+                const info = document.createElement('div');
+                info.className = 'track-info';
+                info.innerHTML = `
+                    <div class="text-[11px] font-black text-zinc-400 uppercase tracking-tighter mb-2 truncate">${track.name}</div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[8px] font-bold text-zinc-600">PITCH</span>
+                        <input type="range" min="0.5" max="2" step="0.05" value="${track.pitch}" 
+                            oninput="tracks[${tIdx}].pitch = parseFloat(this.value)">
+                    </div>
+                `;
+                grid.appendChild(info);
+
+                // Сами ячейки
+                for (let sIdx = 0; sIdx < 16; sIdx++) {
+                    const cell = document.createElement('div');
+                    const isBeat = sIdx % 4 === 0;
+                    cell.id = `c-${tIdx}-${sIdx}`;
+                    cell.className = `cell ${isBeat ? 'beat-marker' : ''} ${track.pattern[sIdx] ? 'active' : ''}`;
+                    
+                    cell.onclick = () => {
+                        track.pattern[sIdx] = !track.pattern[sIdx];
+                        cell.classList.toggle('active');
+                        if (track.pattern[sIdx]) playSound(track, audioCtx.currentTime);
+                    };
+                    grid.appendChild(cell);
+                }
+            });
+        }
+
+        function playSound(track, time) {
+            if (track.type === 'synth') {
+                engine[track.id](time, track.pitch);
+            } else if (customSamples[track.id]) {
+                const source = audioCtx.createBufferSource();
+                source.buffer = customSamples[track.id];
+                source.playbackRate.value = track.pitch;
+                source.connect(masterGain);
+                source.start(time);
+            }
+        }
+
+        function scheduler() {
+            while (nextStepTime < audioCtx.currentTime + 0.1) {
+                // Параллельный запуск всех активных инструментов на шаге
+                tracks.forEach((track, tIdx) => {
+                    if (track.pattern[currentStep]) {
+                        playSound(track, nextStepTime);
+                    }
+
+                    // Визуал для каждой ячейки
+                    const delay = (nextStepTime - audioCtx.currentTime) * 1000;
+                    setTimeout(() => {
+                        const el = document.getElementById(`c-${tIdx}-${currentStep}`);
+                        if (el) {
+                            el.classList.add('playing');
+                            setTimeout(() => el.classList.remove('playing'), 100);
+                        }
+                    }, delay);
+                });
+
+                // Визуал ползунка
+                const stepIdx = currentStep;
+                const delay = (nextStepTime - audioCtx.currentTime) * 1000;
+                setTimeout(() => {
+                    document.getElementById('playhead').style.transform = `translateX(${stepIdx * 100}%)`;
+                }, delay);
+
+                advanceStep();
+            }
+            timerId = setTimeout(scheduler, 25);
+        }
+
+        function advanceStep() {
+            const secondsPerBeat = 60 / bpm / 4;
+            nextStepTime += secondsPerBeat;
+            currentStep = (currentStep + 1) % 16;
+        }
+
+        // --- CONTROLS ---
+        const playBtn = document.getElementById('play-btn');
+        playBtn.onclick = () => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                currentStep = 0;
+                nextStepTime = audioCtx.currentTime + 0.05;
+                scheduler();
+                document.getElementById('play-text').innerText = 'STOP';
+                playBtn.classList.replace('bg-blue-600', 'bg-zinc-700');
+            } else {
+                clearTimeout(timerId);
+                document.getElementById('play-text').innerText = 'PLAY';
+                playBtn.classList.replace('bg-zinc-700', 'bg-blue-600');
+                document.getElementById('playhead').style.transform = `translateX(0)`;
+            }
+        };
+
+        document.getElementById('bpm-control').onchange = (e) => {
+            bpm = Math.max(40, Math.min(240, e.target.value));
+            e.target.value = bpm;
+        };
+
+        document.getElementById('sample-upload').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const buffer = await audioCtx.decodeAudioData(await file.arrayBuffer());
+                const id = 'custom-' + Date.now();
+                tracks.push({
+                    id: id,
+                    name: file.name.split('.')[0].substring(0, 12),
+                    pitch: 1,
+                    type: 'sample',
+                    pattern: Array(16).fill(false)
+                });
+                customSamples[id] = buffer;
+                renderGrid();
+                document.getElementById('status-indicator').innerText = 'Sample Added';
+            } catch (err) {
+                alert('Ошибка загрузки файла');
+            }
+        };
+
+        // Запись WAV
+        let recorder, chunks = [];
+        document.getElementById('record-btn').onclick = function() {
+            if (recorder && recorder.state === 'recording') {
+                recorder.stop();
+                this.classList.remove('bg-rose-600', 'text-white');
+            } else {
+                chunks = [];
+                recorder = new MediaRecorder(recDest.stream);
+                recorder.ondataavailable = e => chunks.push(e.data);
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/wav' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `my-beat-${Date.now()}.wav`;
+                    a.click();
+                };
+                recorder.start();
+                this.classList.add('bg-rose-600', 'text-white');
+                if(!isPlaying) playBtn.click();
+            }
+        };
+
+        window.onkeydown = (e) => {
+            if (e.code === 'Space') { e.preventDefault(); playBtn.click(); }
+        };
+
+        renderGrid();
+    </script>
+</body>
+</html>
+

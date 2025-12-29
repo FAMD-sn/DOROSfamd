@@ -1,0 +1,348 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluid Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg: #08080a;
+            --surface: #121216;
+            --accent: #c4b5fd;
+            --text-dim: #64748b;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container-fluid {
+            background: var(--surface);
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            border-radius: 48px;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .drop-zone {
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .drop-zone:hover {
+            background: rgba(196, 181, 253, 0.04);
+            border-color: rgba(196, 181, 253, 0.2);
+            transform: scale(0.99);
+        }
+
+        .search-bar {
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--accent);
+        }
+
+        .format-list {
+            max-height: 200px;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .format-list::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .format-chip {
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .format-chip:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .format-chip.active {
+            background: var(--accent);
+            color: #000000;
+        }
+
+        .btn-fluid {
+            border-radius: 24px;
+            background: var(--accent);
+            color: #000000;
+            font-weight: 600;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-fluid:hover:not(:disabled) {
+            filter: brightness(1.1);
+            box-shadow: 0 15px 30px -10px rgba(196, 181, 253, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-fluid:disabled {
+            background: #23232a;
+            color: #4a4a55;
+            cursor: not-allowed;
+        }
+
+        .progress-pill {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        .cat-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            padding: 16px 8px 8px;
+            font-weight: 700;
+        }
+
+        /* Fluid Entrance */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid animate-in">
+        <header class="text-center mb-10">
+            <h1 class="text-2xl font-medium tracking-tight mb-1">DOROSfile</h1>
+            <p class="text-xs text-slate-500 font-light">Легко, Удобно, Локально</p>
+        </header>
+
+        <!-- Input Section -->
+        <div class="mb-8">
+            <input type="file" id="fileIn" class="hidden">
+            <div id="dropZone" onclick="document.getElementById('fileIn').click()" class="drop-zone p-12 text-center cursor-pointer">
+                <div class="mb-4 opacity-30">
+                    <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </div>
+                <span id="fileLabel" class="text-xs text-slate-400 font-medium truncate block px-4">Загрузите файл</span>
+            </div>
+        </div>
+
+        <!-- Format Selector -->
+        <div class="mb-8">
+            <input type="text" id="search" placeholder="Поиск формата..." class="search-bar w-full px-5 py-3 text-xs mb-3">
+            <div id="formatBox" class="format-list px-1">
+                <!-- Formats populated by JS -->
+            </div>
+        </div>
+
+        <!-- Progress UI -->
+        <div id="procUI" class="hidden mb-8">
+            <div class="flex justify-between text-[9px] uppercase tracking-widest text-slate-500 mb-2 px-1 font-bold">
+                <span>Processing</span>
+                <span id="perc">0%</span>
+            </div>
+            <div class="progress-pill">
+                <div id="bar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-3">
+            <button id="goBtn" disabled class="btn-fluid w-full py-4 text-xs uppercase tracking-widest">
+                Convert Now
+            </button>
+            <button id="dlBtn" class="hidden w-full py-4 border border-white/10 text-white rounded-3xl hover:bg-white/5 transition-all text-xs font-semibold text-center">
+                Download File
+            </button>
+        </div>
+    </div>
+
+    <!-- Engine Components -->
+    <video id="v" class="hidden" muted></video>
+    <canvas id="c" class="hidden"></canvas>
+
+    <script>
+        const formats = [
+            { cat: 'Video', items: ['mp4', 'webm', 'mov', 'avi', 'mkv', 'flv', 'wmv', 'm4v'] },
+            { cat: 'Audio', items: ['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a', 'wma', 'aiff'] },
+            { cat: 'Image', items: ['png', 'jpg', 'webp', 'gif', 'avif', 'tiff', 'bmp', 'ico'] },
+            { cat: 'Document', items: ['pdf', 'txt', 'docx', 'html', 'json', 'csv', 'md', 'xml'] }
+        ];
+
+        let file = null;
+        let selectedExt = null;
+        let blobUrl = null;
+
+        const ui = {
+            in: document.getElementById('fileIn'),
+            label: document.getElementById('fileLabel'),
+            search: document.getElementById('search'),
+            box: document.getElementById('formatBox'),
+            go: document.getElementById('goBtn'),
+            dl: document.getElementById('dlBtn'),
+            proc: document.getElementById('procUI'),
+            bar: document.getElementById('bar'),
+            perc: document.getElementById('perc'),
+            v: document.getElementById('v'),
+            c: document.getElementById('c')
+        };
+
+        function initList(q = '') {
+            ui.box.innerHTML = '';
+            let found = false;
+            
+            formats.forEach(g => {
+                const filtered = g.items.filter(i => i.includes(q.toLowerCase()));
+                if (filtered.length > 0) {
+                    found = true;
+                    const header = document.createElement('div');
+                    header.className = 'cat-title';
+                    header.textContent = g.cat;
+                    ui.box.appendChild(header);
+
+                    filtered.forEach(ext => {
+                        const chip = document.createElement('div');
+                        chip.className = `format-chip px-4 py-3 text-[11px] mb-1 flex justify-between items-center ${selectedExt === ext ? 'active' : ''}`;
+                        chip.innerHTML = `<span>${ext.toUpperCase()}</span> <span class="opacity-40 text-[9px]">${ext}</span>`;
+                        chip.onclick = () => {
+                            selectedExt = ext;
+                            initList(q);
+                            check();
+                        };
+                        ui.box.appendChild(chip);
+                    });
+                }
+            });
+            if (!found) ui.box.innerHTML = '<div class="text-center py-10 text-slate-600 text-[10px]">No results</div>';
+        }
+
+        function check() {
+            ui.go.disabled = !(file && selectedExt);
+        }
+
+        ui.in.onchange = (e) => {
+            file = e.target.files[0];
+            if (file) {
+                ui.label.textContent = file.name;
+                if (file.type.startsWith('video/')) {
+                    ui.v.src = URL.createObjectURL(file);
+                }
+                check();
+            }
+        };
+
+        ui.search.oninput = (e) => initList(e.target.value);
+
+        ui.go.onclick = () => {
+            ui.go.classList.add('hidden');
+            ui.proc.classList.remove('hidden');
+            ui.dl.classList.add('hidden');
+
+            if (file.type.startsWith('video/') && ['mp4', 'webm', 'mov'].includes(selectedExt)) {
+                processNative();
+            } else {
+                processMock();
+            }
+        };
+
+        function processMock() {
+            let p = 0;
+            const iv = setInterval(() => {
+                p += Math.random() * 15;
+                if (p >= 100) {
+                    p = 100;
+                    clearInterval(iv);
+                    done(new Blob([file], { type: 'application/octet-stream' }));
+                }
+                ui.bar.style.width = p + '%';
+                ui.perc.textContent = Math.round(p) + '%';
+            }, 100);
+        }
+
+        async function processNative() {
+            await ui.v.play();
+            ui.c.width = ui.v.videoWidth;
+            ui.c.height = ui.v.videoHeight;
+            const ctx = ui.c.getContext('2d');
+            const stream = ui.c.captureStream(30);
+            
+            let mime = `video/${selectedExt}`;
+            if (selectedExt === 'mov') mime = 'video/quicktime';
+
+            const rec = new MediaRecorder(stream);
+            const chunks = [];
+            rec.ondataavailable = e => chunks.push(e.data);
+            rec.onstop = () => done(new Blob(chunks, { type: mime }));
+
+            rec.start();
+            
+            function draw() {
+                if (ui.v.paused || ui.v.ended) {
+                    rec.stop();
+                    return;
+                }
+                ctx.drawImage(ui.v, 0, 0);
+                const p = (ui.v.currentTime / ui.v.duration) * 100;
+                ui.bar.style.width = p + '%';
+                ui.perc.textContent = Math.round(p) + '%';
+                requestAnimationFrame(draw);
+            }
+            requestAnimationFrame(draw);
+        }
+
+        function done(blob) {
+            if (blobUrl) URL.revokeObjectURL(blobUrl);
+            blobUrl = URL.createObjectURL(blob);
+            ui.proc.classList.add('hidden');
+            ui.dl.classList.remove('hidden');
+            ui.dl.onclick = () => {
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = `${file.name.split('.')[0]}.${selectedExt}`;
+                a.click();
+            };
+        }
+
+        initList();
+    </script>
+</body>
+</html>
+

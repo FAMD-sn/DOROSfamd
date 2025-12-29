@@ -1,0 +1,3843 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOROSaper</title>
+    <style>
+        /* Стили Windows XP */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #008080;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        /* ========== ТЕМЫ ========== */
+        
+        /* Классическая тема (Windows XP) */
+        body.classic-theme {
+            background: #008080;
+        }
+        
+        /* Темная тема - УЛУЧШЕННАЯ */
+        body.dark-theme {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+        
+        /* Хэллоуин тема - УЛУЧШЕННАЯ */
+        body.halloween-theme {
+            background: linear-gradient(135deg, #0f0a05 0%, #2a1a0a 100%);
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 102, 0, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 80% 20%, rgba(255, 69, 0, 0.1) 0%, transparent 20%);
+        }
+        
+        /* Рождественская тема - УЛУЧШЕННАЯ */
+        body.christmas-theme {
+            background: linear-gradient(135deg, #0a1a0f 0%, #0a2a1a 100%);
+            background-image: 
+                radial-gradient(circle at 10% 90%, rgba(255, 0, 0, 0.1) 0%, transparent 15%),
+                radial-gradient(circle at 90% 10%, rgba(0, 255, 0, 0.1) 0%, transparent 15%);
+        }
+        
+        /* Минималистичная тема - УЛУЧШЕННАЯ */
+        body.minimal-theme {
+            background: #000000;
+        }
+        
+        /* Рождественские гирлянды */
+        .garland {
+            position: fixed;
+            width: 100%;
+            height: 20px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.7;
+        }
+        
+        .garland.top {
+            top: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                #ff0000,
+                #ff0000 10px,
+                #00ff00 10px,
+                #00ff00 20px,
+                #ffffff 20px,
+                #ffffff 30px
+            );
+        }
+        
+        .garland.bottom {
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                #00ff00,
+                #00ff00 10px,
+                #ffffff 10px,
+                #ffffff 20px,
+                #ff0000 20px,
+                #ff0000 30px
+            );
+        }
+        
+        /* Окно в стиле Windows XP */
+        .xp-window {
+            width: 100%;
+            max-width: 1000px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background-color: #c0c0c0;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+            padding: 3px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Темы для окна */
+        body.dark-theme .xp-window {
+            background-color: #1a1a1a;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .xp-window {
+            background-color: #2a1a0a;
+            border-color: #ff7700 #5a3000 #5a3000 #ff7700;
+        }
+        
+        body.christmas-theme .xp-window {
+            background-color: #0a2a1a;
+            border-color: #ff0000 #005500 #005500 #ff0000;
+        }
+        
+        body.minimal-theme .xp-window {
+            background-color: #000000;
+            border-color: #ffffff #666666 #666666 #ffffff;
+        }
+        
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            color: white;
+            padding: 3px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            height: 18px;
+        }
+        
+        /* Темы для заголовка */
+        body.dark-theme .title-bar {
+            background: linear-gradient(90deg, #101020, #2a3a5a);
+        }
+        
+        body.halloween-theme .title-bar {
+            background: linear-gradient(90deg, #5a3000, #ff5500);
+        }
+        
+        body.christmas-theme .title-bar {
+            background: linear-gradient(90deg, #005500, #ff0000);
+        }
+        
+        body.minimal-theme .title-bar {
+            background: linear-gradient(90deg, #000000, #333333);
+            color: #ffffff;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .control-btn {
+            width: 14px;
+            height: 12px;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background-color: #c0c0c0;
+            cursor: pointer;
+            color: black;
+        }
+        
+        body.dark-theme .control-btn {
+            background-color: #333333;
+            border-color: #606060 #202020 #202020 #606060;
+            color: white;
+        }
+        
+        body.halloween-theme .control-btn {
+            background-color: #ff7700;
+            border-color: #ffaa00 #5a3000 #5a3000 #ffaa00;
+        }
+        
+        body.christmas-theme .control-btn {
+            background-color: #ff0000;
+            border-color: #ffffff #005500 #005500 #ffffff;
+            color: white;
+        }
+        
+        body.minimal-theme .control-btn {
+            background-color: #ffffff;
+            border-color: #000000;
+            color: #000000;
+        }
+        
+        /* Основной контейнер */
+        .main-container {
+            display: flex;
+            gap: 20px;
+            padding: 15px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+            }
+        }
+        
+        .left-panel {
+            flex: 1;
+            min-width: 250px;
+            max-width: 600px;
+        }
+        
+        .right-panel {
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+        }
+        
+        /* Меню в стиле XP */
+        .menu-bar {
+            background-color: #c0c0c0;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 0;
+            margin-bottom: 8px;
+            display: flex;
+            font-size: 11px;
+        }
+        
+        body.dark-theme .menu-bar {
+            background-color: #2a2a2a;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .menu-bar {
+            background-color: #ff7700;
+            border-color: #ffaa00 #5a3000 #5a3000 #ffaa00;
+        }
+        
+        body.christmas-theme .menu-bar {
+            background-color: #005500;
+            border-color: #00ff00 #003300 #003300 #00ff00;
+        }
+        
+        body.minimal-theme .menu-bar {
+            background-color: #000000;
+            border-color: #ffffff #666666 #666666 #ffffff;
+        }
+        
+        .menu-item {
+            padding: 3px 8px;
+            margin: 0 1px;
+            cursor: pointer;
+            position: relative;
+            color: black;
+        }
+        
+        body.dark-theme .menu-item {
+            color: #ffffff;
+        }
+        
+        body.halloween-theme .menu-item {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        
+        body.christmas-theme .menu-item {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        
+        body.minimal-theme .menu-item {
+            color: #ffffff;
+        }
+        
+        .menu-item:hover {
+            background-color: #000080;
+            color: white;
+        }
+        
+        body.dark-theme .menu-item:hover {
+            background-color: #2a5a9a;
+        }
+        
+        body.halloween-theme .menu-item:hover {
+            background-color: #ff3300;
+        }
+        
+        body.christmas-theme .menu-item:hover {
+            background-color: #ff0000;
+        }
+        
+        body.minimal-theme .menu-item:hover {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        
+        .menu-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        body.dark-theme .menu-dropdown {
+            background-color: #2a2a2a;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .menu-dropdown {
+            background-color: #ff7700;
+            border-color: #ffaa00 #5a3000 #5a3000 #ffaa00;
+        }
+        
+        body.christmas-theme .menu-dropdown {
+            background-color: #005500;
+            border-color: #00ff00 #003300 #003300 #00ff00;
+        }
+        
+        body.minimal-theme .menu-dropdown {
+            background-color: #000000;
+            border-color: #ffffff #666666 #666666 #ffffff;
+        }
+        
+        .menu-item:hover .menu-dropdown {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 4px 20px 4px 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            color: black;
+        }
+        
+        body.dark-theme .dropdown-item {
+            color: #ffffff;
+        }
+        
+        body.halloween-theme .dropdown-item {
+            color: #ffffff;
+        }
+        
+        body.christmas-theme .dropdown-item {
+            color: #ffffff;
+        }
+        
+        body.minimal-theme .dropdown-item {
+            color: #ffffff;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #000080;
+            color: white;
+        }
+        
+        body.dark-theme .dropdown-item:hover {
+            background-color: #2a5a9a;
+        }
+        
+        body.halloween-theme .dropdown-item:hover {
+            background-color: #ff3300;
+        }
+        
+        body.christmas-theme .dropdown-item:hover {
+            background-color: #ff0000;
+        }
+        
+        body.minimal-theme .dropdown-item:hover {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        
+        .dropdown-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .dropdown-item.disabled:hover {
+            background-color: inherit;
+            color: inherit;
+        }
+        
+        /* Игровая панель */
+        .game-panel {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        body.dark-theme .game-panel {
+            background-color: #2a2a2a;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .game-panel {
+            background-color: #3a2a1a;
+            border-color: #ff7700 #3a2a1a #3a2a1a #ff7700;
+        }
+        
+        body.christmas-theme .game-panel {
+            background-color: #0a3a2a;
+            border-color: #ff0000 #0a3a2a #0a3a2a #ff0000;
+        }
+        
+        body.minimal-theme .game-panel {
+            background-color: #000000;
+            border-color: #ffffff #000000 #000000 #ffffff;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #c0c0c0;
+            border: 2px inset;
+        }
+        
+        body.dark-theme .game-header {
+            background-color: #333333;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .game-header {
+            background-color: #5a3000;
+            border-color: #ff7700 #3a1a00 #3a1a00 #ff7700;
+        }
+        
+        body.christmas-theme .game-header {
+            background-color: #005500;
+            border-color: #00ff00 #003300 #003300 #00ff00;
+        }
+        
+        body.minimal-theme .game-header {
+            background-color: #000000;
+            border-color: #ffffff;
+        }
+        
+        .counter {
+            background-color: #000;
+            color: #f00;
+            font-family: 'LCD', 'Courier New', monospace;
+            font-size: 24px;
+            padding: 2px 5px;
+            border: 2px inset #808080;
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        body.dark-theme .counter {
+            background-color: #000;
+            color: #ff3333;
+        }
+        
+        body.halloween-theme .counter {
+            background-color: #000;
+            color: #ff5500;
+        }
+        
+        body.christmas-theme .counter {
+            background-color: #000;
+            color: #ff3333;
+        }
+        
+        body.minimal-theme .counter {
+            background-color: #000000;
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+        
+        /* Смайлики для разных тем */
+        .smiley-btn {
+            width: 26px;
+            height: 26px;
+            font-size: 16px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background-color: #c0c0c0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        body.dark-theme .smiley-btn {
+            background-color: #404040;
+            border-color: #606060 #202020 #202020 #606060;
+        }
+        
+        body.halloween-theme .smiley-btn {
+            background-color: #ff7700;
+            border-color: #ffaa00 #5a3000 #5a3000 #ffaa00;
+        }
+        
+        body.halloween-theme .smiley-btn::after {
+            content: '🎃';
+        }
+        
+        body.christmas-theme .smiley-btn {
+            background-color: #005500;
+            border-color: #00ff00 #003300 #003300 #00ff00;
+        }
+        
+        body.christmas-theme .smiley-btn::after {
+            content: '🎄';
+        }
+        
+        body.minimal-theme .smiley-btn {
+            background-color: #ffffff;
+            border-color: #000000;
+            color: #000000;
+        }
+        
+        .smiley-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        body.dark-theme .smiley-btn:hover {
+            background-color: #606060;
+        }
+        
+        body.halloween-theme .smiley-btn:hover {
+            background-color: #ff9900;
+        }
+        
+        body.christmas-theme .smiley-btn:hover {
+            background-color: #00aa00;
+        }
+        
+        body.minimal-theme .smiley-btn:hover {
+            background-color: #cccccc;
+        }
+        
+        /* Игровое поле */
+        .game-board {
+            display: grid;
+            margin: 0 auto;
+            background-color: #c0c0c0;
+            border: 4px inset;
+            grid-gap: 0;
+            gap: 0;
+            overflow: hidden;
+        }
+        
+        body.dark-theme .game-board {
+            background-color: #333333;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .game-board {
+            background-color: #3a2a1a;
+            border-color: #ff7700 #3a2a1a #3a2a1a #ff7700;
+        }
+        
+        body.christmas-theme .game-board {
+            background-color: #0a3a2a;
+            border-color: #ff0000 #0a3a2a #0a3a2a #ff0000;
+        }
+        
+        body.minimal-theme .game-board {
+            background-color: #000000;
+            border-color: #ffffff;
+        }
+        
+        /* Клетки */
+        .cell {
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: default;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background-color: #c0c0c0;
+            user-select: none;
+            box-sizing: border-box;
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Стили для сканера */
+        .cell.scanner-safe {
+            background-color: rgba(0, 255, 0, 0.3) !important;
+        }
+        
+        .cell.scanner-mine {
+            background-color: rgba(255, 0, 0, 0.3) !important;
+        }
+        
+        body.dark-theme .cell {
+            background-color: #404040;
+            border-color: #606060 #202020 #202020 #606060;
+        }
+        
+        body.halloween-theme .cell {
+            background-color: #5a3a2a;
+            border-color: #ff9900 #5a3a2a #5a3a2a #ff9900;
+        }
+        
+        body.christmas-theme .cell {
+            background-color: #0a5a3a;
+            border-color: #00ff00 #0a5a3a #0a5a3a #00ff00;
+        }
+        
+        body.minimal-theme .cell {
+            background-color: #ffffff;
+            border-color: #000000;
+            color: #000000;
+        }
+        
+        .cell:hover {
+            background-color: #e0e0e0;
+        }
+        
+        body.dark-theme .cell:hover {
+            background-color: #505050;
+        }
+        
+        body.halloween-theme .cell:hover {
+            background-color: #7a5a3a;
+        }
+        
+        body.christmas-theme .cell:hover {
+            background-color: #1a7a5a;
+        }
+        
+        body.minimal-theme .cell:hover {
+            background-color: #dddddd;
+        }
+        
+        .cell.revealed {
+            border: 1px solid #808080 !important;
+            background-color: #c0c0c0;
+        }
+        
+        body.dark-theme .cell.revealed {
+            background-color: #2a2a2a;
+            border-color: #404040 !important;
+        }
+        
+        body.halloween-theme .cell.revealed {
+            background-color: #4a3a2a;
+            border-color: #ff7700 !important;
+        }
+        
+        body.christmas-theme .cell.revealed {
+            background-color: #1a6a4a;
+            border-color: #00aa00 !important;
+        }
+        
+        body.minimal-theme .cell.revealed {
+            background-color: #000000;
+            border-color: #ffffff !important;
+            color: #ffffff;
+        }
+        
+        .cell.flagged::before {
+            content: '🚩';
+            font-size: 14px;
+        }
+        
+        .cell.mine::before {
+            content: '💣';
+            font-size: 14px;
+        }
+        
+        body.halloween-theme .cell.mine::before {
+            content: '👻';
+        }
+        
+        body.christmas-theme .cell.mine::before {
+            content: '❄️';
+        }
+        
+        .cell.mine.revealed {
+            background-color: #ff0000;
+            animation: explode 0.5s ease;
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Цвета цифр */
+        .cell-1 { color: #0000ff; }
+        .cell-2 { color: #008000; }
+        .cell-3 { color: #ff0000; }
+        .cell-4 { color: #000080; }
+        .cell-5 { color: #800000; }
+        .cell-6 { color: #008080; }
+        .cell-7 { color: #000000; }
+        .cell-8 { color: #808080; }
+        
+        body.dark-theme .cell-1 { color: #4ecdc4; }
+        body.dark-theme .cell-2 { color: #a0d468; }
+        body.dark-theme .cell-3 { color: #ff6b6b; }
+        body.dark-theme .cell-4 { color: #6a11cb; }
+        body.dark-theme .cell-7 { color: #ffffff; }
+        
+        body.halloween-theme .cell-1 { color: #ff5500; }
+        body.halloween-theme .cell-2 { color: #ff9900; }
+        body.halloween-theme .cell-3 { color: #ff0000; }
+        body.halloween-theme .cell-4 { color: #8b4513; }
+        body.halloween-theme .cell-5 { color: #990000; }
+        
+        body.christmas-theme .cell-1 { color: #ff3333; }
+        body.christmas-theme .cell-2 { color: #00aa00; }
+        body.christmas-theme .cell-3 { color: #ffffff; }
+        body.christmas-theme .cell-4 { color: #0066ff; }
+        body.christmas-theme .cell-5 { color: #ffaa00; }
+        
+        body.minimal-theme .cell-1 { color: #ffffff; }
+        body.minimal-theme .cell-2 { color: #cccccc; }
+        body.minimal-theme .cell-3 { color: #999999; }
+        body.minimal-theme .cell-4 { color: #666666; }
+        body.minimal-theme .cell-5 { color: #333333; }
+        
+        /* Панель инструментов */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #c0c0c0;
+            border: 2px inset;
+        }
+        
+        body.dark-theme .toolbar {
+            background-color: #333333;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .toolbar {
+            background-color: #5a3000;
+            border-color: #ff7700 #3a1a00 #3a1a00 #ff7700;
+        }
+        
+        body.christmas-theme .toolbar {
+            background-color: #005500;
+            border-color: #00ff00 #003300 #003300 #00ff00;
+        }
+        
+        body.minimal-theme .toolbar {
+            background-color: #000000;
+            border-color: #ffffff;
+        }
+        
+        .toolbar-btn {
+            padding: 3px 8px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background-color: #c0c0c0;
+            cursor: pointer;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            color: black;
+        }
+        
+        body.dark-theme .toolbar-btn {
+            background-color: #404040;
+            border-color: #606060 #202020 #202020 #606060;
+            color: white;
+        }
+        
+        body.halloween-theme .toolbar-btn {
+            background-color: #ff9900;
+            border-color: #ffcc00 #8b4513 #8b4513 #ffcc00;
+            color: black;
+        }
+        
+        body.christmas-theme .toolbar-btn {
+            background-color: #00aa00;
+            border-color: #00ff00 #005500 #005500 #00ff00;
+            color: white;
+        }
+        
+        body.minimal-theme .toolbar-btn {
+            background-color: #ffffff;
+            border-color: #000000;
+            color: #000000;
+        }
+        
+        .toolbar-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        body.dark-theme .toolbar-btn:hover {
+            background-color: #505050;
+        }
+        
+        body.halloween-theme .toolbar-btn:hover {
+            background-color: #ffaa00;
+        }
+        
+        body.christmas-theme .toolbar-btn:hover {
+            background-color: #00ff00;
+            color: black;
+        }
+        
+        body.minimal-theme .toolbar-btn:hover {
+            background-color: #cccccc;
+        }
+        
+        .toolbar-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .toolbar-btn.disabled:hover {
+            background-color: inherit;
+        }
+        
+        /* Кнопка анализа - тусклая */
+        #btn-analyze {
+            opacity: 0.5;
+        }
+        
+        /* Индикатор идеальности */
+        .perfection-bar {
+            width: 100%;
+            height: 16px;
+            background-color: #c0c0c0;
+            border: 2px inset;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body.dark-theme .perfection-bar {
+            background-color: #333333;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .perfection-bar {
+            background-color: #5a3000;
+            border-color: #ff7700 #3a1a00 #3a1a00 #ff7700;
+        }
+        
+        body.christmas-theme .perfection-bar {
+            background-color: #005500;
+            border-color: #00ff00 #003300 #003300 #00ff00;
+        }
+        
+        body.minimal-theme .perfection-bar {
+            background-color: #000000;
+            border-color: #ffffff;
+        }
+        
+        .perfection-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+            width: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        body.halloween-theme .perfection-fill {
+            background: linear-gradient(90deg, #990000, #ff6600, #ffff00);
+        }
+        
+        body.christmas-theme .perfection-fill {
+            background: linear-gradient(90deg, #ff0000, #ffffff, #00ff00);
+        }
+        
+        body.minimal-theme .perfection-fill {
+            background: linear-gradient(90deg, #000000, #666666, #ffffff);
+        }
+        
+        .perfection-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: black;
+            text-shadow: 0 0 2px white;
+        }
+        
+        body.dark-theme .perfection-text {
+            color: white;
+            text-shadow: 0 0 2px black;
+        }
+        
+        body.halloween-theme .perfection-text {
+            color: white;
+            text-shadow: 0 0 2px black;
+        }
+        
+        body.christmas-theme .perfection-text {
+            color: white;
+            text-shadow: 0 0 2px #005500;
+        }
+        
+        body.minimal-theme .perfection-text {
+            color: white;
+            text-shadow: 0 0 2px black;
+        }
+        
+        /* Панель статистики и достижений */
+        .stats-panel {
+            background-color: #c0c0c0;
+            border: 2px inset;
+            padding: 10px;
+            margin-bottom: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        body.dark-theme .stats-panel {
+            background-color: #2a2a2a;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .stats-panel {
+            background-color: #3a2a1a;
+            border-color: #ff7700 #3a2a1a #3a2a1a #ff7700;
+        }
+        
+        body.christmas-theme .stats-panel {
+            background-color: #0a3a2a;
+            border-color: #ff0000 #0a3a2a #0a3a2a #ff0000;
+        }
+        
+        body.minimal-theme .stats-panel {
+            background-color: #000000;
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+        
+        .stats-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #000080;
+        }
+        
+        body.dark-theme .stats-title {
+            color: #4ecdc4;
+        }
+        
+        body.halloween-theme .stats-title {
+            color: #ff5500;
+        }
+        
+        body.christmas-theme .stats-title {
+            color: #ff3333;
+        }
+        
+        body.minimal-theme .stats-title {
+            color: #ffffff;
+        }
+        
+        /* Монетки */
+        .coins-display {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #c0c0c0;
+            border: 2px inset;
+            font-weight: bold;
+        }
+        
+        .coin-icon {
+            color: gold;
+            font-weight: bold;
+        }
+        
+        /* Достижения */
+        .achievement {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px;
+            margin-bottom: 3px;
+            background-color: #e0e0e0;
+            border: 1px solid #808080;
+        }
+        
+        body.dark-theme .achievement {
+            background-color: #333333;
+            border-color: #404040;
+        }
+        
+        body.halloween-theme .achievement {
+            background-color: #5a3a2a;
+            border-color: #ff7700;
+        }
+        
+        body.christmas-theme .achievement {
+            background-color: #1a5a3a;
+            border-color: #00ff00;
+        }
+        
+        body.minimal-theme .achievement {
+            background-color: #1a1a1a;
+            border-color: #ffffff;
+        }
+        
+        .achievement.unlocked {
+            background-color: #ffffcc;
+        }
+        
+        body.dark-theme .achievement.unlocked {
+            background-color: #ffff66;
+            color: black;
+        }
+        
+        body.halloween-theme .achievement.unlocked {
+            background-color: #ffff99;
+            color: black;
+        }
+        
+        body.christmas-theme .achievement.unlocked {
+            background-color: #ffffc0;
+            color: black;
+        }
+        
+        body.minimal-theme .achievement.unlocked {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        
+        .achievement-icon {
+            font-size: 20px;
+        }
+        
+        .achievement-info {
+            flex: 1;
+        }
+        
+        .achievement-name {
+            font-weight: bold;
+            font-size: 11px;
+        }
+        
+        .achievement-desc {
+            font-size: 9px;
+            color: #666;
+        }
+        
+        body.dark-theme .achievement-desc {
+            color: #cccccc;
+        }
+        
+        body.halloween-theme .achievement-desc {
+            color: #cccccc;
+        }
+        
+        body.christmas-theme .achievement-desc {
+            color: #cccccc;
+        }
+        
+        body.minimal-theme .achievement-desc {
+            color: #cccccc;
+        }
+        
+        /* Ежедневные задания */
+        .daily-quest {
+            background-color: #e0e0e0;
+            border: 1px solid #808080;
+            padding: 8px;
+            margin-bottom: 5px;
+            font-size: 10px;
+        }
+        
+        .quest-reward {
+            color: gold;
+            font-weight: bold;
+        }
+        
+        .quest-completed {
+            background-color: #ccffcc;
+        }
+        
+        /* Модальные окна */
+        .xp-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        
+        .xp-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            min-width: 400px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        body.dark-theme .modal-content {
+            background-color: #2a2a2a;
+            border-color: #404040 #101010 #101010 #404040;
+        }
+        
+        body.halloween-theme .modal-content {
+            background-color: #3a2a1a;
+            border-color: #ff7700 #3a2a1a #3a2a1a #ff7700;
+        }
+        
+        body.christmas-theme .modal-content {
+            background-color: #0a3a2a;
+            border-color: #ff0000 #0a3a2a #0a3a2a #ff0000;
+        }
+        
+        body.minimal-theme .modal-content {
+            background-color: #000000;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            color: #ffffff;
+        }
+        
+        .modal-header {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            color: white;
+            padding: 3px 5px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        body.dark-theme .modal-header {
+            background: linear-gradient(90deg, #101020, #2a3a5a);
+        }
+        
+        body.halloween-theme .modal-header {
+            background: linear-gradient(90deg, #5a3000, #ff5500);
+        }
+        
+        body.christmas-theme .modal-header {
+            background: linear-gradient(90deg, #005500, #ff0000);
+        }
+        
+        body.minimal-theme .modal-header {
+            background: linear-gradient(90deg, #000000, #333333);
+        }
+        
+        .modal-body {
+            padding: 15px;
+            font-size: 11px;
+        }
+        
+        body.dark-theme .modal-body {
+            color: #cccccc;
+        }
+        
+        body.halloween-theme .modal-body {
+            color: #ffffff;
+        }
+        
+        body.christmas-theme .modal-body {
+            color: #ffffff;
+        }
+        
+        .modal-footer {
+            padding: 8px;
+            text-align: right;
+            background-color: #c0c0c0;
+        }
+        
+        body.dark-theme .modal-footer {
+            background-color: #2a2a2a;
+        }
+        
+        body.halloween-theme .modal-footer {
+            background-color: #3a2a1a;
+        }
+        
+        body.christmas-theme .modal-footer {
+            background-color: #0a3a2a;
+        }
+        
+        body.minimal-theme .modal-footer {
+            background-color: #000000;
+        }
+        
+        .xp-button {
+            padding: 4px 12px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background-color: #c0c0c0;
+            cursor: pointer;
+            font-size: 11px;
+            min-width: 70px;
+            color: black;
+        }
+        
+        body.dark-theme .xp-button {
+            background-color: #404040;
+            border-color: #606060 #202020 #202020 #606060;
+            color: white;
+        }
+        
+        body.halloween-theme .xp-button {
+            background-color: #ff9900;
+            border-color: #ffcc00 #8b4513 #8b4513 #ffcc00;
+            color: black;
+        }
+        
+        body.christmas-theme .xp-button {
+            background-color: #00aa00;
+            border-color: #00ff00 #005500 #005500 #00ff00;
+            color: white;
+        }
+        
+        body.minimal-theme .xp-button {
+            background-color: #ffffff;
+            border-color: #000000;
+            color: #000000;
+        }
+        
+        .xp-button:hover {
+            background-color: #e0e0e0;
+        }
+        
+        body.dark-theme .xp-button:hover {
+            background-color: #505050;
+        }
+        
+        body.halloween-theme .xp-button:hover {
+            background-color: #ffaa00;
+        }
+        
+        body.christmas-theme .xp-button:hover {
+            background-color: #00ff00;
+            color: black;
+        }
+        
+        body.minimal-theme .xp-button:hover {
+            background-color: #cccccc;
+        }
+        
+        /* Новые режимы и функции */
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .mode-btn {
+            padding: 8px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background-color: #c0c0c0;
+            cursor: pointer;
+            font-size: 11px;
+            text-align: center;
+        }
+        
+        body.dark-theme .mode-btn {
+            background-color: #404040;
+            border-color: #606060 #202020 #202020 #606060;
+            color: white;
+        }
+        
+        body.halloween-theme .mode-btn {
+            background-color: #ff9900;
+            border-color: #ffcc00 #8b4513 #8b4513 #ffcc00;
+            color: black;
+        }
+        
+        body.christmas-theme .mode-btn {
+            background-color: #00aa00;
+            border-color: #00ff00 #005500 #005500 #00ff00;
+            color: white;
+        }
+        
+        body.minimal-theme .mode-btn {
+            background-color: #ffffff;
+            border-color: #000000;
+            color: #000000;
+        }
+        
+        .mode-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        body.dark-theme .mode-btn:hover {
+            background-color: #505050;
+        }
+        
+        body.halloween-theme .mode-btn:hover {
+            background-color: #ffaa00;
+        }
+        
+        body.christmas-theme .mode-btn:hover {
+            background-color: #00ff00;
+            color: black;
+        }
+        
+        body.minimal-theme .mode-btn:hover {
+            background-color: #cccccc;
+        }
+        
+        .mode-btn.active {
+            background-color: #000080;
+            color: white;
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+        
+        body.dark-theme .mode-btn.active {
+            background-color: #2a5a9a;
+        }
+        
+        body.halloween-theme .mode-btn.active {
+            background-color: #ff3300;
+            color: white;
+        }
+        
+        body.christmas-theme .mode-btn.active {
+            background-color: #ff0000;
+            color: white;
+        }
+        
+        body.minimal-theme .mode-btn.active {
+            background-color: #000000;
+            color: #ffffff;
+            border-color: #ffffff #000000 #000000 #ffffff;
+        }
+        
+        /* Кнопки режимов "В разработке" */
+        .mode-btn.in-dev {
+            opacity: 0.5;
+            cursor: not-allowed;
+            position: relative;
+        }
+        
+        .mode-btn.in-dev:hover::after {
+            content: 'В разработке!';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000080;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        body.dark-theme .mode-btn.in-dev:hover::after {
+            background: #2a5a9a;
+        }
+        
+        body.halloween-theme .mode-btn.in-dev:hover::after {
+            background: #ff3300;
+        }
+        
+        body.christmas-theme .mode-btn.in-dev:hover::after {
+            background: #ff0000;
+        }
+        
+        body.minimal-theme .mode-btn.in-dev:hover::after {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+        }
+        
+        /* Анимации */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes wave {
+            0% { background-color: inherit; }
+            50% { background-color: #ffff00; }
+            100% { background-color: inherit; }
+        }
+        
+        .wave-animation {
+            animation: wave 0.5s ease;
+        }
+        
+        /* Особые клетки и бонусы */
+        .cell.bonus {
+            animation: pulse 2s infinite;
+        }
+        
+        .cell.ghost::before {
+            content: '👻';
+            font-size: 12px;
+        }
+        
+        .cell.ghost.revealed {
+            background-color: #800080;
+        }
+        
+        .cell.teleporter::before {
+            content: '🌀';
+            font-size: 12px;
+        }
+        
+        .cell.detonator::before {
+            content: '💥';
+            font-size: 12px;
+        }
+        
+        .cell.magnet::before {
+            content: '🧲';
+            font-size: 12px;
+        }
+        
+        .cell.chameleon {
+            animation: chameleon 3s infinite;
+        }
+        
+        @keyframes chameleon {
+            0% { background-color: #ff0000; }
+            25% { background-color: #00ff00; }
+            50% { background-color: #0000ff; }
+            75% { background-color: #ffff00; }
+            100% { background-color: #ff00ff; }
+        }
+        
+        /* Панель бонусов */
+        .bonus-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .bonus-item {
+            padding: 8px;
+            border: 2px solid #808080;
+            background-color: #e0e0e0;
+            text-align: center;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+        }
+        
+        body.dark-theme .bonus-item {
+            background-color: #333333;
+            border-color: #404040;
+        }
+        
+        body.halloween-theme .bonus-item {
+            background-color: #5a3a2a;
+            border-color: #ff7700;
+        }
+        
+        body.christmas-theme .bonus-item {
+            background-color: #1a5a3a;
+            border-color: #00ff00;
+        }
+        
+        body.minimal-theme .bonus-item {
+            background-color: #1a1a1a;
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+        
+        .bonus-count {
+            font-weight: bold;
+            color: #000080;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        
+        body.dark-theme .bonus-count {
+            color: #4ecdc4;
+        }
+        
+        body.halloween-theme .bonus-count {
+            color: #ff5500;
+        }
+        
+        body.christmas-theme .bonus-count {
+            color: #ff3333;
+        }
+        
+        body.minimal-theme .bonus-count {
+            color: #ffffff;
+        }
+        
+        /* Кнопка сброса */
+        .reset-btn {
+            background-color: #ff4444 !important;
+            color: white !important;
+            border-color: #ff8888 #880000 #880000 #ff8888 !important;
+        }
+        
+        .reset-btn:hover {
+            background-color: #ff6666 !important;
+        }
+        
+        /* Иконки бонусов */
+        .bonus-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-panel, .right-panel {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .game-board {
+                max-width: 100%;
+                overflow: auto;
+            }
+            
+            .cell {
+                width: 24px;
+                height: 24px;
+                font-size: 12px;
+            }
+            
+            .bonus-panel {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .game-board {
+                grid-gap: 0;
+                gap: 0;
+            }
+            
+            .cell {
+                width: 22px;
+                height: 22px;
+                font-size: 11px;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            .cell {
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+            }
+            
+            .counter {
+                font-size: 18px;
+                min-width: 50px;
+            }
+            
+            .mode-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .bonus-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .cell {
+                width: 18px;
+                height: 18px;
+                font-size: 9px;
+            }
+        }
+        
+        /* Звуковая иконка */
+        .sound-icon {
+            font-size: 12px;
+            margin-right: 3px;
+        }
+        
+        /* Эксперт режим фикс */
+        .expert-fix {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body class="classic-theme">
+    <!-- Рождественские гирлянды (только для рождественской темы) -->
+    <div class="garland top" style="display: none;"></div>
+    <div class="garland bottom" style="display: none;"></div>
+    
+    <!-- Модальное окно выбора языка -->
+    <div class="xp-modal" id="language-modal" style="display: flex;">
+        <div class="modal-content">
+            <div class="modal-header">
+                DOROSaper - Выбор языка / Language Selection
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 20px;">
+                    <h2 style="margin-bottom: 20px;">Выберите язык / Choose language</h2>
+                    <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
+                        <button class="xp-button" id="btn-ru" style="padding: 15px; font-size: 16px;">
+                            🇷🇺 Русский (Russian)
+                        </button>
+                        <button class="xp-button" id="btn-en" style="padding: 15px; font-size: 16px;">
+                            🇺🇸 English (Английский)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно подтверждения выхода -->
+    <div class="xp-modal" id="exit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Внимание!
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 20px;">
+                    <h2 style="margin-bottom: 20px; color: #ff0000;">Куда собрался? 😠</h2>
+                    <p style="font-size: 14px; margin-bottom: 20px;">
+                        Игра еще не закончена! Давай проходи до конца!
+                    </p>
+                    <p style="font-size: 12px; color: #666;">
+                        (На самом деле это шутка, можешь закрыть вкладку если хочешь)
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="xp-button" id="exit-cancel">Вернуться к игре</button>
+                <button class="xp-button" id="exit-confirm">Все равно выйти</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно Dev Console -->
+    <div class="xp-modal" id="devconsole-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Dev Console 💻
+                <div class="control-btn" id="close-devconsole">×</div>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 15px;">
+                    <p><strong>Команды:</strong></p>
+                    <ul style="font-size: 10px; margin-left: 15px;">
+                        <li><code>add coins [число]</code> - добавить монеты</li>
+                        <li><code>add perfection [число]</code> - добавить идеальность</li>
+                        <li><code>add bonus [тип] [число]</code> - добавить бонусы</li>
+                        <li><code>win</code> - выиграть текущую игру</li>
+                        <li><code>unlock all</code> - разблокировать все достижения</li>
+                        <li><code>clear</code> - очистить консоль</li>
+                    </ul>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <input type="text" id="devconsole-input" 
+                           style="width: 100%; padding: 5px; border: 2px inset; background: #000; color: #0f0; font-family: monospace;"
+                           placeholder="Введите команду...">
+                </div>
+                <div id="devconsole-output" 
+                     style="height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 10px; font-family: monospace; font-size: 10px; border: 2px inset;">
+                    Dev Console готов к работе!<br>
+                    Доступные бонусы: scanner, shield, teleport, magnet, detector, chameleon
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="xp-button" id="devconsole-execute">Выполнить</button>
+                <button class="xp-button" id="devconsole-clear">Очистить</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="xp-window" style="display: none;">
+        <div class="title-bar">
+            <div>Minesweeper PLUS+</div>
+            <div class="window-controls">
+                <div class="control-btn" id="minimize-btn">_</div>
+                <div class="control-btn" id="maximize-btn">□</div>
+                <div class="control-btn" id="close-btn">×</div>
+            </div>
+        </div>
+        
+        <div class="menu-bar">
+            <div class="menu-item">
+                Игра
+                <div class="menu-dropdown">
+                    <div class="dropdown-item" id="new-game">Новая игра</div>
+                    <div class="dropdown-item" data-mode="novice">Новичок (9x9)</div>
+                    <div class="dropdown-item" data-mode="amateur">Любитель (16x16)</div>
+                    <div class="dropdown-item" data-mode="expert">Эксперт (16x30)</div>
+                    <div class="dropdown-item disabled" id="custom-mode">Особый режим...</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item" data-mode="ghost">Призраки</div>
+                    <div class="dropdown-item" data-mode="hardcore">Хардкор</div>
+                    <div class="dropdown-item" data-mode="learning">Обучение</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item" id="daily-challenge">Ежедневные задания</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item reset-btn" id="reset-progress">Сброс прогресса</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item" id="exit">Выход</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                Вид
+                <div class="menu-dropdown">
+                    <div class="dropdown-item" data-theme="classic">Классическая тема</div>
+                    <div class="dropdown-item" data-theme="dark">Темная тема</div>
+                    <div class="dropdown-item" data-theme="halloween">Хэллоуин</div>
+                    <div class="dropdown-item" data-theme="christmas">Рождество</div>
+                    <div class="dropdown-item" data-theme="minimal">Минималистик</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                Бонусы
+                <div class="menu-dropdown">
+                    <div class="dropdown-item" id="use-teleport">Телепорт</div>
+                    <div class="dropdown-item" id="use-magnet">Магнит</div>
+                    <div class="dropdown-item" id="use-detector">Детектор</div>
+                    <div class="dropdown-item" id="use-chameleon">Хамелеон</div>
+                    <div class="dropdown-item" id="use-scan">Сканер</div>
+                    <div class="dropdown-item" id="use-shield">Щит</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item" id="shop">Магазин бонусов</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                Звук
+                <div class="menu-dropdown">
+                    <div class="dropdown-item" id="sound-toggle">
+                        <span class="sound-icon">🔊</span> Вкл/Выкл звук
+                    </div>
+                    <div class="dropdown-item" id="sound-volume-up">
+                        <span class="sound-icon">➕</span> Громче
+                    </div>
+                    <div class="dropdown-item" id="sound-volume-down">
+                        <span class="sound-icon">➖</span> Тише
+                    </div>
+                </div>
+            </div>
+            <div class="menu-item">
+                Справка
+                <div class="menu-dropdown">
+                    <div class="dropdown-item" id="tutorial">Обучение</div>
+                    <div class="dropdown-item" id="strategies">Стратегии</div>
+                    <div class="dropdown-item" id="achievements">Достижения</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item" id="about">О программе</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-container">
+            <div class="left-panel">
+                <div class="coins-display">
+                    <span class="coin-icon">🪙</span>
+                    <span id="coins-counter">0</span> монет
+                </div>
+                
+                <div class="toolbar">
+                    <button class="toolbar-btn" id="btn-new">
+                        <span>🔄</span> Новая
+                    </button>
+                    <button class="toolbar-btn" id="btn-hint">
+                        <span>💡</span> Подсказка (<span id="hint-counter">3</span>)
+                    </button>
+                    <button class="toolbar-btn" id="btn-undo" disabled>
+                        <span>↶</span> Отмена (<span id="undo-counter">3</span>)
+                    </button>
+                    <button class="toolbar-btn" id="btn-marks">
+                        <span>?</span> Вопросы
+                    </button>
+                    <button class="toolbar-btn" id="btn-analyze" disabled style="opacity: 0.5;">
+                        <span>📊</span> Анализ
+                    </button>
+                </div>
+                
+                <div class="perfection-bar">
+                    <div class="perfection-fill" id="perfection-fill" style="width: 100%"></div>
+                    <div class="perfection-text" id="perfection-text">Идеальность: 100%</div>
+                </div>
+                
+                <div class="game-panel">
+                    <div class="game-header">
+                        <div class="counter" id="mines-counter">010</div>
+                        <button class="smiley-btn" id="smiley">🙂</button>
+                        <div class="counter" id="time-counter">000</div>
+                    </div>
+                    
+                    <div class="expert-fix">
+                        <div class="game-board" id="game-board">
+                            <!-- Игровое поле будет создано здесь -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bonus-panel" id="bonus-panel">
+                    <!-- Бонусы будут отображаться здесь -->
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="stats-panel">
+                    <div class="stats-title">📈 Статистика игры</div>
+                    <div id="game-stats">
+                        <div>Время: <span id="stat-time">0</span> сек</div>
+                        <div>Идеальность: <span id="stat-perfection">100%</span></div>
+                        <div>Открыто клеток: <span id="stat-opened">0</span></div>
+                        <div>Найдено мин: <span id="stat-found">0/10</span></div>
+                        <div>Взорвано мин: <span id="stat-exploded">0</span></div>
+                        <div>Подсказок осталось: <span id="stat-hints">3</span></div>
+                    </div>
+                    
+                    <div class="stats-title" style="margin-top: 15px;">📅 Ежедневные задания</div>
+                    <div id="daily-quests">
+                        <!-- Задания будут отображаться здесь -->
+                    </div>
+                    
+                    <div class="stats-title" style="margin-top: 15px;">🏆 Достижения</div>
+                    <div id="current-achievements">
+                        <!-- Достижения будут отображаться здесь -->
+                    </div>
+                </div>
+                
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="normal">Обычный</button>
+                    <button class="mode-btn" data-mode="ghost">Призраки</button>
+                    <button class="mode-btn in-dev" data-mode="tournament">Турнир</button>
+                    <button class="mode-btn in-dev" data-mode="timeless">Без времени</button>
+                    <button class="mode-btn" data-mode="learning">Обучение</button>
+                    <button class="mode-btn" data-mode="hardcore">Хардкор</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Все модальные окна -->
+    <div class="xp-modal" id="results-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Результаты игры
+                <div class="control-btn" id="close-results">×</div>
+            </div>
+            <div class="modal-body" id="results-content">
+                <!-- Содержимое будет заполнено JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="xp-button" id="play-again">Играть снова</button>
+                <button class="xp-button" id="share-result">Поделиться</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно достижений -->
+    <div class="xp-modal" id="achievements-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Достижения
+                <div class="control-btn" id="close-achievements">×</div>
+            </div>
+            <div class="modal-body" id="achievements-content">
+                <!-- Достижения будут загружены здесь -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно обучения -->
+    <div class="xp-modal" id="tutorial-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Обучение
+                <div class="control-btn" id="close-tutorial">×</div>
+            </div>
+            <div class="modal-body" id="tutorial-content">
+                <div style="margin-bottom: 15px;">
+                    <h3 style="color: #000080; margin-bottom: 10px;">Основные правила:</h3>
+                    <p>• <strong>Левый клик</strong> - открыть клетку</p>
+                    <p>• <strong>Правый клик</strong> - поставить/убрать флажок</p>
+                    <p>• <strong>Цифры</strong> показывают количество мин вокруг</p>
+                    <p>• <strong>Цель:</strong> открыть все клетки без мин</p>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <h3 style="color: #000080; margin-bottom: 10px;">Новые механики:</h3>
+                    <p>• <strong>Идеальность</strong> - чем меньше ошибок, тем выше</p>
+                    <p>• <strong>Бонусные клетки</strong> - дают особые способности</p>
+                    <p>• <strong>Режимы игры</strong> - разные правила и сложность</p>
+                    <p>• <strong>Достижения</strong> - за особые заслуги</p>
+                </div>
+                <div id="tutorial-step-content">
+                    <!-- Здесь будут пошаговые инструкции -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="xp-button" id="prev-tutorial">Назад</button>
+                <button class="xp-button" id="next-tutorial">Далее</button>
+                <button class="xp-button" id="close-tutorial-btn">Пропустить</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно магазина -->
+    <div class="xp-modal" id="shop-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Магазин бонусов
+                <div class="control-btn" id="close-shop">×</div>
+            </div>
+            <div class="modal-body" id="shop-content">
+                <!-- Товары будут загружены здесь -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно ежедневных заданий -->
+    <div class="xp-modal" id="daily-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Ежедневные задания
+                <div class="control-btn" id="close-daily">×</div>
+            </div>
+            <div class="modal-body" id="daily-content">
+                <!-- Задания будут загружены здесь -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно сообщения при нажатии на бомбу в обучении -->
+    <div class="xp-modal" id="mistake-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Не волнуйтесь!
+                <div class="control-btn" id="close-mistake">×</div>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">😊</div>
+                    <div style="font-weight: bold; margin-bottom: 10px;">Все ошибаются!</div>
+                    <p>В обучении можно нажимать на бомбы без последствий.</p>
+                    <p>Это нормально - с первого раза сложно угадать все мины.</p>
+                    <p>Продолжайте тренироваться и скоро вы станете экспертом!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="xp-button" id="continue-learning">Продолжить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ==========
+        const CONFIG = {
+            novice: { rows: 9, cols: 9, mines: 10, name: "Новичок", multiplier: 1 },
+            amateur: { rows: 16, cols: 16, mines: 40, name: "Любитель", multiplier: 1.5 },
+            expert: { rows: 16, cols: 30, mines: 99, name: "Эксперт", multiplier: 2 },
+            hardcore: { rows: 16, cols: 30, mines: 198, name: "Хардкор", multiplier: 2.5 },
+            learning: { rows: 9, cols: 9, mines: 5, name: "Обучение", multiplier: 0.5 }
+        };
+        
+        const BONUSES = {
+            scanner: { name: 'Сканер', icon: '📡', price: 10, effect: 'Показывает область 3x3' },
+            shield: { name: 'Щит', icon: '🛡️', price: 15, effect: 'Защищает от мины' },
+            teleport: { name: 'Телепорт', icon: '🌀', price: 20, effect: 'Телепортирует в безопасное место' },
+            magnet: { name: 'Магнит', icon: '🧲', price: 12, effect: 'Притягивает флажки к минам' },
+            detector: { name: 'Детектор', icon: '🔍', price: 18, effect: 'Показывает мины в строке/столбце' },
+            chameleon: { name: 'Хамелеон', icon: '🦎', price: 25, effect: 'Меняет цвет для маскировки' }
+        };
+        
+        // ДОСТИЖЕНИЯ
+        const ACHIEVEMENTS = [
+            { id: 'first_win', name: 'Первая кровь', desc: 'Выиграть первую игру', icon: '🥇', unlocked: false },
+            { id: 'perfect_100', name: 'Идеал', desc: 'Достичь 100% идеальности', icon: '💯', unlocked: false },
+            { id: 'speedrun', name: 'Спринтер', desc: 'Победить менее чем за 30 секунд', icon: '⚡', unlocked: false },
+            { id: 'no_mistakes', name: 'Безопасный сапер', desc: 'Победить без взорванных мин', icon: '🛡️', unlocked: false },
+            { id: 'ghost_buster', name: 'Охотник за привидениями', desc: 'Победить в режиме "Призраки"', icon: '👻', unlocked: false },
+            { id: 'hardcore_master', name: 'Мастер хардкора', desc: 'Победить в режиме "Хардкор"', icon: '💀', unlocked: false },
+            { id: 'halloween_win', name: 'Хэллоуинский сапер', desc: 'Победить в хэллоуинской теме', icon: '🎃', unlocked: false },
+            { id: 'christmas_win', name: 'Рождественский сапер', desc: 'Победить в рождественской теме', icon: '🎄', unlocked: false },
+            { id: 'minimal_win', name: 'Минималист', desc: 'Победить в минималистичной теме', icon: '⬜', unlocked: false },
+            { id: 'veteran', name: 'Ветеран', desc: 'Сыграть 50 игр', icon: '🎖️', unlocked: false },
+            { id: 'champion', name: 'Чемпион', desc: 'Выиграть 25 игр', icon: '🏆', unlocked: false },
+            { id: 'collector', name: 'Коллекционер', desc: 'Собрать 100 монет', icon: '🪙', unlocked: false },
+            { id: 'lucky_one', name: 'Везунчик', desc: 'Найти алмазную клетку', icon: '💎', unlocked: false },
+            { id: 'perfectionist', name: 'Перфекционист', desc: '5 раз достичь 100% идеальности', icon: '✨', unlocked: false },
+            { id: 'quick_thinker', name: 'Быстрый мыслитель', desc: 'Выиграть 3 игры подряд менее чем за 5 минут', icon: '🧠', unlocked: false },
+            { id: 'secret_1', name: 'Секретное достижение 1', desc: '???', icon: '❓', unlocked: false, secret: true },
+            { id: 'secret_2', name: 'Секретное достижение 2', desc: '???', icon: '❓', unlocked: false, secret: true }
+        ];
+        
+        // ЕЖЕДНЕВНЫЕ ЗАДАНИЯ
+        const DAILY_QUESTS = [
+            { id: 'daily_1', name: 'Новичок дня', desc: 'Выиграть 1 игру', reward: 2, completed: false },
+            { id: 'daily_2', name: 'Идеалист', desc: 'Достичь 80% идеальности', reward: 5, completed: false },
+            { id: 'daily_3', name: 'Эксперт дня', desc: 'Выиграть в режиме эксперта', reward: 8, completed: false }
+        ];
+        
+        // ========== СОСТОЯНИЕ ИГРЫ ==========
+        let gameState = {
+            board: [],
+            mines: [],
+            revealed: [],
+            flagged: [],
+            gameOver: false,
+            gameWon: false,
+            firstClick: true,
+            timer: null,
+            seconds: 0,
+            mode: 'normal',
+            theme: 'classic',
+            perfection: 100,
+            minesExploded: 0,
+            minesFound: 0,
+            hintsLeft: 3,
+            undosLeft: 3,
+            coins: 0,
+            playerBonuses: {
+                scanner: 0,
+                shield: 0,
+                teleport: 0,
+                magnet: 0,
+                detector: 0,
+                chameleon: 0
+            },
+            stats: {
+                gamesPlayed: 0,
+                gamesWon: 0,
+                bestTime: 999,
+                bestPerfection: 0,
+                totalCoins: 0,
+                achievements: [],
+                perfectGames: 0,
+                totalTime: 0
+            },
+            moveHistory: [],
+            ghosts: [],
+            learningStep: 0,
+            dailyQuests: JSON.parse(JSON.stringify(DAILY_QUESTS)),
+            lastDailyReset: null,
+            language: 'ru',
+            soundEnabled: true,
+            soundVolume: 0.5
+        };
+        
+        // ========== ЗВУКИ ==========
+        const SoundManager = {
+            audioContext: null,
+            sounds: {},
+            
+            init() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.loadSounds();
+                } catch (e) {
+                    console.log('Web Audio API не поддерживается:', e);
+                    gameState.soundEnabled = false;
+                }
+            },
+            
+            loadSounds() {
+                // Создаем простые звуки с помощью генератора
+                this.sounds = {
+                    click: this.createBeep(800, 0.1),
+                    bonus: this.createBeep(1200, 0.2),
+                    explosion: this.createExplosionSound(),
+                    win: this.createWinSound(),
+                    lose: this.createLoseSound(),
+                    flag: this.createBeep(600, 0.1)
+                };
+            },
+            
+            createBeep(frequency, duration) {
+                return () => {
+                    if (!gameState.soundEnabled || !this.audioContext) return;
+                    
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(gameState.soundVolume * 0.3, this.audioContext.currentTime + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                };
+            },
+            
+            createExplosionSound() {
+                return () => {
+                    if (!gameState.soundEnabled || !this.audioContext) return;
+                    
+                    const duration = 1;
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(100, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(50, this.audioContext.currentTime + duration);
+                    
+                    oscillator.type = 'sawtooth';
+                    
+                    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(gameState.soundVolume * 0.5, this.audioContext.currentTime + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                };
+            },
+            
+            createWinSound() {
+                return () => {
+                    if (!gameState.soundEnabled || !this.audioContext) return;
+                    
+                    const times = [0, 0.2, 0.4, 0.6];
+                    const frequencies = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                    
+                    times.forEach((time, i) => {
+                        setTimeout(() => {
+                            const oscillator = this.audioContext.createOscillator();
+                            const gainNode = this.audioContext.createGain();
+                            
+                            oscillator.connect(gainNode);
+                            gainNode.connect(this.audioContext.destination);
+                            
+                            oscillator.frequency.value = frequencies[i];
+                            oscillator.type = 'sine';
+                            
+                            gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                            gainNode.gain.linearRampToValueAtTime(gameState.soundVolume * 0.3, this.audioContext.currentTime + 0.05);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.3);
+                            
+                            oscillator.start(this.audioContext.currentTime);
+                            oscillator.stop(this.audioContext.currentTime + 0.3);
+                        }, time * 1000);
+                    });
+                };
+            },
+            
+            createLoseSound() {
+                return () => {
+                    if (!gameState.soundEnabled || !this.audioContext) return;
+                    
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 1);
+                    
+                    oscillator.type = 'triangle';
+                    
+                    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(gameState.soundVolume * 0.4, this.audioContext.currentTime + 0.1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + 1);
+                };
+            },
+            
+            play(soundName) {
+                if (this.sounds[soundName]) {
+                    this.sounds[soundName]();
+                }
+            },
+            
+            toggle() {
+                gameState.soundEnabled = !gameState.soundEnabled;
+                if (gameState.soundEnabled && this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+                updateSoundDisplay();
+                saveGameData();
+                showMessage(gameState.soundEnabled ? 'Звук включен' : 'Звук выключен');
+            },
+            
+            setVolume(volume) {
+                gameState.soundVolume = Math.max(0, Math.min(1, volume));
+                saveGameData();
+            },
+            
+            volumeUp() {
+                this.setVolume(gameState.soundVolume + 0.1);
+                showMessage(`Громкость: ${Math.round(gameState.soundVolume * 100)}%`);
+            },
+            
+            volumeDown() {
+                this.setVolume(gameState.soundVolume - 0.1);
+                showMessage(`Громкость: ${Math.round(gameState.soundVolume * 100)}%`);
+            }
+        };
+        
+        // ========== ФУНКЦИИ ВЫБОРА ЯЗЫКА ==========
+        function selectLanguage(lang) {
+            gameState.language = lang;
+            localStorage.setItem('minesweeper-language', lang);
+            
+            // Скрываем окно выбора языка
+            document.getElementById('language-modal').style.display = 'none';
+            
+            // Показываем основное окно игры
+            document.querySelector('.xp-window').style.display = 'block';
+            
+            // Инициализируем игру
+            initGame();
+            
+            // Настраиваем обработчики событий
+            setupEventListeners();
+            
+            // Обновляем отображение монет
+            updateCoinsDisplay();
+            
+            // Загружаем сохраненные данные
+            loadGameData();
+            
+            // Инициализируем звуки
+            SoundManager.init();
+        }
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ИГРЫ ==========
+        function initGame() {
+            let config;
+            
+            if (gameState.mode === 'hardcore') {
+                config = { ...CONFIG.expert };
+                config.mines = Math.floor(config.mines * 2);
+                config.name = "Хардкор";
+                config.multiplier = 2.5;
+            } else {
+                config = CONFIG[gameState.mode] || CONFIG.novice;
+            }
+            
+            resetGameState();
+            
+            if (gameState.timer) clearInterval(gameState.timer);
+            gameState.seconds = 0;
+            updateTimeDisplay();
+            
+            document.getElementById('mines-counter').textContent = config.mines.toString().padStart(3, '0');
+            updateSmiley('🙂');
+            
+            createBoard(config.rows, config.cols);
+            updateStatsDisplay();
+            updateBonusPanel();
+            updateAchievementsDisplay();
+            updateDailyQuestsDisplay();
+            updateSoundDisplay();
+            
+            if (gameState.mode === 'learning') {
+                startTutorial();
+            }
+        }
+        
+        function resetGameState() {
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            gameState.board = Array(config.rows).fill().map(() => Array(config.cols).fill(0));
+            gameState.revealed = Array(config.rows).fill().map(() => Array(config.cols).fill(false));
+            gameState.flagged = Array(config.rows).fill().map(() => Array(config.cols).fill(false));
+            gameState.gameOver = false;
+            gameState.gameWon = false;
+            gameState.firstClick = true;
+            gameState.perfection = 100;
+            gameState.minesExploded = 0;
+            gameState.minesFound = 0;
+            gameState.hintsLeft = 3;
+            gameState.undosLeft = 3;
+            gameState.moveHistory = [];
+            gameState.ghosts = [];
+            
+            updatePerfectionDisplay();
+            updateHintButton();
+            updateUndoButton();
+        }
+        
+        // ========== СОЗДАНИЕ ИГРОВОГО ПОЛЯ ==========
+        function createBoard(rows, cols) {
+            const gameBoard = document.getElementById('game-board');
+            gameBoard.innerHTML = '';
+            
+            // Исправление для экспертного режима
+            const cellSize = cols > 20 ? 22 : 26; // Меньшие клетки для экспертного режима
+            
+            gameBoard.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
+            gameBoard.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
+            gameBoard.style.width = `${cols * cellSize}px`;
+            gameBoard.style.height = `${rows * cellSize}px`;
+            
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    
+                    // Устанавливаем размер клетки
+                    cell.style.width = `${cellSize}px`;
+                    cell.style.height = `${cellSize}px`;
+                    cell.style.fontSize = `${Math.max(10, cellSize - 8)}px`;
+                    
+                    cell.addEventListener('click', () => handleCellClick(row, col));
+                    cell.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        handleRightClick(row, col);
+                    });
+                    
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
+        
+        // ========== РАЗМЕЩЕНИЕ МИН ==========
+        function placeMines(firstRow, firstCol) {
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            const excluded = new Set();
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    const r = firstRow + dr;
+                    const c = firstCol + dc;
+                    if (r >= 0 && r < config.rows && c >= 0 && c < config.cols) {
+                        excluded.add(`${r},${c}`);
+                    }
+                }
+            }
+            
+            gameState.mines = [];
+            while (gameState.mines.length < config.mines) {
+                const row = Math.floor(Math.random() * config.rows);
+                const col = Math.floor(Math.random() * config.cols);
+                
+                if (!excluded.has(`${row},${col}`) && 
+                    !gameState.mines.some(m => m.row === row && m.col === col)) {
+                    gameState.mines.push({ row, col });
+                    gameState.board[row][col] = -1;
+                }
+            }
+            
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    if (gameState.board[row][col] !== -1) {
+                        gameState.board[row][col] = countAdjacentMines(row, col);
+                    }
+                }
+            }
+            
+            startTimer();
+            
+            if (gameState.mode === 'ghost') {
+                createGhostMines();
+            }
+        }
+        
+        function countAdjacentMines(row, col) {
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            let count = 0;
+            
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    if (dr === 0 && dc === 0) continue;
+                    
+                    const r = row + dr;
+                    const c = col + dc;
+                    
+                    if (r >= 0 && r < config.rows && c >= 0 && c < config.cols) {
+                        if (gameState.board[r][c] === -1) {
+                            count++;
+                        }
+                    }
+                }
+            }
+            
+            return count;
+        }
+        
+        // ========== РЕЖИМ ПРИЗРАКОВ ==========
+        function createGhostMines() {
+            const config = CONFIG[gameState.mode] || CONFIG.novice;
+            
+            const ghostCount = Math.floor(config.mines * 0.2);
+            gameState.ghosts = [];
+            
+            for (let i = 0; i < ghostCount; i++) {
+                const row = Math.floor(Math.random() * config.rows);
+                const col = Math.floor(Math.random() * config.cols);
+                
+                if (gameState.board[row][col] !== -1 && 
+                    !gameState.ghosts.some(g => g.row === row && g.col === col)) {
+                    gameState.ghosts.push({ row, col });
+                    
+                    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                    cell.classList.add('ghost');
+                }
+            }
+        }
+        
+        // ========== ОБРАБОТКА КЛИКОВ ==========
+        function handleCellClick(row, col) {
+            if (gameState.gameOver || gameState.flagged[row][col]) return;
+            
+            // Воспроизводим звук клика
+            SoundManager.play('click');
+            
+            saveMove();
+            
+            if (gameState.mode === 'learning') {
+                handleLearningClick(row, col);
+                return;
+            }
+            
+            if (gameState.firstClick) {
+                gameState.firstClick = false;
+                placeMines(row, col);
+            }
+            
+            revealCell(row, col);
+            checkWinCondition();
+        }
+        
+        function handleLearningClick(row, col) {
+            if (gameState.firstClick) {
+                gameState.firstClick = false;
+                createLearningBoard(row, col);
+                startTimer();
+                showTutorialStep(1);
+                return;
+            }
+            
+            revealCell(row, col, true);
+            checkWinCondition();
+        }
+        
+        function createLearningBoard(firstRow, firstCol) {
+            const config = CONFIG.learning;
+            
+            const excluded = new Set();
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    const r = firstRow + dr;
+                    const c = firstCol + dc;
+                    if (r >= 0 && r < config.rows && c >= 0 && c < config.cols) {
+                        excluded.add(`${r},${c}`);
+                    }
+                }
+            }
+            
+            gameState.mines = [];
+            while (gameState.mines.length < config.mines) {
+                const row = Math.floor(Math.random() * config.rows);
+                const col = Math.floor(Math.random() * config.cols);
+                
+                if (!excluded.has(`${row},${col}`) && 
+                    !gameState.mines.some(m => m.row === row && m.col === col)) {
+                    gameState.mines.push({ row, col });
+                    gameState.board[row][col] = -1;
+                }
+            }
+            
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    if (gameState.board[row][col] !== -1) {
+                        gameState.board[row][col] = countAdjacentMines(row, col);
+                    }
+                }
+            }
+        }
+        
+        function revealCell(row, col, isLearning = false) {
+            if (gameState.revealed[row][col] || gameState.flagged[row][col]) return;
+            
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            
+            gameState.revealed[row][col] = true;
+            cell.classList.add('revealed');
+            
+            const cellValue = gameState.board[row][col];
+            
+            const isGhost = gameState.ghosts.some(g => g.row === row && g.col === col);
+            if (isGhost) {
+                cell.classList.add('ghost', 'revealed');
+                gameState.minesExploded++;
+                updatePerfection(-10);
+                updateStatsDisplay();
+                SoundManager.play('explosion');
+                return;
+            }
+            
+            if (cellValue === -1) {
+                if (isLearning) {
+                    cell.classList.add('mine', 'revealed');
+                    gameState.minesExploded++;
+                    updatePerfection(-20);
+                    updateStatsDisplay();
+                    SoundManager.play('explosion');
+                    showMistakeMessage();
+                    return;
+                }
+                
+                if (gameState.playerBonuses.shield > 0) {
+                    gameState.playerBonuses.shield--;
+                    updateBonusPanel();
+                    updatePerfection(-5);
+                    
+                    SoundManager.play('bonus');
+                    cell.textContent = '🛡️';
+                    setTimeout(() => {
+                        cell.textContent = '';
+                        revealCell(row, col, isLearning);
+                    }, 500);
+                    return;
+                }
+                
+                gameState.minesExploded++;
+                cell.classList.add('mine', 'revealed');
+                updatePerfection(-20);
+                updateStatsDisplay();
+                updateSmiley('😨');
+                SoundManager.play('explosion');
+                
+                // Проверяем идеальность
+                if (gameState.perfection <= 0) {
+                    setTimeout(() => {
+                        gameOver(false);
+                        showMessage('Идеальность упала до 0%! Игра окончена!');
+                    }, 500);
+                }
+                return;
+            }
+            
+            if (cellValue > 0) {
+                cell.textContent = cellValue;
+                cell.classList.add(`cell-${cellValue}`);
+            } else {
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        if (dr === 0 && dc === 0) continue;
+                        
+                        const r = row + dr;
+                        const c = col + dc;
+                        
+                        if (r >= 0 && r < config.rows && c >= 0 && c < config.cols) {
+                            revealCell(r, c, isLearning);
+                        }
+                    }
+                }
+            }
+        }
+        
+        function handleRightClick(row, col) {
+            if (gameState.revealed[row][col] || gameState.gameOver) return;
+            
+            SoundManager.play('flag');
+            
+            saveMove();
+            
+            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            gameState.flagged[row][col] = !gameState.flagged[row][col];
+            
+            if (gameState.flagged[row][col]) {
+                cell.classList.add('flagged');
+                gameState.minesFound++;
+            } else {
+                cell.classList.remove('flagged');
+                gameState.minesFound--;
+            }
+            
+            updateMinesCounter();
+            updateStatsDisplay();
+        }
+        
+        // ========== СИСТЕМА МОНЕТ ==========
+        function addCoins(amount) {
+            gameState.coins += amount;
+            gameState.stats.totalCoins += amount;
+            updateCoinsDisplay();
+            saveGameData();
+        }
+        
+        function awardCoinsForWin() {
+            if (!gameState.gameWon) return;
+            
+            const perfection = Math.round(gameState.perfection);
+            const config = CONFIG[gameState.mode] || CONFIG.novice;
+            
+            // Базовое количество монет (10% от идеальности)
+            let coins = Math.floor(perfection / 10);
+            
+            // Умножаем на множитель режима
+            coins = Math.floor(coins * config.multiplier);
+            
+            // Минимум 1 монета
+            coins = Math.max(1, coins);
+            
+            addCoins(coins);
+            showMessage(`Награда: ${coins} монет за победу!`);
+        }
+        
+        // ========== МАГАЗИН ==========
+        function showShopModal() {
+            const modal = document.getElementById('shop-modal');
+            const content = document.getElementById('shop-content');
+            
+            let html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">';
+            
+            for (const [type, bonus] of Object.entries(BONUSES)) {
+                html += `
+                    <div class="bonus-item" style="cursor: pointer;" onclick="buyBonus('${type}')">
+                        <div class="bonus-icon">${bonus.icon}</div>
+                        <div style="font-weight: bold;">${bonus.name}</div>
+                        <div style="font-size: 9px;">${bonus.effect}</div>
+                        <div style="color: gold; font-weight: bold; margin-top: 5px;">
+                            ${bonus.price} 🪙
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            content.innerHTML = html;
+            modal.classList.add('active');
+        }
+        
+        function buyBonus(type) {
+            const bonus = BONUSES[type];
+            if (!bonus) return;
+            
+            if (gameState.coins >= bonus.price) {
+                gameState.coins -= bonus.price;
+                gameState.playerBonuses[type]++;
+                
+                updateCoinsDisplay();
+                updateBonusPanel();
+                saveGameData();
+                
+                SoundManager.play('bonus');
+                showMessage(`Куплен ${bonus.name}!`);
+                document.getElementById('shop-modal').classList.remove('active');
+            } else {
+                showMessage('Недостаточно монет!');
+            }
+        }
+        
+        // ========== DEV CONSOLE ==========
+        function showDevConsole() {
+            document.getElementById('devconsole-modal').classList.add('active');
+            document.getElementById('devconsole-input').focus();
+        }
+        
+        function executeDevCommand(command) {
+            const output = document.getElementById('devconsole-output');
+            const parts = command.toLowerCase().split(' ');
+            const cmd = parts[0];
+            const args = parts.slice(1);
+            
+            let result = `> ${command}\n`;
+            
+            switch(cmd) {
+                case 'add':
+                    if (args.length >= 2) {
+                        const type = args[0];
+                        const value = parseInt(args[1]);
+                        
+                        if (type === 'coins') {
+                            addCoins(value);
+                            result += `Добавлено ${value} монет\n`;
+                        } else if (type === 'perfection') {
+                            updatePerfection(value);
+                            result += `Идеальность изменена на ${value}%\n`;
+                        } else if (type === 'bonus' && args.length >= 3) {
+                            const bonusType = args[1];
+                            const bonusCount = parseInt(args[2]);
+                            if (gameState.playerBonuses[bonusType] !== undefined) {
+                                gameState.playerBonuses[bonusType] += bonusCount;
+                                updateBonusPanel();
+                                result += `Добавлено ${bonusCount} ${bonusType}\n`;
+                            }
+                        }
+                    }
+                    break;
+                    
+                case 'win':
+                    gameOver(true);
+                    result += 'Игра выиграна!\n';
+                    break;
+                    
+                case 'unlock':
+                    if (args[0] === 'all') {
+                        ACHIEVEMENTS.forEach(a => unlockAchievement(a.id));
+                        result += 'Все достижения разблокированы!\n';
+                    }
+                    break;
+                    
+                case 'clear':
+                    output.innerHTML = '';
+                    return;
+                    
+                default:
+                    result += 'Неизвестная команда\n';
+            }
+            
+            output.innerHTML += result;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        // ========== ЕЖЕДНЕВНЫЕ ЗАДАНИЯ ==========
+        function checkDailyQuestsReset() {
+            const today = new Date().toDateString();
+            if (gameState.lastDailyReset !== today) {
+                gameState.dailyQuests = JSON.parse(JSON.stringify(DAILY_QUESTS));
+                gameState.lastDailyReset = today;
+                saveGameData();
+            }
+        }
+        
+        function updateDailyQuestsDisplay() {
+            checkDailyQuestsReset();
+            
+            const container = document.getElementById('daily-quests');
+            container.innerHTML = '';
+            
+            gameState.dailyQuests.forEach(quest => {
+                const div = document.createElement('div');
+                div.className = `daily-quest ${quest.completed ? 'quest-completed' : ''}`;
+                div.innerHTML = `
+                    <div style="font-weight: bold; font-size: 10px;">${quest.name}</div>
+                    <div style="font-size: 9px; margin-bottom: 3px;">${quest.desc}</div>
+                    <div style="color: gold; font-weight: bold;">Награда: <span class="quest-reward">${quest.reward} 🪙</span></div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function checkDailyQuests() {
+            gameState.dailyQuests.forEach(quest => {
+                if (!quest.completed) {
+                    if (quest.id === 'daily_1' && gameState.gameWon) {
+                        quest.completed = true;
+                        addCoins(quest.reward);
+                    } else if (quest.id === 'daily_2' && gameState.perfection >= 80 && gameState.gameWon) {
+                        quest.completed = true;
+                        addCoins(quest.reward);
+                    } else if (quest.id === 'daily_3' && gameState.mode === 'expert' && gameState.gameWon) {
+                        quest.completed = true;
+                        addCoins(quest.reward);
+                    }
+                }
+            });
+            
+            updateDailyQuestsDisplay();
+        }
+        
+        // ========== ПОДСКАЗКИ ==========
+        function useHint() {
+            if (gameState.hintsLeft <= 0 || gameState.gameOver || gameState.firstClick) {
+                showMessage('Нет доступных подсказок!');
+                return;
+            }
+            
+            const config = CONFIG[gameState.mode] || CONFIG.novice;
+            
+            // Находим неотмеченные мины
+            const hiddenMines = [];
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    if (gameState.board[row][col] === -1 && 
+                        !gameState.flagged[row][col] && 
+                        !gameState.revealed[row][col]) {
+                        hiddenMines.push({ row, col });
+                    }
+                }
+            }
+            
+            if (hiddenMines.length > 0) {
+                const randomMine = hiddenMines[Math.floor(Math.random() * hiddenMines.length)];
+                const cell = document.querySelector(`.cell[data-row="${randomMine.row}"][data-col="${randomMine.col}"]`);
+                
+                cell.classList.add('wave-animation');
+                setTimeout(() => cell.classList.remove('wave-animation'), 1000);
+                
+                gameState.hintsLeft--;
+                updatePerfection(-5); // Штраф за подсказку
+                updateHintButton();
+                updateStatsDisplay();
+                
+                SoundManager.play('bonus');
+                showMessage(`Подсказка: мина в строке ${randomMine.row + 1}, столбце ${randomMine.col + 1}`);
+            } else {
+                showMessage('Все мины уже найдены!');
+            }
+        }
+        
+        // ========== СИСТЕМА ИДЕАЛЬНОСТИ ==========
+        function updatePerfection(value) {
+            gameState.perfection = Math.max(0, Math.min(100, gameState.perfection + value));
+            updatePerfectionDisplay();
+            
+            // Если идеальность упала до 0 и игра не окончена
+            if (gameState.perfection <= 0 && !gameState.gameOver) {
+                gameOver(false);
+                showMessage('Идеальность упала до 0%! Игра окончена!');
+            }
+        }
+        
+        // ========== ТАЙМЕР ==========
+        function startTimer() {
+            if (gameState.timer) clearInterval(gameState.timer);
+            
+            gameState.timer = setInterval(() => {
+                gameState.seconds++;
+                updateTimeDisplay();
+                updateStatsDisplay();
+            }, 1000);
+        }
+        
+        // ========== ПРОВЕРКА ПОБЕДЫ ==========
+        function checkWinCondition() {
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            const totalCells = config.rows * config.cols;
+            const revealedCount = gameState.revealed.flat().filter(Boolean).length;
+            const safeCells = totalCells - config.mines;
+            
+            if (revealedCount === safeCells) {
+                gameOver(true);
+            }
+        }
+        
+        function gameOver(isWin) {
+            gameState.gameOver = true;
+            gameState.gameWon = isWin;
+            
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            gameState.stats.gamesPlayed++;
+            gameState.stats.totalTime += gameState.seconds;
+            
+            if (isWin) {
+                SoundManager.play('win');
+                updateSmiley('😎');
+                
+                awardCoinsForWin();
+                checkDailyQuests();
+                
+                if (gameState.seconds < gameState.stats.bestTime) {
+                    gameState.stats.bestTime = gameState.seconds;
+                }
+                if (gameState.perfection > gameState.stats.bestPerfection) {
+                    gameState.stats.bestPerfection = gameState.perfection;
+                }
+                
+                if (gameState.perfection >= 100) {
+                    gameState.stats.perfectGames++;
+                }
+                
+                checkAchievements();
+                setTimeout(() => showResults(), 1000);
+            } else {
+                SoundManager.play('lose');
+                updateSmiley('😵');
+                setTimeout(() => showResults(), 1000);
+            }
+            
+            updateStatsDisplay();
+            saveGameData();
+        }
+        
+        // ========== ДОСТИЖЕНИЯ ==========
+        function checkAchievements() {
+            if (gameState.gameWon && gameState.stats.gamesWon === 1) {
+                unlockAchievement('first_win');
+            }
+            
+            if (gameState.perfection >= 100) {
+                unlockAchievement('perfect_100');
+            }
+            
+            if (gameState.seconds < 30 && gameState.gameWon) {
+                unlockAchievement('speedrun');
+            }
+            
+            if (gameState.minesExploded === 0 && gameState.gameWon) {
+                unlockAchievement('no_mistakes');
+            }
+            
+            if (gameState.mode === 'ghost' && gameState.gameWon) {
+                unlockAchievement('ghost_buster');
+            }
+            
+            if (gameState.mode === 'hardcore' && gameState.gameWon) {
+                unlockAchievement('hardcore_master');
+            }
+            
+            if (gameState.gameWon) {
+                if (gameState.theme === 'halloween') {
+                    unlockAchievement('halloween_win');
+                } else if (gameState.theme === 'christmas') {
+                    unlockAchievement('christmas_win');
+                } else if (gameState.theme === 'minimal') {
+                    unlockAchievement('minimal_win');
+                }
+            }
+            
+            if (gameState.stats.gamesPlayed >= 50) {
+                unlockAchievement('veteran');
+            }
+            
+            if (gameState.stats.gamesWon >= 25) {
+                unlockAchievement('champion');
+            }
+            
+            if (gameState.stats.totalCoins >= 100) {
+                unlockAchievement('collector');
+            }
+        }
+        
+        function unlockAchievement(id) {
+            const achievement = ACHIEVEMENTS.find(a => a.id === id);
+            if (achievement && !achievement.unlocked) {
+                achievement.unlocked = true;
+                gameState.stats.achievements.push(id);
+                
+                SoundManager.play('bonus');
+                showMessage(`Достижение разблокировано: ${achievement.name}!`);
+                updateAchievementsDisplay();
+                saveGameData();
+            }
+        }
+        
+        // ========== ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ==========
+        function updateSmiley(emoji) {
+            document.getElementById('smiley').textContent = emoji;
+        }
+        
+        function updateMinesCounter() {
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            const flagged = gameState.flagged.flat().filter(Boolean).length;
+            const remaining = config.mines - flagged;
+            
+            document.getElementById('mines-counter').textContent = 
+                Math.max(0, remaining).toString().padStart(3, '0');
+        }
+        
+        function updateCoinsDisplay() {
+            document.getElementById('coins-counter').textContent = gameState.coins;
+        }
+        
+        function updateStatsDisplay() {
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            document.getElementById('stat-time').textContent = gameState.seconds;
+            document.getElementById('stat-perfection').textContent = `${Math.round(gameState.perfection)}%`;
+            document.getElementById('stat-opened').textContent = 
+                gameState.revealed.flat().filter(Boolean).length;
+            document.getElementById('stat-found').textContent = 
+                `${gameState.minesFound}/${config.mines}`;
+            document.getElementById('stat-exploded').textContent = gameState.minesExploded;
+            document.getElementById('stat-hints').textContent = gameState.hintsLeft;
+        }
+        
+        function updateBonusPanel() {
+            const panel = document.getElementById('bonus-panel');
+            panel.innerHTML = '';
+            
+            for (const [type, count] of Object.entries(gameState.playerBonuses)) {
+                if (count > 0 && BONUSES[type]) {
+                    const item = document.createElement('div');
+                    item.className = 'bonus-item';
+                    item.innerHTML = `
+                        <div class="bonus-icon">${BONUSES[type].icon}</div>
+                        <div class="bonus-count">${count}</div>
+                        <div style="font-size: 10px;">${BONUSES[type].name}</div>
+                    `;
+                    panel.appendChild(item);
+                }
+            }
+            
+            if (panel.innerHTML === '') {
+                panel.innerHTML = '<div style="text-align: center; font-size: 10px; color: #808080; grid-column: 1/-1; padding: 20px;">Бонусов пока нет<br><small>Купите их в магазине!</small></div>';
+            }
+        }
+        
+        function updateAchievementsDisplay() {
+            const container = document.getElementById('current-achievements');
+            container.innerHTML = '';
+            
+            const unlocked = ACHIEVEMENTS.filter(a => a.unlocked && !a.secret).slice(-3);
+            
+            if (unlocked.length === 0) {
+                container.innerHTML = '<div style="text-align: center; font-size: 10px; color: #808080;">Достижений пока нет</div>';
+                return;
+            }
+            
+            unlocked.forEach(achievement => {
+                const div = document.createElement('div');
+                div.className = 'achievement unlocked';
+                div.innerHTML = `
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-info">
+                        <div class="achievement-name">${achievement.name}</div>
+                        <div class="achievement-desc">${achievement.desc}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function updateHintButton() {
+            const btn = document.getElementById('btn-hint');
+            const counter = document.getElementById('hint-counter');
+            counter.textContent = gameState.hintsLeft;
+            btn.disabled = gameState.hintsLeft <= 0;
+        }
+        
+        function updateUndoButton() {
+            const btn = document.getElementById('btn-undo');
+            const counter = document.getElementById('undo-counter');
+            counter.textContent = gameState.undosLeft;
+            btn.disabled = gameState.undosLeft <= 0;
+        }
+        
+        function updateSoundDisplay() {
+            const soundIcon = document.querySelector('#sound-toggle .sound-icon');
+            if (soundIcon) {
+                soundIcon.textContent = gameState.soundEnabled ? '🔊' : '🔇';
+            }
+        }
+        
+        // ========== СИСТЕМА ОТМЕНЫ ==========
+        function saveMove() {
+            if (gameState.undosLeft <= 0) return;
+            
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            const revealed = gameState.revealed.map(row => [...row]);
+            const flagged = gameState.flagged.map(row => [...row]);
+            
+            gameState.moveHistory.push({
+                revealed,
+                flagged,
+                minesFound: gameState.minesFound,
+                minesExploded: gameState.minesExploded,
+                perfection: gameState.perfection
+            });
+            
+            updateUndoButton();
+        }
+        
+        function undoMove() {
+            if (gameState.moveHistory.length === 0 || gameState.undosLeft <= 0) return;
+            
+            const lastMove = gameState.moveHistory.pop();
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    gameState.revealed[row][col] = lastMove.revealed[row][col];
+                    gameState.flagged[row][col] = lastMove.flagged[row][col];
+                    
+                    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                    cell.classList.toggle('revealed', lastMove.revealed[row][col]);
+                    cell.classList.toggle('flagged', lastMove.flagged[row][col]);
+                    
+                    if (!lastMove.revealed[row][col]) {
+                        cell.textContent = '';
+                        cell.className = 'cell';
+                        if (gameState.flagged[row][col]) {
+                            cell.classList.add('flagged');
+                        }
+                    } else {
+                        const value = gameState.board[row][col];
+                        if (typeof value === 'number' && value > 0) {
+                            cell.textContent = value;
+                            cell.classList.add(`cell-${value}`);
+                        }
+                    }
+                }
+            }
+            
+            gameState.minesFound = lastMove.minesFound;
+            gameState.minesExploded = lastMove.minesExploded;
+            gameState.perfection = lastMove.perfection;
+            gameState.undosLeft--;
+            
+            // Штраф за отмену
+            updatePerfection(-2);
+            
+            updateMinesCounter();
+            updateStatsDisplay();
+            updatePerfectionDisplay();
+            updateUndoButton();
+            showMessage('Ход отменен (-2% к идеальности)');
+        }
+        
+        // ========== БОНУСЫ ==========
+        function useBonus(bonusType) {
+            if (gameState.playerBonuses[bonusType] <= 0) {
+                showMessage(`У вас нет бонуса "${BONUSES[bonusType]?.name || bonusType}"!`);
+                return;
+            }
+            
+            gameState.playerBonuses[bonusType]--;
+            updateBonusPanel();
+            
+            SoundManager.play('bonus');
+            
+            switch(bonusType) {
+                case 'scanner':
+                    useScanner();
+                    break;
+                case 'teleport':
+                    useTeleport();
+                    break;
+                case 'magnet':
+                    useMagnet();
+                    break;
+                case 'detector':
+                    useDetector();
+                    break;
+                case 'chameleon':
+                    useChameleon();
+                    break;
+                case 'shield':
+                    // Щит используется автоматически
+                    showMessage('Щит активирован! Следующая мина будет обезврежена.');
+                    break;
+            }
+            
+            saveGameData();
+        }
+        
+        function useScanner() {
+            const config = CONFIG[gameState.mode] || CONFIG.novice;
+            
+            // Выбираем случайную область 3x3
+            const centerRow = Math.floor(Math.random() * (config.rows - 2)) + 1;
+            const centerCol = Math.floor(Math.random() * (config.cols - 2)) + 1;
+            
+            // Сканируем область 3x3
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    const r = centerRow + dr;
+                    const c = centerCol + dc;
+                    
+                    if (r >= 0 && r < config.rows && c >= 0 && c < config.cols) {
+                        const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+                        
+                        if (gameState.board[r][c] === -1) {
+                            // Мина - красный
+                            cell.classList.add('scanner-mine');
+                        } else if (!gameState.revealed[r][c] && !gameState.flagged[r][c]) {
+                            // Безопасная клетка - зеленый
+                            cell.classList.add('scanner-safe');
+                        }
+                        
+                        setTimeout(() => {
+                            cell.classList.remove('scanner-mine', 'scanner-safe');
+                        }, 3000);
+                    }
+                }
+            }
+            
+            showMessage('Сканер активирован! Красные клетки - мины, зеленые - безопасные');
+        }
+        
+        function useTeleport() {
+            const config = CONFIG[gameState.mode] || CONFIG.novice;
+            
+            let safeRow = -1, safeCol = -1;
+            
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    if (!gameState.revealed[row][col] && 
+                        !gameState.flagged[row][col] && 
+                        gameState.board[row][col] !== -1) {
+                        safeRow = row;
+                        safeCol = col;
+                        break;
+                    }
+                }
+                if (safeRow !== -1) break;
+            }
+            
+            if (safeRow !== -1) {
+                const cell = document.querySelector(`.cell[data-row="${safeRow}"][data-col="${safeCol}"]`);
+                cell.classList.add('wave-animation');
+                revealCell(safeRow, safeCol);
+                
+                showMessage('Телепортация в безопасное место!');
+            } else {
+                showMessage('Нет безопасных клеток для телепортации!');
+            }
+        }
+        
+        function useMagnet() {
+            const config = CONFIG[gameState.mode] || CONFIG.novice;
+            let flagsPlaced = 0;
+            
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    if (gameState.board[row][col] === -1 && 
+                        !gameState.flagged[row][col] && 
+                        !gameState.revealed[row][col]) {
+                        
+                        gameState.flagged[row][col] = true;
+                        gameState.minesFound++;
+                        flagsPlaced++;
+                        
+                        const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                        cell.classList.add('flagged');
+                    }
+                }
+            }
+            
+            updateMinesCounter();
+            updateStatsDisplay();
+            
+            if (flagsPlaced > 0) {
+                showMessage(`Магнит поставил ${flagsPlaced} флажков на мины!`);
+            } else {
+                showMessage('Все мины уже помечены!');
+            }
+        }
+        
+        function useDetector() {
+            const config = CONFIG[gameState.mode] || CONFIG.novice;
+            
+            const rowCounts = Array(config.rows).fill(0);
+            const colCounts = Array(config.cols).fill(0);
+            
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    if (gameState.board[row][col] === -1 && !gameState.revealed[row][col]) {
+                        rowCounts[row]++;
+                        colCounts[col]++;
+                    }
+                }
+            }
+            
+            const maxRow = rowCounts.indexOf(Math.max(...rowCounts));
+            const maxCol = colCounts.indexOf(Math.max(...colCounts));
+            
+            for (let col = 0; col < config.cols; col++) {
+                const cell = document.querySelector(`.cell[data-row="${maxRow}"][data-col="${col}"]`);
+                if (cell) {
+                    cell.classList.add('wave-animation');
+                    setTimeout(() => cell.classList.remove('wave-animation'), 1000);
+                }
+            }
+            
+            for (let row = 0; row < config.rows; row++) {
+                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${maxCol}"]`);
+                if (cell) {
+                    cell.classList.add('wave-animation');
+                    setTimeout(() => cell.classList.remove('wave-animation'), 1000);
+                }
+            }
+            
+            showMessage(`Детектор: строка ${maxRow + 1} и столбец ${maxCol + 1} содержат больше всего мин`);
+        }
+        
+        function useChameleon() {
+            const config = CONFIG[gameState.mode] || CONFIG.novice;
+            
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    if (!gameState.revealed[row][col] && !gameState.flagged[row][col]) {
+                        const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                        cell.classList.add('chameleon');
+                        
+                        setTimeout(() => {
+                            cell.classList.remove('chameleon');
+                        }, 10000);
+                    }
+                }
+            }
+            
+            showMessage('Хамелеон активирован! Клетки меняют цвет для маскировки');
+        }
+        
+        // ========== ТЕМЫ ==========
+        function changeTheme(theme) {
+            gameState.theme = theme;
+            
+            document.body.className = '';
+            document.body.classList.add(`${theme}-theme`);
+            
+            const garlands = document.querySelectorAll('.garland');
+            garlands.forEach(g => {
+                g.style.display = theme === 'christmas' ? 'block' : 'none';
+            });
+            
+            const smileyBtn = document.getElementById('smiley');
+            if (theme === 'halloween') {
+                smileyBtn.textContent = '';
+                smileyBtn.classList.add('halloween-smiley');
+            } else if (theme === 'christmas') {
+                smileyBtn.textContent = '';
+                smileyBtn.classList.add('christmas-smiley');
+            } else {
+                smileyBtn.classList.remove('halloween-smiley', 'christmas-smiley');
+                smileyBtn.textContent = gameState.gameWon ? '😎' : gameState.gameOver ? '😵' : '🙂';
+            }
+            
+            localStorage.setItem('minesweeper-theme', theme);
+        }
+        
+        // ========== РЕЖИМЫ ==========
+        function changeMode(mode) {
+            if (mode === 'tournament' || mode === 'timeless') {
+                return;
+            }
+            
+            gameState.mode = mode;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+            
+            initGame();
+        }
+        
+        // ========== СОХРАНЕНИЕ И ЗАГРУЗКА ==========
+        function saveGameData() {
+            localStorage.setItem('minesweeper-stats', JSON.stringify(gameState.stats));
+            localStorage.setItem('minesweeper-bonuses', JSON.stringify(gameState.playerBonuses));
+            localStorage.setItem('minesweeper-achievements', JSON.stringify(gameState.stats.achievements));
+            localStorage.setItem('minesweeper-coins', gameState.coins.toString());
+            localStorage.setItem('minesweeper-daily', JSON.stringify({
+                quests: gameState.dailyQuests,
+                lastReset: gameState.lastDailyReset
+            }));
+            localStorage.setItem('minesweeper-sound', JSON.stringify({
+                enabled: gameState.soundEnabled,
+                volume: gameState.soundVolume
+            }));
+        }
+        
+        function loadGameData() {
+            const stats = localStorage.getItem('minesweeper-stats');
+            const bonuses = localStorage.getItem('minesweeper-bonuses');
+            const achievements = localStorage.getItem('minesweeper-achievements');
+            const coins = localStorage.getItem('minesweeper-coins');
+            const daily = localStorage.getItem('minesweeper-daily');
+            const theme = localStorage.getItem('minesweeper-theme');
+            const sound = localStorage.getItem('minesweeper-sound');
+            
+            if (stats) gameState.stats = JSON.parse(stats);
+            if (bonuses) gameState.playerBonuses = JSON.parse(bonuses);
+            if (achievements) {
+                gameState.stats.achievements = JSON.parse(achievements);
+                ACHIEVEMENTS.forEach(a => {
+                    a.unlocked = gameState.stats.achievements.includes(a.id);
+                });
+            }
+            if (coins) gameState.coins = parseInt(coins);
+            if (daily) {
+                const dailyData = JSON.parse(daily);
+                gameState.dailyQuests = dailyData.quests;
+                gameState.lastDailyReset = dailyData.lastReset;
+            }
+            if (theme) changeTheme(theme);
+            if (sound) {
+                const soundData = JSON.parse(sound);
+                gameState.soundEnabled = soundData.enabled;
+                gameState.soundVolume = soundData.volume;
+            }
+        }
+        
+        // ========== ОБНОВЛЕНИЕ ДИСПЛЕЕВ ==========
+        function updatePerfectionDisplay() {
+            const fill = document.getElementById('perfection-fill');
+            const text = document.getElementById('perfection-text');
+            
+            fill.style.width = `${gameState.perfection}%`;
+            text.textContent = `Идеальность: ${Math.round(gameState.perfection)}%`;
+            document.getElementById('stat-perfection').textContent = `${Math.round(gameState.perfection)}%`;
+        }
+        
+        function updateTimeDisplay() {
+            document.getElementById('time-counter').textContent = 
+                gameState.seconds.toString().padStart(3, '0');
+        }
+        
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+        function showMessage(text) {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #000080;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                z-index: 10000;
+                font-size: 12px;
+                box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            message.textContent = text;
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => message.remove(), 300);
+            }, 3000);
+        }
+        
+        function showResults() {
+            const config = gameState.mode === 'hardcore' ? 
+                { ...CONFIG.expert, mines: Math.floor(CONFIG.expert.mines * 2) } : 
+                CONFIG[gameState.mode] || CONFIG.novice;
+            
+            const perfection = Math.round(gameState.perfection);
+            
+            let resultHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="color: ${gameState.gameWon ? '#008000' : '#ff0000'}; margin-bottom: 10px;">
+                        ${gameState.gameWon ? '🎉 ПОБЕДА! 🎉' : '💥 ИГРА ОКОНЧЕНА 💥'}
+                    </h2>
+                    <div style="font-size: 14px; margin-bottom: 5px;">
+                        Идеальность: <strong style="color: ${perfection >= 80 ? '#008000' : perfection >= 50 ? '#ff9900' : '#ff0000'}">${perfection}%</strong>
+                    </div>
+                </div>
+                
+                <div style="background-color: #e0e0e0; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+                        <div><strong>Время:</strong> ${gameState.seconds} сек</div>
+                        <div><strong>Режим:</strong> ${config.name}</div>
+                        <div><strong>Открыто клеток:</strong> ${gameState.revealed.flat().filter(Boolean).length}</div>
+                        <div><strong>Найдено мин:</strong> ${gameState.minesFound}/${config.mines}</div>
+                        <div><strong>Взорвано мин:</strong> ${gameState.minesExploded}</div>
+                        <div><strong>Использовано отмен:</strong> ${3 - gameState.undosLeft}</div>
+                        <div><strong>Использовано подсказок:</strong> ${3 - gameState.hintsLeft}</div>
+                    </div>
+                </div>
+            `;
+            
+            if (gameState.gameWon) {
+                const coinsEarned = Math.floor((perfection / 10) * config.multiplier);
+                resultHTML += `
+                    <div style="background-color: #ffffcc; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                        <strong>Награда:</strong><br>
+                        ${coinsEarned} 🪙 монет (${perfection}% идеальность × ${config.multiplier}x множитель)
+                    </div>
+                `;
+            }
+            
+            document.getElementById('results-content').innerHTML = resultHTML;
+            document.getElementById('results-modal').classList.add('active');
+        }
+        
+        // ========== СБРОС ПРОГРЕССА ==========
+        function resetProgress() {
+            if (confirm('Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить!')) {
+                localStorage.clear();
+                gameState = {
+                    board: [],
+                    mines: [],
+                    revealed: [],
+                    flagged: [],
+                    gameOver: false,
+                    gameWon: false,
+                    firstClick: true,
+                    timer: null,
+                    seconds: 0,
+                    mode: 'normal',
+                    theme: 'classic',
+                    perfection: 100,
+                    minesExploded: 0,
+                    minesFound: 0,
+                    hintsLeft: 3,
+                    undosLeft: 3,
+                    coins: 0,
+                    playerBonuses: {
+                        scanner: 0,
+                        shield: 0,
+                        teleport: 0,
+                        magnet: 0,
+                        detector: 0,
+                        chameleon: 0
+                    },
+                    stats: {
+                        gamesPlayed: 0,
+                        gamesWon: 0,
+                        bestTime: 999,
+                        bestPerfection: 0,
+                        totalCoins: 0,
+                        achievements: [],
+                        perfectGames: 0,
+                        totalTime: 0
+                    },
+                    moveHistory: [],
+                    ghosts: [],
+                    learningStep: 0,
+                    dailyQuests: JSON.parse(JSON.stringify(DAILY_QUESTS)),
+                    lastDailyReset: null,
+                    language: 'ru',
+                    soundEnabled: true,
+                    soundVolume: 0.5
+                };
+                
+                // Сброс достижений
+                ACHIEVEMENTS.forEach(a => a.unlocked = false);
+                
+                // Перезагрузка страницы
+                location.reload();
+            }
+        }
+        
+        // ========== НАСТРОЙКА ОБРАБОТЧИКОВ СОБЫТИЙ ==========
+        function setupEventListeners() {
+            // Кнопка новой игры
+            document.getElementById('btn-new').addEventListener('click', initGame);
+            document.getElementById('smiley').addEventListener('click', initGame);
+            document.getElementById('new-game').addEventListener('click', initGame);
+            
+            // Подсказка
+            document.getElementById('btn-hint').addEventListener('click', useHint);
+            
+            // Отмена
+            document.getElementById('btn-undo').addEventListener('click', undoMove);
+            
+            // Анализ
+            document.getElementById('btn-analyze').addEventListener('click', () => {
+                showMessage('Функция в разработке!');
+            });
+            
+            // Вопросные отметки
+            document.getElementById('btn-marks').addEventListener('click', function() {
+                this.classList.toggle('active');
+                showMessage(this.classList.contains('active') ? 
+                    'Вопросные отметки включены' : 'Вопросные отметки выключены');
+            });
+            
+            // Выбор режима
+            document.querySelectorAll('.mode-btn:not(.in-dev)').forEach(btn => {
+                btn.addEventListener('click', () => changeMode(btn.dataset.mode));
+            });
+            
+            // Выбор темы
+            document.querySelectorAll('[data-theme]').forEach(item => {
+                item.addEventListener('click', () => changeTheme(item.dataset.theme));
+            });
+            
+            // Использование бонусов
+            document.getElementById('use-teleport').addEventListener('click', () => useBonus('teleport'));
+            document.getElementById('use-magnet').addEventListener('click', () => useBonus('magnet'));
+            document.getElementById('use-detector').addEventListener('click', () => useBonus('detector'));
+            document.getElementById('use-chameleon').addEventListener('click', () => useBonus('chameleon'));
+            document.getElementById('use-scan').addEventListener('click', () => useBonus('scanner'));
+            document.getElementById('use-shield').addEventListener('click', () => useBonus('shield'));
+            
+            // Магазин
+            document.getElementById('shop').addEventListener('click', showShopModal);
+            
+            // Ежедневные задания
+            document.getElementById('daily-challenge').addEventListener('click', () => {
+                const modal = document.getElementById('daily-modal');
+                const content = document.getElementById('daily-content');
+                
+                let html = '<div style="max-height: 400px; overflow-y: auto;">';
+                gameState.dailyQuests.forEach(quest => {
+                    html += `
+                        <div class="daily-quest ${quest.completed ? 'quest-completed' : ''}">
+                            <div style="font-weight: bold; font-size: 12px;">${quest.name}</div>
+                            <div style="font-size: 10px; margin-bottom: 5px;">${quest.desc}</div>
+                            <div style="color: gold; font-weight: bold;">
+                                Награда: ${quest.reward} 🪙
+                                ${quest.completed ? '<span style="color: green; margin-left: 10px;">✓ Выполнено</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                content.innerHTML = html;
+                modal.classList.add('active');
+            });
+            
+            // Достижения
+            document.getElementById('achievements').addEventListener('click', () => {
+                showAchievementsModal();
+            });
+            
+            // Обучение
+            document.getElementById('tutorial').addEventListener('click', () => {
+                changeMode('learning');
+            });
+            
+            // Звук
+            document.getElementById('sound-toggle').addEventListener('click', () => {
+                SoundManager.toggle();
+            });
+            
+            document.getElementById('sound-volume-up').addEventListener('click', () => {
+                SoundManager.volumeUp();
+            });
+            
+            document.getElementById('sound-volume-down').addEventListener('click', () => {
+                SoundManager.volumeDown();
+            });
+            
+            // Сброс прогресса
+            document.getElementById('reset-progress').addEventListener('click', resetProgress);
+            
+            // Особый режим
+            document.getElementById('custom-mode').addEventListener('click', () => {
+                showMessage('Особый режим в разработке!');
+            });
+            
+            // Кнопка закрытия
+            document.getElementById('close-btn').addEventListener('click', () => {
+                document.getElementById('exit-modal').classList.add('active');
+            });
+            
+            document.getElementById('exit-cancel').addEventListener('click', () => {
+                document.getElementById('exit-modal').classList.remove('active');
+            });
+            
+            document.getElementById('exit-confirm').addEventListener('click', () => {
+                // В реальном приложении здесь было бы закрытие окна
+                showMessage('Шутка! Игра осталась открытой 😊');
+                document.getElementById('exit-modal').classList.remove('active');
+            });
+            
+            // Dev Console (Ctrl+Shift+C)
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                    showDevConsole();
+                }
+                
+                // Dev Console команды при нажатии Enter
+                if (e.key === 'Enter' && document.getElementById('devconsole-modal').classList.contains('active')) {
+                    const input = document.getElementById('devconsole-input');
+                    if (input.value.trim()) {
+                        executeDevCommand(input.value.trim());
+                        input.value = '';
+                    }
+                }
+            });
+            
+            // Dev Console кнопки
+            document.getElementById('devconsole-execute').addEventListener('click', () => {
+                const input = document.getElementById('devconsole-input');
+                if (input.value.trim()) {
+                    executeDevCommand(input.value.trim());
+                    input.value = '';
+                }
+            });
+            
+            document.getElementById('devconsole-clear').addEventListener('click', () => {
+                document.getElementById('devconsole-output').innerHTML = '';
+            });
+            
+            document.getElementById('close-devconsole').addEventListener('click', () => {
+                document.getElementById('devconsole-modal').classList.remove('active');
+            });
+            
+            // Закрытие модальных окон
+            document.querySelectorAll('.control-btn[id^="close-"]').forEach(btn => {
+                if (btn.id !== 'close-btn') {
+                    btn.addEventListener('click', function() {
+                        this.closest('.xp-modal').classList.remove('active');
+                    });
+                }
+            });
+            
+            document.getElementById('play-again').addEventListener('click', () => {
+                document.getElementById('results-modal').classList.remove('active');
+                initGame();
+            });
+            
+            // Выбор уровня сложности из меню
+            document.querySelectorAll('[data-mode]').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const mode = e.target.dataset.mode;
+                    if (mode === 'tournament' || mode === 'timeless') {
+                        showMessage('Этот режим находится в разработке!');
+                        return;
+                    }
+                    changeMode(mode);
+                });
+            });
+            
+            // Обучение при первом запуске
+            if (!localStorage.getItem('minesweeper-first-run')) {
+                setTimeout(() => {
+                    changeMode('learning');
+                    localStorage.setItem('minesweeper-first-run', 'true');
+                }, 1000);
+            }
+        }
+        
+        function showAchievementsModal() {
+            const modal = document.getElementById('achievements-modal');
+            const content = document.getElementById('achievements-content');
+            
+            let html = '<div style="max-height: 400px; overflow-y: auto;">';
+            
+            ACHIEVEMENTS.forEach(achievement => {
+                if (achievement.secret && !achievement.unlocked) {
+                    html += `
+                        <div class="achievement">
+                            <div class="achievement-icon">❓</div>
+                            <div class="achievement-info">
+                                <div class="achievement-name">Секретное достижение</div>
+                                <div class="achievement-desc">Разблокируйте, чтобы узнать</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="achievement ${achievement.unlocked ? 'unlocked' : ''}">
+                            <div class="achievement-icon">${achievement.icon}</div>
+                            <div class="achievement-info">
+                                <div class="achievement-name">${achievement.name}</div>
+                                <div class="achievement-desc">${achievement.desc}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            html += '</div>';
+            content.innerHTML = html;
+            modal.classList.add('active');
+        }
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Настраиваем обработчики для кнопок выбора языка
+            document.getElementById('btn-ru').addEventListener('click', function() {
+                selectLanguage('ru');
+            });
+            
+            document.getElementById('btn-en').addEventListener('click', function() {
+                selectLanguage('en');
+            });
+            
+            // Проверяем, был ли уже выбран язык
+            const savedLanguage = localStorage.getItem('minesweeper-language');
+            if (savedLanguage) {
+                selectLanguage(savedLanguage);
+            } else {
+                // Показываем окно выбора языка
+                document.getElementById('language-modal').style.display = 'flex';
+            }
+        });
+        
+        // Стили для анимаций
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

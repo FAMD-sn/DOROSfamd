@@ -1,0 +1,450 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cubic Jump Ultimate</title>
+    <style>
+        :root {
+            --accent: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --gold: #f1c40f;
+            --bg: #f0f3f5;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background: #b2bec3;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow: hidden; touch-action: none;
+        }
+
+        #app-wrapper {
+            position: relative;
+            width: 420px; height: 750px;
+            background: white; border-radius: 35px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        canvas { display: block; background: #ffffff; background-image: radial-gradient(#dfe6e9 1.5px, transparent 1.5px); background-size: 30px 30px; }
+
+        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        
+        .hud-container { padding: 25px; display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95); padding: 12px 18px; border-radius: 22px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(8px);
+            font-weight: 900; color: #2d3436; display: flex; flex-direction: column; gap: 4px;
+        }
+
+        .hearts-row { display: flex; gap: 3px; color: var(--danger); font-size: 22px; }
+
+        .overlay {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.98);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; text-align: center; padding: 40px;
+        }
+
+        h1 { font-size: 52px; margin: 0; color: #2d3436; font-weight: 900; letter-spacing: -2px; }
+        .sub-text { font-size: 18px; color: #636e72; margin: 15px 0 30px; }
+
+        .btn-stack { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 280px; }
+        
+        .ui-btn {
+            padding: 20px; border: none; border-radius: 22px; font-size: 20px; font-weight: 800;
+            cursor: pointer; color: white; box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+            transition: 0.1s; text-transform: uppercase;
+        }
+        .ui-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+        .btn-play { background: var(--success); }
+        .btn-shop { background: var(--accent); }
+        .btn-case { background: var(--gold); }
+
+        #shop-scroll {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+            margin: 20px 0; max-height: 300px; overflow-y: auto; padding: 10px;
+        }
+        .skin-slot {
+            aspect-ratio: 1; border: 4px solid #f1f2f6; border-radius: 20px;
+            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
+        }
+        .skin-slot.owned { border-color: #dfe6e9; }
+        .skin-slot.active { border-color: var(--accent); background: #f0f9ff; transform: scale(1.1); }
+        .skin-view { width: 35px; height: 35px; border-radius: 10px; }
+
+        .active-effects { position: absolute; bottom: 30px; left: 20px; display: flex; flex-direction: column; gap: 8px; }
+        .effect-tag {
+            background: white; padding: 8px 15px; border-radius: 15px; font-size: 14px;
+            font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(-30px); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+<div id="app-wrapper">
+    <div class="ui-layer">
+        <div class="hud-container">
+            <div class="stat-card">
+                <div id="hud-score">0</div>
+                <div id="hud-coins">💰 0</div>
+            </div>
+            <div class="stat-card">
+                <div class="hearts-row" id="hud-hearts">❤️❤️❤️</div>
+            </div>
+        </div>
+        <div class="active-effects" id="hud-buffs"></div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Menu -->
+    <div id="screen-start" class="overlay" style="display: flex;">
+        <h1>Cubic Jump</h1>
+        <p class="sub-text">Прыгай, выживай, побеждай!</p>
+        <div class="btn-stack">
+            <button class="ui-btn btn-play" onclick="game.init()">Играть</button>
+            <button class="ui-btn btn-shop" onclick="ui.toggleShop(true)">Магазин</button>
+        </div>
+    </div>
+
+    <!-- Death -->
+    <div id="screen-death" class="overlay">
+        <h1>Игра окончена</h1>
+        <p id="death-score" class="sub-text"></p>
+        <div class="btn-stack">
+            <button class="ui-btn btn-play" onclick="game.init()">Еще раз</button>
+            <button class="ui-btn btn-shop" onclick="ui.toggleShop(true)">Магазин</button>
+        </div>
+    </div>
+
+    <!-- Shop -->
+    <div id="screen-shop" class="overlay">
+        <h1>Магазин</h1>
+        <div id="shop-scroll"></div>
+        <div class="btn-stack">
+            <button class="ui-btn btn-case" onclick="ui.openCase()">Кейс (50 💰)</button>
+            <button class="ui-btn btn-play" onclick="ui.toggleShop(false)">Назад</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CONFIG = {
+        w: 420, h: 750,
+        gravity: 0.38, jump: -11.5,
+        friction: 0.84, accel: 0.82, // Медленное управление
+        maxLives: 3
+    };
+
+    let user = {
+        coins: 100,
+        ownedSkins: ['#f1c40f'],
+        activeSkin: '#f1c40f'
+    };
+
+    const ALL_SKINS = [
+        { c: '#f1c40f', n: 'Классик' }, { c: '#2ecc71', n: 'Лес' },
+        { c: '#3498db', n: 'Океан' }, { c: '#e74c3c', n: 'Пламя' },
+        { c: '#9b59b6', n: 'Магия' }, { c: '#1abc9c', n: 'Бирюза' },
+        { c: '#e67e22', n: 'Оранж' }, { c: '#34495e', n: 'Тень' },
+        { c: '#95a5a6', n: 'Металл' }
+    ];
+
+    function drawRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+    }
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x; this.y = y; this.color = color;
+            this.vx = (Math.random() - 0.5) * 10;
+            this.vy = (Math.random() - 0.5) * 10;
+            this.life = 1.0; this.size = Math.random() * 4 + 2;
+        }
+        update() { this.x += this.vx; this.y += this.vy; this.life -= 0.025; }
+        draw(ctx) {
+            ctx.globalAlpha = this.life; ctx.fillStyle = this.color;
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    class Game {
+        constructor() {
+            this.canvas = document.getElementById('gameCanvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.canvas.width = CONFIG.w; this.canvas.height = CONFIG.h;
+            
+            this.active = false; this.score = 0; this.lives = CONFIG.maxLives;
+            this.platforms = []; this.items = []; this.enemies = [];
+            this.vfx = []; this.keys = {}; this.invul = 0;
+            this.buffs = { magnet: 0, x2: 0, shield: false };
+
+            this.player = { x: 0, y: 0, w: 44, h: 44, vx: 0, vy: 0, fly: 0 };
+
+            window.addEventListener('keydown', e => this.keys[e.code] = true);
+            window.addEventListener('keyup', e => this.keys[e.code] = false);
+            this.canvas.addEventListener('touchstart', e => {
+                const tx = e.touches[0].clientX - this.canvas.getBoundingClientRect().left;
+                if(tx < CONFIG.w/2) this.keys['ArrowLeft'] = true; else this.keys['ArrowRight'] = true;
+            });
+            this.canvas.addEventListener('touchend', () => { this.keys['ArrowLeft'] = false; this.keys['ArrowRight'] = false; });
+        }
+
+        init() {
+            this.score = 0; this.lives = CONFIG.maxLives; this.invul = 0;
+            this.platforms = []; this.items = []; this.enemies = []; this.vfx = [];
+            this.buffs = { magnet: 0, x2: 0, shield: false };
+            
+            this.player.x = CONFIG.w/2 - 22; this.player.y = 550;
+            this.player.vx = 0; this.player.vy = 0; this.player.fly = 0;
+
+            this.platforms.push({ x: 50, y: 700, w: 320, h: 25, type: 'normal' });
+            for(let i=0; i<9; i++) this.generate(600 - i*115);
+
+            this.active = true;
+            ui.hideAll();
+            requestAnimationFrame(() => this.loop());
+        }
+
+        generate(y) {
+            let type = 'normal';
+            let r = Math.random();
+            if(this.score > 2000 && r > 0.75) type = 'moving';
+            if(this.score > 4000 && r > 0.88) type = 'fragile';
+            if(this.score > 6000 && r > 0.93) type = 'cloud';
+            if(this.score > 8000 && r > 0.96) type = 'ice';
+            if(this.score > 10000 && r > 0.98) type = 'portal';
+
+            const p = {
+                x: Math.random() * (CONFIG.w - 85),
+                y: y, w: 85, h: 22, type: type,
+                vx: type === 'moving' ? (Math.random() > 0.5 ? 2.2 : -2.2) : 0,
+                dead: false
+            };
+            this.platforms.push(p);
+
+            // Враг (занимает 1 клетку 30x30)
+            if(this.score > 1500 && Math.random() > 0.88) {
+                this.enemies.push({
+                    x: Math.random() * (CONFIG.w - 30),
+                    y: y - 130, w: 30, h: 30,
+                    vx: (Math.random() - 0.5) * 4, ang: 0
+                });
+            }
+
+            // Бонус
+            if(Math.random() > 0.85) {
+                let it = 'coin';
+                let ir = Math.random();
+                if(ir > 0.98) it = 'jetpack';
+                else if(ir > 0.94) it = 'magnet';
+                else if(ir > 0.90) it = 'shield';
+                else if(ir > 0.86) it = 'x2';
+                this.items.push({ x: p.x + p.w/2 - 12, y: p.y - 35, w: 24, h: 24, type: it });
+            }
+        }
+
+        update() {
+            if(!this.active) return;
+            const p = this.player;
+
+            // Медленное управление
+            if(this.keys['ArrowLeft'] || this.keys['KeyA']) p.vx -= CONFIG.accel;
+            else if(this.keys['ArrowRight'] || this.keys['KeyD']) p.vx += CONFIG.accel;
+            else p.vx *= CONFIG.friction;
+            
+            p.vx = Math.max(Math.min(p.vx, 10), -10);
+            p.x += p.vx;
+            if(p.x < -p.w) p.x = CONFIG.w;
+            if(p.x > CONFIG.w) p.x = -p.w;
+
+            if(p.fly > 0) { p.vy = -15; p.fly--; this.particleEffect(p.x+p.w/2, p.y+p.h, '#e67e22', 2); }
+            else { p.vy += CONFIG.gravity; }
+            p.y += p.vy;
+
+            if(this.invul > 0) this.invul--;
+
+            // Камера
+            if(p.y < CONFIG.h * 0.45) {
+                let diff = CONFIG.h * 0.45 - p.y;
+                p.y = CONFIG.h * 0.45; this.score += Math.floor(diff);
+                this.platforms.forEach(o => o.y += diff);
+                this.enemies.forEach(o => o.y += diff);
+                this.items.forEach(o => o.y += diff);
+                this.vfx.forEach(o => o.y += diff);
+            }
+
+            // Платформы
+            this.platforms.forEach((pl, i) => {
+                if(pl.type === 'moving') {
+                    pl.x += pl.vx; if(pl.x <= 0 || pl.x + pl.w >= CONFIG.w) pl.vx *= -1;
+                }
+                if(p.vy > 0 && !pl.dead && p.x + p.w*0.8 > pl.x && p.x + p.w*0.2 < pl.x + pl.w &&
+                   p.y + p.h > pl.y && p.y + p.h < pl.y + pl.h + p.vy + 4) {
+                    
+                    if(pl.type === 'portal') {
+                        let other = this.platforms.find(x => x.type === 'portal' && x !== pl);
+                        if(other) { p.x = other.x; p.y = other.y - 60; this.particleEffect(pl.x, pl.y, '#9b59b6', 15); }
+                    } else {
+                        p.vy = CONFIG.jump;
+                        this.particleEffect(p.x+p.w/2, p.y+p.h, '#dfe6e9', 8);
+                        if(pl.type === 'fragile') { pl.dead = true; this.particleEffect(pl.x+pl.w/2, pl.y, '#e74c3c', 12); }
+                        if(pl.type === 'cloud') { setTimeout(() => pl.dead = true, 300); }
+                    }
+                }
+                if(pl.y > CONFIG.h) { this.platforms.splice(i, 1); this.generate(0); }
+            });
+
+            // Враги
+            this.enemies.forEach((en, i) => {
+                en.x += en.vx; if(en.x <= 0 || en.x + en.w >= CONFIG.w) en.vx *= -1;
+                en.ang += 0.1;
+                let dy = en.y + Math.sin(en.ang)*15;
+                if(this.invul === 0 && p.x < en.x+en.w && p.x+p.w > en.x && p.y < dy+en.h && p.y+p.h > dy) {
+                    if(this.buffs.shield) { this.buffs.shield = false; this.particleEffect(en.x, en.y, '#3498db', 20); this.enemies.splice(i, 1); }
+                    else {
+                        this.lives--; this.invul = 60; p.vy = -10;
+                        this.particleEffect(p.x, p.y, '#e74c3c', 15);
+                        if(this.lives <= 0) this.gameOver();
+                    }
+                }
+                if(en.y > CONFIG.h) this.enemies.splice(i, 1);
+            });
+
+            // Предметы
+            this.items.forEach((it, i) => {
+                if(it.type === 'coin' && this.buffs.magnet > 0) { it.x += (p.x-it.x)*0.2; it.y += (p.y-it.y)*0.2; }
+                if(p.x < it.x+it.w && p.x+p.w > it.x && p.y < it.y+it.h && p.y+p.h > it.y) {
+                    this.collect(it); this.items.splice(i, 1);
+                }
+                if(it.y > CONFIG.h) this.items.splice(i, 1);
+            });
+
+            if(p.y > CONFIG.h + 100) this.gameOver();
+
+            this.vfx.forEach((v, i) => { v.update(); if(v.life <= 0) this.vfx.splice(i, 1); });
+            
+            if(this.buffs.magnet > 0) this.buffs.magnet--;
+            if(this.buffs.x2 > 0) this.buffs.x2--;
+
+            ui.refreshHUD(this.score, user.coins, this.lives, this.buffs);
+        }
+
+        collect(it) {
+            this.particleEffect(it.x, it.y, '#f1c40f', 10);
+            if(it.type === 'coin') user.coins += (this.buffs.x2 > 0 ? 10 : 5);
+            if(it.type === 'magnet') this.buffs.magnet = 600;
+            if(it.type === 'shield') this.buffs.shield = true;
+            if(it.type === 'jetpack') this.player.fly = 180;
+            if(it.type === 'x2') this.buffs.x2 = 600;
+        }
+
+        particleEffect(x, y, color, n) { for(let i=0; i<n; i++) this.vfx.push(new Particle(x, y, color)); }
+
+        draw() {
+            const ctx = this.ctx; ctx.clearRect(0, 0, CONFIG.w, CONFIG.h);
+            
+            this.platforms.forEach(pl => {
+                if(pl.dead) return;
+                ctx.fillStyle = pl.type==='moving'?'#3498db':(pl.type==='fragile'?'#e74c3c':(pl.type==='ice'?'#a5dff9':(pl.type==='portal'?'#9b59b6':'#2ecc71')));
+                drawRect(ctx, pl.x, pl.y, pl.w, pl.h, 11); ctx.fill();
+            });
+
+            this.items.forEach(it => {
+                ctx.fillStyle = it.type==='coin'?'#f1c40f':(it.type==='shield'?'#3498db':'#9b59b6');
+                ctx.beginPath(); ctx.arc(it.x+12, it.y+12, 10, 0, Math.PI*2); ctx.fill();
+            });
+
+            this.enemies.forEach(en => {
+                let dy = en.y + Math.sin(en.ang)*15;
+                ctx.fillStyle = '#2d3436'; drawRect(ctx, en.x, dy, en.w, en.h, 8); ctx.fill();
+                ctx.fillStyle = 'red'; ctx.beginPath(); ctx.arc(en.x+10, dy+12, 3, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(en.x+20, dy+12, 3, 0, Math.PI*2); ctx.fill();
+            });
+
+            this.vfx.forEach(v => v.draw(ctx));
+
+            // Игрок с направлением взгляда
+            ctx.save();
+            if(this.invul > 0 && Math.floor(Date.now()/100)%2) ctx.globalAlpha = 0.3;
+            ctx.fillStyle = user.activeSkin;
+            drawRect(ctx, this.player.x, this.player.y, this.player.w, this.player.h, 12); ctx.fill();
+            
+            // Глаза смотрят в сторону скорости
+            let eyeX = this.player.x + 12 + (this.player.vx * 1.5);
+            ctx.fillStyle = 'white';
+            ctx.beginPath(); ctx.arc(eyeX, this.player.y+15, 6, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(eyeX+18, this.player.y+15, 6, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = 'black';
+            ctx.beginPath(); ctx.arc(eyeX + (this.player.vx*0.5), this.player.y+15, 3, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(eyeX+18 + (this.player.vx*0.5), this.player.y+15, 3, 0, Math.PI*2); ctx.fill();
+            
+            if(this.buffs.shield) { ctx.strokeStyle = '#3498db'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(this.player.x+22, this.player.y+22, 40, 0, Math.PI*2); ctx.stroke(); }
+            ctx.restore();
+        }
+
+        gameOver() {
+            this.active = false; document.getElementById('screen-death').style.display = 'flex';
+            document.getElementById('death-score').innerText = `Счет: ${this.score} | Монеты: ${user.coins}`;
+        }
+
+        loop() { this.update(); this.draw(); if(this.active) requestAnimationFrame(() => this.loop()); }
+    }
+
+    const ui = {
+        hideAll: () => document.querySelectorAll('.overlay').forEach(el => el.style.display = 'none'),
+        refreshHUD: (s, c, l, b) => {
+            document.getElementById('hud-score').innerText = s;
+            document.getElementById('hud-coins').innerText = '💰 ' + c;
+            document.getElementById('hud-hearts').innerText = '❤️'.repeat(Math.max(0, l));
+            const container = document.getElementById('hud-buffs'); container.innerHTML = '';
+            if(b.magnet > 0) container.innerHTML += `<div class="effect-tag">🧲 Магнит: ${Math.ceil(b.magnet/60)}с</div>`;
+            if(b.x2 > 0) container.innerHTML += `<div class="effect-tag" style="color:#9b59b6">💎 x2 Очки: ${Math.ceil(b.x2/60)}с</div>`;
+            if(b.shield) container.innerHTML += `<div class="effect-tag" style="color:#3498db">🛡️ Щит активен</div>`;
+        },
+        toggleShop: (show) => {
+            ui.hideAll(); if(!show) return document.getElementById('screen-start').style.display = 'flex';
+            document.getElementById('screen-shop').style.display = 'flex';
+            const grid = document.getElementById('shop-scroll'); grid.innerHTML = '';
+            ALL_SKINS.forEach(s => {
+                const isOwned = user.ownedSkins.includes(s.c);
+                const isActive = user.activeSkin === s.c;
+                const slot = document.createElement('div');
+                slot.className = `skin-slot ${isOwned?'owned':''} ${isActive?'active':''}`;
+                slot.innerHTML = `<div class="skin-view" style="background:${s.c}"></div>`;
+                slot.onclick = () => { if(isOwned) { user.activeSkin = s.c; ui.toggleShop(true); } };
+                grid.appendChild(slot);
+            });
+        },
+        openCase: () => {
+            if(user.coins < 50) return alert("Нужно 50 монет! 💰");
+            user.coins -= 50;
+            const locked = ALL_SKINS.filter(s => !user.ownedSkins.includes(s.c));
+            if(locked.length > 0) {
+                const win = locked[Math.floor(Math.random()*locked.length)];
+                user.ownedSkins.push(win.c); alert(`Ура! Выпал скин: ${win.n}`);
+            } else { user.coins += 25; alert("Все скины собраны! Возвращаем 25 монет."); }
+            ui.toggleShop(true);
+        }
+    };
+
+    const game = new Game();
+</script>
+</body>
+</html>
+

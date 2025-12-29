@@ -1,0 +1,964 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pixel Studio Ultimate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap');
+
+        :root { color-scheme: dark; }
+
+        body {
+            background-color: #050505;
+            color: #e2e2e7;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
+        .top-bar {
+            background: #0a0a0a;
+            border-bottom: 1px solid #1a1a1a;
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            gap: 12px;
+            z-index: 50;
+            flex-shrink: 0;
+        }
+
+        .scroll-tools {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            align-items: center;
+        }
+        .scroll-tools::-webkit-scrollbar { display: none; }
+
+        /* --- ВСПЛЫВАЮЩЕЕ МЕНЮ ЦВЕТА --- */
+        #colorPickerPopup {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 16px;
+            background: #0a0a0a;
+            border: 1px solid #27272a;
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            z-index: 100;
+            width: 260px;
+        }
+
+        /* --- ХОЛСТ --- */
+        .viewport {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #050505;
+            position: relative;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .canvas-container {
+            position: relative;
+            background-color: #020202;
+            border: 1px solid #1a1a1a;
+            box-shadow: 0 0 60px rgba(0,0,0,0.7);
+            image-rendering: pixelated;
+        }
+        canvas { display: block; touch-action: none; cursor: crosshair; }
+
+        /* --- НИЖНЯЯ ПАНЕЛЬ --- */
+        .bottom-panel {
+            background: #0a0a0a;
+            border-top: 1px solid #1a1a1a;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 45vh;
+            overflow-y: auto;
+        }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        /* --- КАРТОЧКИ --- */
+        .card { 
+            background: #000000;
+            border: 1px solid #1a1a1a;
+            padding: 18px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .label { 
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #52525b;
+            margin-bottom: 4px;
+        }
+
+        /* --- ФОРМЫ (Inputs) --- */
+        input, select, textarea {
+            background-color: #080808 !important;
+            border: 1px solid #1a1a1a !important;
+            color: #ffffff !important;
+            padding: 12px !important;
+            border-radius: 12px !important;
+            font-size: 13px !important;
+            outline: none !important;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #3f3f46 !important;
+        }
+
+        /* Ползунки (Range) */
+        input[type="range"] {
+            -webkit-appearance: none;
+            background: #1a1a1a !important;
+            height: 6px;
+            border-radius: 3px;
+            padding: 0 !important;
+            border: none !important;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px; height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+        /* Кнопки */
+        .btn-tool {
+            @apply flex items-center justify-center min-w-[42px] h-[42px] rounded-xl text-zinc-500 hover:text-white hover:bg-zinc-900 transition-all active:scale-90;
+        }
+        .btn-tool.active { @apply bg-zinc-800 text-white shadow-lg; }
+
+        .primary-btn {
+            @apply bg-zinc-100 hover:bg-white text-black text-[11px] py-3 rounded-xl font-black uppercase transition-all active:scale-95;
+        }
+
+        .secondary-btn {
+            @apply bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-[11px] py-3 rounded-xl font-bold uppercase transition-all;
+        }
+
+        /* Чекбокс (Toggle) */
+        .toggle-checkbox {
+            appearance: none;
+            width: 40px; height: 20px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid #27272a;
+        }
+        .toggle-checkbox:checked { background: #ffffff; }
+        .toggle-checkbox::after {
+            content: ''; position: absolute;
+            top: 2px; left: 2px;
+            width: 14px; height: 14px;
+            background: #555;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .toggle-checkbox:checked::after {
+            left: 22px; background: #000;
+        }
+
+        /* Лоадер */
+        #loader {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.95);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; border-radius: inherit;
+        }
+
+        .swatch {
+            width: 30px; height: 30px; border-radius: 8px; cursor: pointer; transition: transform 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .swatch:hover { transform: scale(1.1); z-index: 2; }
+    </style>
+</head>
+<body>
+
+    <!-- СКРЫТЫЙ INPUT ДЛЯ ЗАГРУЗКИ ФОТО -->
+    <input type="file" id="fileUpload" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+
+    <!-- ВСПЛЫВАЮЩЕЕ МЕНЮ ЦВЕТА -->
+    <div id="colorPickerPopup">
+        <div class="flex justify-between items-center mb-4">
+            <span class="label">Палитра и RGB</span>
+            <button onclick="toggleColorPopup()" class="text-zinc-600 hover:text-white"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="grid grid-cols-6 gap-2 mb-6" id="palette"></div>
+        
+        <div class="space-y-4">
+            <div>
+                <span class="text-[10px] block mb-1 text-zinc-500 font-bold">HEX КОД</span>
+                <input type="text" id="hexInput" value="#FFFFFF" oninput="updateColorFromHex(this.value)">
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <span class="text-[10px] block mb-1 text-zinc-500 font-bold">R</span>
+                    <input type="number" id="rInput" min="0" max="255" value="255" oninput="updateColorFromRGB()">
+                </div>
+                <div>
+                    <span class="text-[10px] block mb-1 text-zinc-500 font-bold">G</span>
+                    <input type="number" id="gInput" min="0" max="255" value="255" oninput="updateColorFromRGB()">
+                </div>
+                <div>
+                    <span class="text-[10px] block mb-1 text-zinc-500 font-bold">B</span>
+                    <input type="number" id="bInput" min="0" max="255" value="255" oninput="updateColorFromRGB()">
+                </div>
+            </div>
+            
+            <div>
+                <span class="text-[10px] block mb-1 text-zinc-500 font-bold">СИСТЕМНЫЙ ВЫБОР</span>
+                <input type="color" id="nativeColor" oninput="updateColorFromNative(this.value)" class="!h-12 cursor-pointer w-full !p-1">
+            </div>
+        </div>
+    </div>
+
+    <!-- ХОТБАР ВЕРХНИЙ -->
+    <header class="top-bar">
+        <div class="scroll-tools">
+            <!-- Индикатор текущего цвета открывает меню -->
+            <button onclick="toggleColorPopup()" id="colorIndicator" class="w-10 h-10 rounded-xl border-2 border-zinc-800 transition-all hover:scale-105" style="background: #ffffff;"></button>
+            
+            <div class="w-px h-8 bg-zinc-900 mx-1"></div>
+            
+            <button onclick="setTool('brush')" id="t-brush" class="btn-tool active" title="Кисть"><i class="fas fa-pencil-alt"></i></button>
+            <button onclick="setTool('eraser')" id="t-eraser" class="btn-tool" title="Ластик"><i class="fas fa-eraser"></i></button>
+            <button onclick="setTool('fill')" id="t-fill" class="btn-tool" title="Заливка"><i class="fas fa-fill-drip"></i></button>
+            <button onclick="setTool('picker')" id="t-picker" class="btn-tool" title="Пипетка"><i class="fas fa-eye-dropper"></i></button>
+            
+            <div class="w-px h-8 bg-zinc-900 mx-1"></div>
+            
+            <button onclick="undo()" class="btn-tool" title="Назад"><i class="fas fa-undo"></i></button>
+            <button onclick="redo()" class="btn-tool" title="Вперед"><i class="fas fa-redo"></i></button>
+            <button onclick="clearAll()" class="btn-tool hover:text-red-500" title="Очистить"><i class="fas fa-trash-alt"></i></button>
+            <!-- КНОПКА ЗАГРУЗКИ ФОТО -->
+            <button onclick="document.getElementById('fileUpload').click()" class="btn-tool hover:text-blue-400" title="Загрузить фото (с авто-ресайзом)"><i class="fas fa-image"></i></button>
+        </div>
+
+        <!-- Размеры холста -->
+        <div class="ml-auto flex items-center bg-black border border-zinc-900 rounded-xl px-3 py-1 gap-2">
+            <input type="number" id="inpW" value="64" class="!w-12 !p-1 !border-none !bg-transparent text-center font-black text-white">
+            <span class="text-zinc-800 font-black">×</span>
+            <input type="number" id="inpH" value="64" class="!w-12 !p-1 !border-none !bg-transparent text-center font-black text-white">
+            <button onclick="applyResize()" class="text-zinc-500 hover:text-white p-1 ml-1"><i class="fas fa-sync-alt text-xs"></i></button>
+        </div>
+    </header>
+
+    <!-- ВЬЮПОРТ -->
+    <main class="viewport" id="viewport">
+        <div class="canvas-container" id="canvBox">
+            <div id="loader">
+                <div class="w-8 h-8 border-4 border-zinc-100 border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-[10px] font-black mt-4 text-white uppercase tracking-[0.2em]">Нейросеть думает...</p>
+            </div>
+            <canvas id="canvas"></canvas>
+        </div>
+    </main>
+
+    <!-- НИЖНЯЯ ПАНЕЛЬ -->
+    <footer class="bottom-panel">
+        <div class="panel-grid">
+            
+            <!-- ОБЛАЧНЫЙ ИИ -->
+            <div class="card">
+                <span class="label">Облачный ИИ (Imagen 4.0)</span>
+                <textarea id="aiPrompt" placeholder="Опишите ваш шедевр... (напр: киберпанк самурай)" class="h-20 resize-none font-medium"></textarea>
+                <button onclick="genCloud()" class="primary-btn">Генерировать через облако</button>
+            </div>
+
+            <!-- КИСТЬ -->
+            <div class="card">
+                <span class="label">Настройки кисти</span>
+                <div class="flex flex-col gap-4 mt-2">
+                    <div>
+                        <span class="text-[10px] text-zinc-500 mb-2 block">ТИП КИСТИ</span>
+                        <select id="brushType" class="w-full">
+                            <option value="pixel">Пиксельная (Квадрат)</option>
+                            <option value="hard">Твердая (Круг)</option>
+                            <option value="soft">Мягкая (Размытие)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] text-zinc-500">РАДИУС</span>
+                            <span class="text-[10px] text-white font-mono bg-zinc-900 px-2 py-0.5 rounded" id="radVal">1</span>
+                        </div>
+                        <input type="range" id="brushRad" min="1" max="100" value="1" oninput="document.getElementById('radVal').innerText=this.value" class="w-full accent-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ЛОКАЛЬНЫЕ ШАБЛОНЫ (С ИСКАЖЕНИЕМ) -->
+            <div class="card">
+                <span class="label">Локальная нейросеть</span>
+                <div class="flex flex-col gap-4">
+                    <select id="genType" class="w-full">
+                        <optgroup label="🌀 Фракталы и Искажение">
+                            <option value="mandelbrot">Множество Мандельброта</option>
+                            <option value="julia">Множество Жюлиа</option>
+                            <option value="burning_ship">Горящий Корабль</option>
+                            <option value="tricorn">Трикорн (Mandelbar)</option>
+                            <option value="sierpinski">Ковер Серпинского</option>
+                        </optgroup>
+                        <optgroup label="✨ Фэнтези">
+                            <option value="sword">Магический Меч</option>
+                            <option value="shield">Легендарный Щит</option>
+                            <option value="potion">Эликсир Жизни</option>
+                            <option value="crystal">Кристалл Маны</option>
+                        </optgroup>
+                        <optgroup label="👤 Существа">
+                            <option value="face">Генеративное Лицо</option>
+                            <option value="ghost">Призрак</option>
+                            <option value="alien">Пришелец</option>
+                            <option value="creature">Симметричный Монстр</option>
+                        </optgroup>
+                        <optgroup label="🌌 Космос">
+                            <option value="planet">Планета</option>
+                            <option value="stars">Звездное скопление</option>
+                            <option value="blackhole">Черная дыра</option>
+                        </optgroup>
+                        <optgroup label="🏰 Окружение">
+                            <option value="landscape">Горная гряда</option>
+                            <option value="tower">Одинокая башня</option>
+                            <option value="island">Летающий остров</option>
+                        </optgroup>
+                    </select>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] text-zinc-500">СЛОЖНОСТЬ / ИТЕРАЦИИ</span>
+                            <span class="text-[10px] text-white font-mono bg-zinc-900 px-2 py-0.5 rounded" id="iterVal">100</span>
+                        </div>
+                        <input type="range" id="pIter" min="10" max="500" value="100" oninput="document.getElementById('iterVal').innerText=this.value" class="w-full accent-white">
+                    </div>
+
+                    <!-- ТУМБЛЕР ИСКАЖЕНИЯ -->
+                    <div class="flex items-center justify-between bg-zinc-900 p-2 rounded-xl border border-zinc-800">
+                        <span class="text-[10px] font-bold text-zinc-400">ИСКАЖАТЬ ФОТО (WARP)</span>
+                        <input type="checkbox" id="warpMode" class="toggle-checkbox">
+                    </div>
+
+                    <button onclick="genLocal()" class="secondary-btn mt-auto">Выполнить локально</button>
+                </div>
+            </div>
+
+            <!-- SEED И ЭКСПОРТ -->
+            <div class="card">
+                <span class="label">Управление проектом</span>
+                <input type="text" id="seedField" placeholder="Seed код рисунка..." class="font-mono text-[10px]">
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copySeed()" class="secondary-btn"><i class="fas fa-copy mr-2"></i>Copy</button>
+                    <button onclick="restoreSeed()" class="secondary-btn"><i class="fas fa-paste mr-2"></i>Paste</button>
+                </div>
+                <button onclick="downloadPng()" class="secondary-btn w-full"><i class="fas fa-download mr-2"></i>Скачать PNG</button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const apiKey = ""; // Ключ среды
+
+        let cw = 64, ch = 64;
+        let isDrawing = false, tool = 'brush';
+        let history = [], step = -1;
+        let curColor = "#ffffff";
+        let lastX, lastY;
+
+        // Расширенная палитра
+        const paletteColors = [
+            '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF',
+            '#FFFFFF', '#C0C0C0', '#808080', '#404040', '#000000', '#8B4513',
+            '#FFA500', '#800000', '#808000', '#008000', '#800080', '#008080'
+        ];
+
+        window.onload = () => {
+            initPalette();
+            applyResize();
+        };
+
+        function initPalette() {
+            const pal = document.getElementById('palette');
+            paletteColors.forEach(c => {
+                const d = document.createElement('div');
+                d.className = 'swatch';
+                d.style.background = c;
+                d.onclick = () => updateColorFromHex(c);
+                pal.appendChild(d);
+            });
+        }
+
+        function handleImageUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Рисуем изображение, подгоняя его под размер холста (cw x ch)
+                        // Это обеспечивает адаптацию, например, фото 64x64 ужмется в 16x16
+                        ctx.drawImage(img, 0, 0, cw, ch);
+                        saveHistory();
+                        // Очистим input, чтобы можно было загрузить тот же файл повторно
+                        input.value = ''; 
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function toggleColorPopup() {
+            const p = document.getElementById('colorPickerPopup');
+            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function updateColorFromHex(hex) {
+            if(!/^#[0-9A-F]{6}$/i.test(hex)) return;
+            curColor = hex;
+            document.getElementById('colorIndicator').style.background = hex;
+            document.getElementById('hexInput').value = hex.toUpperCase();
+            document.getElementById('nativeColor').value = hex;
+            
+            const r = parseInt(hex.slice(1,3), 16);
+            const g = parseInt(hex.slice(3,5), 16);
+            const b = parseInt(hex.slice(5,7), 16);
+            document.getElementById('rInput').value = r;
+            document.getElementById('gInput').value = g;
+            document.getElementById('bInput').value = b;
+        }
+
+        function updateColorFromRGB() {
+            const r = Math.max(0, Math.min(255, document.getElementById('rInput').value || 0));
+            const g = Math.max(0, Math.min(255, document.getElementById('gInput').value || 0));
+            const b = Math.max(0, Math.min(255, document.getElementById('bInput').value || 0));
+            const hex = "#" + [r,g,b].map(x => x.toString(16).padStart(2, '0')).join('');
+            updateColorFromHex(hex);
+        }
+
+        function updateColorFromNative(hex) { updateColorFromHex(hex); }
+
+        function setTool(t) {
+            tool = t;
+            document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
+            document.getElementById('t-' + t).classList.add('active');
+        }
+
+        function applyResize() {
+            cw = parseInt(document.getElementById('inpW').value) || 64;
+            ch = parseInt(document.getElementById('inpH').value) || 64;
+            canvas.width = cw;
+            canvas.height = ch;
+            
+            // Адаптивный зум в вьюпорте
+            const vW = document.getElementById('viewport').clientWidth - 60;
+            const vH = document.getElementById('viewport').clientHeight - 60;
+            const ratio = Math.min(vW/cw, vH/ch);
+            
+            canvas.style.width = Math.floor(cw * ratio) + 'px';
+            canvas.style.height = Math.floor(ch * ratio) + 'px';
+            
+            clearAll(false);
+        }
+
+        function clearAll(save = true) {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0,0,cw,ch);
+            if(save) saveHistory();
+        }
+
+        function saveHistory() {
+            step++;
+            if(step < history.length) history.length = step;
+            history.push(canvas.toDataURL());
+            if(history.length > 30) { history.shift(); step--; }
+        }
+
+        function undo() { if(step > 0) { step--; loadHistory(); } }
+        function redo() { if(step < history.length - 1) { step++; loadHistory(); } }
+        
+        function loadHistory() {
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0,0,cw,ch);
+                ctx.drawImage(img,0,0);
+            };
+            img.src = history[step];
+        }
+
+        function getCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const sx = cw / rect.width;
+            const sy = ch / rect.height;
+            const cx = e.touches ? e.touches[0].clientX : e.clientX;
+            const cy = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: (cx - rect.left) * sx, y: (cy - rect.top) * sy };
+        }
+
+        function drawShape(x, y) {
+            const rad = parseInt(document.getElementById('brushRad').value);
+            const type = document.getElementById('brushType').value;
+            
+            ctx.globalCompositeOperation = 'source-over';
+            if (tool === 'eraser') ctx.fillStyle = '#000000';
+            else ctx.fillStyle = curColor;
+
+            if (type === 'pixel') {
+                ctx.fillRect(Math.floor(x - rad/2), Math.floor(y - rad/2), rad, rad);
+            } else if (type === 'hard') {
+                ctx.beginPath();
+                ctx.arc(x, y, rad/2, 0, Math.PI*2);
+                ctx.fill();
+            } else { // Мягкая
+                const g = ctx.createRadialGradient(x, y, 0, x, y, rad/2);
+                const rgb = hexToRgb(tool === 'eraser' ? '#000000' : curColor);
+                g.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},1)`);
+                g.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`);
+                ctx.fillStyle = g;
+                ctx.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+            }
+        }
+
+        function hexToRgb(hex) {
+            const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return r ? { r: parseInt(r[1], 16), g: parseInt(r[2], 16), b: parseInt(r[3], 16) } : {r:0,g:0,b:0};
+        }
+
+        function handleStart(e) {
+            const {x, y} = getCoords(e);
+            if(tool === 'fill') { floodFill(Math.floor(x), Math.floor(y)); saveHistory(); return; }
+            if(tool === 'picker') {
+                const p = ctx.getImageData(x, y, 1, 1).data;
+                const hex = "#" + [p[0],p[1],p[2]].map(c => c.toString(16).padStart(2, '0')).join('');
+                updateColorFromHex(hex);
+                setTool('brush'); return;
+            }
+            isDrawing = true;
+            drawShape(x, y);
+            [lastX, lastY] = [x, y];
+        }
+
+        function handleMove(e) {
+            if(!isDrawing) return;
+            const {x, y} = getCoords(e);
+            const dist = Math.hypot(x - lastX, y - lastY);
+            const steps = Math.ceil(dist / 0.5);
+            for(let i=0; i<steps; i++) {
+                drawShape(lastX + (x - lastX) * (i / steps), lastY + (y - lastY) * (i / steps));
+            }
+            [lastX, lastY] = [x, y];
+        }
+
+        canvas.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', () => { if(isDrawing) { saveHistory(); isDrawing = false; } });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleStart(e); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); handleMove(e); });
+        canvas.addEventListener('touchend', () => { if(isDrawing) { saveHistory(); isDrawing = false; } });
+
+        function floodFill(sx, sy) {
+            const img = ctx.getImageData(0,0,cw,ch);
+            const d = img.data;
+            const i = (sy*cw+sx)*4;
+            const sR=d[i], sG=d[i+1], sB=d[i+2];
+            const rgb = hexToRgb(curColor);
+            if(sR===rgb.r && sG===rgb.g && sB===rgb.b) return;
+            const q = [[sx, sy]];
+            while(q.length) {
+                const [x, y] = q.pop();
+                if(x<0||x>=cw||y<0||y>=ch) continue;
+                const idx = (y*cw+x)*4;
+                if(d[idx]===sR && d[idx+1]===sG && d[idx+2]===sB) {
+                    d[idx]=rgb.r; d[idx+1]=rgb.g; d[idx+2]=rgb.b; d[idx+3]=255;
+                    q.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+                }
+            }
+            ctx.putImageData(img, 0, 0);
+        }
+
+        async function genCloud() {
+            const p = document.getElementById('aiPrompt').value;
+            if(!p) return;
+            document.getElementById('loader').style.display = 'flex';
+            try {
+                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ instances: [{ prompt: `detailed pixel art, sprite, ${p}` }], parameters: { sampleCount: 1 } })
+                });
+                const data = await r.json();
+                const b64 = data.predictions[0].bytesBase64Encoded;
+                const i = new Image();
+                i.onload = () => {
+                    ctx.drawImage(i, 0, 0, cw, ch);
+                    document.getElementById('loader').style.display = 'none';
+                    saveHistory();
+                };
+                i.src = `data:image/png;base64,${b64}`;
+            } catch(e) { 
+                document.getElementById('loader').style.display = 'none';
+                console.error("AI Error:", e);
+            }
+        }
+
+        // --- ЛОКАЛЬНЫЕ ГЕНЕРАТОРЫ ---
+        function genLocal() {
+            const type = document.getElementById('genType').value;
+            const iters = parseInt(document.getElementById('pIter').value);
+            const warp = document.getElementById('warpMode').checked; // Проверяем включен ли Warp Mode
+            const mx = cw/2, my = ch/2;
+
+            // Если Warp Mode включен и это фрактал, мы берем текущее изображение для искажения
+            let srcData = null;
+            if (warp && ['mandelbrot', 'julia', 'burning_ship', 'tricorn', 'sierpinski'].includes(type)) {
+                srcData = ctx.getImageData(0,0,cw,ch);
+                // Не очищаем холст, так как будем писать поверх или использовать его как источник
+            } else {
+                clearAll(false);
+            }
+
+            ctx.fillStyle = curColor;
+
+            switch(type) {
+                // --- ФРАКТАЛЫ ---
+                case 'mandelbrot':
+                    for(let x=0; x<cw; x++) for(let y=0; y<ch; y++) {
+                        let a = (x-cw*0.7)/(cw/3), b = (y-ch/2)/(ch/3), ca=a, cb=b, n=0;
+                        while(n < iters) {
+                            let aa=a*a-b*b, bb=2*a*b; a=aa+ca; b=bb+cb;
+                            if(a*a+b*b>16) break; n++;
+                        }
+                        
+                        if (warp && srcData) {
+                            // ИСКАЖЕНИЕ: Используем координаты a и b для выбора пикселя из исходного фото
+                            if (n < iters) {
+                                // Маппинг координат фрактала на координаты холста
+                                let srcX = Math.abs(Math.floor((a * 0.5 + 0.5) * cw * 2)) % cw;
+                                let srcY = Math.abs(Math.floor((b * 0.5 + 0.5) * ch * 2)) % ch;
+                                let idx = (srcY * cw + srcX) * 4;
+                                ctx.fillStyle = `rgba(${srcData.data[idx]},${srcData.data[idx+1]},${srcData.data[idx+2]},${srcData.data[idx+3]/255})`;
+                                ctx.fillRect(x,y,1,1);
+                            } else {
+                                // Черный фон или прозрачный
+                                ctx.fillStyle = '#000'; ctx.fillRect(x,y,1,1);
+                            }
+                        } else {
+                            // ОБЫЧНЫЙ РЕЖИМ
+                            if(n < iters){ ctx.fillStyle=`hsl(${(n*20)%360}, 70%, 50%)`; ctx.fillRect(x,y,1,1); }
+                        }
+                    }
+                    break;
+
+                case 'julia':
+                    for(let x=0; x<cw; x++) for(let y=0; y<ch; y++) {
+                        let a = (x-mx)/(cw/3.5), b = (y-my)/(ch/3.5), n=0;
+                        while(n < iters) {
+                            let aa=a*a-b*b, bb=2*a*b; a=aa-0.7; b=bb+0.27;
+                            if(a*a+b*b>16) break; n++;
+                        }
+                        if (warp && srcData) {
+                             if (n < iters) {
+                                let srcX = Math.abs(Math.floor((a + 1) * cw)) % cw;
+                                let srcY = Math.abs(Math.floor((b + 1) * ch)) % ch;
+                                let idx = (srcY * cw + srcX) * 4;
+                                ctx.fillStyle = `rgba(${srcData.data[idx]},${srcData.data[idx+1]},${srcData.data[idx+2]},${srcData.data[idx+3]/255})`;
+                                ctx.fillRect(x,y,1,1);
+                             } else { ctx.fillStyle='#000'; ctx.fillRect(x,y,1,1); }
+                        } else {
+                            if(n < iters){ ctx.fillStyle=`hsl(${(n*25)%360}, 60%, 40%)`; ctx.fillRect(x,y,1,1); }
+                        }
+                    }
+                    break;
+
+                case 'burning_ship':
+                    for(let x=0; x<cw; x++) for(let y=0; y<ch; y++) {
+                        let a = (x-mx)/(cw/4) - 0.5, b = (y-my)/(ch/4) - 0.5, ca=a, cb=b, n=0;
+                        while(n < iters) {
+                            let aa = a*a - b*b + ca;
+                            let bb = 2*Math.abs(a*b) + cb;
+                            a = aa; b = bb;
+                            if(a*a + b*b > 16) break; n++;
+                        }
+                         if (warp && srcData) {
+                             if (n < iters) {
+                                let srcX = Math.abs(Math.floor((a+1.5)*cw)) % cw;
+                                let srcY = Math.abs(Math.floor((b+1.5)*ch)) % ch;
+                                let idx = (srcY * cw + srcX) * 4;
+                                ctx.fillStyle = `rgba(${srcData.data[idx]},${srcData.data[idx+1]},${srcData.data[idx+2]},${srcData.data[idx+3]/255})`;
+                                ctx.fillRect(x,y,1,1);
+                             } else { ctx.fillStyle='#000'; ctx.fillRect(x,y,1,1); }
+                        } else {
+                            if(n < iters){ ctx.fillStyle=`hsl(${(n*10)%360}, 80%, 60%)`; ctx.fillRect(x,y,1,1); }
+                        }
+                    }
+                    break;
+
+                case 'tricorn':
+                    for(let x=0; x<cw; x++) for(let y=0; y<ch; y++) {
+                        let a = (x-mx)/(cw/3.5), b = (y-my)/(ch/3.5), ca=a, cb=b, n=0;
+                        while(n < iters) {
+                            let aa = a*a - b*b + ca;
+                            let bb = -2*a*b + cb;
+                            a = aa; b = bb;
+                            if(a*a + b*b > 16) break; n++;
+                        }
+                         if (warp && srcData) {
+                             if (n < iters) {
+                                let srcX = Math.abs(Math.floor((a+1)*cw)) % cw;
+                                let srcY = Math.abs(Math.floor((b+1)*ch)) % ch;
+                                let idx = (srcY * cw + srcX) * 4;
+                                ctx.fillStyle = `rgba(${srcData.data[idx]},${srcData.data[idx+1]},${srcData.data[idx+2]},${srcData.data[idx+3]/255})`;
+                                ctx.fillRect(x,y,1,1);
+                             } else { ctx.fillStyle='#000'; ctx.fillRect(x,y,1,1); }
+                        } else {
+                            if(n < iters){ ctx.fillStyle=`hsl(${(n*5)%360}, 90%, 50%)`; ctx.fillRect(x,y,1,1); }
+                        }
+                    }
+                    break;
+                
+                case 'sierpinski':
+                    for(let x=0; x<cw; x++) for(let y=0; y<ch; y++) {
+                        if((x & y) == 0) { 
+                             if (warp && srcData) {
+                                 // Искажение серпинского: просто сдвиг пикселей
+                                 let srcX = (x + Math.floor(Math.sin(y/10)*5) + cw) % cw;
+                                 let srcY = (y + Math.floor(Math.cos(x/10)*5) + ch) % ch;
+                                 let idx = (srcY * cw + srcX) * 4;
+                                 ctx.fillStyle = `rgba(${srcData.data[idx]},${srcData.data[idx+1]},${srcData.data[idx+2]},${srcData.data[idx+3]/255})`;
+                             } else {
+                                 ctx.fillStyle = curColor;
+                             }
+                             ctx.fillRect(x,y,1,1);
+                        } else if (warp) {
+                             ctx.fillStyle='#000'; ctx.fillRect(x,y,1,1);
+                        }
+                    }
+                    break;
+
+                // --- ФЭНТЕЗИ И ПРЕДМЕТЫ ---
+                case 'sword':
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(mx - cw*0.02, ch*0.75, cw*0.04, ch*0.2);
+                    ctx.fillStyle = curColor;
+                    let guardW = cw*0.24 + (iters > 200 ? cw*0.1 : 0); 
+                    ctx.fillRect(mx - guardW/2, ch*0.72, guardW, ch*0.04);
+                    ctx.fillRect(mx - cw*0.04, ch*0.1, cw*0.08, ch*0.62);
+                    ctx.beginPath();
+                    ctx.moveTo(mx - cw*0.04, ch*0.1); ctx.lineTo(mx, ch*0.02); ctx.lineTo(mx + cw*0.04, ch*0.1);
+                    ctx.fill();
+                    if(iters > 100) {
+                        ctx.fillStyle = '#fff';
+                        for(let i=0; i < (iters/40); i++) {
+                            ctx.fillRect(mx-1, ch*0.2 + i*10, 2, 2);
+                        }
+                    }
+                    break;
+                
+                case 'shield':
+                    for(let y = ch*0.2; y < ch*0.8; y++) {
+                        let progress = (y - ch*0.2) / (ch*0.6);
+                        let w = cw*0.25 * (1 - Math.pow(progress - 0.5, 2)*2);
+                        ctx.fillRect(mx - w, y, w*2, 1);
+                    }
+                    if(iters > 50) {
+                         ctx.fillStyle = '#0004';
+                         ctx.fillRect(mx - cw*0.02, ch*0.2, cw*0.04, ch*0.6);
+                         if(iters > 150) {
+                             ctx.fillRect(mx - cw*0.15, ch*0.48, cw*0.3, ch*0.04);
+                         }
+                    }
+                    break;
+
+                case 'potion':
+                    ctx.fillStyle = curColor;
+                    for(let y = ch*0.45; y < ch*0.9; y++) {
+                        let w = cw*0.22 * Math.sin(((y - ch*0.45) / (ch*0.45)) * Math.PI);
+                        ctx.fillRect(mx - w, y, w*2, 1);
+                    }
+                    ctx.fillStyle = '#555';
+                    ctx.fillRect(mx - cw*0.08, ch*0.25, cw*0.16, ch*0.2);
+                    ctx.fillStyle = '#321';
+                    ctx.fillRect(mx - cw*0.06, ch*0.18, cw*0.12, ch*0.1);
+                    ctx.fillStyle = '#fff5';
+                    for(let i=0; i<iters/10; i++){
+                         let bx = mx + (Math.random()-0.5)*cw*0.2;
+                         let by = ch*0.5 + Math.random()*ch*0.3;
+                         ctx.fillRect(bx, by, 1, 1);
+                    }
+                    break;
+
+                case 'crystal':
+                    for(let i=0; i < (iters > 50 ? 12 : 6); i++) {
+                        let rx = (Math.random()-0.5)*cw*0.3;
+                        let ry = (Math.random()-0.5)*ch*0.4;
+                        ctx.fillStyle = curColor;
+                        ctx.beginPath();
+                        ctx.moveTo(mx+rx, my+ry-ch*0.2);
+                        ctx.lineTo(mx+rx+cw*0.08, my+ry);
+                        ctx.lineTo(mx+rx, my+ry+ch*0.2);
+                        ctx.lineTo(mx+rx-cw*0.08, my+ry);
+                        ctx.fill();
+                    }
+                    break;
+
+                case 'planet':
+                    for(let y=0; y<ch; y++) for(let x=0; x<cw; x++) {
+                        let d = Math.sqrt((x-mx)**2 + (y-my)**2);
+                        if(d < cw*0.38) {
+                            let freq = iters > 200 ? 0.2 : 0.1;
+                            let n = Math.sin(x/(cw*freq) + Math.cos(y/(ch*freq*1.5))*3);
+                            ctx.fillStyle = n > 0 ? curColor : '#0a0a0a';
+                            ctx.fillRect(x,y,1,1);
+                        }
+                    }
+                    break;
+
+                case 'stars':
+                    for(let i=0; i < iters*5; i++) {
+                        let b = Math.random()*255; ctx.fillStyle=`rgba(${b},${b},${255},${Math.random()})`;
+                        ctx.fillRect(Math.random()*cw, Math.random()*ch, 1, 1);
+                    }
+                    break;
+
+                case 'blackhole':
+                    for(let i=0; i < iters*10; i++) {
+                        let a = Math.random()*Math.PI*2;
+                        let r = cw*0.1 + Math.random()*cw*0.35;
+                        let px = mx + Math.cos(a + r/10)*r;
+                        let py = my + Math.sin(a + r/10)*r;
+                        ctx.fillStyle = `hsl(${(r*5)%360}, 70%, 50%)`;
+                        ctx.fillRect(px,py,1,1);
+                    }
+                    ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(mx, my, cw*0.08, 0, Math.PI*2); ctx.fill();
+                    break;
+
+                case 'landscape':
+                    let h = ch*0.7;
+                    for(let x=0; x<cw; x++) {
+                        let roughness = iters > 100 ? 0.15 : 0.05;
+                        h += (Math.random()-0.5)*cw*roughness;
+                        ctx.fillStyle = curColor; ctx.fillRect(x, h, 1, ch-h);
+                        ctx.fillStyle = '#fff2'; ctx.fillRect(x, h, 1, 1);
+                    }
+                    break;
+
+                case 'tower':
+                    ctx.fillStyle = '#111'; ctx.fillRect(mx-cw*0.1, ch*0.3, cw*0.2, ch*0.7);
+                    ctx.fillStyle = curColor; ctx.fillRect(mx-cw*0.12, ch*0.25, cw*0.24, ch*0.08);
+                    let toothCount = iters > 100 ? 5 : 3;
+                    let toothW = (cw*0.2) / (toothCount*2 - 1);
+                    for(let i=0; i<toothCount; i++) ctx.fillRect(mx-cw*0.1 + i*toothW*2, ch*0.2, toothW, ch*0.05);
+                    break;
+
+                case 'island':
+                    for(let y=my-ch*0.1; y<my+ch*0.3; y++) {
+                        let w = (cw*0.3) * (1 - Math.pow((y-my)/ (ch*0.2), 2));
+                        ctx.fillStyle = y < my ? curColor : '#321';
+                        ctx.fillRect(mx-w, y, w*2, 1);
+                    }
+                    break;
+
+                case 'face':
+                    ctx.fillStyle = curColor;
+                    for(let i=0; i < iters; i++) {
+                        let rx = Math.floor(Math.random()*cw*0.15), ry = Math.floor(Math.random()*ch*0.4)+ch*0.2;
+                        ctx.fillRect(mx-rx, ry, 1, 1); ctx.fillRect(mx+rx-1, ry, 1, 1);
+                    }
+                    ctx.fillStyle='#000'; 
+                    ctx.fillRect(mx-cw*0.08, ch*0.35, cw*0.04, ch*0.04);
+                    ctx.fillRect(mx+cw*0.04, ch*0.35, cw*0.04, ch*0.04);
+                    break;
+
+                case 'ghost':
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    for(let y=ch*0.2; y<ch*0.8; y++) {
+                        let w = cw*0.15 + Math.sin(y/(iters/10))*cw*0.05;
+                        ctx.fillRect(mx-w, y, w*2, 1);
+                    }
+                    break;
+
+                case 'alien':
+                    ctx.fillStyle = curColor;
+                    ctx.beginPath(); ctx.ellipse(mx, my, cw*0.2, ch*0.25, 0, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath(); ctx.ellipse(mx-cw*0.08, my-ch*0.05, cw*0.06, ch*0.1, 0.3, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(mx+cw*0.08, my-ch*0.05, cw*0.06, ch*0.1, -0.3, 0, Math.PI*2); ctx.fill();
+                    break;
+
+                case 'creature':
+                    for(let i=0; i < iters*2; i++) {
+                        let rx = Math.floor(Math.random()*mx), ry = Math.floor(Math.random()*ch);
+                        ctx.fillRect(mx-rx, ry, 2, 2); ctx.fillRect(mx+rx-2, ry, 2, 2);
+                    }
+                    break;
+            }
+            saveHistory();
+        }
+
+        function copySeed() {
+            const d = ctx.getImageData(0,0,cw,ch).data;
+            let p = []; for(let i=0; i<d.length; i+=4) p.push(d[i], d[i+1], d[i+2]);
+            const s = btoa(String.fromCharCode(...p)) + `_${cw}x${ch}`;
+            document.getElementById('seedField').value = s;
+            navigator.clipboard.writeText(s);
+        }
+
+        function restoreSeed() {
+            const s = document.getElementById('seedField').value.trim();
+            const m = s.match(/_((\d+)x(\d+))$/);
+            if(!m) return;
+            document.getElementById('inpW').value = m[2];
+            document.getElementById('inpH').value = m[3];
+            applyResize();
+            const b = Uint8Array.from(atob(s.split('_')[0]), c => c.charCodeAt(0));
+            const img = ctx.createImageData(cw, ch);
+            for(let i=0, j=0; i<img.data.length; i+=4) {
+                img.data[i]=b[j++]; img.data[i+1]=b[j++]; img.data[i+2]=b[j++]; img.data[i+3]=255;
+            }
+            ctx.putImageData(img,0,0);
+            saveHistory();
+        }
+
+        function downloadPng() {
+            const a = document.createElement('a');
+            a.download = `pixel_art_${Date.now()}.png`;
+            a.href = canvas.toDataURL();
+            a.click();
+        }
+    </script>
+</body>
+</html>
+
+
