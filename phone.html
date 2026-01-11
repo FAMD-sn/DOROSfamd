@@ -2,1053 +2,163 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOROSphone - Звонки</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DOROScall - Private Meet</title>
+    <script src='https://meet.jit.si/external_api.js'></script>
     <style>
-        /* Все ваши стили остаются без изменений */
-        :root {
-            --primary: #8A2BE2;
-            --accent: #00FF7F;
-            --background: #0A0A0A;
-            --card-bg: #1A1A1A;
-            --text-color: #FFFFFF;
-            --text-secondary: #B0B0B0;
-            --border-color: #333;
-            --shadow: 0 4px 20px rgba(138, 43, 226, 0.2);
-            --transition: all 0.3s ease;
-        }
+        :root { --primary: #0066ff; --bg: #121212; --card: #1e1e1e; --text: #fff; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: sans-serif; height: 100vh; overflow: hidden; }
+        
+        .screen { display: none; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
+        .active { display: flex; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+        .card { width: 90%; max-width: 400px; background: var(--card); padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        
+        input { width: 100%; background: #2c2c2c; border: 1px solid #333; padding: 15px; border-radius: 10px; color: white; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--primary); }
 
-        body {
-            background: var(--background);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: #333; color: white; }
+        .btn:hover { opacity: 0.9; }
 
-        .container {
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 400px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        .screen {
-            padding: 40px 30px;
-            display: none;
-        }
-
-        .active {
-            display: block;
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--text-color);
-            margin-bottom: 30px;
-            font-size: 28px;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 16px;
-            background: var(--background);
-            color: var(--text-color);
-            transition: var(--transition);
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            color: var(--text-color);
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        .switch-form {
-            text-align: center;
-            margin-top: 20px;
-            color: var(--text-secondary);
-        }
-
-        .switch-form a {
-            color: var(--accent);
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .phone-number {
-            background: var(--background);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 30px;
-            border: 2px solid var(--primary);
-        }
-
-        .phone-number h3 {
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .phone-number .number {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--accent);
-            letter-spacing: 2px;
-        }
-
-        .call-section {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .call-section input {
-            flex: 1;
-        }
-
-        .call-section button {
-            width: auto;
-            padding: 15px 20px;
-            background: var(--primary);
-        }
-
-        .call-status {
-            text-align: center;
-            padding: 20px;
-            background: var(--background);
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: none;
-            border: 2px solid transparent;
-            transition: var(--transition);
-        }
-
-        .call-status.calling {
-            border-color: var(--accent);
-            background: rgba(0, 255, 127, 0.1);
-        }
-
-        .call-status.ringing {
-            border-color: var(--primary);
-            background: rgba(138, 43, 226, 0.1);
-            animation: pulse 1s infinite;
-        }
-
-        .call-status.connected {
-            border-color: var(--accent);
-            background: rgba(0, 255, 127, 0.2);
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-
-        .user-list {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px;
-            background: var(--background);
-        }
-
-        .user-item {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: var(--transition);
-        }
-
-        .user-item:hover {
-            background: rgba(138, 43, 226, 0.1);
-            transform: translateX(5px);
-        }
-
-        .user-item:last-child {
-            border-bottom: none;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-        }
-
-        .user-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: var(--text-color);
-        }
-
-        .user-phone {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .call-button {
-            background: var(--accent);
-            color: var(--background);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .call-button:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow);
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 2px solid var(--text-secondary);
-            color: var(--text-secondary);
-            margin-top: 20px;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .call-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .call-controls button {
-            flex: 1;
-        }
-
-        .accept-call {
-            background: var(--accent);
-            color: var(--background);
-        }
-
-        .reject-call {
-            background: #ff4444;
-            color: white;
-        }
-
-        .online-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent);
-            margin-left: 10px;
-        }
-
-        .offline {
-            background: var(--text-secondary);
-        }
-
-        /* Стили для звонка */
-        .call-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .call-video-container {
-            display: flex;
-            gap: 20px;
-            max-width: 800px;
-            width: 100%;
-            height: 60vh;
-        }
-
-        .call-video {
-            flex: 1;
-            border-radius: 16px;
-            overflow: hidden;
-            position: relative;
-            background: #000;
-        }
-
-        .call-video video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .call-video.local video {
-            transform: scaleX(-1);
-        }
-
-        .call-user-info {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .call-controls {
-            display: flex;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .call-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .call-btn.mute {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .call-btn.end {
-            background: linear-gradient(45deg, #FF416C, #FF4B2B);
-            color: white;
-        }
-
-        .call-btn:hover {
-            transform: scale(1.1);
-            box-shadow: var(--shadow);
-        }
-
-        .call-timer {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--accent);
-            margin-top: 10px;
-        }
+        #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: black; }
+        
+        /* Кнопки управления поверх видео */
+        .controls { position: absolute; top: 20px; left: 20px; z-index: 20; display: flex; gap: 10px; }
+        .ctrl-btn { background: rgba(0,0,0,0.6); color: white; border: 1px solid #555; padding: 8px 15px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(5px); }
+        .ctrl-btn.red { color: #ff4444; border-color: #ff4444; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Экран регистрации -->
-        <div id="registerScreen" class="screen active">
-            <h1>Регистрация в сети</h1>
-            <form id="registerForm">
-                <div class="form-group">
-                    <input type="email" id="regEmail" placeholder="Email" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="regPassword" placeholder="Пароль" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="regName" placeholder="Ваше имя" required>
-                </div>
-                <button type="submit">Зарегистрироваться</button>
-            </form>
-            <div class="switch-form">
-                Уже есть аккаунт? <a onclick="showLogin()">Войти</a>
-            </div>
-        </div>
 
-        <!-- Экран входа -->
-        <div id="loginScreen" class="screen">
-            <h1>Вход в сеть</h1>
-            <form id="loginForm">
-                <div class="form-group">
-                    <input type="email" id="loginEmail" placeholder="Email" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="loginPassword" placeholder="Пароль" required>
-                </div>
-                <button type="submit">Войти</button>
-            </form>
-            <div class="switch-form">
-                Нет аккаунта? <a onclick="showRegister()">Зарегистрироваться</a>
-            </div>
-        </div>
-
-        <!-- Основной экран -->
-        <div id="mainScreen" class="screen">
-            <h1>DOROSphone</h1>
-            
-            <div class="phone-number">
-                <h3>Ваш номер телефона:</h3>
-                <div class="number" id="userPhoneNumber">-</div>
-            </div>
-            
-            <div class="call-section">
-                <input type="text" id="callNumber" placeholder="Введите номер для звонка">
-                <button onclick="makeCall()">📞</button>
-            </div>
-
-            <div id="callStatus" class="call-status"></div>
-
-            <h3 style="margin: 20px 0 10px 0; color: var(--text-secondary);">Пользователи онлайн:</h3>
-            <div id="userList" class="user-list"></div>
-
-            <button class="logout-btn" onclick="logout()">Выйти из системы</button>
+    <div id="login-screen" class="screen active">
+        <div class="card">
+            <h2>Вход</h2>
+            <p style="color:#888; font-size: 14px;">Как вас представить?</p>
+            <input type="text" id="username" placeholder="Ваше имя">
+            <button class="btn btn-primary" onclick="login()">Войти</button>
         </div>
     </div>
 
-    <!-- Контейнер активного звонка -->
-    <div class="call-container" id="callContainer">
-        <div class="call-video-container">
-            <div class="call-video remote">
-                <video id="remoteVideo" autoplay playsinline></video>
-                <div class="call-user-info">
-                    <div class="user-avatar" id="remoteUserAvatar">U</div>
-                    <div>
-                        <div id="remoteUserName">Пользователь</div>
-                        <div class="call-timer" id="callTimer">00:00</div>
-                    </div>
-                </div>
-            </div>
-            <div class="call-video local">
-                <video id="localVideo" autoplay muted playsinline></video>
-                <div class="call-user-info">
-                    <div class="user-avatar">Вы</div>
-                </div>
-            </div>
-        </div>
-        <div class="call-controls">
-            <button class="call-btn mute" onclick="toggleMute()">
-                <span id="muteIcon">🎤</span>
-            </button>
-            <button class="call-btn end" onclick="endCall()">
-                <span>📞</span>
-            </button>
+    <div id="dashboard-screen" class="screen">
+        <div class="card">
+            <h2 id="greet">Привет!</h2>
+            <p style="color:#888; font-size: 14px;">Придумайте название комнаты или создайте случайную</p>
+            
+            <input type="text" id="room-name" placeholder="Название (например: proekt-1)">
+            <button class="btn btn-primary" onclick="createNamedRoom()">📹 Создать комнату</button>
+            <button class="btn btn-secondary" onclick="createRandomRoom()">🎲 Случайная встреча</button>
+            
+            <p style="font-size: 12px; color: #555; margin-top: 20px;">
+                Отправьте ссылку другу, и он сразу попадет к вам.
+            </p>
         </div>
     </div>
 
-    <!-- Аудио для рингтона -->
-    <audio id="ringtone" loop>
-        <source src="https://assets.mixkit.co/active_storage/sfx/250/250-preview.mp3" type="audio/mpeg">
-    </audio>
+    <div id="video-screen" style="display: none;">
+        <div class="controls">
+            <button class="ctrl-btn red" onclick="leaveRoom()">Выйти</button>
+            <button class="ctrl-btn" onclick="copyLink()">🔗 Скопировать ссылку</button>
+        </div>
+        <div id="video-container"></div>
+    </div>
 
     <script>
-        // Конфигурация Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDX14zgvDk57Wy1q7WTrLCO1o8U1MdqP-w",
-            authDomain: "doros-f9d89.firebaseapp.com",
-            projectId: "doros-f9d89",
-            storageBucket: "doros-f9d89.appspot.com",
-            messagingSenderId: "351289560916",
-            appId: "1:351289560916:web:c5ef1d0ab49cf451ca82c1",
-            databaseURL: "https://doros-f9d89-default-rtdb.firebaseio.com/"
+        // === ВАЖНОЕ ИЗМЕНЕНИЕ: СЕРВЕР ===
+        // Используем meet.guifi.net вместо meet.jit.si, так как он не требует логина
+        // Если он будет тормозить, можно попробовать: 'meet.golem.de' или 'framatalk.org'
+        const DOMAIN = 'meet.guifi.net'; 
+        
+        const PREFIX = "MY_PRIV_V1_"; 
+        
+        let api = null;
+        let user = localStorage.getItem('user_name');
+
+        window.onload = () => {
+            const hash = window.location.hash.replace('#', '');
+            if(user) {
+                if(hash) startMeeting(hash);
+                else showDashboard();
+            }
         };
 
-        // Инициализация Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
-
-        let currentUser = null;
-        let currentCall = null;
-        let userPhoneNumber = null;
-        let localStream = null;
-        let remoteStream = null;
-        let peerConnection = null;
-        let isMuted = false;
-        let callStartTime = null;
-        let callTimerInterval = null;
-        let ringtone = document.getElementById('ringtone');
-        let isCaller = false;
-
-        // WebRTC конфигурация
-        const configuration = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
-        };
-
-        // Показать экран регистрации
-        function showRegister() {
-            document.getElementById('registerScreen').classList.add('active');
-            document.getElementById('loginScreen').classList.remove('active');
-            document.getElementById('mainScreen').classList.remove('active');
-        }
-
-        // Показать экран входа
-        function showLogin() {
-            document.getElementById('loginScreen').classList.add('active');
-            document.getElementById('registerScreen').classList.remove('active');
-            document.getElementById('mainScreen').classList.remove('active');
-        }
-
-        // Показать основной экран
-        function showMain() {
-            document.getElementById('mainScreen').classList.add('active');
-            document.getElementById('registerScreen').classList.remove('active');
-            document.getElementById('loginScreen').classList.remove('active');
-        }
-
-        // Генерация случайного номера телефона
-        function generatePhoneNumber() {
-            const prefix = '+7';
-            const firstPart = Math.floor(900 + Math.random() * 100).toString();
-            const secondPart = Math.floor(100 + Math.random() * 900).toString();
-            const thirdPart = Math.floor(1000 + Math.random() * 9000).toString();
-            return `${prefix}${firstPart}-${secondPart}-${thirdPart}`;
-        }
-
-        // Регистрация
-        document.getElementById('registerForm').addEventListener('submit', (e) => {
-            e.preventDefault();
+        function login() {
+            const val = document.getElementById('username').value;
+            if(!val) return alert("Введите имя");
+            user = val;
+            localStorage.setItem('user_name', user);
             
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const name = document.getElementById('regName').value;
-
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    userPhoneNumber = generatePhoneNumber();
-                    
-                    return database.ref('users/' + user.uid).set({
-                        name: name,
-                        email: email,
-                        phoneNumber: userPhoneNumber,
-                        online: true,
-                        lastSeen: Date.now()
-                    });
-                })
-                .then(() => {
-                    showMain();
-                    loadUserData();
-                    showNotification('Регистрация успешна! Ваш номер: ' + userPhoneNumber);
-                })
-                .catch((error) => {
-                    showNotification('Ошибка регистрации: ' + error.message, 'error');
-                });
-        });
-
-        // Вход
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    showMain();
-                    loadUserData();
-                    showNotification('Вход выполнен успешно!');
-                })
-                .catch((error) => {
-                    showNotification('Ошибка входа: ' + error.message, 'error');
-                });
-        });
-
-        // Загрузка данных пользователя
-        function loadUserData() {
-            currentUser = auth.currentUser;
-            if (currentUser) {
-                database.ref('users/' + currentUser.uid).once('value')
-                    .then((snapshot) => {
-                        const userData = snapshot.val();
-                        if (userData) {
-                            userPhoneNumber = userData.phoneNumber;
-                            document.getElementById('userPhoneNumber').textContent = userPhoneNumber;
-                            
-                            database.ref('users/' + currentUser.uid).update({
-                                online: true,
-                                lastSeen: Date.now()
-                            });
-                        }
-                    });
-
-                loadUsersList();
-                listenForIncomingCalls();
-            }
+            const hash = window.location.hash.replace('#', '');
+            if(hash) startMeeting(hash);
+            else showDashboard();
         }
 
-        // Загрузка списка пользователей
-        function loadUsersList() {
-            database.ref('users').on('value', (snapshot) => {
-                const users = snapshot.val();
-                const userList = document.getElementById('userList');
-                userList.innerHTML = '';
-
-                if (!users) {
-                    userList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Нет пользователей онлайн</div>';
-                    return;
-                }
-
-                for (const userId in users) {
-                    if (userId !== currentUser.uid) {
-                        const user = users[userId];
-                        const userItem = document.createElement('div');
-                        userItem.className = 'user-item';
-                        userItem.innerHTML = `
-                            <div class="user-info">
-                                <div class="user-avatar">${user.name ? user.name.charAt(0).toUpperCase() : 'U'}</div>
-                                <div class="user-details">
-                                    <div class="user-name">${user.name || 'Пользователь'}</div>
-                                    <div class="user-phone">${user.phoneNumber}</div>
-                                </div>
-                                <div class="online-indicator ${user.online ? '' : 'offline'}"></div>
-                            </div>
-                            ${user.online ? `<button class="call-button" onclick="callUser('${user.phoneNumber}')">Позвонить</button>` : ''}
-                        `;
-                        userList.appendChild(userItem);
-                    }
-                }
-            });
+        function showDashboard() {
+            document.getElementById('login-screen').classList.remove('active');
+            document.getElementById('video-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').classList.add('active');
+            document.getElementById('greet').innerText = `Привет, ${user}!`;
+            history.pushState("", document.title, window.location.pathname);
         }
 
-        // Звонок пользователю
-        function callUser(phoneNumber) {
-            document.getElementById('callNumber').value = phoneNumber;
-            makeCall();
+        function createNamedRoom() {
+            let name = document.getElementById('room-name').value;
+            name = name.replace(/[^a-zA-Z0-9-_]/g, ''); // Только англ буквы и цифры
+            
+            if(!name) return alert("Используйте английские буквы для названия!");
+            startMeeting(name);
         }
 
-        // Совершение звонка
-        function makeCall() {
-            const targetNumber = document.getElementById('callNumber').value;
-            if (!targetNumber) {
-                showNotification('Введите номер телефона', 'error');
-                return;
-            }
-
-            database.ref('users').orderByChild('phoneNumber').equalTo(targetNumber).once('value')
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        const users = snapshot.val();
-                        const targetUserId = Object.keys(users)[0];
-                        const targetUser = users[targetUserId];
-
-                        if (!targetUser.online) {
-                            showNotification('Пользователь не в сети', 'error');
-                            return;
-                        }
-
-                        const callId = database.ref('calls').push().key;
-                        currentCall = callId;
-                        isCaller = true;
-
-                        database.ref('calls/' + callId).set({
-                            from: currentUser.uid,
-                            to: targetUserId,
-                            fromNumber: userPhoneNumber,
-                            toNumber: targetNumber,
-                            status: 'calling',
-                            timestamp: Date.now(),
-                            targetName: targetUser.name
-                        });
-
-                        const callStatus = document.getElementById('callStatus');
-                        callStatus.style.display = 'block';
-                        callStatus.className = 'call-status calling';
-                        callStatus.innerHTML = `
-                            <div>📞 Звонок на ${targetNumber}</div>
-                            <div style="margin-top: 10px; font-size: 14px; color: var(--text-secondary);">Ожидание ответа...</div>
-                            <div class="call-controls">
-                                <button class="reject-call" onclick="endCall()">Завершить</button>
-                            </div>
-                        `;
-
-                        // Слушаем WebRTC сигналы
-                        listenForWebRTCSignals(callId);
-
-                        database.ref('calls/' + callId).on('value', (callSnapshot) => {
-                            const callData = callSnapshot.val();
-                            if (callData) {
-                                if (callData.status === 'answered') {
-                                    startVideoCall(callId, callData);
-                                } else if (callData.status === 'ended' || callData.status === 'rejected') {
-                                    endCall();
-                                }
-                            }
-                        });
-
-                    } else {
-                        showNotification('Пользователь с таким номером не найден', 'error');
-                    }
-                });
+        function createRandomRoom() {
+            const id = Math.random().toString(36).substring(2, 10);
+            startMeeting(id);
         }
 
-        // Создание PeerConnection
-        function createPeerConnection() {
-            peerConnection = new RTCPeerConnection(configuration);
+        function startMeeting(roomID) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('video-screen').style.display = 'block';
             
-            // Добавляем локальный поток
-            if (localStream) {
-                localStream.getTracks().forEach(track => {
-                    peerConnection.addTrack(track, localStream);
-                });
-            }
-            
-            // Получаем удаленный поток
-            peerConnection.ontrack = (event) => {
-                remoteStream = event.streams[0];
-                document.getElementById('remoteVideo').srcObject = remoteStream;
-            };
-            
-            // Обработка ICE кандидатов
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate && currentCall) {
-                    database.ref('calls/' + currentCall + '/iceCandidates').push({
-                        candidate: event.candidate,
-                        from: currentUser.uid
-                    });
+            window.location.hash = roomID;
+
+            const options = {
+                roomName: PREFIX + roomID, 
+                width: '100%',
+                height: '100%',
+                parentNode: document.querySelector('#video-container'),
+                userInfo: { displayName: user },
+                // Отключаем лишние экраны
+                configOverwrite: { 
+                    prejoinPageEnabled: false,
+                    startWithAudioMuted: false, 
+                    startWithVideoMuted: false 
+                },
+                interfaceConfigOverwrite: { 
+                    MOBILE_APP_PROMO: false,
+                    SHOW_JITSI_WATERMARK: false
                 }
             };
+
+            if(api) api.dispose();
+            // ВАЖНО: Тут мы используем переменную DOMAIN, которую задали выше
+            api = new JitsiMeetExternalAPI(DOMAIN, options);
             
-            return peerConnection;
-        }
-
-        // Прослушивание WebRTC сигналов
-        function listenForWebRTCSignals(callId) {
-            // Слушаем предложения (offers)
-            database.ref('calls/' + callId + '/offer').on('value', async (snapshot) => {
-                const offer = snapshot.val();
-                if (offer && !isCaller) {
-                    await peerConnection.setRemoteDescription(offer);
-                    const answer = await peerConnection.createAnswer();
-                    await peerConnection.setLocalDescription(answer);
-                    
-                    database.ref('calls/' + callId + '/answer').set(answer);
-                }
-            });
-
-            // Слушаем ответы (answers)
-            database.ref('calls/' + callId + '/answer').on('value', async (snapshot) => {
-                const answer = snapshot.val();
-                if (answer && isCaller) {
-                    await peerConnection.setRemoteDescription(answer);
-                }
-            });
-
-            // Слушаем ICE кандидаты
-            database.ref('calls/' + callId + '/iceCandidates').on('child_added', async (snapshot) => {
-                const candidateData = snapshot.val();
-                if (candidateData && candidateData.from !== currentUser.uid) {
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(candidateData.candidate));
-                }
+            api.addEventListeners({
+                readyToClose: () => leaveRoom(),
+                videoConferenceLeft: () => leaveRoom()
             });
         }
 
-        // Начать видеозвонок
-        async function startVideoCall(callId, callData) {
-            try {
-                // Получаем медиапоток
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true
-                });
-
-                // Создаем PeerConnection
-                peerConnection = createPeerConnection();
-
-                // Показываем контейнер звонка
-                document.getElementById('callContainer').style.display = 'flex';
-                document.getElementById('localVideo').srcObject = localStream;
-
-                // Устанавливаем информацию о собеседнике
-                document.getElementById('remoteUserName').textContent = callData.targetName || 'Пользователь';
-                document.getElementById('remoteUserAvatar').textContent = callData.targetName ? callData.targetName.charAt(0).toUpperCase() : 'U';
-
-                // Если мы инициатор, создаем предложение
-                if (isCaller) {
-                    const offer = await peerConnection.createOffer();
-                    await peerConnection.setLocalDescription(offer);
-                    database.ref('calls/' + callId + '/offer').set(offer);
-                }
-
-                // Запускаем таймер
-                startCallTimer();
-
-                showNotification('Соединение установлено!');
-
-            } catch (error) {
-                console.error('Ошибка видеозвонка:', error);
-                showNotification('Ошибка доступа к камере/микрофону', 'error');
-                endCall();
-            }
+        function leaveRoom() {
+            if(api) api.dispose();
+            showDashboard();
         }
 
-        // Запуск таймера звонка
-        function startCallTimer() {
-            callStartTime = Date.now();
-            callTimerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-                const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
-                const seconds = (elapsed % 60).toString().padStart(2, '0');
-                document.getElementById('callTimer').textContent = `${minutes}:${seconds}`;
-            }, 1000);
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => alert("Ссылка скопирована!"))
+                .catch(() => alert("Скопируйте ссылку из адресной строки."));
         }
-
-        // Остановка таймера звонка
-        function stopCallTimer() {
-            if (callTimerInterval) {
-                clearInterval(callTimerInterval);
-                callTimerInterval = null;
-            }
-            document.getElementById('callTimer').textContent = '00:00';
-        }
-
-        // Включить/выключить микрофон
-        function toggleMute() {
-            if (localStream) {
-                const audioTrack = localStream.getAudioTracks()[0];
-                if (audioTrack) {
-                    isMuted = !audioTrack.enabled;
-                    audioTrack.enabled = !isMuted;
-                    
-                    const icon = document.getElementById('muteIcon');
-                    icon.textContent = isMuted ? '🔇' : '🎤';
-                    
-                    showNotification(isMuted ? 'Микрофон выключен' : 'Микрофон включен');
-                }
-            }
-        }
-
-        // Прослушивание входящих звонков
-        function listenForIncomingCalls() {
-            database.ref('calls').on('child_added', (snapshot) => {
-                const callData = snapshot.val();
-                if (callData.to === currentUser.uid && callData.status === 'calling') {
-                    showIncomingCall(snapshot.key, callData);
-                }
-            });
-        }
-
-        // Показать входящий звонок
-        function showIncomingCall(callId, callData) {
-            ringtone.play().catch(e => console.log('Автовоспроизведение заблокировано'));
-
-            const callStatus = document.getElementById('callStatus');
-            callStatus.style.display = 'block';
-            callStatus.className = 'call-status ringing';
-            callStatus.innerHTML = `
-                <div>📞 Входящий звонок</div>
-                <div style="margin-top: 5px; font-size: 18px; color: var(--accent);">${callData.fromNumber}</div>
-                <div style="margin-top: 10px; font-size: 14px; color: var(--text-secondary);">Звонит вам...</div>
-                <div class="call-controls">
-                    <button class="accept-call" onclick="answerCall('${callId}')">Принять</button>
-                    <button class="reject-call" onclick="rejectCall('${callId}')">Отклонить</button>
-                </div>
-            `;
-            currentCall = callId;
-        }
-
-        // Ответить на звонок
-        function answerCall(callId) {
-            ringtone.pause();
-            ringtone.currentTime = 0;
-
-            database.ref('calls/' + callId).update({
-                status: 'answered'
-            });
-
-            database.ref('calls/' + callId).once('value').then((snapshot) => {
-                const callData = snapshot.val();
-                startVideoCall(callId, callData);
-            });
-
-            showNotification('Вы ответили на звонок');
-        }
-
-        // Отклонить звонок
-        function rejectCall(callId) {
-            ringtone.pause();
-            ringtone.currentTime = 0;
-
-            database.ref('calls/' + callId).update({
-                status: 'rejected'
-            });
-            document.getElementById('callStatus').style.display = 'none';
-            currentCall = null;
-            showNotification('Звонок отклонен');
-        }
-
-        // Завершить звонок
-        function endCall() {
-            ringtone.pause();
-            ringtone.currentTime = 0;
-
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-
-            if (peerConnection) {
-                peerConnection.close();
-                peerConnection = null;
-            }
-
-            document.getElementById('callContainer').style.display = 'none';
-            document.getElementById('callStatus').style.display = 'none';
-
-            stopCallTimer();
-
-            if (currentCall) {
-                database.ref('calls/' + currentCall).update({
-                    status: 'ended'
-                });
-                
-                // Очищаем WebRTC данные
-                database.ref('calls/' + currentCall + '/offer').remove();
-                database.ref('calls/' + currentCall + '/answer').remove();
-                database.ref('calls/' + currentCall + '/iceCandidates').remove();
-                
-                currentCall = null;
-            }
-
-            isCaller = false;
-            showNotification('Звонок завершен');
-        }
-
-        // Выход
-        function logout() {
-            if (currentUser) {
-                database.ref('users/' + currentUser.uid).update({
-                    online: false,
-                    lastSeen: Date.now()
-                });
-            }
-            if (currentCall) {
-                endCall();
-            }
-            auth.signOut();
-            showLogin();
-            showNotification('Вы вышли из системы');
-        }
-
-        // Уведомления
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'error' ? '#ff4444' : 'var(--primary)'};
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                box-shadow: var(--shadow);
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Слушатель изменения состояния аутентификации
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                currentUser = user;
-                loadUserData();
-            } else {
-                showLogin();
-            }
-        });
-
-        // Обработка закрытия вкладки
-        window.addEventListener('beforeunload', () => {
-            if (currentUser) {
-                database.ref('users/' + currentUser.uid).update({
-                    online: false,
-                    lastSeen: Date.now()
-                });
-            }
-            if (currentCall) {
-                endCall();
-            }
-        });
-
-        // Стиль для анимации уведомлений
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
