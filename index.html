@@ -3,2803 +3,1801 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOROSfamd — Экосистема: маркетплейс, видео, новости, сообщество</title>
-    <meta name="description" content="Официальный сайт DOROSfamd. Всё о проектах DORO: DOROShop, DOROSvid, новости, блог, сообщество и больше. Заходи на главную.">
-    <meta name="keywords" content="DOROSfamd, FAMD, DOROS, DOROShop, DOROSvideo, тест на тип личности, переводчик, игры, ислам, сервисы, DOROS service, словарь, чат, marketplace, FAMD-сервисы, ФЭМД">
-    <meta name="robots" content="index, follow">    
-    <meta name="author" content="FAMD-sn">
-   
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>DOROSfamd — Экосистема проектов</title>
+    <meta name="description" content="Современная платформа с играми, инструментами и сервисами. Более 50 проектов в одном месте.">
+    <meta name="keywords" content="DOROSfamd, игры, сервисы, инструменты, платформа">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="DOROSfamd Team">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
     <link rel="icon" href="https://dorosfamd.com/logof.png" type="image/png">
-    <link rel="shortcut icon" href="https://dorosfamd.com/logof.png" type="image/png">
     <link rel="apple-touch-icon" href="https://dorosfamd.com/logof.png">
     
     <style>
+        /* CSS Reset & Variables */
         :root {
-            --bg-primary: #0c0c1a;
-            --bg-secondary: #15152b;
-            --bg-surface: #1e1e3a;
-            --bg-card: #25254a;
-            --text-primary: #ffffff;
-            --text-secondary: #b8c1ec;
-            --text-muted: #8a93c9;
-            --accent-red: #ff3366;
-            --accent-green: #33cc99;
-            --accent-gold: #ffcc00;
-            --accent-blue: #3366ff;
-            --accent-purple: #cc33ff;
-            --gradient-primary: linear-gradient(135deg, var(--accent-red), var(--accent-purple));
-            --gradient-secondary: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
-            --gradient-gold: linear-gradient(135deg, var(--accent-gold), #ff9900);
-            --border-color: #3a3a6e;
-            --border-light: #4a4a8e;
-            --shadow-heavy: 0 20px 60px rgba(255, 51, 102, 0.4);
-            --shadow-medium: 0 12px 40px rgba(51, 204, 153, 0.3);
-            --shadow-light: 0 8px 30px rgba(255, 204, 0, 0.2);
-            --radius-xl: 28px;
-            --radius-lg: 20px;
-            --radius-md: 16px;
-            --radius-sm: 12px;
-            --radius-xs: 8px;
-            --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-normal: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-fast: all 0.2s ease;
+            /* Цветовая система */
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --primary-light: #818CF8;
+            --secondary: #10B981;
+            --secondary-dark: #059669;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --surface-light: #334155;
+            --text-primary: #F8FAFC;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+            --border: #475569;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --info: #3B82F6;
+            
+            /* Тени */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --shadow-primary: 0 4px 20px rgba(99, 102, 241, 0.3);
+            
+            /* Скругления */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            
+            /* Анимации */
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
         }
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-
+        
         html {
             scroll-behavior: smooth;
         }
-
+        
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--background);
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
-            position: relative;
             min-height: 100vh;
+            padding-bottom: 80px; /* Для bottom nav */
         }
-
-        /* Фоновые узоры */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(255, 51, 102, 0.15) 0%, transparent 25%),
-                radial-gradient(circle at 90% 80%, rgba(51, 204, 153, 0.15) 0%, transparent 25%),
-                radial-gradient(circle at 50% 50%, rgba(255, 204, 0, 0.1) 0%, transparent 35%),
-                linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.03) 50%, transparent 52%),
-                linear-gradient(-45deg, transparent 48%, rgba(255, 255, 255, 0.03) 50%, transparent 52%);
-            background-size: 200% 200%, 200% 200%, 300% 300%, 60px 60px, 60px 60px;
-            z-index: -2;
-            pointer-events: none;
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
         }
-
-        /* Новогодние шары */
-        .christmas-ball {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            z-index: -1;
-            opacity: 0.4;
-            filter: blur(1px);
-            animation: float-ball 15s ease-in-out infinite;
+        
+        .display-1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
         }
-
-        @keyframes float-ball {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-30px) rotate(90deg); }
-            50% { transform: translateY(0) rotate(180deg); }
-            75% { transform: translateY(30px) rotate(270deg); }
+        
+        .display-2 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.25px;
         }
-
-        /* Снежинки */
-        .snowflake {
-            position: fixed;
-            background: white;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0.8;
-            filter: blur(0.5px);
-            animation: snowfall linear infinite;
-        }
-
-        @keyframes snowfall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-            }
-        }
-
-        /* Блестки */
-        .glitter {
-            position: fixed;
-            width: 4px;
-            height: 4px;
-            background: var(--accent-gold);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0;
-            animation: glitter-fall 3s linear infinite;
-        }
-
-        @keyframes glitter-fall {
-            0% {
-                transform: translateY(-20px) translateX(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) translateX(100px);
-                opacity: 0;
-            }
-        }
-
-        /* Гирлянда */
-        .garland {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: repeating-linear-gradient(
-                90deg,
-                var(--accent-red),
-                var(--accent-green) 15px,
-                var(--accent-gold) 30px,
-                var(--accent-blue) 45px,
-                var(--accent-purple) 60px
-            );
-            z-index: 999;
-            opacity: 0.7;
-            animation: twinkle 1.5s infinite;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-
+        
+        .h1 { font-size: 32px; font-weight: 700; }
+        .h2 { font-size: 28px; font-weight: 700; }
+        .h3 { font-size: 24px; font-weight: 600; }
+        .h4 { font-size: 20px; font-weight: 600; }
+        
+        .body-large { font-size: 18px; }
+        .body { font-size: 16px; }
+        .body-small { font-size: 14px; }
+        .caption { font-size: 12px; color: var(--text-muted); }
+        
+        /* Utility Classes */
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* Шапка */
-        .header {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 48px);
-            max-width: 1350px;
-            z-index: 1000;
-            background: rgba(30, 30, 58, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-xl);
-            border: 2px solid rgba(255, 51, 102, 0.3);
-            box-shadow: var(--shadow-heavy);
-            transition: var(--transition-normal);
-            padding: 20px 0;
-        }
-
-        .header.scrolled {
-            top: 0;
             width: 100%;
-            max-width: 100%;
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-            border-top: none;
-            padding: 15px 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
         }
-
-        .header-content {
+        
+        .section {
+            padding: 32px 0;
+        }
+        
+        .text-center { text-align: center; }
+        .text-primary { color: var(--primary); }
+        .text-secondary { color: var(--secondary); }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .mb-1 { margin-bottom: 8px; }
+        .mb-2 { margin-bottom: 16px; }
+        .mb-3 { margin-bottom: 24px; }
+        .mb-4 { margin-bottom: 32px; }
+        .mb-5 { margin-bottom: 48px; }
+        
+        /* Top Navigation */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            height: 64px;
         }
-
+        
         .logo {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 12px;
             text-decoration: none;
-            position: relative;
         }
-
+        
         .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--gradient-primary);
-            border-radius: 18px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
             color: white;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(255, 51, 102, 0.5);
-            transition: var(--transition-normal);
+            font-size: 20px;
         }
-
-        .logo-icon::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(255, 255, 255, 0.1),
-                transparent
-            );
-            transform: rotate(45deg);
-            transition: var(--transition-normal);
-        }
-
-        .logo:hover .logo-icon::before {
-            transform: rotate(45deg) translate(50%, 50%);
-        }
-
+        
         .logo-text {
-            font-size: 36px;
-            font-weight: 900;
-            background: var(--gradient-primary);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -0.5px;
-            text-shadow: 0 4px 20px rgba(255, 51, 102, 0.3);
         }
-
-        .logo-subtitle {
-            font-size: 13px;
-            color: var(--accent-gold);
-            margin-top: -5px;
-            letter-spacing: 2px;
+        
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        /* Search Button */
+        .search-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-full);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+        
+        .search-btn:hover {
+            background: var(--surface-light);
+            border-color: var(--primary);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            transition: var(--transition-normal);
+            min-width: 64px;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: var(--text-secondary);
+            transition: var(--transition-normal);
+        }
+        
+        .nav-item span {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: var(--transition-normal);
+        }
+        
+        .nav-item.active i,
+        .nav-item.active span {
+            color: var(--primary);
+        }
+        
+        .nav-item:hover:not(.active) {
+            background: var(--surface);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding-top: 96px;
+            padding-bottom: 48px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.1), transparent 50%);
+            z-index: -1;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-full);
+            padding: 8px 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .hero-badge i {
+            color: var(--secondary);
+        }
+        
+        /* Category Chips */
+        .category-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 16px 0;
+            margin-bottom: 24px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .category-chips::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-chip {
+            flex-shrink: 0;
+            padding: 12px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            white-space: nowrap;
+        }
+        
+        .category-chip:hover {
+            background: var(--surface-light);
+            border-color: var(--primary-light);
+        }
+        
+        .category-chip.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: transparent;
+            box-shadow: var(--shadow-primary);
+        }
+        
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 48px;
+        }
+        
+        .project-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+        
+        .project-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .project-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .project-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--secondary);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .project-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
             font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .project-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        
+        .project-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .project-link {
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .logo-subtitle i {
-            font-size: 14px;
-            color: var(--accent-green);
-        }
-
-        .nav-toggle {
-            display: none;
-            background: rgba(255, 51, 102, 0.1);
-            border: 2px solid rgba(255, 51, 102, 0.3);
-            color: var(--text-primary);
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 1001;
-            transition: var(--transition-normal);
-            padding: 12px;
-            border-radius: var(--radius-sm);
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .nav-toggle:hover {
-            background: rgba(255, 51, 102, 0.2);
-            transform: rotate(90deg);
-        }
-
-        .nav {
-            display: flex;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: var(--text-secondary);
+            color: var(--primary);
             text-decoration: none;
             font-weight: 600;
-            transition: var(--transition-normal);
-            position: relative;
-            padding: 12px 0;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-link i {
-            font-size: 18px;
-            width: 24px;
-            text-align: center;
-        }
-
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 3px;
-            background: var(--gradient-gold);
-            border-radius: 2px;
+            font-size: 14px;
             transition: var(--transition-normal);
         }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--text-primary);
+        
+        .project-link:hover {
+            gap: 12px;
+            color: var(--primary-light);
         }
-
-        .nav-link:hover::before,
-        .nav-link.active::before {
-            width: 100%;
-        }
-
-        /* Главный экран */
-        .hero {
-            padding: 220px 0 160px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            margin-top: 40px;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 1000px;
-            height: 1000px;
-            background: radial-gradient(
-                circle,
-                rgba(255, 51, 102, 0.2) 0%,
-                rgba(51, 204, 153, 0.1) 30%,
-                transparent 70%
-            );
-            z-index: -1;
-            animation: pulse 8s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            50% {
-                opacity: 0.8;
-                transform: translate(-50%, -50%) scale(1.05);
-            }
-        }
-
-        .hero-title {
-            font-size: 72px;
-            font-weight: 900;
-            margin-bottom: 32px;
-            position: relative;
-            display: inline-block;
-        }
-
-        .hero-title-text {
-            background: linear-gradient(
-                135deg,
-                var(--text-primary) 0%,
-                var(--accent-gold) 25%,
-                var(--accent-red) 50%,
-                var(--accent-blue) 75%,
-                var(--text-primary) 100%
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            background-size: 300% 300%;
-            animation: gradient-flow 8s ease infinite;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .hero-title-text::before,
-        .hero-title-text::after {
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            font-size: 48px;
-            color: var(--accent-gold);
-            animation: bounce 2s infinite;
-        }
-
-        .hero-title-text::before {
-            content: '\f7aa';
-        }
-
-        .hero-title-text::after {
-            content: '\f06d';
-        }
-
-        @keyframes gradient-flow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(10deg); }
-        }
-
-        .hero-subtitle {
-            font-size: 24px;
-            color: var(--text-secondary);
-            max-width: 800px;
-            margin: 0 auto 64px;
-            line-height: 1.8;
-            padding: 28px 40px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius-xl);
-            border: 2px solid var(--border-light);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-subtitle::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 28px;
-            justify-content: center;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 2;
-        }
-
+        
+        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 14px;
-            padding: 22px 44px;
-            border-radius: var(--radius-lg);
-            font-weight: 700;
-            text-decoration: none;
-            transition: var(--transition-normal);
-            cursor: pointer;
-            border: none;
-            font-size: 18px;
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.5px;
-            min-width: 220px;
             justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.2),
-                transparent
-            );
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
             transition: var(--transition-normal);
+            min-height: 44px;
+            user-select: none;
+            -webkit-user-select: none;
         }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
+        
         .btn-primary {
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            box-shadow: var(--shadow-heavy);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-primary);
         }
-
+        
         .btn-primary:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 25px 70px rgba(255, 51, 102, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
         }
-
+        
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--surface);
             color: var(--text-primary);
-            border: 2px solid var(--accent-gold);
-            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
         }
-
+        
         .btn-secondary:hover {
-            background: var(--accent-gold);
-            color: var(--bg-primary);
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: var(--shadow-heavy);
+            background: var(--surface-light);
+            border-color: var(--primary);
         }
-
-        .btn-accent {
-            background: var(--gradient-secondary);
-            color: white;
-            border: 2px solid var(--accent-green);
-            box-shadow: var(--shadow-medium);
+        
+        .btn-lg {
+            padding: 18px 32px;
+            font-size: 18px;
         }
-
-        .btn-accent:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 25px 70px rgba(51, 204, 153, 0.5);
+        
+        .btn-block {
+            width: 100%;
         }
-
-        /* Новогодний таймер */
-        .countdown {
-            margin: 80px auto;
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-xl);
-            padding: 40px;
-            border: 2px solid var(--border-light);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .countdown::before {
-            content: '';
-            position: absolute;
+        
+        /* Modal */
+        .modal {
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: var(--gradient-gold);
-        }
-
-        .countdown-title {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 32px;
-            color: var(--accent-gold);
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-        }
-
-        .countdown-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .countdown-item {
-            text-align: center;
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
             transition: var(--transition-normal);
         }
-
-        .countdown-item:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-gold);
-            box-shadow: var(--shadow-light);
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
         }
-
-        .countdown-number {
-            font-size: 48px;
-            font-weight: 900;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-            line-height: 1;
+        
+        .modal-content {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            max-width: 400px;
+            width: 100%;
+            transform: translateY(20px);
+            transition: var(--transition-normal);
         }
-
-        .countdown-label {
-            font-size: 14px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
         }
-
-        /* Поиск */
-        .search-section {
-            margin: 80px 0 100px;
-            position: relative;
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
         }
-
-        .search-container {
-            position: relative;
-            max-width: 800px;
-            margin: 0 auto;
+        
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            background: var(--background);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-normal);
         }
-
+        
+        .modal-close:hover {
+            background: var(--surface-light);
+            border-color: var(--primary);
+        }
+        
+        /* Search Modal */
         .search-input {
             width: 100%;
-            padding: 24px 80px 24px 36px;
-            border-radius: var(--radius-xl);
-            background: rgba(255, 255, 255, 0.08);
-            border: 2px solid var(--border-color);
+            padding: 16px;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             color: var(--text-primary);
-            font-size: 18px;
-            transition: var(--transition-normal);
-            backdrop-filter: blur(10px);
             font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            margin-bottom: 16px;
+            transition: var(--transition-normal);
         }
-
+        
         .search-input:focus {
             outline: none;
-            border-color: var(--accent-red);
-            box-shadow: 0 0 40px rgba(255, 51, 102, 0.3);
-            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
-
-        .search-input::placeholder {
-            color: var(--text-muted);
+        
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
         }
-
-        .search-icon {
-            position: absolute;
-            right: 36px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 22px;
-            transition: var(--transition-normal);
-            pointer-events: none;
-        }
-
-        .search-input:focus + .search-icon {
-            color: var(--accent-red);
-            transform: translateY(-50%) scale(1.2);
-        }
-
-        /* Категории */
-        .categories {
-            margin: 120px 0 100px;
-        }
-
-        .section-title {
-            font-size: 52px;
-            font-weight: 900;
-            margin-bottom: 64px;
-            text-align: center;
-            position: relative;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 0 40px;
-        }
-
-        .section-title::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                var(--accent-gold),
-                var(--accent-red),
-                var(--accent-green),
-                transparent
-            );
-        }
-
-        .section-title-text {
-            position: relative;
-            background: linear-gradient(
-                135deg,
-                var(--accent-gold),
-                var(--accent-red),
-                var(--accent-blue)
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            padding: 0 40px;
-            background-color: var(--bg-primary);
-        }
-
-        .categories-tabs {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 64px;
-            padding: 0 20px;
-        }
-
-        .category-tab {
-            padding: 18px 36px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            color: var(--text-secondary);
-            font-weight: 700;
+        
+        .search-result-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
             cursor: pointer;
             transition: var(--transition-normal);
-            position: relative;
-            overflow: hidden;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            backdrop-filter: blur(10px);
-            min-width: 180px;
-            justify-content: center;
         }
-
-        .category-tab i {
-            font-size: 20px;
-            width: 24px;
-            text-align: center;
+        
+        .search-result-item:hover {
+            background: var(--surface-light);
         }
-
-        .category-tab:hover {
-            background: var(--gradient-primary);
-            color: white;
-            border-color: transparent;
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: var(--shadow-medium);
+        
+        .search-result-item:last-child {
+            border-bottom: none;
         }
-
-        .category-tab.active {
-            background: var(--gradient-primary);
-            color: white;
-            border-color: transparent;
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        /* Сетка сервисов */
-        .services-grid {
+        
+        /* Features */
+        .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-            gap: 40px;
-            margin-bottom: 160px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
         }
-
-        .service-card {
-            background: linear-gradient(
-                145deg,
-                rgba(255, 255, 255, 0.05),
-                rgba(255, 255, 255, 0.02)
-            );
-            border-radius: var(--radius-xl);
-            padding: 40px;
+        
+        .feature-card {
+            text-align: center;
+            padding: 32px 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
             transition: var(--transition-normal);
-            cursor: pointer;
-            border: 2px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(20px);
         }
-
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--gradient-primary);
-            transform: scaleX(0);
-            transition: var(--transition-normal);
-            transform-origin: left;
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
         }
-
-        .service-card:hover {
-            transform: translateY(-15px) scale(1.03);
-            box-shadow: var(--shadow-heavy);
-            border-color: var(--accent-red);
-        }
-
-        .service-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .service-icon {
-            width: 90px;
-            height: 90px;
-            border-radius: 24px;
-            background: rgba(255, 51, 102, 0.1);
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 32px;
-            font-size: 38px;
-            color: var(--accent-red);
-            transition: var(--transition-normal);
-            position: relative;
-            border: 2px solid rgba(255, 51, 102, 0.2);
-        }
-
-        .service-card:hover .service-icon {
-            background: var(--gradient-primary);
             color: white;
-            transform: scale(1.15) rotate(15deg);
-            box-shadow: 0 15px 35px rgba(255, 51, 102, 0.4);
-            border-color: transparent;
-        }
-
-        .service-title {
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            color: var(--text-primary);
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .service-title .new-badge {
-            background: var(--gradient-gold);
-            color: var(--bg-primary);
-            font-size: 11px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            box-shadow: var(--shadow-light);
-        }
-
-        .service-desc {
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            flex-grow: 1;
-            line-height: 1.7;
-            font-size: 16px;
-        }
-
-        .service-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 14px;
-            color: var(--accent-red);
-            font-weight: 700;
-            text-decoration: none;
-            transition: var(--transition-normal);
-            position: relative;
-            padding: 12px 0;
-            border-radius: var(--radius-xs);
-            width: fit-content;
-            font-size: 16px;
-        }
-
-        .service-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent-gold);
-            transition: var(--transition-normal);
-        }
-
-        .service-link:hover {
-            color: var(--accent-gold);
-            gap: 20px;
-        }
-
-        .service-link:hover::after {
-            width: 100%;
-        }
-
-        /* Футер */
-        .footer {
-            padding: 120px 0 80px;
-            background: linear-gradient(to bottom, transparent, var(--bg-surface));
-            position: relative;
-            overflow: hidden;
-            border-top: 2px solid var(--border-color);
-        }
-
-        .footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--gradient-primary);
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 60px;
-        }
-
-        .footer-brand {
-            font-weight: 900;
             font-size: 28px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
-
+        
+        /* Footer */
+        .footer {
+            margin-top: 64px;
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        
         .footer-links {
             display: flex;
-            gap: 40px;
+            justify-content: center;
+            gap: 32px;
+            margin: 24px 0;
+            flex-wrap: wrap;
         }
-
+        
         .footer-link {
             color: var(--text-secondary);
             text-decoration: none;
-            transition: var(--transition-normal);
-            font-weight: 600;
-            position: relative;
-            padding: 8px 0;
-            font-size: 16px;
-        }
-
-        .footer-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent-gold);
+            font-size: 14px;
             transition: var(--transition-normal);
         }
-
+        
         .footer-link:hover {
-            color: var(--text-primary);
+            color: var(--primary);
         }
-
-        .footer-link:hover::after {
-            width: 100%;
-        }
-
-        .watermark {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 15px;
-            opacity: 0.8;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 40px;
-            padding-top: 40px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .watermark i {
-            color: var(--accent-gold);
-            font-size: 16px;
-        }
-
-        /* Новогодние декорации */
-        .decoration-tree {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 60px;
-            height: 80px;
-            z-index: 998;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        .decoration-tree i {
-            font-size: 60px;
-            color: var(--accent-green);
-            filter: drop-shadow(0 5px 15px rgba(51, 204, 153, 0.3));
-            animation: sway 6s ease-in-out infinite;
-        }
-
-        @keyframes sway {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
-        }
-
-        .decoration-gift {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 998;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        .decoration-gift i {
-            font-size: 60px;
-            color: var(--accent-red);
-            filter: drop-shadow(0 5px 15px rgba(255, 51, 102, 0.3));
-            animation: bounce-gift 4s ease-in-out infinite;
-        }
-
-        @keyframes bounce-gift {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        /* Адаптивность */
-        @media (max-width: 1200px) {
-            .services-grid {
-                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-                gap: 32px;
-            }
-            
-            .countdown-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
+        
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .header {
-                width: calc(100% - 32px);
-                top: 16px;
-                padding: 16px 0;
-            }
-
-            .nav-toggle {
-                display: flex;
-            }
-
-            .nav {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 85%;
-                height: 100vh;
-                background: var(--bg-surface);
-                flex-direction: column;
-                padding: 140px 40px 60px;
-                transition: var(--transition-normal);
-                box-shadow: -10px 0 60px rgba(0, 0, 0, 0.5);
-                z-index: 999;
-                border-left: 2px solid var(--accent-red);
-                border-radius: 24px 0 0 24px;
-                gap: 0;
-            }
-
-            .nav.active {
-                right: 0;
-            }
-
-            .nav-link {
-                font-size: 20px;
-                padding: 20px 0;
-                border-bottom: 1px solid var(--border-color);
-                width: 100%;
-                justify-content: flex-start;
-            }
-
-            .nav-link:last-child {
-                border-bottom: none;
-            }
-
-            .hero {
-                padding: 180px 0 120px;
-                margin-top: 60px;
-            }
-
-            .hero-title {
-                font-size: 48px;
-            }
-
-            .hero-title-text {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .hero-title-text::before,
-            .hero-title-text::after {
-                font-size: 36px;
-            }
-
-            .hero-subtitle {
-                font-size: 20px;
-                padding: 24px 32px;
-            }
-
-            .btn {
-                padding: 20px 36px;
-                font-size: 16px;
-                min-width: 200px;
-            }
-
-            .hero-actions {
-                gap: 20px;
-            }
-
-            .services-grid {
+            .display-1 { font-size: 36px; }
+            .display-2 { font-size: 28px; }
+            .h1 { font-size: 28px; }
+            .h2 { font-size: 24px; }
+            
+            .projects-grid {
                 grid-template-columns: 1fr;
-                gap: 28px;
-            }
-
-            .section-title {
-                font-size: 40px;
-            }
-
-            .footer-content {
-                flex-direction: column;
-                gap: 32px;
-                text-align: center;
-            }
-
-            .footer-links {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .decoration-tree,
-            .decoration-gift {
-                display: none;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 36px;
-            }
-
-            .hero-subtitle {
-                font-size: 18px;
-                padding: 20px 24px;
-            }
-
-            .hero-actions {
-                flex-direction: column;
-                align-items: center;
                 gap: 16px;
             }
-
-            .btn {
-                width: 100%;
-                max-width: 320px;
-            }
-
-            .categories-tabs {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .category-tab {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .section-title {
-                font-size: 32px;
-            }
-
-            .countdown-grid {
+            
+            .features-grid {
                 grid-template-columns: 1fr;
             }
-
-            .service-card {
-                padding: 32px;
-            }
-
-            .service-icon {
-                width: 80px;
-                height: 80px;
-                font-size: 34px;
+            
+            .modal-content {
+                padding: 24px;
             }
         }
-
-        /* Специальные стили для новых сервисов */
-        .new-year-service {
-            border: 2px solid var(--accent-gold);
-            background: linear-gradient(
-                145deg,
-                rgba(255, 204, 0, 0.05),
-                rgba(255, 204, 0, 0.02)
-            );
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+            
+            .section {
+                padding: 24px 0;
+            }
+            
+            .hero {
+                padding-top: 80px;
+                padding-bottom: 32px;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .bottom-nav {
+                padding: 8px 12px;
+            }
+            
+            .nav-item {
+                padding: 8px 12px;
+                min-width: 56px;
+            }
         }
-
-        .new-year-service .service-icon {
-            background: rgba(255, 204, 0, 0.15);
-            color: var(--accent-gold);
-            border-color: rgba(255, 204, 0, 0.3);
+        
+        @media (min-width: 769px) {
+            body {
+                padding-bottom: 0;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            .top-nav {
+                padding: 12px 32px;
+            }
+            
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
         }
-
-        .new-year-service:hover .service-icon {
-            background: var(--gradient-gold);
+        
+        /* Dark mode preference */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --background: #F8FAFC;
+                --surface: #FFFFFF;
+                --surface-light: #F1F5F9;
+                --text-primary: #0F172A;
+                --text-secondary: #475569;
+                --text-muted: #64748B;
+                --border: #E2E8F0;
+            }
+            
+            .top-nav,
+            .bottom-nav {
+                background: rgba(248, 250, 252, 0.95);
+            }
         }
-
-        /* Анимации для появления элементов */
-        .animate-fade-in {
-            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            opacity: 0;
-        }
-
+        
+        /* Loading animation */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(40px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-
-        /* Эффект для кнопок */
-        .btn-sparkle {
-            position: relative;
-            overflow: hidden;
+        
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease forwards;
         }
-
-        .btn-sparkle::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(255, 255, 255, 0.1),
-                transparent
-            );
-            transform: rotate(45deg);
-            animation: sparkle 2s linear infinite;
-        }
-
-        @keyframes sparkle {
-            0% {
-                transform: rotate(45deg) translateX(-100%);
-            }
-            100% {
-                transform: rotate(45deg) translateX(100%);
-            }
-        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
-    <!-- Новогодние декорации -->
-    <div class="garland"></div>
-    <div class="decoration-tree">
-        <i class="fas fa-tree"></i>
-    </div>
-    <div class="decoration-gift">
-        <i class="fas fa-gift"></i>
-    </div>
-    
-    <!-- Динамические элементы будут добавлены через JS -->
-    <div id="dynamicDecorations"></div>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <a href="#" class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-cube"></i>
+            </div>
+            <span class="logo-text">DOROS</span>
+        </a>
+        
+        <div class="nav-actions">
+            <button class="search-btn" id="searchBtn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </nav>
 
-    <!-- Шапка -->
-    <header class="header" id="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="#" class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-snowflake"></i>
-                    </div>
-                    <div>
-                        <div class="logo-text">DOROSfamd</div>
-                        <div class="logo-subtitle">
-                            <i class="fas fa-star"></i>
-                            Новый Год 2026
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </a>
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-bg"></div>
+            <div class="container">
+                <div class="hero-badge animate-fade-in">
+                    <i class="fas fa-rocket"></i>
+                    <span>Более 50 проектов в экосистеме</span>
+                </div>
                 
-                <button class="nav-toggle" id="navToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <h1 class="display-1 mb-3 animate-fade-in delay-1">
+                    <span class="text-gradient">Всё в одном месте</span>
+                </h1>
                 
-                <nav class="nav" id="nav">
-                    <a href="#hero" class="nav-link active">
-                        <i class="fas fa-home"></i>
-                        Главная
-                    </a>
-                    <a href="#games" class="nav-link">
+                <p class="body-large text-secondary mb-5 animate-fade-in delay-2">
+                    Игры, инструменты, сервисы — всё, что нужно для работы, 
+                    творчества и развлечения в современном интерфейсе.
+                </p>
+                
+                <div class="animate-fade-in delay-3">
+                    <a href="#projects" class="btn btn-primary btn-lg">
                         <i class="fas fa-gamepad"></i>
-                        Игры
+                        <span>Начать исследовать</span>
                     </a>
-                    <a href="#services" class="nav-link">
-                        <i class="fas fa-cogs"></i>
-                        Сервисы
-                    </a>
-                    <a href="#new" class="nav-link">
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories -->
+        <section class="section">
+            <div class="container">
+                <div class="category-chips" id="categoryChips">
+                    <button class="category-chip active" data-category="all">
+                        <i class="fas fa-th-large"></i>
+                        <span>Все проекты</span>
+                    </button>
+                    <button class="category-chip" data-category="games">
+                        <i class="fas fa-gamepad"></i>
+                        <span>Игры</span>
+                    </button>
+                    <button class="category-chip" data-category="tools">
+                        <i class="fas fa-tools"></i>
+                        <span>Инструменты</span>
+                    </button>
+                    <button class="category-chip" data-category="creative">
+                        <i class="fas fa-paint-brush"></i>
+                        <span>Творчество</span>
+                    </button>
+                    <button class="category-chip" data-category="new">
                         <i class="fas fa-rocket"></i>
-                        Новинки
-                    </a>
-                </nav>
+                        <span>Новые</span>
+                    </button>
+                </div>
             </div>
-        </div>
-    </header>
+        </section>
 
-    <!-- Главный экран -->
-    <section class="hero" id="hero">
-        <div class="container">
-            <h1 class="hero-title animate-fade-in">
-                <span class="hero-title-text">
-                    <i class="fas fa-crown"></i>
-                    DOROSfamd 2026
-                    <i class="fas fa-crown"></i>
-                </span>
-            </h1>
-            <p class="hero-subtitle animate-fade-in" style="animation-delay: 0.2s;">
-                <i class="fas fa-star"></i> Встречайте обновлённую экосистему с новогодним настроением! 
-                <i class="fas fa-star"></i> Новые игры, улучшенные сервисы и волшебная атмосфера ждут вас. 
-                <i class="fas fa-star"></i> Погрузитесь в мир цифровых развлечений и возможностей.
-            </p>
-            
-            <div class="hero-actions">
-                <a href="#new" class="btn btn-primary btn-sparkle animate-fade-in" style="animation-delay: 0.4s;">
-                    <i class="fas fa-gift"></i>
-                    Новогодние Новинки
-                </a>
+        <!-- Projects Grid -->
+        <section class="section" id="projects">
+            <div class="container">
+                <div class="projects-grid" id="projectsGrid">
+                    <!-- Projects will be loaded here dynamically -->
+                </div>
                 
-                <a href="https://dorosfamd.com/dfapp" class="btn btn-secondary animate-fade-in" style="animation-delay: 0.6s;">
-                    <i class="fas fa-mobile-alt"></i>
-                    Скачать Приложение
-                </a>
-                
-                <a href="#games" class="btn btn-accent animate-fade-in" style="animation-delay: 0.8s;">
-                    <i class="fas fa-gamepad"></i>
-                    Игровая Коллекция
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Новогодний таймер -->
-    <div class="countdown animate-fade-in" style="animation-delay: 1s;">
-        <h3 class="countdown-title">
-            <i class="fas fa-clock"></i>
-            До Нового 2026 Года осталось:
-            <i class="fas fa-clock"></i>
-        </h3>
-        <div class="countdown-grid" id="countdownGrid">
-            <div class="countdown-item">
-                <div class="countdown-number" id="days">00</div>
-                <div class="countdown-label">Дней</div>
-            </div>
-            <div class="countdown-item">
-                <div class="countdown-number" id="hours">00</div>
-                <div class="countdown-label">Часов</div>
-            </div>
-            <div class="countdown-item">
-                <div class="countdown-number" id="minutes">00</div>
-                <div class="countdown-label">Минут</div>
-            </div>
-            <div class="countdown-item">
-                <div class="countdown-number" id="seconds">00</div>
-                <div class="countdown-label">Секунд</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Поиск -->
-    <section class="search-section">
-        <div class="container">
-            <div class="search-container animate-fade-in" style="animation-delay: 1.2s;">
-                <input type="text" class="search-input" placeholder="Найти праздничные сервисы, игры и развлечения..." id="searchInput">
-                <i class="fas fa-search search-icon"></i>
-            </div>
-        </div>
-    </section>
-
-    <!-- Категории и сервисы -->
-    <section class="categories" id="services">
-        <div class="container">
-            <h2 class="section-title animate-fade-in">
-                <span class="section-title-text">Праздничная Коллекция</span>
-            </h2>
-            
-            <div class="categories-tabs" id="categoriesTabs">
-                <button class="category-tab active" data-category="all">
-                    <i class="fas fa-th-large"></i> Все сервисы
-                </button>
-                <button class="category-tab" data-category="new">
-                    <i class="fas fa-rocket"></i> Новинки
-                </button>
-                <button class="category-tab" data-category="games">
-                    <i class="fas fa-gamepad"></i> Игры
-                </button>
-                <button class="category-tab" data-category="tools">
-                    <i class="fas fa-tools"></i> Инструменты
-                </button>
-                <button class="category-tab" data-category="creative">
-                    <i class="fas fa-paint-brush"></i> Творчество
-                </button>
-                <button class="category-tab" data-category="communication">
-                    <i class="fas fa-comments"></i> Общение
-                </button>
-            </div>
-            
-            <div class="services-grid" id="servicesGrid">
-                <!-- НОВОГОДНИЕ НОВИНКИ -->
-                
-                <!-- DOROSbeat -->
-                <div class="service-card new-year-service animate-fade-in" data-category="new creative" style="animation-delay: 0.1s;">
-                    <div class="service-icon">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <h3 class="service-title">
-                        DOROSbeat
-                        <span class="new-badge">НОВИНКА</span>
-                    </h3>
-                    <p class="service-desc">
-                        Создавайте уникальные мелодии и биты с профессиональным интерфейсом. Новогодние звуковые эффекты, библиотека семплов и возможность экспорта ваших композиций.
-                    </p>
-                    <a href="https://dorosfamd.com/beat" class="service-link" target="_blank">
-                        Создать музыку
-                        <i class="fas fa-arrow-right"></i>
+                <div class="text-center">
+                    <a href="https://dorosfamd.com/dfapp" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-download"></i>
+                        <span>Скачать полное приложение</span>
                     </a>
                 </div>
+            </div>
+        </section>
 
-                <!-- DOROSfile -->
-                <div class="service-card new-year-service animate-fade-in" data-category="new tools" style="animation-delay: 0.2s;">
-                    <div class="service-icon">
-                        <i class="fas fa-file-export"></i>
+        <!-- Features -->
+        <section class="section">
+            <div class="container">
+                <h2 class="h2 text-center mb-5">Почему DOROSfamd?</h2>
+                
+                <div class="features-grid">
+                    <div class="feature-card animate-fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="h4 mb-2">Быстрый доступ</h3>
+                        <p class="body-small text-secondary">
+                            Все сервисы загружаются мгновенно, без лишних кликов и ожиданий.
+                        </p>
                     </div>
-                    <h3 class="service-title">
-                        DOROSfile
-                        <span class="new-badge">НОВИНКА</span>
-                    </h3>
-                    <p class="service-desc">
-                        Универсальный конвертер файлов с поддержкой более 50 форматов. Быстрая конвертация видео, аудио, изображений и документов без потери качества.
-                    </p>
-                    <a href="https://dorosfamd.com/file" class="service-link" target="_blank">
-                        Конвертировать файлы
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
+                    
+                    <div class="feature-card animate-fade-in delay-1">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="h4 mb-2">Mobile-first</h3>
+                        <p class="body-small text-secondary">
+                            Создано для смартфонов. Удобное управление пальцем, крупные кнопки.
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card animate-fade-in delay-2">
+                        <div class="feature-icon">
+                            <i class="fas fa-infinity"></i>
+                        </div>
+                        <h3 class="h4 mb-2">Всё в одном</h3>
+                        <p class="body-small text-secondary">
+                            Не нужно переходить между сайтами. Все инструменты в единой экосистеме.
+                        </p>
+                    </div>
                 </div>
+            </div>
+        </section>
 
-                <!-- DOROScub -->
-                <div class="service-card new-year-service animate-fade-in" data-category="new games" style="animation-delay: 0.3s;">
-                    <div class="service-icon">
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="logo mb-4">
+                    <div class="logo-icon">
                         <i class="fas fa-cube"></i>
                     </div>
-                    <h3 class="service-title">
-                        DOROScub
-                        <span class="new-badge">НОВИНКА</span>
-                    </h3>
-                    <p class="service-desc">
-                        Динамичная игра с прыгающим кубиком. Побеждайте врагов, собирайте монеты, прокачивайте персонажа и открывайте уникальные скины в магазине.
-                    </p>
-                    <a href="https://dorosfamd.com/cub" class="service-link" target="_blank">
-                        Начать игру
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
+                    <span class="logo-text">DOROSfamd</span>
                 </div>
-
-                <!-- DOROSris -->
-                <div class="service-card new-year-service animate-fade-in" data-category="new creative" style="animation-delay: 0.4s;">
-                    <div class="service-icon">
-                        <i class="fas fa-paint-brush"></i>
-                    </div>
-                    <h3 class="service-title">
-                        DOROSris
-                        <span class="new-badge">НОВИНКА</span>
-                    </h3>
-                    <p class="service-desc">
-                        Продвинутый графический редактор для цифрового искусства. Кисти, слои, фильтры и профессиональные инструменты для создания потрясающих изображений.
-                    </p>
-                    <a href="https://dorosfamd.com/ris" class="service-link" target="_blank">
-                        Начать рисовать
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- DOROSaper -->
-                <div class="service-card new-year-service animate-fade-in" data-category="new games" style="animation-delay: 0.5s;">
-                    <div class="service-icon">
-                        <i class="fas fa-bomb"></i>
-                    </div>
-                    <h3 class="service-title">
-                        DOROSaper
-                        <span class="new-badge">НОВИНКА</span>
-                    </h3>
-                    <p class="service-desc">
-                        Классический сапёр с современными улучшениями. Несколько уровней сложности, система достижений, таблица рекордов и новогодние темы оформления.
-                    </p>
-                    <a href="https://dorosfamd.com/saper" class="service-link" target="_blank">
-                        Разминировать поле
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- DOROStransport -->
-                <div class="service-card new-year-service animate-fade-in" data-category="new games" style="animation-delay: 0.6s;">
-                    <div class="service-icon">
-                        <i class="fas fa-car"></i>
-                    </div>
-                    <h3 class="service-title">
-                        DOROStransport
-                        <span class="new-badge">НОВИНКА</span>
-                    </h3>
-                    <p class="service-desc">
-                        Увлекательная игра с различными видами транспорта. Создавайте карты, собирайте монеты, покупайте новые транспортные средства и участвуйте в гонках.
-                    </p>
-                    <a href="https://dorosfamd.com/transport" class="service-link" target="_blank">
-                        Отправиться в путь
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- ИГРЫ -->
                 
-                <!-- PACfamd -->
-                <div class="service-card animate-fade-in" data-category="games" style="animation-delay: 0.7s;">
-                    <div class="service-icon">
-                        <i class="fas fa-ghost"></i>
-                    </div>
-                    <h3 class="service-title">PACfamd</h3>
-                    <p class="service-desc">
-                        Классическая аркадная игра в современном исполнении. Собирайте точки, избегайте призраков и открывайте новые уровни с уникальными механиками.
-                    </p>
-                    <a href="https://dorosfamd.com/pacfamd" class="service-link" target="_blank">
-                        Начать игру
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- PACfamd 2 игрока -->
-                <div class="service-card animate-fade-in" data-category="games" style="animation-delay: 0.8s;">
-                    <div class="service-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3 class="service-title">PACfamd 2 игрока</h3>
-                    <p class="service-desc">
-                        Кооперативная версия классической аркады. Играйте вместе с другом на одном устройстве, разрабатывайте стратегии и достигайте высоких результатов.
-                    </p>
-                    <a href="https://dorosfamd.com/pac7" class="service-link" target="_blank">
-                        Играть вдвоём
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Крестики-Нолики -->
-                <div class="service-card animate-fade-in" data-category="games" style="animation-delay: 0.9s;">
-                    <div class="service-icon">
-                        <i class="fas fa-times"></i>
-                    </div>
-                    <h3 class="service-title">Крестики-Нолики</h3>
-                    <p class="service-desc">
-                        Интеллектуальная игра с адаптивным искусственным интеллектом. Несколько уровней сложности, статистика побед и возможность игры с другом.
-                    </p>
-                    <a href="https://dorosfamd.com/krestikinolikifamd" class="service-link" target="_blank">
-                        Начать матч
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Чёт/Нечёт -->
-                <div class="service-card animate-fade-in" data-category="games" style="animation-delay: 1s;">
-                    <div class="service-icon">
-                        <i class="fas fa-dice"></i>
-                    </div>
-                    <h3 class="service-title">Чёт/Нечёт</h3>
-                    <p class="service-desc">
-                        Азартная игра на логику и интуицию. Угадывайте чётность чисел, повышайте ставки и соревнуйтесь с другими игроками в таблице рекордов.
-                    </p>
-                    <a href="https://dorosfamd.com/index2" class="service-link" target="_blank">
-                        Сделать ставку
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- PixBall Football -->
-                <div class="service-card animate-fade-in" data-category="games" style="animation-delay: 1.1s;">
-                    <div class="service-icon">
-                        <i class="fas fa-futbol"></i>
-                    </div>
-                    <h3 class="service-title">PixBall Football</h3>
-                    <p class="service-desc">
-                        2D футбольный симулятор с реалистичной физикой. Создавайте команды, участвуйте в турнирах и становитесь чемпионом виртуального футбола.
-                    </p>
-                    <a href="https://dorosfamd.com/PIXBALL" class="service-link" target="_blank">
-                        Начать матч
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Sheenyystar Game -->
-                <div class="service-card animate-fade-in" data-category="games" style="animation-delay: 1.2s;">
-                    <div class="service-icon">
-                        <i class="fas fa-gun"></i>
-                    </div>
-                    <h3 class="service-title">Sheenyystar Game</h3>
-                    <p class="service-desc">
-                        Эксклюзивный шутер, разработанный совместно с Sheenyystar. Динамичный геймплей, уникальное оружие и захватывающие миссии ждут вас.
-                    </p>
-                    <a href="https://dorosfamd.com/ShGun" class="service-link" target="_blank">
-                        Начать миссию
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Шуттер -->
-                <div class="service-card animate-fade-in" data-category="games" style="animation-delay: 1.3s;">
-                    <div class="service-icon">
-                        <i class="fas fa-crosshairs"></i>
-                    </div>
-                    <h3 class="service-title">Шуттер</h3>
-                    <p class="service-desc">
-                        Интенсивный шутер с мультиплеерным режимом. Разнообразное оружие, несколько игровых режимов и система прокачки персонажа.
-                    </p>
-                    <a href="https://dorosfamd.com/strike" class="service-link" target="_blank">
-                        Вступить в бой
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Minecraft -->
-                <div class="service-card animate-fade-in" data-category="games" style="animation-delay: 1.4s;">
-                    <div class="service-icon">
-                        <i class="fas fa-cubes"></i>
-                    </div>
-                    <h3 class="service-title">Minecraft</h3>
-                    <p class="service-desc">
-                        Браузерная версия популярной песочницы. Стройте, исследуйте и выживайте в бесконечном мире кубических блоков с друзьями.
-                    </p>
-                    <a href="https://dorosfamd.com/craft" class="service-link" target="_blank">
-                        Начать строительство
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- ИНСТРУМЕНТЫ -->
+                <p class="body text-secondary mb-4">
+                    Современная платформа с играми, инструментами и сервисами
+                </p>
                 
-                <!-- Словарь -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 1.5s;">
-                    <div class="service-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <h3 class="service-title">Словарь</h3>
-                    <p class="service-desc">
-                        Обширная база терминов и определений. Быстрый поиск, подробные объяснения и примеры использования слов в различных контекстах.
-                    </p>
-                    <a href="https://dorosfamd.com/словарь" class="service-link" target="_blank">
-                        Найти слово
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Переводчик -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 1.6s;">
-                    <div class="service-icon">
-                        <i class="fas fa-language"></i>
-                    </div>
-                    <h3 class="service-title">Переводчик</h3>
-                    <p class="service-desc">
-                        Многоязычный переводчик с поддержкой 100+ языков. Точный перевод текстов, веб-страниц и документов в реальном времени.
-                    </p>
-                    <a href="https://dorosfamd.com/FAMDai" class="service-link" target="_blank">
-                        Перевести текст
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Прогноз Погоды -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 1.7s;">
-                    <div class="service-icon">
-                        <i class="fas fa-cloud-sun"></i>
-                    </div>
-                    <h3 class="service-title">Прогноз Погоды</h3>
-                    <p class="service-desc">
-                        Точные метеоданные для любого города мира. Подробный прогноз на 10 дней, текущие условия и исторические данные.
-                    </p>
-                    <a href="https://dorosfamd.com/FAMDweather" class="service-link" target="_blank">
-                        Узнать погоду
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Конвертер Валют -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 1.8s;">
-                    <div class="service-icon">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
-                    <h3 class="service-title">Конвертер Валют</h3>
-                    <p class="service-desc">
-                        Актуальные курсы валют и криптовалют. Быстрая конвертация между любыми валютами с историей изменений курсов.
-                    </p>
-                    <a href="https://dorosfamd.com/FAMDvaluta" class="service-link" target="_blank">
-                        Конвертировать валюту
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Браузер -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 1.9s;">
-                    <div class="service-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <h3 class="service-title">Браузер</h3>
-                    <p class="service-desc">
-                        Безопасный веб-браузер с защитой приватности. Быстрая навигация, блокировка рекламы и встроенные инструменты разработчика.
-                    </p>
-                    <a href="https://dorosfamd.com/b" class="service-link" target="_blank">
-                        Начать просмотр
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Карта -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2s;">
-                    <div class="service-icon">
-                        <i class="fas fa-map-marked-alt"></i>
-                    </div>
-                    <h3 class="service-title">Карта</h3>
-                    <p class="service-desc">
-                        Интерактивная карта с навигацией и поиском мест. Маршрутизация, офлайн карты и информация о достопримечательностях.
-                    </p>
-                    <a href="https://dorosfamd.com/index3" class="service-link" target="_blank">
-                        Открыть карту
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Калькулятор -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2.1s;">
-                    <div class="service-icon">
-                        <i class="fas fa-calculator"></i>
-                    </div>
-                    <h3 class="service-title">Калькулятор</h3>
-                    <p class="service-desc">
-                        Продвинутый калькулятор с научными функциями. Вычисления любой сложности, история операций и конвертер единиц измерения.
-                    </p>
-                    <a href="https://dorosfamd.com/cal" class="service-link" target="_blank">
-                        Произвести расчёт
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Облако -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2.2s;">
-                    <div class="service-icon">
-                        <i class="fas fa-cloud"></i>
-                    </div>
-                    <h3 class="service-title">Облако</h3>
-                    <p class="service-desc">
-                        Надёжное облачное хранилище для ваших файлов. Синхронизация между устройствами, совместный доступ и защита данных.
-                    </p>
-                    <a href="https://dorosfamd.com/data" class="service-link" target="_blank">
-                        Загрузить файлы
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Организация Дня -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2.3s;">
-                    <div class="service-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <h3 class="service-title">Организация Дня</h3>
-                    <p class="service-desc">
-                        Персональный планировщик задач и расписания. Умные напоминания, категоризация дел и аналитика продуктивности.
-                    </p>
-                    <a href="https://dorosfamd.com/day" class="service-link" target="_blank">
-                        Запланировать день
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Короткие Ссылки -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2.4s;">
-                    <div class="service-icon">
-                        <i class="fas fa-link"></i>
-                    </div>
-                    <h3 class="service-title">Короткие Ссылки</h3>
-                    <p class="service-desc">
-                        Сервис для создания и управления короткими ссылками. Статистика переходов, кастомные домены и QR-коды.
-                    </p>
-                    <a href="https://dorosfamd.com/link" class="service-link" target="_blank">
-                        Создать ссылку
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Генератор QR-кодов -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2.5s;">
-                    <div class="service-icon">
-                        <i class="fas fa-qrcode"></i>
-                    </div>
-                    <h3 class="service-title">Генератор QR-кодов</h3>
-                    <p class="service-desc">
-                        Создание QR-кодов для любой информации. Настройка дизайна, отслеживание сканирований и массовая генерация.
-                    </p>
-                    <a href="https://dorosfamd.com/QR" class="service-link" target="_blank">
-                        Создать QR-код
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Мировое Время -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2.6s;">
-                    <div class="service-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3 class="service-title">Мировое Время</h3>
-                    <p class="service-desc">
-                        Точное время в разных часовых поясах мира. Сравнение времени между городами и планирование международных встреч.
-                    </p>
-                    <a href="https://dorosfamd.com/time" class="service-link" target="_blank">
-                        Посмотреть время
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Редактор Кода -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2.7s;">
-                    <div class="service-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <h3 class="service-title">Редактор Кода</h3>
-                    <p class="service-desc">
-                        Профессиональный редактор для программирования. Подсветка синтаксиса, автодополнение и поддержка множества языков.
-                    </p>
-                    <a href="https://dorosfamd.com/code" class="service-link" target="_blank">
-                        Написать код
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Планировщик -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2.8s;">
-                    <div class="service-icon">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                    <h3 class="service-title">Планировщик</h3>
-                    <p class="service-desc">
-                        Система управления проектами и задачами. Гантт-диаграммы, совместная работа и интеграция с календарём.
-                    </p>
-                    <a href="https://dorosfamd.com/plan" class="service-link" target="_blank">
-                        Создать проект
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Услуги Сервисов -->
-                <div class="service-card animate-fade-in" data-category="tools" style="animation-delay: 2.9s;">
-                    <div class="service-icon">
-                        <i class="fas fa-concierge-bell"></i>
-                    </div>
-                    <h3 class="service-title">Услуги Сервисов</h3>
-                    <p class="service-desc">
-                        Каталог профессиональных услуг и сервисов. Поиск исполнителей, отзывы клиентов и система заказов.
-                    </p>
-                    <a href="https://dorosfamd.com/service" class="service-link" target="_blank">
-                        Найти услуги
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- ТВОРЧЕСТВО -->
-                
-                <!-- Графический Редактор -->
-                <div class="service-card animate-fade-in" data-category="creative" style="animation-delay: 3s;">
-                    <div class="service-icon">
-                        <i class="fas fa-paint-brush"></i>
-                    </div>
-                    <h3 class="service-title">Графический Редактор</h3>
-                    <p class="service-desc">
-                        Инструмент для создания цифровых изображений. Кисти, слои, фильтры и профессиональные функции для художников.
-                    </p>
-                    <a href="https://dorosfamd.com/paint" class="service-link" target="_blank">
-                        Создать рисунок
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Редактор Фото -->
-                <div class="service-card animate-fade-in" data-category="creative" style="animation-delay: 3.1s;">
-                    <div class="service-icon">
-                        <i class="fas fa-camera-retro"></i>
-                    </div>
-                    <h3 class="service-title">Редактор Фото</h3>
-                    <p class="service-desc">
-                        Мощный редактор для обработки фотографий. Коррекция цвета, ретушь, фильтры и профессиональные инструменты.
-                    </p>
-                    <a href="https://dorosfamd.com/photo" class="service-link" target="_blank">
-                        Обработать фото
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Генератор шрифтов -->
-                <div class="service-card animate-fade-in" data-category="creative" style="animation-delay: 3.2s;">
-                    <div class="service-icon">
-                        <i class="fas fa-font"></i>
-                    </div>
-                    <h3 class="service-title">Генератор шрифтов</h3>
-                    <p class="service-desc">
-                        Создание уникальных шрифтов и текстовых стилей. Библиотека стилей, настройка параметров и предпросмотр в реальном времени.
-                    </p>
-                    <a href="https://dorosfamd.com/textgen" class="service-link" target="_blank">
-                        Создать шрифт
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Генератор рифм -->
-                <div class="service-card animate-fade-in" data-category="creative" style="animation-delay: 3.3s;">
-                    <div class="service-icon">
-                        <i class="fas fa-pencil-alt"></i>
-                    </div>
-                    <h3 class="service-title">Генератор рифм</h3>
-                    <p class="service-desc">
-                        Инструмент для создания рифмованных текстов. База рифм, подбор синонимов и помощь в сочинении стихов.
-                    </p>
-                    <a href="https://dorosfamd.com/rifm" class="service-link" target="_blank">
-                        Создать рифму
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Галерея -->
-                <div class="service-card animate-fade-in" data-category="creative" style="animation-delay: 3.4s;">
-                    <div class="service-icon">
-                        <i class="fas fa-images"></i>
-                    </div>
-                    <h3 class="service-title">Галерея</h3>
-                    <p class="service-desc">
-                        Управление и организация медиафайлов. Сортировка, тегирование, создание альбомов и облачное хранение.
-                    </p>
-                    <a href="https://dorosfamd.com/index8" class="service-link" target="_blank">
-                        Просмотреть галерею
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- DREAMfamd -->
-                <div class="service-card animate-fade-in" data-category="creative" style="animation-delay: 3.5s;">
-                    <div class="service-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <h3 class="service-title">DREAMfamd</h3>
-                    <p class="service-desc">
-                        Платформа для творческих проектов и вдохновения. Публикация работ, сообщество художников и конкурсы.
-                    </p>
-                    <a href="https://dorosfamd.com/DREAMfamd" class="service-link" target="_blank">
-                        Поделиться творчеством
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- ОБЩЕНИЕ -->
-                
-                <!-- Глобальный Чат -->
-                <div class="service-card animate-fade-in" data-category="communication" style="animation-delay: 3.6s;">
-                    <div class="service-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <h3 class="service-title">Глобальный Чат</h3>
-                    <p class="service-desc">
-                        Платформа для общения с пользователями по всему миру. Групповые чаты, приватные сообщения и мультимедиа.
-                    </p>
-                    <a href="https://dorosfamd.com/DOROSchat" class="service-link" target="_blank">
-                        Присоединиться к чату
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Приватный Чат -->
-                <div class="service-card animate-fade-in" data-category="communication" style="animation-delay: 3.7s;">
-                    <div class="service-icon">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                    <h3 class="service-title">Приватный Чат</h3>
-                    <p class="service-desc">
-                        Защищённое общение с шифрованием сообщений. Конфиденциальные переписки и безопасный обмен файлами.
-                    </p>
-                    <a href="https://dorosfamd.com/DOROSchatv4" class="service-link" target="_blank">
-                        Начать приватный чат
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Звонки -->
-                <div class="service-card animate-fade-in" data-category="communication" style="animation-delay: 3.8s;">
-                    <div class="service-icon">
-                        <i class="fas fa-phone-alt"></i>
-                    </div>
-                    <h3 class="service-title">Звонки</h3>
-                    <p class="service-desc">
-                        Качественные аудио и видео звонки через интернет. Групповые конференции, запись разговоров и эффекты.
-                    </p>
-                    <a href="https://dorosfamd.com/phone" class="service-link" target="_blank">
-                        Совершить звонок
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Вики -->
-                <div class="service-card animate-fade-in" data-category="communication" style="animation-delay: 3.9s;">
-                    <div class="service-icon">
-                        <i class="fas fa-wikipedia-w"></i>
-                    </div>
-                    <h3 class="service-title">Вики</h3>
-                    <p class="service-desc">
-                        Пользовательская энциклопедия с совместным редактированием. Создание статей, обсуждения и система версий.
-                    </p>
-                    <a href="https://dorosfamd.com/wiki" class="service-link" target="_blank">
-                        Исследовать вики
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- ОБРАЗОВАНИЕ И БИЗНЕС -->
-                
-                <!-- Тест на тип личности -->
-                <div class="service-card animate-fade-in" data-category="education" style="animation-delay: 4s;">
-                    <div class="service-icon">
-                        <i class="fas fa-user-astronaut"></i>
-                    </div>
-                    <h3 class="service-title">Тест на тип личности</h3>
-                    <p class="service-desc">
-                        Профессиональное тестирование для определения психологического типа. Подробный анализ и рекомендации.
-                    </p>
-                    <a href="https://dorosfamd.com/dinofamd" class="service-link" target="_blank">
-                        Пройти тест
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Викторина -->
-                <div class="service-card animate-fade-in" data-category="education" style="animation-delay: 4.1s;">
-                    <div class="service-icon">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
-                    <h3 class="service-title">Викторина</h3>
-                    <p class="service-desc">
-                        Интерактивные тесты по различным темам. Разные уровни сложности, таймер и таблица лидеров.
-                    </p>
-                    <a href="https://dorosfamd.com/FAMDquiz" class="service-link" target="_blank">
-                        Начать викторину
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Энциклопедия -->
-                <div class="service-card animate-fade-in" data-category="education" style="animation-delay: 4.2s;">
-                    <div class="service-icon">
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <h3 class="service-title">Энциклопедия</h3>
-                    <p class="service-desc">
-                        Достоверный источник знаний по различным темам. Регулярно обновляемая база статей и фактов.
-                    </p>
-                    <a href="https://dorosfamd.com/incoklopedia" class="service-link" target="_blank">
-                        Искать информацию
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Голосовой Словарь -->
-                <div class="service-card animate-fade-in" data-category="education" style="animation-delay: 4.3s;">
-                    <div class="service-icon">
-                        <i class="fas fa-microphone"></i>
-                    </div>
-                    <h3 class="service-title">Голосовой Словарь</h3>
-                    <p class="service-desc">
-                        Словарь с аудиоподдержкой произношения. Корректное произношение слов на разных языках.
-                    </p>
-                    <a href="https://dorosfamd.com/Dr.Zulfon" class="service-link" target="_blank">
-                        Прослушать произношение
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Frontend Обучение -->
-                <div class="service-card animate-fade-in" data-category="education" style="animation-delay: 4.4s;">
-                    <div class="service-icon">
-                        <i class="fas fa-laptop-code"></i>
-                    </div>
-                    <h3 class="service-title">Frontend Обучение</h3>
-                    <p class="service-desc">
-                        Интерактивные курсы по веб-разработке. Практические задания, проекты и сертификаты.
-                    </p>
-                    <a href="https://dorosfamd.com/lfront" class="service-link" target="_blank">
-                        Начать обучение
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Трекер Привычек -->
-                <div class="service-card animate-fade-in" data-category="education" style="animation-delay: 4.5s;">
-                    <div class="service-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <h3 class="service-title">Трекер Привычек</h3>
-                    <p class="service-desc">
-                        Отслеживание и формирование полезных привычек. Статистика прогресса, напоминания и мотивация.
-                    </p>
-                    <a href="https://dorosfamd.com/priv" class="service-link" target="_blank">
-                        Начать отслеживание
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- DOROShop Маркетплейс -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 4.6s;">
-                    <div class="service-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <h3 class="service-title">DOROShop Маркетплейс</h3>
-                    <p class="service-desc">
-                        Платформа для онлайн-торговли. Безопасные транзакции, система рейтингов и широкий выбор товаров.
-                    </p>
-                    <a href="https://dorosfamd.com/DOROShop" class="service-link" target="_blank">
-                        Перейти в магазин
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Новости -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 4.7s;">
-                    <div class="service-icon">
-                        <i class="fas fa-newspaper"></i>
-                    </div>
-                    <h3 class="service-title">Новости</h3>
-                    <p class="service-desc">
-                        Актуальные новости из проверенных источников. Персонализированная лента и уведомления.
-                    </p>
-                    <a href="https://dorosfamd.com/index5" class="service-link" target="_blank">
-                        Читать новости
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Такси -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 4.8s;">
-                    <div class="service-icon">
-                        <i class="fas fa-taxi"></i>
-                    </div>
-                    <h3 class="service-title">Такси</h3>
-                    <p class="service-desc">
-                        Заказ такси в любой точке страны. Быстрое прибытие, отслеживание маршрута и безопасные поездки.
-                    </p>
-                    <a href="https://dorosfamd.com/taxi" class="service-link" target="_blank">
-                        Заказать такси
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Такси Express -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 4.9s;">
-                    <div class="service-icon">
-                        <i class="fas fa-car"></i>
-                    </div>
-                    <h3 class="service-title">Такси Express</h3>
-                    <p class="service-desc">
-                        Экспресс-заказ такси с приоритетным обслуживанием. Минимальное время ожидания и комфортные автомобили.
-                    </p>
-                    <a href="https://dorosfamd.com/khtaxi" class="service-link" target="_blank">
-                        Вызвать экспресс
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Khujand City Bank -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 5s;">
-                    <div class="service-icon">
-                        <i class="fas fa-bank"></i>
-                    </div>
-                    <h3 class="service-title">Khujand City Bank</h3>
-                    <p class="service-desc">
-                        Инновационный банк с онлайн-услугами. Управление счетами, переводы и финансовые операции.
-                    </p>
-                    <a href="https://dorosfamd.com/KhujandCityBank" class="service-link" target="_blank">
-                        Управлять финансами
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Финансы -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 5.1s;">
-                    <div class="service-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3 class="service-title">Финансы</h3>
-                    <p class="service-desc">
-                        Управление личными финансами и инвестициями. Бюджетирование, аналитика и планирование.
-                    </p>
-                    <a href="https://dorosfamd.com/fin" class="service-link" target="_blank">
-                        Контролировать финансы
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Идеи для бизнеса -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 5.2s;">
-                    <div class="service-icon">
-                        <i class="fas fa-lightbulb"></i>
-                    </div>
-                    <h3 class="service-title">Идеи для бизнеса</h3>
-                    <p class="service-desc">
-                        Генератор бизнес-идей и планирование стартапов. Анализ рынка, финансовые модели и стратегии.
-                    </p>
-                    <a href="https://dorosfamd.com/ideya" class="service-link" target="_blank">
-                        Найти идею
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Бухгалтерия -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 5.3s;">
-                    <div class="service-icon">
-                        <i class="fas fa-calculator"></i>
-                    </div>
-                    <h3 class="service-title">Бухгалтерия</h3>
-                    <p class="service-desc">
-                        Система управления финансами для малого бизнеса. Отчётность, налоги и финансовый учёт.
-                    </p>
-                    <a href="https://dorosfamd.com/bschool" class="service-link" target="_blank">
-                        Вести учёт
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Квартиры и Отели -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 5.4s;">
-                    <div class="service-icon">
-                        <i class="fas fa-hotel"></i>
-                    </div>
-                    <h3 class="service-title">Квартиры и Отели</h3>
-                    <p class="service-desc">
-                        Поиск и бронирование жилья для отдыха. Отзывы, фотографии и удобный поиск по параметрам.
-                    </p>
-                    <a href="https://dorosfamd.com/room" class="service-link" target="_blank">
-                        Найти жильё
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Платежи -->
-                <div class="service-card animate-fade-in" data-category="business" style="animation-delay: 5.5s;">
-                    <div class="service-icon">
-                        <i class="fas fa-credit-card"></i>
-                    </div>
-                    <h3 class="service-title">Платежи</h3>
-                    <p class="service-desc">
-                        Безопасные онлайн-платежи и денежные переводы. Поддержка различных платёжных систем.
-                    </p>
-                    <a href="https://dorosfamd.com/school" class="service-link" target="_blank">
-                        Совершить платёж
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Мусульманский Поиск -->
-                <div class="service-card animate-fade-in" data-category="other" style="animation-delay: 5.6s;">
-                    <div class="service-icon">
-                        <i class="fas fa-mosque"></i>
-                    </div>
-                    <h3 class="service-title">Мусульманский Поиск</h3>
-                    <p class="service-desc">
-                        Поисковая система с исламским контентом. Религиозные тексты, статьи и образовательные материалы.
-                    </p>
-                    <a href="https://dorosfamd.com/musl" class="service-link" target="_blank">
-                        Начать поиск
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Музыка -->
-                <div class="service-card animate-fade-in" data-category="entertainment" style="animation-delay: 5.7s;">
-                    <div class="service-icon">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <h3 class="service-title">Музыка</h3>
-                    <p class="service-desc">
-                        Стриминговая платформа с обширной библиотекой. Персональные рекомендации и создание плейлистов.
-                    </p>
-                    <a href="https://dorosfamd.com/DOROSmus4" class="service-link" target="_blank">
-                        Слушать музыку
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Музыка Pro -->
-                <div class="service-card animate-fade-in" data-category="entertainment" style="animation-delay: 5.8s;">
-                    <div class="service-icon">
-                        <i class="fas fa-headphones-alt"></i>
-                    </div>
-                    <h3 class="service-title">Музыка Pro</h3>
-                    <p class="service-desc">
-                        Продвинутый музыкальный плеер с эквалайзером. Высокое качество звука и расширенные настройки.
-                    </p>
-                    <a href="https://dorosfamd.com/music" class="service-link" target="_blank">
-                        Наслаждаться музыкой
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Видеоплатформа -->
-                <div class="service-card animate-fade-in" data-category="entertainment" style="animation-delay: 5.9s;">
-                    <div class="service-icon">
-                        <i class="fas fa-video"></i>
-                    </div>
-                    <h3 class="service-title">Видеоплатформа</h3>
-                    <p class="service-desc">
-                        Платформа для просмотра и загрузки видеоконтента. Поддержка различных форматов и качество до 4K.
-                    </p>
-                    <a href="https://dorosfamd.com/DOROSvid" class="service-link" target="_blank">
-                        Смотреть видео
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Фильмы и книги -->
-                <div class="service-card animate-fade-in" data-category="entertainment" style="animation-delay: 6s;">
-                    <div class="service-icon">
-                        <i class="fas fa-film"></i>
-                    </div>
-                    <h3 class="service-title">Фильмы и книги</h3>
-                    <p class="service-desc">
-                        Каталог фильмов, сериалов и литературы. Рекомендации на основе предпочтений и рецензии.
-                    </p>
-                    <a href="https://dorosfamd.com/FAMDcm" class="service-link" target="_blank">
-                        Найти контент
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Футер -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">DOROSfamd Новогоднее Издание 2026</div>
                 <div class="footer-links">
-                    <a href="onas.html" class="footer-link">О проекте</a>
-                    <a href="mailto:dorosfamd@gmail.com" class="footer-link">Связаться с нами</a>
-                    <a href="#" class="footer-link">Пользовательское соглашение</a>
+                    <a href="https://dorosfamd.com/onas.html" class="footer-link">О проекте</a>
+                    <a href="mailto:dorosfamd@gmail.com" class="footer-link">Связаться</a>
+                    <a href="#" class="footer-link" id="termsBtn">Условия использования</a>
                 </div>
+                
+                <p class="caption">
+                    © 2024 DOROSfamd. Все права защищены.
+                </p>
             </div>
-            <div class="watermark">
-                <i class="fas fa-star"></i>
-                С Новым 2026 Годом! Желаем успехов, вдохновения и новых достижений!
-                <i class="fas fa-star"></i>
+        </footer>
+    </main>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Главная</span>
+        </a>
+        <a href="#projects" class="nav-item">
+            <i class="fas fa-gamepad"></i>
+            <span>Проекты</span>
+        </a>
+        <a href="#" class="nav-item" id="mobileSearchBtn">
+            <i class="fas fa-search"></i>
+            <span>Поиск</span>
+        </a>
+        <a href="https://dorosfamd.com/dfapp" class="nav-item">
+            <i class="fas fa-download"></i>
+            <span>Приложение</span>
+        </a>
+    </nav>
+
+    <!-- Search Modal -->
+    <div class="modal" id="searchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="h3">Поиск проектов</h3>
+                <button class="modal-close" id="searchModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Начните вводить название..."
+                id="searchInput"
+            >
+            
+            <div class="search-results" id="searchResults">
+                <!-- Search results will appear here -->
             </div>
         </div>
-    </footer>
+    </div>
+
+    <!-- Terms Modal -->
+    <div class="modal" id="termsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="h3">Условия использования</h3>
+                <button class="modal-close" id="termsModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="body text-secondary">
+                <p class="mb-3">
+                    DOROSfamd — это экосистема проектов, предоставляющая доступ к играм, 
+                    инструментам и сервисам.
+                </p>
+                
+                <p class="mb-3">
+                    Используя наши сервисы, вы соглашаетесь с тем, что:
+                </p>
+                
+                <ul class="mb-4" style="padding-left: 20px;">
+                    <li>Все проекты предоставляются "как есть"</li>
+                    <li>Мы не несём ответственности за контент внешних сервисов</li>
+                    <li>Вы используете сервисы на свой собственный риск</li>
+                    <li>Мы можем обновлять условия использования</li>
+                </ul>
+                
+                <p>
+                    Для получения дополнительной информации пишите на 
+                    <a href="mailto:dorosfamd@gmail.com" class="text-primary">dorosfamd@gmail.com</a>
+                </p>
+            </div>
+            
+            <button class="btn btn-primary btn-block mt-4" id="acceptTermsBtn">
+                <span>Понятно</span>
+            </button>
+        </div>
+    </div>
 
     <script>
-        // Создание новогодних декораций
-        function createDecorations() {
-            const container = document.getElementById('dynamicDecorations');
-            
-            // Новогодние шары
-            const ballColors = ['#ff3366', '#33cc99', '#ffcc00', '#3366ff', '#cc33ff'];
-            for (let i = 0; i < 20; i++) {
-                const ball = document.createElement('div');
-                ball.className = 'christmas-ball';
-                
-                const size = Math.random() * 50 + 30;
-                const posX = Math.random() * 100;
-                const posY = Math.random() * 100;
-                const delay = Math.random() * 10;
-                const duration = Math.random() * 10 + 10;
-                const color = ballColors[Math.floor(Math.random() * ballColors.length)];
-                
-                ball.style.width = `${size}px`;
-                ball.style.height = `${size}px`;
-                ball.style.left = `${posX}%`;
-                ball.style.top = `${posY}%`;
-                ball.style.animationDelay = `${delay}s`;
-                ball.style.animationDuration = `${duration}s`;
-                ball.style.background = `radial-gradient(circle at 30% 30%, ${color}, ${color}40)`;
-                ball.style.boxShadow = `0 0 20px ${color}80`;
-                
-                container.appendChild(ball);
+        // All DOROSfamd Projects Data
+        const projects = [
+            // Новые проекты
+            {
+                id: 'doroobeat',
+                title: 'DOROSbeat',
+                description: 'Создание музыки и битов с профессиональным интерфейсом',
+                icon: 'fas fa-music',
+                category: ['new', 'creative'],
+                url: 'https://dorosfamd.com/beat',
+                badge: 'НОВОЕ'
+            },
+            {
+                id: 'dorosfile',
+                title: 'DOROSfile',
+                description: 'Конвертер файлов с поддержкой 50+ форматов',
+                icon: 'fas fa-file-export',
+                category: ['new', 'tools'],
+                url: 'https://dorosfamd.com/file',
+                badge: 'НОВОЕ'
+            },
+            {
+                id: 'doroscub',
+                title: 'DOROScub',
+                description: 'Динамичная игра с прыгающим кубиком',
+                icon: 'fas fa-cube',
+                category: ['new', 'games'],
+                url: 'https://dorosfamd.com/cub',
+                badge: 'НОВОЕ'
+            },
+            {
+                id: 'dorosris',
+                title: 'DOROSris',
+                description: 'Продвинутый графический редактор для художников',
+                icon: 'fas fa-paint-brush',
+                category: ['new', 'creative'],
+                url: 'https://dorosfamd.com/ris',
+                badge: 'НОВОЕ'
+            },
+            {
+                id: 'dorosaper',
+                title: 'DOROSaper',
+                description: 'Классический сапёр с современными улучшениями',
+                icon: 'fas fa-bomb',
+                category: ['new', 'games'],
+                url: 'https://dorosfamd.com/saper',
+                badge: 'НОВОЕ'
+            },
+            {
+                id: 'dorostransport',
+                title: 'DOROStransport',
+                description: 'Игра с различными видами транспорта',
+                icon: 'fas fa-car',
+                category: ['new', 'games'],
+                url: 'https://dorosfamd.com/transport',
+                badge: 'НОВОЕ'
+            },
+
+            // Игры
+            {
+                id: 'pacfamd',
+                title: 'PACfamd',
+                description: 'Классическая аркадная игра в современном стиле',
+                icon: 'fas fa-ghost',
+                category: ['games'],
+                url: 'https://dorosfamd.com/pacfamd'
+            },
+            {
+                id: 'pacfamd2',
+                title: 'PACfamd 2 игрока',
+                description: 'Кооперативная версия для игры вдвоём',
+                icon: 'fas fa-users',
+                category: ['games'],
+                url: 'https://dorosfamd.com/pac7'
+            },
+            {
+                id: 'krestikinoliti',
+                title: 'Крестики-Нолики',
+                description: 'Интеллектуальная игра с ИИ',
+                icon: 'fas fa-times',
+                category: ['games'],
+                url: 'https://dorosfamd.com/krestikinolikifamd'
+            },
+            {
+                id: 'chetnechet',
+                title: 'Чёт/Нечёт',
+                description: 'Азартная игра на логику и интуицию',
+                icon: 'fas fa-dice',
+                category: ['games'],
+                url: 'https://dorosfamd.com/index2'
+            },
+            {
+                id: 'pixball',
+                title: 'PixBall Football',
+                description: '2D футбольный симулятор с физикой',
+                icon: 'fas fa-futbol',
+                category: ['games'],
+                url: 'https://dorosfamd.com/PIXBALL'
+            },
+            {
+                id: 'sheenyystar',
+                title: 'Sheenyystar Game',
+                description: 'Эксклюзивный шутер с уникальным оружием',
+                icon: 'fas fa-gun',
+                category: ['games'],
+                url: 'https://dorosfamd.com/ShGun'
+            },
+            {
+                id: 'shutter',
+                title: 'Шуттер',
+                description: 'Интенсивный шутер с мультиплеером',
+                icon: 'fas fa-crosshairs',
+                category: ['games'],
+                url: 'https://dorosfamd.com/strike'
+            },
+            {
+                id: 'minecraft',
+                title: 'Minecraft',
+                description: 'Браузерная версия популярной песочницы',
+                icon: 'fas fa-cubes',
+                category: ['games'],
+                url: 'https://dorosfamd.com/craft'
+            },
+
+            // Инструменты
+            {
+                id: 'dictionary',
+                title: 'Словарь',
+                description: 'Обширная база терминов и определений',
+                icon: 'fas fa-book',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/словарь'
+            },
+            {
+                id: 'translator',
+                title: 'Переводчик',
+                description: 'Многоязычный переводчик 100+ языков',
+                icon: 'fas fa-language',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/FAMDai'
+            },
+            {
+                id: 'weather',
+                title: 'Погода',
+                description: 'Точный прогноз для любого города',
+                icon: 'fas fa-cloud-sun',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/FAMDweather'
+            },
+            {
+                id: 'currency',
+                title: 'Конвертер валют',
+                description: 'Актуальные курсы валют и криптовалют',
+                icon: 'fas fa-exchange-alt',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/FAMDvaluta'
+            },
+            {
+                id: 'browser',
+                title: 'Браузер',
+                description: 'Безопасный браузер с защитой приватности',
+                icon: 'fas fa-globe',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/b'
+            },
+            {
+                id: 'map',
+                title: 'Карта',
+                description: 'Интерактивная карта с навигацией',
+                icon: 'fas fa-map-marked-alt',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/index3'
+            },
+            {
+                id: 'calculator',
+                title: 'Калькулятор',
+                description: 'Продвинутый калькулятор с научными функциями',
+                icon: 'fas fa-calculator',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/cal'
+            },
+            {
+                id: 'cloud',
+                title: 'Облако',
+                description: 'Надёжное облачное хранилище файлов',
+                icon: 'fas fa-cloud',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/data'
+            },
+            {
+                id: 'dayorganizer',
+                title: 'Организация дня',
+                description: 'Планировщик задач и расписания',
+                icon: 'fas fa-calendar-alt',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/day'
+            },
+            {
+                id: 'shortlinks',
+                title: 'Короткие ссылки',
+                description: 'Создание и управление короткими ссылками',
+                icon: 'fas fa-link',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/link'
+            },
+            {
+                id: 'qrgenerator',
+                title: 'QR-генератор',
+                description: 'Создание QR-кодов для любой информации',
+                icon: 'fas fa-qrcode',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/QR'
+            },
+            {
+                id: 'worldtime',
+                title: 'Мировое время',
+                description: 'Точное время в разных часовых поясах',
+                icon: 'fas fa-clock',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/time'
+            },
+            {
+                id: 'codeeditor',
+                title: 'Редактор кода',
+                description: 'Профессиональный редактор для программирования',
+                icon: 'fas fa-code',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/code'
+            },
+            {
+                id: 'planner',
+                title: 'Планировщик',
+                description: 'Система управления проектами и задачами',
+                icon: 'fas fa-tasks',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/plan'
+            },
+            {
+                id: 'services',
+                title: 'Услуги сервисов',
+                description: 'Каталог профессиональных услуг',
+                icon: 'fas fa-concierge-bell',
+                category: ['tools'],
+                url: 'https://dorosfamd.com/service'
+            },
+
+            // Творчество
+            {
+                id: 'graphiceditor',
+                title: 'Графический редактор',
+                description: 'Инструмент для создания цифровых изображений',
+                icon: 'fas fa-paint-brush',
+                category: ['creative'],
+                url: 'https://dorosfamd.com/paint'
+            },
+            {
+                id: 'photoeditor',
+                title: 'Редактор фото',
+                description: 'Мощный редактор для обработки фотографий',
+                icon: 'fas fa-camera-retro',
+                category: ['creative'],
+                url: 'https://dorosfamd.com/photo'
+            },
+            {
+                id: 'fontgenerator',
+                title: 'Генератор шрифтов',
+                description: 'Создание уникальных шрифтов и стилей',
+                icon: 'fas fa-font',
+                category: ['creative'],
+                url: 'https://dorosfamd.com/textgen'
+            },
+            {
+                id: 'rhymegenerator',
+                title: 'Генератор рифм',
+                description: 'Инструмент для создания рифмованных текстов',
+                icon: 'fas fa-pencil-alt',
+                category: ['creative'],
+                url: 'https://dorosfamd.com/rifm'
+            },
+            {
+                id: 'gallery',
+                title: 'Галерея',
+                description: 'Управление и организация медиафайлов',
+                icon: 'fas fa-images',
+                category: ['creative'],
+                url: 'https://dorosfamd.com/index8'
+            },
+            {
+                id: 'dreamfamd',
+                title: 'DREAMfamd',
+                description: 'Платформа для творческих проектов',
+                icon: 'fas fa-heart',
+                category: ['creative'],
+                url: 'https://dorosfamd.com/DREAMfamd'
+            },
+
+            // Общение
+            {
+                id: 'globalchat',
+                title: 'Глобальный чат',
+                description: 'Общение с пользователями по всему миру',
+                icon: 'fas fa-comments',
+                category: ['communication'],
+                url: 'https://dorosfamd.com/DOROSchat'
+            },
+            {
+                id: 'privatechat',
+                title: 'Приватный чат',
+                description: 'Защищённое общение с шифрованием',
+                icon: 'fas fa-lock',
+                category: ['communication'],
+                url: 'https://dorosfamd.com/DOROSchatv4'
+            },
+            {
+                id: 'calls',
+                title: 'Звонки',
+                description: 'Аудио и видео звонки через интернет',
+                icon: 'fas fa-phone-alt',
+                category: ['communication'],
+                url: 'https://dorosfamd.com/phone'
+            },
+            {
+                id: 'wiki',
+                title: 'Вики',
+                description: 'Пользовательская энциклопедия',
+                icon: 'fas fa-wikipedia-w',
+                category: ['communication'],
+                url: 'https://dorosfamd.com/wiki'
+            },
+
+            // Образование
+            {
+                id: 'personalitytest',
+                title: 'Тест личности',
+                description: 'Профессиональное тестирование психологического типа',
+                icon: 'fas fa-user-astronaut',
+                category: ['education'],
+                url: 'https://dorosfamd.com/dinofamd'
+            },
+            {
+                id: 'quiz',
+                title: 'Викторина',
+                description: 'Интерактивные тесты по различным темам',
+                icon: 'fas fa-question-circle',
+                category: ['education'],
+                url: 'https://dorosfamd.com/FAMDquiz'
+            },
+            {
+                id: 'encyclopedia',
+                title: 'Энциклопедия',
+                description: 'Достоверный источник знаний',
+                icon: 'fas fa-info-circle',
+                category: ['education'],
+                url: 'https://dorosfamd.com/incoklopedia'
+            },
+            {
+                id: 'voicedictionary',
+                title: 'Голосовой словарь',
+                description: 'Словарь с аудиоподдержкой произношения',
+                icon: 'fas fa-microphone',
+                category: ['education'],
+                url: 'https://dorosfamd.com/Dr.Zulfon'
+            },
+            {
+                id: 'frontendlearning',
+                title: 'Frontend обучение',
+                description: 'Интерактивные курсы по веб-разработке',
+                icon: 'fas fa-laptop-code',
+                category: ['education'],
+                url: 'https://dorosfamd.com/lfront'
+            },
+            {
+                id: 'habittracker',
+                title: 'Трекер привычек',
+                description: 'Отслеживание и формирование полезных привычек',
+                icon: 'fas fa-chart-bar',
+                category: ['education'],
+                url: 'https://dorosfamd.com/priv'
+            },
+
+            // Бизнес
+            {
+                id: 'doroshop',
+                title: 'DOROShop',
+                description: 'Платформа для онлайн-торговли',
+                icon: 'fas fa-shopping-cart',
+                category: ['business'],
+                url: 'https://dorosfamd.com/DOROShop'
+            },
+            {
+                id: 'news',
+                title: 'Новости',
+                description: 'Актуальные новости из проверенных источников',
+                icon: 'fas fa-newspaper',
+                category: ['business'],
+                url: 'https://dorosfamd.com/index5'
+            },
+            {
+                id: 'taxi',
+                title: 'Такси',
+                description: 'Заказ такси в любой точке страны',
+                icon: 'fas fa-taxi',
+                category: ['business'],
+                url: 'https://dorosfamd.com/taxi'
+            },
+            {
+                id: 'taxiexpress',
+                title: 'Такси Express',
+                description: 'Экспресс-заказ такси',
+                icon: 'fas fa-car',
+                category: ['business'],
+                url: 'https://dorosfamd.com/khtaxi'
+            },
+            {
+                id: 'bank',
+                title: 'Khujand City Bank',
+                description: 'Инновационный банк с онлайн-услугами',
+                icon: 'fas fa-bank',
+                category: ['business'],
+                url: 'https://dorosfamd.com/KhujandCityBank'
+            },
+            {
+                id: 'finance',
+                title: 'Финансы',
+                description: 'Управление личными финансами и инвестициями',
+                icon: 'fas fa-chart-line',
+                category: ['business'],
+                url: 'https://dorosfamd.com/fin'
+            },
+            {
+                id: 'businessideas',
+                title: 'Идеи для бизнеса',
+                description: 'Генератор бизнес-идей и планирование стартапов',
+                icon: 'fas fa-lightbulb',
+                category: ['business'],
+                url: 'https://dorosfamd.com/ideya'
+            },
+            {
+                id: 'accounting',
+                title: 'Бухгалтерия',
+                description: 'Система управления финансами для бизнеса',
+                icon: 'fas fa-calculator',
+                category: ['business'],
+                url: 'https://dorosfamd.com/bschool'
+            },
+            {
+                id: 'hotels',
+                title: 'Квартиры и отели',
+                description: 'Поиск и бронирование жилья',
+                icon: 'fas fa-hotel',
+                category: ['business'],
+                url: 'https://dorosfamd.com/room'
+            },
+            {
+                id: 'payments',
+                title: 'Платежи',
+                description: 'Безопасные онлайн-платежи',
+                icon: 'fas fa-credit-card',
+                category: ['business'],
+                url: 'https://dorosfamd.com/school'
+            },
+
+            // Развлечения
+            {
+                id: 'music',
+                title: 'Музыка',
+                description: 'Стриминговая платформа с обширной библиотекой',
+                icon: 'fas fa-music',
+                category: ['entertainment'],
+                url: 'https://dorosfamd.com/DOROSmus4'
+            },
+            {
+                id: 'musicpro',
+                title: 'Музыка Pro',
+                description: 'Продвинутый музыкальный плеер',
+                icon: 'fas fa-headphones-alt',
+                category: ['entertainment'],
+                url: 'https://dorosfamd.com/music'
+            },
+            {
+                id: 'videoplatform',
+                title: 'Видеоплатформа',
+                description: 'Платформа для просмотра и загрузки видео',
+                icon: 'fas fa-video',
+                category: ['entertainment'],
+                url: 'https://dorosfamd.com/DOROSvid'
+            },
+            {
+                id: 'moviesbooks',
+                title: 'Фильмы и книги',
+                description: 'Каталог фильмов, сериалов и литературы',
+                icon: 'fas fa-film',
+                category: ['entertainment'],
+                url: 'https://dorosfamd.com/FAMDcm'
+            },
+
+            // Другие
+            {
+                id: 'muslimsearch',
+                title: 'Мусульманский поиск',
+                description: 'Поисковая система с исламским контентом',
+                icon: 'fas fa-mosque',
+                category: ['other'],
+                url: 'https://dorosfamd.com/musl'
             }
-            
-            // Снежинки
-            for (let i = 0; i < 100; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.className = 'snowflake';
-                
-                const size = Math.random() * 8 + 2;
-                const posX = Math.random() * 100;
-                const delay = Math.random() * 20;
-                const duration = Math.random() * 15 + 10;
-                const opacity = Math.random() * 0.7 + 0.3;
-                
-                snowflake.style.width = `${size}px`;
-                snowflake.style.height = `${size}px`;
-                snowflake.style.left = `${posX}%`;
-                snowflake.style.animationDelay = `${delay}s`;
-                snowflake.style.animationDuration = `${duration}s`;
-                snowflake.style.opacity = opacity;
-                
-                container.appendChild(snowflake);
-            }
-            
-            // Блестки
-            for (let i = 0; i < 30; i++) {
-                const glitter = document.createElement('div');
-                glitter.className = 'glitter';
-                
-                const posX = Math.random() * 100;
-                const delay = Math.random() * 15;
-                const duration = Math.random() * 5 + 2;
-                
-                glitter.style.left = `${posX}%`;
-                glitter.style.animationDelay = `${delay}s`;
-                glitter.style.animationDuration = `${duration}s`;
-                glitter.style.boxShadow = '0 0 10px #ffcc00';
-                
-                container.appendChild(glitter);
-            }
+        ];
+
+        // DOM Elements
+        const projectsGrid = document.getElementById('projectsGrid');
+        const categoryChips = document.getElementById('categoryChips');
+        const searchBtn = document.getElementById('searchBtn');
+        const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+        const searchModal = document.getElementById('searchModal');
+        const searchModalClose = document.getElementById('searchModalClose');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const termsBtn = document.getElementById('termsBtn');
+        const termsModal = document.getElementById('termsModal');
+        const termsModalClose = document.getElementById('termsModalClose');
+        const acceptTermsBtn = document.getElementById('acceptTermsBtn');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // Current category filter
+        let currentCategory = 'all';
+        let searchTerm = '';
+
+        // Initialize the app
+        function init() {
+            renderProjects();
+            setupEventListeners();
+            setupSmoothScrolling();
         }
 
-        // Таймер обратного отсчета до Нового Года
-        function updateCountdown() {
-            const now = new Date();
-            const newYear = new Date(now.getFullYear() + 1, 0, 1, 0, 0, 0);
-            const diff = newYear - now;
+        // Render projects based on current filter
+        function renderProjects() {
+            projectsGrid.innerHTML = '';
             
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            const filteredProjects = projects.filter(project => {
+                const matchesCategory = currentCategory === 'all' || 
+                    project.category.includes(currentCategory);
+                
+                const matchesSearch = !searchTerm || 
+                    project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    project.description.toLowerCase().includes(searchTerm.toLowerCase());
+                
+                return matchesCategory && matchesSearch;
+            });
             
-            document.getElementById('days').textContent = days.toString().padStart(2, '0');
-            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            if (filteredProjects.length === 0) {
+                projectsGrid.innerHTML = `
+                    <div class="text-center" style="grid-column: 1 / -1;">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="h4 mb-2">Ничего не найдено</h3>
+                        <p class="text-secondary">Попробуйте изменить категорию или поисковый запрос</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredProjects.forEach(project => {
+                const projectElement = document.createElement('div');
+                projectElement.className = 'project-card animate-fade-in';
+                projectElement.innerHTML = `
+                    ${project.badge ? `<span class="project-badge">${project.badge}</span>` : ''}
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <i class="${project.icon}"></i>
+                        </div>
+                        <div>
+                            <h3 class="project-title">${project.title}</h3>
+                            <p class="caption">${getCategoryNames(project.category)}</p>
+                        </div>
+                    </div>
+                    <p class="project-description">${project.description}</p>
+                    <div class="project-footer">
+                        <a href="${project.url}" target="_blank" class="project-link" data-project="${project.id}">
+                            <span>Перейти</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                `;
+                
+                // Add click event to the entire card
+                projectElement.addEventListener('click', (e) => {
+                    if (!e.target.closest('.project-link')) {
+                        window.open(project.url, '_blank');
+                    }
+                });
+                
+                projectsGrid.appendChild(projectElement);
+            });
         }
 
-        // Навигация
-        const navToggle = document.getElementById('navToggle');
-        const nav = document.getElementById('nav');
-        
-        navToggle.addEventListener('click', () => {
-            nav.classList.toggle('active');
-            navToggle.innerHTML = nav.classList.contains('active') 
-                ? '<i class="fas fa-times"></i>' 
-                : '<i class="fas fa-bars"></i>';
+        // Get readable category names
+        function getCategoryNames(categories) {
+            const names = {
+                'new': 'Новое',
+                'games': 'Игры',
+                'tools': 'Инструменты',
+                'creative': 'Творчество',
+                'communication': 'Общение',
+                'education': 'Образование',
+                'business': 'Бизнес',
+                'entertainment': 'Развлечения',
+                'other': 'Другое'
+            };
             
-            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : '';
-        });
+            return categories.map(cat => names[cat] || cat).join(' • ');
+        }
 
-        // Закрытие навигации при клике на ссылку
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                if (link.getAttribute('href').startsWith('#')) {
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Category filter chips
+            categoryChips.addEventListener('click', (e) => {
+                const chip = e.target.closest('.category-chip');
+                if (!chip) return;
+                
+                const category = chip.dataset.category;
+                currentCategory = category;
+                
+                // Update active chip
+                document.querySelectorAll('.category-chip').forEach(c => {
+                    c.classList.remove('active');
+                });
+                chip.classList.add('active');
+                
+                renderProjects();
+            });
+            
+            // Search modal
+            searchBtn.addEventListener('click', () => {
+                searchModal.classList.add('active');
+                searchInput.focus();
+            });
+            
+            mobileSearchBtn.addEventListener('click', () => {
+                searchModal.classList.add('active');
+                searchInput.focus();
+            });
+            
+            searchModalClose.addEventListener('click', () => {
+                searchModal.classList.remove('active');
+                searchInput.value = '';
+                searchTerm = '';
+                renderProjects();
+            });
+            
+            // Search input
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value.trim();
+                performSearch();
+            });
+            
+            // Terms modal
+            termsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                termsModal.classList.add('active');
+            });
+            
+            termsModalClose.addEventListener('click', () => {
+                termsModal.classList.remove('active');
+            });
+            
+            acceptTermsBtn.addEventListener('click', () => {
+                termsModal.classList.remove('active');
+            });
+            
+            // Close modals on backdrop click
+            [searchModal, termsModal].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                        if (modal === searchModal) {
+                            searchInput.value = '';
+                            searchTerm = '';
+                            renderProjects();
+                        }
+                    }
+                });
+            });
+            
+            // Project link tracking
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.project-link')) {
                     e.preventDefault();
-                    const targetId = link.getAttribute('href').substring(1);
-                    const targetElement = document.getElementById(targetId);
+                    const link = e.target.closest('.project-link');
+                    const projectId = link.dataset.project;
+                    const project = projects.find(p => p.id === projectId);
                     
+                    if (project) {
+                        // Add click animation
+                        link.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            link.style.transform = '';
+                            window.open(project.url, '_blank');
+                        }, 150);
+                    }
+                }
+            });
+            
+            // Navigation active state
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (item.href.includes('#')) {
+                        e.preventDefault();
+                        const targetId = item.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                    
+                    // Update active state
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+        }
+
+        // Perform search
+        function performSearch() {
+            const results = projects.filter(project => {
+                return project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       project.description.toLowerCase().includes(searchTerm.toLowerCase());
+            });
+            
+            displaySearchResults(results);
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            searchResults.innerHTML = '';
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="text-center" style="padding: 32px 16px;">
+                        <i class="fas fa-search mb-3" style="font-size: 48px; color: var(--text-muted);"></i>
+                        <p class="text-secondary">Ничего не найдено</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            results.forEach(project => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="${project.icon}"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">${project.title}</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">${getCategoryNames(project.category)}</div>
+                        </div>
+                    </div>
+                `;
+                
+                resultItem.addEventListener('click', () => {
+                    searchModal.classList.remove('active');
+                    window.open(project.url, '_blank');
+                });
+                
+                searchResults.appendChild(resultItem);
+            });
+        }
+
+        // Setup smooth scrolling
+        function setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
                     if (targetElement) {
                         window.scrollTo({
-                            top: targetElement.offsetTop - 100,
+                            top: targetElement.offsetTop - 80,
                             behavior: 'smooth'
                         });
                     }
-                }
-                
-                nav.classList.remove('active');
-                navToggle.innerHTML = '<i class="fas fa-bars"></i>';
-                document.body.style.overflow = '';
-            });
-        });
-
-        // Эффект при скролле для шапки
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 100) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-
-        // Фильтрация по категориям
-        const categoryTabs = document.querySelectorAll('.category-tab');
-        const serviceCards = document.querySelectorAll('.service-card');
-        
-        categoryTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Обновление активной вкладки
-                categoryTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Фильтрация карточек
-                const category = tab.getAttribute('data-category');
-                
-                serviceCards.forEach((card, index) => {
-                    const cardCategories = card.getAttribute('data-category').split(' ');
-                    
-                    if (category === 'all' || cardCategories.includes(category)) {
-                        setTimeout(() => {
-                            card.style.display = 'flex';
-                            setTimeout(() => {
-                                card.style.opacity = '1';
-                                card.style.transform = 'translateY(0) scale(1)';
-                            }, 10);
-                        }, index * 20);
-                    } else {
-                        card.style.opacity = '0';
-                        card.style.transform = 'translateY(20px) scale(0.95)';
-                        setTimeout(() => {
-                            card.style.display = 'none';
-                        }, 300);
-                    }
                 });
             });
-        });
+        }
 
-        // Поиск
-        const searchInput = document.getElementById('searchInput');
-        
-        searchInput.addEventListener('input', () => {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            
-            serviceCards.forEach((card, index) => {
-                const title = card.querySelector('.service-title').textContent.toLowerCase();
-                const desc = card.querySelector('.service-desc').textContent.toLowerCase();
-                
-                if (searchTerm === '' || title.includes(searchTerm) || desc.includes(searchTerm)) {
-                    setTimeout(() => {
-                        card.style.display = 'flex';
-                        setTimeout(() => {
-                            card.style.opacity = '1';
-                            card.style.transform = 'translateY(0) scale(1)';
-                        }, 10);
-                    }, index * 20);
-                } else {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(20px) scale(0.95)';
-                    setTimeout(() => {
-                        card.style.display = 'none';
-                    }, 300);
-                }
-            });
-        });
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
 
-        // Новогодние эффекты при наведении
-        serviceCards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                // Добавление блесток
-                for (let i = 0; i < 5; i++) {
-                    setTimeout(() => {
-                        const sparkle = document.createElement('div');
-                        sparkle.style.cssText = `
-                            position: absolute;
-                            width: 6px;
-                            height: 6px;
-                            background: var(--accent-gold);
-                            border-radius: 50%;
-                            pointer-events: none;
-                            z-index: 10;
-                            left: ${Math.random() * 100}%;
-                            top: ${Math.random() * 100}%;
-                            animation: fadeOut 0.5s ease-out forwards;
-                            box-shadow: 0 0 10px var(--accent-gold);
-                        `;
-                        
-                        card.appendChild(sparkle);
-                        
-                        setTimeout(() => {
-                            if (sparkle.parentNode) {
-                                sparkle.remove();
-                            }
-                        }, 500);
-                    }, i * 100);
-                }
-                
-                // Эффект свечения
-                card.style.boxShadow = '0 0 40px rgba(255, 51, 102, 0.6)';
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.boxShadow = '';
-            });
-        });
-
-        // Новогодняя анимация при загрузке
-        document.addEventListener('DOMContentLoaded', () => {
-            createDecorations();
-            
-            // Запуск таймера
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-            
-            // Анимация карточек при загрузке
-            setTimeout(() => {
-                serviceCards.forEach((card, index) => {
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                    }, index * 50);
-                });
-            }, 500);
-            
-            // Новогодние звуковые эффекты (опционально)
-            const logo = document.querySelector('.logo');
-            logo.addEventListener('click', () => {
-                // Эффект снегопада
-                for (let i = 0; i < 15; i++) {
-                    setTimeout(() => {
-                        const snow = document.createElement('div');
-                        snow.style.cssText = `
-                            position: fixed;
-                            width: 12px;
-                            height: 12px;
-                            background: white;
-                            border-radius: 50%;
-                            pointer-events: none;
-                            z-index: 10000;
-                            top: 100px;
-                            left: ${Math.random() * 100}%;
-                            animation: fall 1s linear forwards;
-                            filter: blur(1px);
-                            box-shadow: 0 0 10px white;
-                        `;
-                        
-                        document.body.appendChild(snow);
-                        setTimeout(() => snow.remove(), 1000);
-                    }, i * 50);
-                }
-                
-                // Праздничное сообщение
-                const message = document.createElement('div');
-                message.innerHTML = `
-                    <i class="fas fa-tree"></i>
-                    С Новым  Годом!
-                    <i class="fas fa-gift"></i>
-                `;
-                message.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: var(--gradient-primary);
-                    color: white;
-                    padding: 30px 50px;
-                    border-radius: var(--radius-xl);
-                    font-size: 32px;
-                    font-weight: 900;
-                    z-index: 10000;
-                    box-shadow: 0 0 60px rgba(255, 51, 102, 0.8);
-                    animation: bounce 1s;
-                    display: flex;
-                    align-items: center;
-                    gap: 20px;
-                    backdrop-filter: blur(20px);
-                    border: 3px solid var(--accent-gold);
-                `;
-                
-                document.body.appendChild(message);
-                
-                setTimeout(() => {
-                    message.style.opacity = '0';
-                    message.style.transform = 'translate(-50%, -50%) scale(0.9)';
-                    setTimeout(() => message.remove(), 1000);
-                }, 2000);
-            });
-            
-            // Автоматическое прокручивание новогоднего сообщения
-            setTimeout(() => {
-                const autoMessage = document.createElement('div');
-                autoMessage.innerHTML = `
-                    <i class="fas fa-star"></i>
-                    DOROSfamd поздравляет с наступающим Новым Годом!
-                    <i class="fas fa-star"></i>
-                `;
-                autoMessage.style.cssText = `
-                    position: fixed;
-                    bottom: 20px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: var(--gradient-gold);
-                    color: var(--bg-primary);
-                    padding: 15px 30px;
-                    border-radius: var(--radius-lg);
-                    font-weight: 700;
-                    z-index: 999;
-                    box-shadow: var(--shadow-heavy);
-                    display: flex;
-                    align-items: center;
-                    gap: 15px;
-                    opacity: 0;
-                    animation: slideUp 0.5s forwards 1s;
-                `;
-                
-                document.body.appendChild(autoMessage);
-                
-                setTimeout(() => {
-                    autoMessage.style.opacity = '0';
-                    setTimeout(() => autoMessage.remove(), 500);
-                }, 5000);
-            }, 3000);
-        });
-
-        // Стили для анимаций
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fall {
-                to {
-                    transform: translateY(100vh);
-                    opacity: 0;
-                }
-            }
-            
-            @keyframes fadeOut {
-                to {
-                    opacity: 0;
-                    transform: scale(0);
-                }
-            }
-            
-            @keyframes slideUp {
-                from {
-                    transform: translateX(-50%) translateY(20px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(-50%) translateY(0);
-                    opacity: 1;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+        // Handle touch feedback for mobile
+        document.addEventListener('touchstart', () => {}, { passive: true });
     </script>
 </body>
 </html>
