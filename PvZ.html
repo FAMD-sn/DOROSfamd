@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PvZ: High Fidelity Remaster</title>
+    <style>
+        body {
+            margin: 0;
+            background: #121212;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            user-select: none;
+        }
+        canvas {
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            border-radius: 8px;
+            cursor: default;
+            background-color: #000;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        .card {
+            width: 75px;
+            height: 100px;
+            background: linear-gradient(to bottom, #8d6e63, #5d4037);
+            border: 2px solid #3e2723;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px;
+            cursor: pointer;
+            transition: transform 0.1s, filter 0.2s;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .card:hover { transform: scale(1.05); }
+        .card.selected { border-color: #ffd700; box-shadow: 0 0 15px #ffd700; background: #6d4c41; }
+        .card.disabled { filter: grayscale(1) brightness(0.7); cursor: not-allowed; }
+        
+        /* SVG Data URIs for Icons */
+        .card-img { width: 50px; height: 50px; background-repeat: no-repeat; background-position: center; background-size: contain; margin-top: 5px; }
+        
+        #img-peashooter {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M80 30 Q60 30 50 50 Q40 70 50 90' stroke='%234CAF50' stroke-width='8' fill='none'/%3E%3Ccircle cx='35' cy='35' r='25' fill='%2376FF03' stroke='%2333691E' stroke-width='3'/%3E%3Cellipse cx='75' cy='30' rx='15' ry='12' fill='%2376FF03' stroke='%2333691E' stroke-width='3'/%3E%3Ccircle cx='80' cy='25' r='8' fill='black' opacity='0.5'/%3E%3Cpath d='M30 60 Q10 70 20 90 M70 60 Q90 70 80 90' stroke='%2333691E' stroke-width='3' fill='%234CAF50'/%3E%3C/svg%3E");
+        }
+        #img-sunflower {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 90 L50 60' stroke='%234CAF50' stroke-width='6'/%3E%3Cpath d='M30 70 Q10 60 30 50 M70 70 Q90 60 70 50' fill='%234CAF50' stroke='%232E7D32' stroke-width='2'/%3E%3Cg fill='%23FFD700' stroke='%23F57F17' stroke-width='2'%3E%3Ccircle cx='50' cy='20' r='10'/%3E%3Ccircle cx='70' cy='25' r='10'/%3E%3Ccircle cx='80' cy='45' r='10'/%3E%3Ccircle cx='70' cy='65' r='10'/%3E%3Ccircle cx='50' cy='70' r='10'/%3E%3Ccircle cx='30' cy='65' r='10'/%3E%3Ccircle cx='20' cy='45' r='10'/%3E%3Ccircle cx='30' cy='25' r='10'/%3E%3C/g%3E%3Ccircle cx='50' cy='45' r='18' fill='%23795548' stroke='%233E2723' stroke-width='2'/%3E%3C/svg%3E");
+        }
+        #img-wallnut {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cellipse cx='50' cy='50' rx='30' ry='40' fill='%23D7CCC8' stroke='%235D4037' stroke-width='4'/%3E%3Cpath d='M35 35 Q40 40 45 35 M55 35 Q60 40 65 35' stroke='%233E2723' stroke-width='3' fill='none'/%3E%3Ccircle cx='40' cy='38' r='3' fill='black'/%3E%3Ccircle cx='60' cy='38' r='3' fill='black'/%3E%3Cpath d='M45 55 Q50 60 55 55' stroke='%233E2723' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+        }
+        #img-cherry {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30 60 Q50 10 70 60' stroke='%2333691E' stroke-width='4' fill='none'/%3E%3Ccircle cx='30' cy='65' r='20' fill='%23D50000' stroke='black' stroke-width='2'/%3E%3Ccircle cx='70' cy='65' r='20' fill='%23D50000' stroke='black' stroke-width='2'/%3E%3Cpath d='M20 55 L25 45 M60 55 L65 45' stroke='white' stroke-width='2' opacity='0.5'/%3E%3C/svg%3E");
+        }
+
+        .cost { font-weight: 900; font-size: 16px; color: #ffff00; text-shadow: 2px 2px 0 #000; font-family: 'Courier New', monospace; }
+        .plant-name { font-size: 11px; color: #ddd; text-shadow: 1px 1px 0 #000; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
+        
+        .cooldown-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            transform-origin: bottom;
+            transition: height 0.1s linear;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        #sun-counter {
+            background: #000;
+            border: 2px solid #5d4037;
+            padding: 5px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            min-width: 80px;
+        }
+        #sun-icon { 
+            width: 30px; height: 30px; 
+            background: radial-gradient(circle, #fff176 0%, #fbc02d 100%);
+            border-radius: 50%; margin-right: 10px; 
+            border: 2px solid #f57f17;
+            box-shadow: 0 0 10px #fbc02d;
+        }
+        #sun-text { font-family: 'Courier New', monospace; font-size: 24px; font-weight: bold; color: #fff; }
+
+        #game-over {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        h1 { font-family: 'Segoe UI', cursive, sans-serif; font-size: 80px; color: #b71c1c; text-shadow: 4px 4px 0 #000, 0 0 20px #b71c1c; margin: 0; letter-spacing: 5px; }
+        button {
+            margin-top: 40px; padding: 15px 40px; font-size: 24px; font-family: 'Courier New', monospace; font-weight: bold;
+            background: #33691e; color: #aeea00; border: 2px solid #aeea00; border-radius: 8px;
+            cursor: pointer; box-shadow: 0 0 20px rgba(174, 234, 0, 0.3);
+            text-transform: uppercase;
+        }
+        button:hover { background: #558b2f; transform: scale(1.1); }
+    </style>
+</head>
+<body>
+
+<div id="ui-layer">
+    <div id="sun-counter"><div id="sun-icon"></div><span id="sun-text">50</span></div>
+    
+    <div class="card" id="card-peashooter" onclick="selectPlant('peashooter')">
+        <div class="plant-name">Peashooter</div>
+        <div class="card-img" id="img-peashooter"></div>
+        <div class="cost">100</div>
+        <div class="cooldown-overlay" id="cd-peashooter"></div>
+    </div>
+    
+    <div class="card" id="card-sunflower" onclick="selectPlant('sunflower')">
+        <div class="plant-name">Sunflower</div>
+        <div class="card-img" id="img-sunflower"></div>
+        <div class="cost">50</div>
+        <div class="cooldown-overlay" id="cd-sunflower"></div>
+    </div>
+    
+    <div class="card" id="card-wallnut" onclick="selectPlant('wallnut')">
+        <div class="plant-name">Wall-nut</div>
+        <div class="card-img" id="img-wallnut"></div>
+        <div class="cost">50</div>
+        <div class="cooldown-overlay" id="cd-wallnut"></div>
+    </div>
+    
+    <div class="card" id="card-cherry" onclick="selectPlant('cherry')">
+        <div class="plant-name">Cherry</div>
+        <div class="card-img" id="img-cherry"></div>
+        <div class="cost">150</div>
+        <div class="cooldown-overlay" id="cd-cherry"></div>
+    </div>
+</div>
+
+<div id="game-over">
+    <h1>THE ZOMBIES ATE YOUR BRAINS!</h1>
+    <button onclick="resetGame()">Try Again</button>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+/** * PVZ HIGH FIDELITY REMASTER
+ * --------------------------
+ * Features: High Detail House, Wave System, Physics Sun, Fixed Cherry Bomb
+ */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// --- LAYOUT & CONFIGURATION ---
+const TILE_W = 80;
+const TILE_H = 100;
+const HOUSE_W = 160; 
+const STREET_W = 100; 
+const GRID_COLS = 9;
+const GRID_ROWS = 5;
+const MARGIN_TOP = 80;
+
+canvas.width = HOUSE_W + (GRID_COLS * TILE_W) + STREET_W;
+canvas.height = MARGIN_TOP + (GRID_ROWS * TILE_H) + 20;
+
+let gameActive = true;
+let sun = 200;
+let shakeTime = 0;
+let frameCount = 0;
+
+// --- WAVE SYSTEM VARS ---
+let levelTimer = 0;
+let zombieSpawnTimer = 0;
+let nextZombieTime = 600; // Starts slow (10s)
+let nextHugeWave = 3600; // 60s
+let isHugeWave = false;
+
+// --- SUN SPAWN VARS ---
+let sunSpawnTimer = 0;
+let nextSunSpawn = 300; // Initial
+
+// --- INPUT ---
+const mouse = { x: 0, y: 0 };
+canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+});
+canvas.addEventListener('mousedown', handleInput);
+
+// --- GAME STATE ARRAYS ---
+const grid = [];
+const projectiles = [];
+const zombies = [];
+const particles = [];
+const suns = [];
+const mowers = [];
+let selectedPlantType = null;
+
+const PLANT_TYPES = {
+    peashooter: { cost: 100, hp: 100 },
+    sunflower:  { cost: 50,  hp: 80 },
+    wallnut:    { cost: 50,  hp: 400 },
+    cherry:     { cost: 150, hp: 999 }
+};
+
+// --- CLASSES ---
+
+class Cell {
+    constructor(x, y, row, col) {
+        this.x = x;
+        this.y = y;
+        this.row = row;
+        this.col = col;
+        this.plant = null;
+    }
+    draw() {
+        if (mouse.x > this.x && mouse.x < this.x + TILE_W &&
+            mouse.y > this.y && mouse.y < this.y + TILE_H && selectedPlantType) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillRect(this.x, this.y, TILE_W, TILE_H);
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(this.x, this.y, TILE_W, TILE_H);
+        }
+    }
+}
+
+class Lawnmower {
+    constructor(row) {
+        this.row = row;
+        this.w = 60;
+        this.h = 50;
+        this.x = HOUSE_W - 50;
+        this.y = MARGIN_TOP + (row * TILE_H) + (TILE_H - this.h) - 10;
+        this.active = false;
+        this.speed = 0;
+        this.used = false;
+    }
+    update() {
+        if (this.used) return;
+        if (this.active) {
+            this.x += this.speed;
+            this.speed += 1; 
+            zombies.forEach(z => {
+                if (z.row === this.row && z.x < this.x + this.w && z.x > this.x - 50) {
+                    z.hp = 0;
+                    z.hitFlash = 10;
+                    spawnSplatter(z.x, z.y + 40, '#000');
+                }
+            });
+            if (this.x > canvas.width) this.used = true;
+        } else {
+            const threat = zombies.find(z => z.row === this.row && z.x < this.x + this.w - 20);
+            if (threat) {
+                this.active = true;
+                this.speed = 5;
+            }
+        }
+    }
+    draw() {
+        if (this.used) return;
+        const cx = this.x + this.w/2;
+        const cy = this.y + this.h/2;
+        drawShadow(cx, this.y + this.h, 30);
+        ctx.strokeStyle = '#cfd8dc'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(this.x, this.y + 20); ctx.lineTo(this.x - 20, this.y - 10); ctx.stroke();
+        ctx.fillStyle = '#f44336';
+        ctx.beginPath(); ctx.moveTo(this.x, this.y + 50); ctx.lineTo(this.x + 60, this.y + 50); ctx.lineTo(this.x + 50, this.y + 20); ctx.lineTo(this.x + 10, this.y + 20); ctx.fill();
+        ctx.strokeRect(this.x, this.y+20, 60, 30);
+        ctx.fillStyle = '#b0bec5'; ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#212121';
+        ctx.beginPath(); ctx.arc(this.x + 10, this.y + 50, 12, 0, Math.PI*2); ctx.fill(); 
+        ctx.beginPath(); ctx.arc(this.x + 50, this.y + 50, 12, 0, Math.PI*2); ctx.fill();
+    }
+}
+
+class Plant {
+    constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.hp = PLANT_TYPES[type].hp;
+        this.maxHp = this.hp;
+        this.timer = 0;
+        this.sway = Math.random() * 100;
+        this.dead = false; // Flag for removal
+        
+        if (type === 'cherry') this.timer = 50;
+    }
+
+    update() {
+        this.sway++;
+        
+        if (this.type === 'sunflower') {
+            this.timer++;
+            if (this.timer >= 600) {
+                this.timer = 0;
+                suns.push(new Sun(this.x + 10, this.y + 10, false)); // false = not from sky
+                particles.push(new Particle(this.x+40, this.y+40, '#fff', 'glow'));
+            }
+        }
+        else if (this.type === 'peashooter') {
+            this.timer++;
+            const hasTarget = zombies.some(z => 
+                z.y > this.y - 10 && z.y < this.y + TILE_H && z.x > this.x
+            );
+            if (this.timer >= 90 && hasTarget) {
+                this.timer = 0;
+                projectiles.push(new Projectile(this.x + 50, this.y + 20));
+            }
+        }
+        else if (this.type === 'cherry') {
+            this.timer--;
+            if (this.timer <= 0) {
+                this.explode();
+            }
+        }
+    }
+
+    explode() {
+        shakeTime = 20;
+        createExplosion(this.x + TILE_W/2, this.y + TILE_H/2);
+        
+        const cx = this.x + TILE_W/2;
+        const cy = this.y + TILE_H/2;
+        
+        zombies.forEach(z => {
+            const zx = z.x + 40;
+            const zy = z.y + 50;
+            const dist = Math.hypot(cx - zx, cy - zy);
+            if (dist < 150) {
+                z.hp -= 2000;
+                z.hitFlash = 15;
+            }
+        });
+        
+        // Mark for immediate removal
+        this.dead = true;
+    }
+
+    draw() {
+        const cx = this.x + TILE_W/2;
+        const cy = this.y + TILE_H/2 + 10;
+        if (this.type === 'peashooter') drawPeashooter(cx, cy, this.sway);
+        else if (this.type === 'sunflower') drawSunflower(cx, cy, this.sway);
+        else if (this.type === 'wallnut') drawWallnut(cx, cy, this.hp, this.maxHp);
+        else if (this.type === 'cherry') drawCherryBomb(cx, cy, this.sway, this.timer);
+    }
+}
+
+class Zombie {
+    constructor(row) {
+        this.row = row;
+        this.y = MARGIN_TOP + (row * TILE_H);
+        this.x = canvas.width + 20;
+        this.hp = 120;
+        this.maxHp = 120;
+        this.speed = 0.2 + Math.random() * 0.25;
+        this.eating = false;
+        this.delete = false;
+        this.hitFlash = 0;
+        this.walkOffset = Math.random() * 100;
+    }
+    update() {
+        this.walkOffset++;
+        this.eating = false;
+        if (this.hitFlash > 0) this.hitFlash--;
+
+        const hitBoxX = this.x + 30;
+        const hitBoxW = 20;
+        
+        for (let cell of grid) {
+            if (cell.plant && cell.row === this.row) {
+                if (hitBoxX < cell.x + TILE_W - 20 && hitBoxX + hitBoxW > cell.x + 20) {
+                    this.eating = true;
+                    cell.plant.hp -= 0.5;
+                    if (cell.plant.hp <= 0) {
+                        cell.plant = null;
+                        this.eating = false;
+                    }
+                }
+            }
+        }
+
+        if (!this.eating) this.x -= this.speed;
+
+        if (this.x < HOUSE_W - 70) {
+            const mower = mowers.find(m => m.row === this.row);
+            if (!mower || mower.used || mower.x > this.x) {
+                triggerGameOver();
+            }
+        }
+        if (this.hp <= 0) this.delete = true;
+    }
+    draw() { drawZombie(this); }
+}
+
+class Projectile {
+    constructor(x, y) {
+        this.x = x; this.y = y; this.speed = 7; this.delete = false;
+    }
+    update() {
+        this.x += this.speed;
+        if (this.x > canvas.width) this.delete = true;
+    }
+    draw() {
+        ctx.fillStyle = '#76FF03'; ctx.strokeStyle = '#33691E'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(this.x, this.y, 10, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(this.x - 3, this.y - 3, 3, 0, Math.PI*2); ctx.fill();
+    }
+}
+
+class Sun {
+    constructor(x, y, fromSky) {
+        this.x = x;
+        this.y = y;
+        this.fromSky = fromSky;
+        // Logic: if from sky, destY is random spot on lawn. If from flower, destY is slightly lower
+        this.destY = fromSky 
+            ? MARGIN_TOP + Math.random() * (GRID_ROWS * TILE_H - 50) 
+            : y + (Math.random() * 40) + 20;
+            
+        this.timer = 0;
+        this.delete = false;
+        this.rot = 0;
+    }
+    update() {
+        this.rot += 0.02;
+        
+        // Physics Fall
+        if (this.y < this.destY) {
+            this.y += 1.5;
+        }
+
+        // Only count expire timer if it has landed (or is from flower)
+        if (!this.fromSky || Math.abs(this.y - this.destY) < 5) {
+            this.timer++;
+        }
+        
+        if (this.timer > 800) this.delete = true;
+
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        if (Math.hypot(dx, dy) < 40) {
+            sun += 25;
+            this.delete = true;
+            for(let i=0; i<5; i++) particles.push(new Particle(this.x, this.y, '#FFD700', 'sparkle'));
+        }
+    }
+    draw() {
+        ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rot);
+        ctx.shadowBlur = 20; ctx.shadowColor = '#FFD700';
+        const r = 22;
+        ctx.fillStyle = '#fff176'; ctx.strokeStyle = '#f57f17'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fbc02d';
+        for(let i=0; i<8; i++) {
+            ctx.rotate(Math.PI/4); ctx.beginPath(); ctx.moveTo(r, -5); ctx.lineTo(r+12, 0); ctx.lineTo(r, 5); ctx.fill();
+        }
+        ctx.restore();
+    }
+}
+
+class Particle {
+    constructor(x, y, color, type) {
+        this.x = x; this.y = y; this.color = color; this.type = type;
+        this.life = 1.0;
+        this.vx = (Math.random()-0.5)*6;
+        this.vy = (Math.random()-0.5)*6;
+        this.size = Math.random()*5 + 2;
+    }
+    update() {
+        this.x += this.vx; this.y += this.vy; this.life -= 0.03;
+    }
+    draw() {
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.fillStyle = this.color;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+// --- ART FUNCTIONS ---
+
+function drawShadow(x, y, w) {
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath(); ctx.ellipse(x, y, w, w/4, 0, 0, Math.PI*2); ctx.fill();
+}
+
+function drawDetailedHouse() {
+    // 1. Main Body
+    const houseH = GRID_ROWS * TILE_H + 40;
+    const houseY = MARGIN_TOP - 20;
+    
+    // Siding (Horizontal lines effect)
+    ctx.fillStyle = '#795548'; // Base Brown
+    ctx.fillRect(0, houseY, HOUSE_W, houseH);
+    
+    ctx.fillStyle = '#5D4037'; // Darker lines
+    for(let y = houseY; y < houseY + houseH; y += 20) {
+        ctx.fillRect(0, y, HOUSE_W, 2);
+    }
+
+    // 2. The Roof (Shingles)
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(0, houseY);
+    ctx.lineTo(HOUSE_W, houseY);
+    ctx.lineTo(HOUSE_W - 20, houseY - 60);
+    ctx.lineTo(0, houseY - 60);
+    ctx.closePath();
+    ctx.clip(); // Clip drawing to roof shape
+    
+    ctx.fillStyle = '#3E2723'; // Dark roof base
+    ctx.fillRect(0, houseY-60, HOUSE_W, 60);
+    
+    // Draw individual shingles
+    ctx.fillStyle = '#4E342E';
+    for(let ry = houseY - 60; ry < houseY; ry += 10) {
+        const offset = (ry % 20 === 0) ? 0 : 10;
+        for(let rx = -10; rx < HOUSE_W; rx += 20) {
+            ctx.beginPath();
+            ctx.arc(rx + offset, ry + 10, 10, Math.PI, 0);
+            ctx.fill();
+        }
+    }
+    ctx.restore();
+
+    // 3. The Door
+    const doorX = 30;
+    const doorY = MARGIN_TOP + 120;
+    const doorW = 70;
+    const doorH = 140;
+    
+    // Doormat
+    ctx.fillStyle = '#33691E';
+    ctx.beginPath();
+    ctx.ellipse(doorX + doorW/2, doorY + doorH + 5, 45, 15, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2; ctx.stroke();
+    
+    // Frame
+    ctx.fillStyle = '#3E2723';
+    ctx.fillRect(doorX - 5, doorY - 5, doorW + 10, doorH + 5);
+    // Door panel
+    ctx.fillStyle = '#5D4037';
+    ctx.fillRect(doorX, doorY, doorW, doorH);
+    // Panels
+    ctx.fillStyle = '#4E342E';
+    ctx.fillRect(doorX+10, doorY+10, 50, 50);
+    ctx.fillRect(doorX+10, doorY+70, 50, 60);
+    // Knob
+    ctx.fillStyle = '#FFCA28';
+    ctx.beginPath(); ctx.arc(doorX + 60, doorY + 70, 5, 0, Math.PI*2); ctx.fill();
+
+    // 4. The Window
+    const winX = 30;
+    const winY = MARGIN_TOP + 20;
+    const winW = 70;
+    const winH = 60;
+    
+    ctx.fillStyle = '#fff'; // Frame
+    ctx.fillRect(winX-4, winY-4, winW+8, winH+8);
+    
+    // Glass Gradient
+    const grad = ctx.createLinearGradient(winX, winY, winX, winY+winH);
+    grad.addColorStop(0, '#81D4FA');
+    grad.addColorStop(1, '#29B6F6');
+    ctx.fillStyle = grad;
+    ctx.fillRect(winX, winY, winW, winH);
+    
+    // Reflection lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(winX + 10, winY + 50); ctx.lineTo(winX + 40, winY + 10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(winX + 25, winY + 50); ctx.lineTo(winX + 45, winY + 25); ctx.stroke();
+    
+    // Cross Pane
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(winX + winW/2 - 2, winY, 4, winH);
+    ctx.fillRect(winX, winY + winH/2 - 2, winW, 4);
+
+    // 5. Gutter
+    ctx.fillStyle = '#9E9E9E'; // Pipe
+    ctx.fillRect(HOUSE_W - 15, MARGIN_TOP - 60, 10, houseH + 60);
+    ctx.fillStyle = '#616161'; // Shade
+    ctx.fillRect(HOUSE_W - 15, MARGIN_TOP - 60, 3, houseH + 60);
+    // Exit
+    ctx.beginPath();
+    ctx.moveTo(HOUSE_W - 15, houseY + houseH);
+    ctx.quadraticCurveTo(HOUSE_W - 15, houseY + houseH + 15, HOUSE_W + 5, houseY + houseH + 15);
+    ctx.lineTo(HOUSE_W + 5, houseY + houseH + 5);
+    ctx.quadraticCurveTo(HOUSE_W - 5, houseY + houseH + 5, HOUSE_W - 5, houseY + houseH);
+    ctx.fill();
+}
+
+function drawPeashooter(x, y, frame) {
+    const breathe = Math.sin(frame * 0.1) * 2;
+    drawShadow(x, y + 25, 18);
+    ctx.fillStyle = '#33691E'; 
+    ctx.beginPath(); ctx.ellipse(x-12, y+20, 12, 6, -0.5, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x+12, y+20, 12, 6, 0.5, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#558B2F'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x, y+20); ctx.quadraticCurveTo(x-5, y, x, y-15+breathe); ctx.stroke();
+    ctx.fillStyle = '#76FF03'; ctx.strokeStyle = '#33691E'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x-12, y-20+breathe, 15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-5, y-25+breathe); ctx.lineTo(x+20, y-25+breathe); ctx.lineTo(x+20, y-10+breathe); ctx.lineTo(x-5, y-10+breathe); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#1B5E20'; ctx.beginPath(); ctx.ellipse(x+20, y-17+breathe, 4, 7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(x-6, y-24+breathe, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x-7, y-25+breathe, 1, 0, Math.PI*2); ctx.fill();
+}
+
+function drawSunflower(x, y, frame) {
+    const sway = Math.sin(frame * 0.05) * 3;
+    drawShadow(x, y + 25, 18);
+    ctx.fillStyle = '#33691E';
+    ctx.beginPath(); ctx.ellipse(x-10, y+20, 12, 6, -0.4, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x+10, y+20, 12, 6, 0.4, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#558B2F'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x, y+20); ctx.lineTo(x+sway, y-10); ctx.stroke();
+    ctx.translate(x+sway, y-15);
+    ctx.fillStyle = '#FFD600'; ctx.strokeStyle = '#F57F17'; ctx.lineWidth = 1;
+    const petals = 12;
+    for(let i=0; i<petals; i++) { ctx.rotate((Math.PI*2)/petals); ctx.beginPath(); ctx.ellipse(18, 0, 10, 5, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke(); }
+    ctx.rotate(-(Math.PI*2));
+    ctx.fillStyle = '#795548'; ctx.strokeStyle = '#3E2723'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(-5, -3, 2, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(5, -3, 2, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 2, 8, 0.2, Math.PI-0.2); ctx.stroke();
+    ctx.translate(-(x+sway), -(y-15));
+}
+
+function drawWallnut(x, y, hp, maxHp) {
+    drawShadow(x, y+25, 20);
+    ctx.fillStyle = '#A1887F'; ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(x, y, 22, 28, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x-10, y-15); ctx.quadraticCurveTo(x, y-20, x+10, y-15); ctx.stroke();
+    const eyeH = (hp < maxHp/2) ? 2 : 5;
+    ctx.fillStyle = 'white'; ctx.strokeStyle = 'black';
+    ctx.beginPath(); ctx.ellipse(x-7, y-5, 5, eyeH, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x+7, y-5, 5, eyeH, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(x-6, y-5, 1.5, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(x+8, y-5, 1.5, 0, Math.PI*2); ctx.fill();
+    if (hp < maxHp * 0.7) { ctx.strokeStyle = '#3E2723'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x-15, y-10); ctx.lineTo(x-5, y); ctx.lineTo(x-15, y+10); ctx.stroke(); }
+    if (hp < maxHp * 0.3) { ctx.beginPath(); ctx.moveTo(x+15, y-10); ctx.lineTo(x+5, y); ctx.lineTo(x+15, y+10); ctx.stroke(); }
+}
+
+function drawCherryBomb(x, y, frame, timer) {
+    const scale = 1 + Math.sin(frame * 0.5) * 0.1;
+    const red = (timer % 4 < 2) ? '#FF1744' : '#D50000';
+    drawShadow(x, y+25, 20);
+    ctx.translate(x, y); ctx.scale(scale, scale);
+    ctx.strokeStyle = '#33691E'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-10, -5); ctx.quadraticCurveTo(0, -25, 10, -5); ctx.stroke();
+    ctx.fillStyle = red; ctx.strokeStyle = 'black'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(-12, 5, 15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(12, 8, 15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.beginPath(); ctx.arc(-16, 0, 4, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(8, 3, 4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'white'; ctx.beginPath(); ctx.moveTo(-18, 2); ctx.lineTo(-6, 6); ctx.stroke(); ctx.beginPath(); ctx.moveTo(6, 6); ctx.lineTo(18, 2); ctx.stroke();
+    ctx.scale(1/scale, 1/scale); ctx.translate(-x, -y);
+}
+
+function drawZombie(z) {
+    const x = z.x; const y = z.y;
+    const wobble = Math.sin(z.walkOffset * 0.1) * 3;
+    const legL = Math.sin(z.walkOffset * 0.15) * 10;
+    
+    drawShadow(x + 40, y + 90, 25);
+    ctx.save(); ctx.translate(x + 40, y + 60); ctx.rotate(wobble * Math.PI/180); ctx.translate(-(x+40), -(y+60));
+    ctx.fillStyle = '#37474F'; ctx.strokeStyle = 'black'; ctx.lineWidth = 2;
+    ctx.fillRect(x+35 + legL, y+60, 12, 30);
+    ctx.fillStyle = '#3E2723'; ctx.fillRect(x+32 + legL, y+90, 18, 8);
+    ctx.fillStyle = '#455A64'; ctx.fillRect(x+25 - legL, y+60, 12, 30);
+    ctx.fillStyle = '#3E2723'; ctx.fillRect(x+22 - legL, y+90, 18, 8);
+    ctx.fillStyle = '#546E7A'; ctx.beginPath(); ctx.moveTo(x+20, y+30); ctx.lineTo(x+60, y+30); ctx.lineTo(x+55, y+70); ctx.lineTo(x+25, y+70); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#D32F2F'; ctx.beginPath(); ctx.moveTo(x+40, y+32); ctx.lineTo(x+45, y+50); ctx.lineTo(x+35, y+50); ctx.fill();
+    ctx.fillStyle = '#546E7A'; ctx.beginPath(); ctx.moveTo(x+45, y+35); ctx.lineTo(x+10, y+45); ctx.lineWidth = 8; ctx.stroke(); ctx.lineWidth = 2;
+    const hx = x + 40; const hy = y + 10;
+    ctx.fillStyle = '#9CCC65'; ctx.beginPath(); ctx.moveTo(hx-10, hy+15); ctx.quadraticCurveTo(hx+15, hy+15, hx+18, hy-10); ctx.bezierCurveTo(hx+15, hy-30, hx-20, hy-30, hx-18, hy-10); ctx.quadraticCurveTo(hx-20, hy+10, hx-10, hy+15); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(hx-8, hy-8, 7, 0, Math.PI*2); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(hx+6, hy-8, 9, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(hx-8, hy-8, 1.5, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(hx+7, hy-7, 1.5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#3E2723'; ctx.beginPath(); ctx.ellipse(hx, hy+8, 6, 3, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#FFF9C4'; ctx.fillRect(hx-2, hy+6, 3, 3);
+    ctx.strokeStyle = '#212121'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(hx, hy-25); ctx.lineTo(hx-5, hy-32); ctx.stroke(); ctx.beginPath(); ctx.moveTo(hx+2, hy-24); ctx.lineTo(hx+8, hy-30); ctx.stroke();
+    ctx.restore();
+
+    if (z.hitFlash > 0) {
+        ctx.save(); ctx.globalCompositeOperation = 'source-atop'; ctx.fillStyle = 'rgba(255, 0, 0, 0.4)'; ctx.fillRect(x, y, 80, 100); ctx.restore();
+    }
+}
+
+function spawnSplatter(x, y, color='#76FF03') {
+    for(let i=0; i<6; i++) particles.push(new Particle(x, y, color, 'splat'));
+}
+
+function createExplosion(x, y) {
+    for(let i=0; i<30; i++) particles.push(new Particle(x, y, '#212121', 'smoke')); 
+    for(let i=0; i<15; i++) particles.push(new Particle(x, y, '#D50000', 'fire')); 
+}
+
+function drawBackground() {
+    drawDetailedHouse();
+
+    // The Lawn
+    for (let r = 0; r < GRID_ROWS; r++) {
+        for (let c = 0; c < GRID_COLS; c++) {
+            const x = HOUSE_W + c * TILE_W;
+            const y = MARGIN_TOP + r * TILE_H;
+            ctx.fillStyle = ((r + c) % 2 === 0) ? '#4CAF50' : '#43A047'; 
+            ctx.fillRect(x, y, TILE_W, TILE_H);
+        }
+    }
+
+    // Street
+    const streetX = HOUSE_W + GRID_COLS * TILE_W;
+    ctx.fillStyle = '#212121'; ctx.fillRect(streetX, MARGIN_TOP, STREET_W, GRID_ROWS * TILE_H);
+    ctx.fillStyle = '#9E9E9E'; ctx.fillRect(streetX, MARGIN_TOP, 15, GRID_ROWS * TILE_H);
+}
+
+function drawProgressBar() {
+    const w = 200;
+    const h = 20;
+    const x = canvas.width - w - 20;
+    const y = 20;
+
+    // Background
+    ctx.fillStyle = '#3E2723';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeRect(x, y, w, h);
+
+    // Progress (Fill based on levelTimer)
+    // Arbitrary goal of 3 minutes for full bar in this demo
+    const pct = Math.min(1, levelTimer / 10800); 
+    
+    ctx.fillStyle = '#76FF03';
+    ctx.fillRect(x + 2, y + 2, (w-4) * pct, h - 4);
+    
+    // Label
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText("WAVE PROGRESS", x, y - 5);
+    
+    if (isHugeWave) {
+        ctx.fillStyle = '#D50000';
+        ctx.font = 'bold 20px Creepster';
+        ctx.fillText("HUGE WAVE!", x + 40, y + 45);
+    }
+}
+
+// --- LOGIC ---
+
+function handleInput() {
+    if (!gameActive) return;
+
+    if (mouse.x > HOUSE_W && mouse.x < HOUSE_W + GRID_COLS * TILE_W &&
+        mouse.y > MARGIN_TOP && mouse.y < MARGIN_TOP + GRID_ROWS * TILE_H) {
+        
+        const col = Math.floor((mouse.x - HOUSE_W) / TILE_W);
+        const row = Math.floor((mouse.y - MARGIN_TOP) / TILE_H);
+        const idx = row * GRID_COLS + col;
+        const cell = grid[idx];
+
+        if (selectedPlantType && !cell.plant) {
+            const cost = PLANT_TYPES[selectedPlantType].cost;
+            if (sun >= cost) {
+                sun -= cost;
+                cell.plant = new Plant(cell.x, cell.y, selectedPlantType);
+                selectedPlantType = null;
+                updateUICards();
+            }
+        }
+    }
+}
+
+function selectPlant(type) {
+    if (sun >= PLANT_TYPES[type].cost) {
+        selectedPlantType = type;
+        updateUICards();
+        document.getElementById('card-'+type).classList.add('selected');
+    }
+}
+
+function updateUICards() {
+    document.querySelectorAll('.card').forEach(c => {
+        c.classList.remove('selected');
+        const type = c.id.replace('card-', '');
+        if (sun < PLANT_TYPES[type].cost) c.classList.add('disabled');
+        else c.classList.remove('disabled');
+    });
+}
+
+function initGame() {
+    grid.length = 0;
+    mowers.length = 0;
+    for(let r=0; r<GRID_ROWS; r++) {
+        for(let c=0; c<GRID_COLS; c++) {
+            grid.push(new Cell(HOUSE_W + c * TILE_W, MARGIN_TOP + r * TILE_H, r, c));
+        }
+        mowers.push(new Lawnmower(r));
+    }
+}
+
+function resetGame() {
+    gameActive = true;
+    sun = 200;
+    frameCount = 0;
+    levelTimer = 0;
+    nextZombieTime = 600;
+    zombieSpawnTimer = 0;
+    isHugeWave = false;
+    zombies.length = 0;
+    projectiles.length = 0;
+    particles.length = 0;
+    suns.length = 0;
+    document.getElementById('game-over').style.display = 'none';
+    initGame();
+}
+
+function triggerGameOver() {
+    gameActive = false;
+    document.getElementById('game-over').style.display = 'flex';
+}
+
+function spawnZombie() {
+    const r = Math.floor(Math.random() * GRID_ROWS);
+    zombies.push(new Zombie(r));
+}
+
+function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#263238'; 
+    ctx.fillRect(0,0, canvas.width, canvas.height);
+
+    if (shakeTime > 0) {
+        ctx.save();
+        const dx = (Math.random() - 0.5) * 10;
+        const dy = (Math.random() - 0.5) * 10;
+        ctx.translate(dx, dy);
+        shakeTime--;
+    }
+
+    drawBackground();
+    drawProgressBar();
+
+    if (gameActive) {
+        frameCount++;
+        levelTimer++;
+        
+        // --- WAVE SPAWN LOGIC ---
+        zombieSpawnTimer++;
+        
+        // Decrease spawn interval as level progresses (min 100 frames)
+        if (frameCount % 600 === 0 && nextZombieTime > 100) {
+            nextZombieTime -= 50; 
+        }
+
+        if (zombieSpawnTimer > nextZombieTime) {
+            spawnZombie();
+            zombieSpawnTimer = 0;
+        }
+
+        // HUGE WAVE (Every 60s approx)
+        if (levelTimer % nextHugeWave === 0 && levelTimer > 0) {
+            isHugeWave = true;
+            setTimeout(() => isHugeWave = false, 3000);
+            for(let i=0; i<5; i++) {
+                setTimeout(spawnZombie, i * 500);
+            }
+        }
+
+        // --- SUN SPAWN LOGIC (Randomized & Physics) ---
+        sunSpawnTimer++;
+        if (sunSpawnTimer > nextSunSpawn) {
+            suns.push(new Sun(HOUSE_W + Math.random() * (GRID_COLS * TILE_W), -50, true));
+            sunSpawnTimer = 0;
+            nextSunSpawn = Math.random() * 300 + 300; // Random 5-10s
+        }
+    }
+
+    grid.forEach(cell => {
+        cell.draw();
+        if (cell.plant) {
+            if (gameActive) cell.plant.update();
+            cell.plant.draw();
+            // CRITICAL FIX: Cherry Bomb Cleanup
+            // If the plant marked itself as dead (exploded), remove it immediately
+            if (cell.plant.dead) {
+                cell.plant = null;
+            }
+        }
+    });
+
+    mowers.forEach(m => {
+        if (gameActive) m.update();
+        m.draw();
+    });
+
+    zombies.sort((a,b) => a.y - b.y);
+    zombies.forEach((z, i) => {
+        if (gameActive) z.update();
+        z.draw();
+        if (z.delete) zombies.splice(i, 1);
+    });
+
+    projectiles.forEach((p, i) => {
+        if (gameActive) p.update();
+        p.draw();
+        
+        for (let z of zombies) {
+            if (p.x > z.x + 20 && p.x < z.x + 60 && p.y > z.y + 10 && p.y < z.y + 90) {
+                z.hp -= 20;
+                z.hitFlash = 5;
+                spawnSplatter(p.x, p.y);
+                p.delete = true;
+                break;
+            }
+        }
+        if (p.delete) projectiles.splice(i, 1);
+    });
+
+    particles.forEach((p, i) => {
+        if (gameActive) p.update();
+        p.draw();
+        if (p.life <= 0) particles.splice(i, 1);
+    });
+
+    suns.forEach((s, i) => {
+        if (gameActive) s.update();
+        s.draw();
+        if (s.delete) suns.splice(i, 1);
+    });
+
+    if (shakeTime >= 0) ctx.restore();
+
+    document.getElementById('sun-text').innerText = sun;
+    if (gameActive) updateUICards();
+
+    requestAnimationFrame(update);
+}
+
+initGame();
+requestAnimationFrame(update);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,3061 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кулинарная энциклопедия | 60+ рецептов с фото</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #fef9f3;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header styles */
+        header {
+            background-color: #ff7b54;
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 25px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #fff9c4;
+        }
+        
+        /* Hero section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 120px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 3.2rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #ff7b54;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #ff926b;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Section styles */
+        section {
+            padding: 60px 0;
+        }
+        
+        section h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #ff7b54;
+            font-size: 2.5rem;
+        }
+        
+        .section-description {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 50px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        /* Recipe categories */
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .category-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .category-img {
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .category-content {
+            padding: 20px;
+        }
+        
+        .category-content h3 {
+            margin-bottom: 10px;
+            color: #ff7b54;
+        }
+        
+        /* Recipes grid */
+        .recipes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .recipe-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+        }
+        
+        .recipe-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .recipe-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .recipe-content {
+            padding: 20px;
+        }
+        
+        .recipe-content h3 {
+            margin-bottom: 10px;
+            color: #ff7b54;
+            font-size: 1.3rem;
+            height: 60px;
+            overflow: hidden;
+        }
+        
+        .recipe-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .recipe-meta span {
+            display: flex;
+            align-items: center;
+        }
+        
+        .recipe-meta i {
+            margin-right: 5px;
+            color: #ff7b54;
+        }
+        
+        /* Recipe Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalOpen 0.5s;
+        }
+        
+        @keyframes modalOpen {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            background-color: rgba(0,0,0,0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-modal:hover {
+            background-color: rgba(0,0,0,0.7);
+        }
+        
+        .modal-header {
+            position: relative;
+            height: 350px;
+            overflow: hidden;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .modal-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .modal-body h2 {
+            color: #ff7b54;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+        }
+        
+        .recipe-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .detail-item i {
+            color: #ff7b54;
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .ingredients-section, .instructions-section {
+            margin-bottom: 30px;
+        }
+        
+        .ingredients-section h3, .instructions-section h3 {
+            color: #ff7b54;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .ingredients-list {
+            list-style-type: none;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .ingredients-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .ingredients-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .ingredient-name {
+            font-weight: 500;
+        }
+        
+        .ingredient-amount {
+            color: #ff7b54;
+            font-weight: 600;
+        }
+        
+        .instructions-list {
+            list-style-type: none;
+            counter-reset: step-counter;
+        }
+        
+        .instructions-list li {
+            counter-increment: step-counter;
+            margin-bottom: 20px;
+            padding-left: 50px;
+            position: relative;
+            line-height: 1.7;
+        }
+        
+        .instructions-list li:before {
+            content: counter(step-counter);
+            background-color: #ff7b54;
+            color: white;
+            font-weight: bold;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-col h3 {
+            margin-bottom: 20px;
+            color: #ff7b54;
+        }
+        
+        .footer-col ul {
+            list-style: none;
+        }
+        
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-col ul li a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-col ul li a:hover {
+            color: #ff7b54;
+        }
+        
+        .social-icons {
+            display: flex;
+            margin-top: 20px;
+        }
+        
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            margin-right: 10px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .social-icons a:hover {
+            background-color: #ff7b54;
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        /* Search bar */
+        .search-bar {
+            display: flex;
+            max-width: 600px;
+            margin: 30px auto 50px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 30px 0 0 30px;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .search-bar button {
+            background-color: #ff7b54;
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 0 30px 30px 0;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .search-bar button:hover {
+            background-color: #ff926b;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+            gap: 10px;
+        }
+        
+        .pagination button {
+            background-color: white;
+            border: 2px solid #ff7b54;
+            color: #ff7b54;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .pagination button:hover {
+            background-color: #ff7b54;
+            color: white;
+        }
+        
+        .pagination button.active {
+            background-color: #ff7b54;
+            color: white;
+        }
+        
+        /* Category filter */
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .filter-btn {
+            background-color: white;
+            border: 2px solid #ff7b54;
+            color: #ff7b54;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background-color: #ff7b54;
+            color: white;
+        }
+        
+        .filter-btn.active {
+            background-color: #ff7b54;
+            color: white;
+        }
+        
+        /* Recipe counter */
+        .recipe-counter {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <i class="fas fa-utensils"></i>
+                Кулинарная энциклопедия DF
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#home">Главная</a></li>
+                    <li><a href="#categories">Категории</a></li>
+                    <li><a href="#recipes">Все рецепты</a></li>
+                    <li><a href="#about">О проекте</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Более 60 проверенных рецептов с пошаговыми фото</h1>
+            <p>От простых домашних блюд до ресторанных шедевров. Каждый рецепт подробно описан с фотографиями и рекомендациями.</p>
+            <a href="#recipes" class="btn">Исследовать рецепты</a>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section>
+        <div class="container">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Найти рецепт по названию или ингредиенту...">
+                <button type="submit" id="search-btn"><i class="fas fa-search"></i> Найти</button>
+            </div>
+            <div class="recipe-counter">Всего рецептов: <span id="total-recipes">0</span></div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section id="categories">
+        <div class="container">
+            <h2>Категории рецептов</h2>
+            <p class="section-description">Выберите категорию для быстрого поиска нужных рецептов</p>
+            
+            <div class="categories">
+                <div class="category-card" data-category="soups">
+                    <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Супы" class="category-img">
+                    <div class="category-content">
+                        <h3>Супы</h3>
+                        <p>12 рецептов</p>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="main-dishes">
+                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Основные блюда" class="category-img">
+                    <div class="category-content">
+                        <h3>Основные блюда</h3>
+                        <p>18 рецептов</p>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="salads">
+                    <img src="https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Салаты" class="category-img">
+                    <div class="category-content">
+                        <h3>Салаты</h3>
+                        <p>10 рецептов</p>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="desserts">
+                    <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Десерты" class="category-img">
+                    <div class="category-content">
+                        <h3>Десерты</h3>
+                        <p>15 рецептов</p>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="baking">
+                    <img src="https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Выпечка" class="category-img">
+                    <div class="category-content">
+                        <h3>Выпечка</h3>
+                        <p>12 рецептов</p>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="drinks">
+                    <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Напитки" class="category-img">
+                    <div class="category-content">
+                        <h3>Напитки</h3>
+                        <p>8 рецептов</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recipes Section -->
+    <section id="recipes">
+        <div class="container">
+            <h2>Коллекция рецептов</h2>
+            <p class="section-description">Популярные рецепты из разных кухонь мира</p>
+            
+            <!-- Category filter -->
+            <div class="category-filter">
+                <button class="filter-btn active" data-category="all">Все рецепты</button>
+                <button class="filter-btn" data-category="soups">Супы</button>
+                <button class="filter-btn" data-category="main-dishes">Основные блюда</button>
+                <button class="filter-btn" data-category="salads">Салаты</button>
+                <button class="filter-btn" data-category="desserts">Десерты</button>
+                <button class="filter-btn" data-category="baking">Выпечка</button>
+                <button class="filter-btn" data-category="drinks">Напитки</button>
+            </div>
+            
+            <!-- Recipes grid -->
+            <div class="recipes" id="recipes-grid">
+                <!-- Рецепты будут загружены через JavaScript -->
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <!-- Пагинация будет сгенерирована через JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Recipe Modal -->
+    <div id="recipe-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-content">
+                <!-- Контент будет загружен через JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-col">
+                    <h3>Кулинарная энциклопедия DF</h3>
+                    <p>Крупнейшая коллекция рецептов с подробными инструкциями и фотографиями. Мы собрали лучшие рецепты со всего мира.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-vk"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Категории</h3>
+                    <ul>
+                        <li><a href="#" data-category="soups">Супы и бульоны</a></li>
+                        <li><a href="#" data-category="main-dishes">Основные блюда</a></li>
+                        <li><a href="#" data-category="salads">Салаты и закуски</a></li>
+                        <li><a href="#" data-category="desserts">Десерты</a></li>
+                        <li><a href="#" data-category="baking">Выпечка</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Популярные рецепты</h3>
+                    <ul>
+                        <li><a href="#" data-recipe="borscht">Борщ с говядиной</a></li>
+                        <li><a href="#" data-recipe="pelmeni">Пельмени домашние</a></li>
+                        <li><a href="#" data-recipe="olivier">Салат Оливье</a></li>
+                        <li><a href="#" data-recipe="medovik">Торт Медовик</a></li>
+                        <li><a href="#" data-recipe="blini">Блины с икрой</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Контакты</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Санкт-Петербург, Невский пр., 100</li>
+                        <li><i class="fas fa-phone"></i> +992 92 6310060</li>
+                       
+                        <li><i class="fas fa-clock"></i> Поддержка: 9:00-21:00</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2026 Кулинарная энциклопедия. Все права защищены. Рецепты собраны из открытых источников.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // База данных рецептов (60+ рецептов)
+        const recipes = [
+            // СУПЫ (12 рецептов)
+            {
+                id: 'borscht',
+                title: 'Борщ с говядиной',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1556909211-36987daf7b4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '120 мин',
+                servings: '6',
+                calories: '320 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Говядина на кости', amount: '500 г'},
+                    {name: 'Свекла', amount: '2 шт'},
+                    {name: 'Картофель', amount: '3 шт'},
+                    {name: 'Капуста белокочанная', amount: '200 г'},
+                    {name: 'Морковь', amount: '1 шт'},
+                    {name: 'Лук репчатый', amount: '1 шт'},
+                    {name: 'Томатная паста', amount: '2 ст.л.'},
+                    {name: 'Уксус', amount: '1 ст.л.'},
+                    {name: 'Чеснок', amount: '3 зубчика'},
+                    {name: 'Сметана и зелень', amount: 'для подачи'}
+                ],
+                instructions: [
+                    'Говядину залейте 3 литрами воды, доведите до кипения, снимите пену и варите 1.5 часа.',
+                    'Свеклу натрите на терке, добавьте уксус и тушите на сковороде 10 минут.',
+                    'Добавьте к свекле томатную пасту, тушите еще 5 минут.',
+                    'Лук и морковь нарежьте и обжарьте до мягкости.',
+                    'Достаньте мясо из бульона, отделите от костей и нарежьте.',
+                    'В бульон добавьте картофель и капусту. Варите 15 минут.',
+                    'Добавьте обжаренные овощи, свеклу и мясо. Варите еще 10 минут.',
+                    'В конце добавьте чеснок, лавровый лист, соль и перец.',
+                    'Подавайте со сметаной и зеленью.'
+                ]
+            },
+            {
+                id: 'shchi',
+                title: 'Щи из свежей капусты',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '6',
+                calories: '280 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Говядина', amount: '400 г'},
+                    {name: 'Капуста белокочанная', amount: '300 г'},
+                    {name: 'Картофель', amount: '3 шт'},
+                    {name: 'Морковь', amount: '1 шт'},
+                    {name: 'Лук репчатый', amount: '1 шт'},
+                    {name: 'Томатная паста', amount: '1 ст.л.'},
+                    {name: 'Чеснок', amount: '2 зубчика'},
+                    {name: 'Сметана', amount: 'для подачи'}
+                ],
+                instructions: [
+                    'Говядину залейте водой и варите 1 час.',
+                    'Добавьте нарезанный картофель и капусту.',
+                    'Обжарьте лук и морковь с томатной пастой.',
+                    'Добавьте зажарку в суп, варите 20 минут.',
+                    'В конце добавьте чеснок и зелень.'
+                ]
+            },
+            {
+                id: 'solyanka',
+                title: 'Солянка мясная',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '80 мин',
+                servings: '4',
+                calories: '350 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Разные виды мяса', amount: '500 г'},
+                    {name: 'Огурцы соленые', amount: '3 шт'},
+                    {name: 'Каперсы', amount: '2 ст.л.'},
+                    {name: 'Оливки', amount: '100 г'},
+                    {name: 'Лимон', amount: '1 шт'},
+                    {name: 'Сметана', amount: 'для подачи'}
+                ],
+                instructions: [
+                    'Сварите бульон из разных видов мяса.',
+                    'Обжарьте лук, добавьте томатную пасту.',
+                    'Добавьте нарезанные огурцы и каперсы.',
+                    'Все соедините с бульоном, варите 15 минут.',
+                    'Подавайте с лимоном, оливками и сметаной.'
+                ]
+            },
+            {
+                id: 'chicken-noodle',
+                title: 'Куриный суп с лапшой',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '4',
+                calories: '250 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Курица', amount: '500 г'},
+                    {name: 'Лапша яичная', amount: '150 г'},
+                    {name: 'Морковь', amount: '1 шт'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Зелень', amount: 'пучок'},
+                    {name: 'Соль, перец', amount: 'по вкусу'}
+                ],
+                instructions: [
+                    'Курицу отварите до готовности.',
+                    'Добавьте нарезанные овощи.',
+                    'За 10 минут до готовности добавьте лапшу.',
+                    'Подавайте с зеленью.'
+                ]
+            },
+            {
+                id: 'tomato-cream',
+                title: 'Томатный крем-суп',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '45 мин',
+                servings: '4',
+                calories: '180 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Помидоры', amount: '1 кг'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Чеснок', amount: '3 зубчика'},
+                    {name: 'Сливки', amount: '200 мл'},
+                    {name: 'Базилик', amount: 'пучок'}
+                ],
+                instructions: [
+                    'Обжарьте лук и чеснок.',
+                    'Добавьте помидоры, тушите 20 минут.',
+                    'Измельчите блендером.',
+                    'Добавьте сливки, прогрейте.',
+                    'Подавайте с базиликом.'
+                ]
+            },
+            {
+                id: 'mushroom-cream',
+                title: 'Грибной крем-суп',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '50 мин',
+                servings: '4',
+                calories: '220 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Шампиньоны', amount: '500 г'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Сливки', amount: '200 мл'},
+                    {name: 'Картофель', amount: '2 шт'},
+                    {name: 'Сливочное масло', amount: '50 г'}
+                ],
+                instructions: [
+                    'Обжарьте грибы с луком.',
+                    'Добавьте картофель и воду.',
+                    'Варите 20 минут, измельчите блендером.',
+                    'Добавьте сливки, прогрейте.',
+                    'Подавайте с гренками.'
+                ]
+            },
+            {
+                id: 'fish-soup',
+                title: 'Уха из речной рыбы',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '4',
+                calories: '200 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Речная рыба', amount: '800 г'},
+                    {name: 'Картофель', amount: '3 шт'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Морковь', amount: '1 шт'},
+                    {name: 'Укроп', amount: 'пучок'}
+                ],
+                instructions: [
+                    'Сварите бульон из рыбы.',
+                    'Добавьте овощи.',
+                    'Варите до готовности картофеля.',
+                    'Подавайте с укропом.'
+                ]
+            },
+            {
+                id: 'lentil-soup',
+                title: 'Суп из красной чечевицы',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '40 мин',
+                servings: '4',
+                calories: '280 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Красная чечевица', amount: '200 г'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Морковь', amount: '1 шт'},
+                    {name: 'Чеснок', amount: '3 зубчика'},
+                    {name: 'Куркума', amount: '1 ч.л.'}
+                ],
+                instructions: [
+                    'Обжарьте лук и морковь.',
+                    'Добавьте чечевицу и специи.',
+                    'Залейте водой, варите 25 минут.',
+                    'Измельчите блендером.',
+                    'Подавайте с лимоном.'
+                ]
+            },
+            {
+                id: 'pumpkin-soup',
+                title: 'Тыквенный крем-суп',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '50 мин',
+                servings: '4',
+                calories: '190 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Тыква', amount: '800 г'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Имбирь', amount: '20 г'},
+                    {name: 'Кокосовое молоко', amount: '200 мл'},
+                    {name: 'Сливочное масло', amount: '30 г'}
+                ],
+                instructions: [
+                    'Обжарьте лук и имбирь.',
+                    'Добавьте тыкву, тушите 10 минут.',
+                    'Залейте водой, варите 20 минут.',
+                    'Измельчите блендером.',
+                    'Добавьте кокосовое молоко.',
+                    'Подавайте с тыквенными семечками.'
+                ]
+            },
+            {
+                id: 'okroshka',
+                title: 'Окрошка на кефире',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 мин',
+                servings: '4',
+                calories: '150 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Кефир', amount: '1 л'},
+                    {name: 'Вареная колбаса', amount: '200 г'},
+                    {name: 'Огурцы', amount: '3 шт'},
+                    {name: 'Редис', amount: '100 г'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Зеленый лук', amount: 'пучок'}
+                ],
+                instructions: [
+                    'Нарежьте все ингредиенты кубиками.',
+                    'Сложите в кастрюлю.',
+                    'Залейте кефиром, разбавленным водой.',
+                    'Посолите, добавьте зелень.',
+                    'Подавайте охлажденным.'
+                ]
+            },
+            {
+                id: 'bean-soup',
+                title: 'Суп из белой фасоли',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '120 мин',
+                servings: '6',
+                calories: '300 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Фасоль белая', amount: '300 г'},
+                    {name: 'Копченые ребрышки', amount: '300 г'},
+                    {name: 'Лук', amount: '2 шт'},
+                    {name: 'Морковь', amount: '2 шт'},
+                    {name: 'Чеснок', amount: '4 зубчика'}
+                ],
+                instructions: [
+                    'Замочите фасоль на ночь.',
+                    'Сварите фасоль с ребрышками.',
+                    'Обжарьте лук и морковь.',
+                    'Все соедините, варите 30 минут.',
+                    'Подавайте с чесноком и зеленью.'
+                ]
+            },
+            {
+                id: 'borscht-green',
+                title: 'Зеленый борщ со щавелем',
+                category: 'soups',
+                image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '4',
+                calories: '180 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Говядина', amount: '400 г'},
+                    {name: 'Щавель', amount: '300 г'},
+                    {name: 'Картофель', amount: '3 шт'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Сметана', amount: 'для подачи'}
+                ],
+                instructions: [
+                    'Сварите бульон из говядины.',
+                    'Добавьте картофель.',
+                    'За 5 минут до готовности добавьте щавель.',
+                    'Заправьте взбитым яйцом.',
+                    'Подавайте со сметаной.'
+                ]
+            },
+            
+            // ОСНОВНЫЕ БЛЮДА (18 рецептов)
+            {
+                id: 'pelmeni',
+                title: 'Пельмени домашние',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '120 мин',
+                servings: '6',
+                calories: '450 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Мука', amount: '500 г'},
+                    {name: 'Вода', amount: '200 мл'},
+                    {name: 'Яйцо', amount: '1 шт'},
+                    {name: 'Говяжий фарш', amount: '300 г'},
+                    {name: 'Свиной фарш', amount: '200 г'},
+                    {name: 'Лук', amount: '2 шт'},
+                    {name: 'Соль, перец', amount: 'по вкусу'}
+                ],
+                instructions: [
+                    'Замесите тесто из муки, воды и яйца.',
+                    'Для начинки смешайте фарш с луком.',
+                    'Раскатайте тесто, вырежьте кружки.',
+                    'На каждый кружок положите фарш.',
+                    'Слепите пельмени.',
+                    'Варите в кипящей воде 5-7 минут.',
+                    'Подавайте со сметаной или уксусом.'
+                ]
+            },
+            {
+                id: 'plov',
+                title: 'Узбекский плов',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '6',
+                calories: '550 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Баранина', amount: '800 г'},
+                    {name: 'Рис', amount: '500 г'},
+                    {name: 'Морковь', amount: '500 г'},
+                    {name: 'Лук', amount: '3 шт'},
+                    {name: 'Масло растительное', amount: '150 мл'},
+                    {name: 'Зира', amount: '1 ст.л.'}
+                ],
+                instructions: [
+                    'Обжарьте лук и мясо.',
+                    'Добавьте морковь соломкой.',
+                    'Залейте водой, тушите 40 минут.',
+                    'Добавьте рис, готовьте 30 минут.',
+                    'Дайте настояться 20 минут.'
+                ]
+            },
+            {
+                id: 'beef-stroganoff',
+                title: 'Бефстроганов',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '40 мин',
+                servings: '4',
+                calories: '420 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Говядина', amount: '500 г'},
+                    {name: 'Лук', amount: '2 шт'},
+                    {name: 'Сметана', amount: '200 г'},
+                    {name: 'Томатная паста', amount: '1 ст.л.'},
+                    {name: 'Мука', amount: '1 ст.л.'}
+                ],
+                instructions: [
+                    'Обжарьте лук.',
+                    'Добавьте мясо соломкой.',
+                    'Обжарьте до румяной корочки.',
+                    'Добавьте муку, томатную пасту.',
+                    'Влейте сметану, тушите 15 минут.',
+                    'Подавайте с картофельным пюре.'
+                ]
+            },
+            {
+                id: 'chicken-kiev',
+                title: 'Котлета по-киевски',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '4',
+                calories: '480 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Куриное филе', amount: '4 шт'},
+                    {name: 'Сливочное масло', amount: '100 г'},
+                    {name: 'Чеснок', amount: '3 зубчика'},
+                    {name: 'Зелень', amount: 'пучок'},
+                    {name: 'Яйца', amount: '2 шт'},
+                    {name: 'Сухари панировочные', amount: '150 г'}
+                ],
+                instructions: [
+                    'Сделайте кармашек в филе.',
+                    'Наполните маслом с чесноком и зеленью.',
+                    'Обваляйте в муке, яйце, сухарях.',
+                    'Обжарьте до золотистой корочки.',
+                    'Доведите до готовности в духовке.'
+                ]
+            },
+            {
+                id: 'golubtsy',
+                title: 'Голубцы',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '6',
+                calories: '380 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Капуста белокочанная', amount: '1 шт'},
+                    {name: 'Фарш мясной', amount: '500 г'},
+                    {name: 'Рис', amount: '100 г'},
+                    {name: 'Лук', amount: '2 шт'},
+                    {name: 'Морковь', amount: '1 шт'},
+                    {name: 'Томатная паста', amount: '2 ст.л.'}
+                ],
+                instructions: [
+                    'Отварите капусту, отделите листья.',
+                    'Смешайте фарш с рисом и луком.',
+                    'Заверните фарш в капустные листья.',
+                    'Обжарьте лук и морковь.',
+                    'Уложите голубцы в кастрюлю.',
+                    'Залейте соусом, тушите 40 минут.'
+                ]
+            },
+            {
+                id: 'solyanka-meat',
+                title: 'Солянка сборная',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '4',
+                calories: '520 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Разные виды мяса', amount: '600 г'},
+                    {name: 'Огурцы соленые', amount: '3 шт'},
+                    {name: 'Каперсы', amount: '2 ст.л.'},
+                    {name: 'Оливки', amount: '100 г'},
+                    {name: 'Томатная паста', amount: '2 ст.л.'}
+                ],
+                instructions: [
+                    'Обжарьте лук.',
+                    'Добавьте мясо, обжарьте.',
+                    'Добавьте томатную пасту.',
+                    'Добавьте огурцы и каперсы.',
+                    'Тушите 30 минут.',
+                    'Подавайте с лимоном.'
+                ]
+            },
+            {
+                id: 'zharkoe',
+                title: 'Жаркое в горшочках',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '4',
+                calories: '450 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Свинина', amount: '500 г'},
+                    {name: 'Картофель', amount: '6 шт'},
+                    {name: 'Лук', amount: '2 шт'},
+                    {name: 'Морковь', amount: '2 шт'},
+                    {name: 'Сметана', amount: '200 г'}
+                ],
+                instructions: [
+                    'Обжарьте мясо и овощи.',
+                    'Разложите по горшочкам.',
+                    'Залейте сметаной.',
+                    'Запекайте 45 минут при 180°C.',
+                    'Подавайте в горшочках.'
+                ]
+            },
+            {
+                id: 'cutlets',
+                title: 'Котлеты домашние',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '40 мин',
+                servings: '4',
+                calories: '380 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Фарш говяжий', amount: '500 г'},
+                    {name: 'Лук', amount: '2 шт'},
+                    {name: 'Хлеб белый', amount: '100 г'},
+                    {name: 'Молоко', amount: '100 мл'},
+                    {name: 'Яйцо', amount: '1 шт'}
+                ],
+                instructions: [
+                    'Размочите хлеб в молоке.',
+                    'Смешайте с фаршем и луком.',
+                    'Добавьте яйцо, соль, перец.',
+                    'Сформируйте котлеты.',
+                    'Обжарьте с двух сторон.'
+                ]
+            },
+            {
+                id: 'manti',
+                title: 'Манты с бараниной',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '120 мин',
+                servings: '6',
+                calories: '500 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Мука', amount: '500 г'},
+                    {name: 'Вода', amount: '250 мл'},
+                    {name: 'Баранина', amount: '600 г'},
+                    {name: 'Лук', amount: '3 шт'},
+                    {name: 'Соль, перец', amount: 'по вкусу'}
+                ],
+                instructions: [
+                    'Замесите тесто.',
+                    'Для начинки смешайте баранину с луком.',
+                    'Раскатайте тесто, нарежьте квадратами.',
+                    'Положите начинку, слепите манты.',
+                    'Готовьте в мантоварке 40 минут.'
+                ]
+            },
+            {
+                id: 'fish-cutlets',
+                title: 'Рыбные котлеты',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '40 мин',
+                servings: '4',
+                calories: '320 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Филе рыбы', amount: '500 г'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Хлеб', amount: '100 г'},
+                    {name: 'Яйцо', amount: '1 шт'},
+                    {name: 'Зелень', amount: 'пучок'}
+                ],
+                instructions: [
+                    'Измельчите рыбу и лук.',
+                    'Добавьте размоченный хлеб.',
+                    'Добавьте яйцо и зелень.',
+                    'Сформируйте котлеты.',
+                    'Обжарьте до золотистой корочки.'
+                ]
+            },
+            {
+                id: 'chicken-tabaka',
+                title: 'Цыпленок табака',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '2',
+                calories: '550 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Цыпленок', amount: '1 шт (800 г)'},
+                    {name: 'Чеснок', amount: '5 зубчиков'},
+                    {name: 'Аджика', amount: '2 ст.л.'},
+                    {name: 'Масло сливочное', amount: '100 г'},
+                    {name: 'Лимон', amount: '1 шт'}
+                ],
+                instructions: [
+                    'Разрежьте цыпленка вдоль.',
+                    'Расправьте, отбейте.',
+                    'Натрите аджикой и чесноком.',
+                    'Обжарьте под прессом.',
+                    'Подавайте с лимоном.'
+                ]
+            },
+            {
+                id: 'shashlyk',
+                title: 'Шашлык из свинины',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '240 мин',
+                servings: '6',
+                calories: '580 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Свиная шея', amount: '1.5 кг'},
+                    {name: 'Лук', amount: '5 шт'},
+                    {name: 'Уксус', amount: '100 мл'},
+                    {name: 'Специи для шашлыка', amount: '2 ст.л.'},
+                    {name: 'Зелень', amount: 'пучок'}
+                ],
+                instructions: [
+                    'Нарежьте мясо кубиками.',
+                    'Добавьте лук, уксус, специи.',
+                    'Маринуйте 3 часа.',
+                    'Нанижите на шампуры.',
+                    'Жарьте на углях 15-20 минут.',
+                    'Подавайте с зеленью.'
+                ]
+            },
+            {
+                id: 'vegetable-stew',
+                title: 'Овощное рагу',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '45 мин',
+                servings: '4',
+                calories: '220 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Кабачок', amount: '1 шт'},
+                    {name: 'Баклажан', amount: '1 шт'},
+                    {name: 'Перец болгарский', amount: '2 шт'},
+                    {name: 'Помидоры', amount: '3 шт'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Чеснок', amount: '3 зубчика'}
+                ],
+                instructions: [
+                    'Обжарьте лук.',
+                    'Добавьте овощи кубиками.',
+                    'Тушите 20 минут.',
+                    'Добавьте чеснок и зелень.',
+                    'Тушите еще 5 минут.'
+                ]
+            },
+            {
+                id: 'chicken-curry',
+                title: 'Курица карри',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '50 мин',
+                servings: '4',
+                calories: '420 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Куриное филе', amount: '500 г'},
+                    {name: 'Кокосовое молоко', amount: '400 мл'},
+                    {name: 'Паста карри', amount: '2 ст.л.'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Чеснок', amount: '3 зубчика'}
+                ],
+                instructions: [
+                    'Обжарьте лук и чеснок.',
+                    'Добавьте курицу.',
+                    'Добавьте пасту карри.',
+                    'Влейте кокосовое молоко.',
+                    'Тушите 20 минут.',
+                    'Подавайте с рисом.'
+                ]
+            },
+            {
+                id: 'stuffed-peppers',
+                title: 'Фаршированные перцы',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '6',
+                calories: '350 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Перец болгарский', amount: '6 шт'},
+                    {name: 'Фарш мясной', amount: '500 г'},
+                    {name: 'Рис', amount: '100 г'},
+                    {name: 'Лук', amount: '2 шт'},
+                    {name: 'Морковь', amount: '1 шт'},
+                    {name: 'Томатная паста', amount: '2 ст.л.'}
+                ],
+                instructions: [
+                    'Срежьте верхушки перцев.',
+                    'Смешайте фарш с рисом и луком.',
+                    'Нафаршируйте перцы.',
+                    'Обжарьте лук и морковь.',
+                    'Уложите перцы в кастрюлю.',
+                    'Залейте соусом, тушите 40 минут.'
+                ]
+            },
+            {
+                id: 'lamb-shashlyk',
+                title: 'Шашлык из баранины',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '240 мин',
+                servings: '6',
+                calories: '600 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Баранина', amount: '1.5 кг'},
+                    {name: 'Лук', amount: '6 шт'},
+                    {name: 'Уксус винный', amount: '100 мл'},
+                    {name: 'Зира', amount: '1 ст.л.'},
+                    {name: 'Кинза', amount: 'пучок'}
+                ],
+                instructions: [
+                    'Нарежьте мясо кубиками.',
+                    'Добавьте лук, уксус, специи.',
+                    'Маринуйте 4 часа.',
+                    'Нанижите на шампуры.',
+                    'Жарьте на углях.',
+                    'Подавайте с кинзой.'
+                ]
+            },
+            {
+                id: 'baked-potatoes',
+                title: 'Картофель запеченный',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '4',
+                calories: '320 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Картофель', amount: '8 шт'},
+                    {name: 'Чеснок', amount: '5 зубчиков'},
+                    {name: 'Масло оливковое', amount: '4 ст.л.'},
+                    {name: 'Розмарин', amount: '2 веточки'},
+                    {name: 'Соль морская', amount: 'по вкусу'}
+                ],
+                instructions: [
+                    'Нарежьте картофель дольками.',
+                    'Смешайте с маслом и чесноком.',
+                    'Выложите на противень.',
+                    'Посыпьте розмарином и солью.',
+                    'Запекайте 45 минут при 200°C.'
+                ]
+            },
+            {
+                id: 'meatballs',
+                title: 'Тефтели в томатном соусе',
+                category: 'main-dishes',
+                image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '50 мин',
+                servings: '4',
+                calories: '380 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Фарш мясной', amount: '500 г'},
+                    {name: 'Рис', amount: '100 г'},
+                    {name: 'Лук', amount: '2 шт'},
+                    {name: 'Томатная паста', amount: '3 ст.л.'},
+                    {name: 'Сметана', amount: '2 ст.л.'}
+                ],
+                instructions: [
+                    'Смешайте фарш с рисом и луком.',
+                    'Сформируйте тефтели.',
+                    'Обжарьте до румяной корочки.',
+                    'Приготовьте томатный соус.',
+                    'Залейте тефтели соусом.',
+                    'Тушите 30 минут.'
+                ]
+            },
+            
+            // САЛАТЫ (10 рецептов)
+            {
+                id: 'olivier',
+                title: 'Салат Оливье',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '8',
+                calories: '350 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Картофель', amount: '4 шт'},
+                    {name: 'Морковь', amount: '2 шт'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Огурцы соленые', amount: '4 шт'},
+                    {name: 'Горошек консервированный', amount: '1 банка'},
+                    {name: 'Колбаса вареная', amount: '300 г'},
+                    {name: 'Майонез', amount: '200 г'}
+                ],
+                instructions: [
+                    'Отварите картофель, морковь и яйца.',
+                    'Нарежьте все ингредиенты кубиками.',
+                    'Добавьте горошек.',
+                    'Заправьте майонезом.',
+                    'Посолите по вкусу.',
+                    'Украсьте зеленью.'
+                ]
+            },
+            {
+                id: 'herring-fur-coat',
+                title: 'Сельдь под шубой',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '8',
+                calories: '320 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Сельдь соленая', amount: '2 шт'},
+                    {name: 'Картофель', amount: '3 шт'},
+                    {name: 'Свекла', amount: '2 шт'},
+                    {name: 'Морковь', amount: '2 шт'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Майонез', amount: '250 г'}
+                ],
+                instructions: [
+                    'Отварите овощи и яйца.',
+                    'Натрите на терке отдельно.',
+                    'Филе сельди нарежьте кусочками.',
+                    'Выкладывайте слоями: картофель, сельдь, лук, морковь, яйца, свекла.',
+                    'Каждый слой смазывайте майонезом.',
+                    'Украсьте тертым яйцом.'
+                ]
+            },
+            {
+                id: 'caesar',
+                title: 'Салат Цезарь',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 мин',
+                servings: '2',
+                calories: '420 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Куриное филе', amount: '200 г'},
+                    {name: 'Салат романо', amount: '1 кочан'},
+                    {name: 'Сухарики', amount: '100 г'},
+                    {name: 'Пармезан', amount: '50 г'},
+                    {name: 'Соус Цезарь', amount: '4 ст.л.'}
+                ],
+                instructions: [
+                    'Обжарьте курицу.',
+                    'Порвите салат.',
+                    'Смешайте все ингредиенты.',
+                    'Заправьте соусом.',
+                    'Посыпьте пармезаном.'
+                ]
+            },
+            {
+                id: 'greek-salad',
+                title: 'Салат Греческий',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '20 мин',
+                servings: '4',
+                calories: '280 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Помидоры', amount: '4 шт'},
+                    {name: 'Огурцы', amount: '2 шт'},
+                    {name: 'Перец болгарский', amount: '1 шт'},
+                    {name: 'Лук красный', amount: '1 шт'},
+                    {name: 'Сыр Фета', amount: '200 г'},
+                    {name: 'Оливки', amount: '100 г'},
+                    {name: 'Масло оливковое', amount: '4 ст.л.'}
+                ],
+                instructions: [
+                    'Нарежьте овощи крупно.',
+                    'Добавьте сыр кубиками.',
+                    'Добавьте оливки.',
+                    'Заправьте маслом.',
+                    'Посыпьте орегано.'
+                ]
+            },
+            {
+                id: 'mimosa',
+                title: 'Салат Мимоза',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '6',
+                calories: '380 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Рыба консервированная', amount: '2 банки'},
+                    {name: 'Картофель', amount: '3 шт'},
+                    {name: 'Морковь', amount: '2 шт'},
+                    {name: 'Яйца', amount: '5 шт'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Майонез', amount: '200 г'}
+                ],
+                instructions: [
+                    'Отварите овощи и яйца.',
+                    'Натрите на терке отдельно.',
+                    'Разомните рыбу.',
+                    'Выкладывайте слоями: картофель, рыба, лук, морковь, белки, желтки.',
+                    'Смазывайте слои майонезом.',
+                    'Украсьте зеленью.'
+                ]
+            },
+            {
+                id: 'beetroot-salad',
+                title: 'Салат из свеклы',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '40 мин',
+                servings: '4',
+                calories: '180 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Свекла', amount: '3 шт'},
+                    {name: 'Чеснок', amount: '3 зубчика'},
+                    {name: 'Грецкие орехи', amount: '100 г'},
+                    {name: 'Чернослив', amount: '100 г'},
+                    {name: 'Майонез', amount: '3 ст.л.'}
+                ],
+                instructions: [
+                    'Отварите свеклу.',
+                    'Натрите на терке.',
+                    'Добавьте измельченные орехи и чернослив.',
+                    'Добавьте чеснок.',
+                    'Заправьте майонезом.'
+                ]
+            },
+            {
+                id: 'crab-salad',
+                title: 'Крабовый салат',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 мин',
+                servings: '4',
+                calories: '320 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Крабовые палочки', amount: '200 г'},
+                    {name: 'Кукуруза консервированная', amount: '1 банка'},
+                    {name: 'Рис', amount: '100 г'},
+                    {name: 'Яйца', amount: '3 шт'},
+                    {name: 'Зеленый горошек', amount: '100 г'},
+                    {name: 'Майонез', amount: '4 ст.л.'}
+                ],
+                instructions: [
+                    'Отварите рис и яйца.',
+                    'Нарежьте крабовые палочки.',
+                    'Смешайте все ингредиенты.',
+                    'Заправьте майонезом.',
+                    'Посолите по вкусу.'
+                ]
+            },
+            {
+                id: 'caprese',
+                title: 'Салат Капрезе',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '15 мин',
+                servings: '2',
+                calories: '250 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Помидоры', amount: '2 шт'},
+                    {name: 'Моцарелла', amount: '200 г'},
+                    {name: 'Базилик', amount: 'пучок'},
+                    {name: 'Масло оливковое', amount: '3 ст.л.'},
+                    {name: 'Бальзамический уксус', amount: '1 ст.л.'}
+                ],
+                instructions: [
+                    'Нарежьте помидоры и сыр кружками.',
+                    'Выложите поочередно.',
+                    'Украсьте базиликом.',
+                    'Полейте маслом и уксусом.',
+                    'Посолите, поперчите.'
+                ]
+            },
+            {
+                id: 'vinaigrette',
+                title: 'Винегрет',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '50 мин',
+                servings: '6',
+                calories: '150 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Свекла', amount: '2 шт'},
+                    {name: 'Картофель', amount: '3 шт'},
+                    {name: 'Морковь', amount: '2 шт'},
+                    {name: 'Огурцы соленые', amount: '4 шт'},
+                    {name: 'Лук', amount: '1 шт'},
+                    {name: 'Горошек консервированный', amount: '1 банка'},
+                    {name: 'Масло растительное', amount: '4 ст.л.'}
+                ],
+                instructions: [
+                    'Отварите овощи.',
+                    'Нарежьте кубиками.',
+                    'Добавьте горошек.',
+                    'Заправьте маслом.',
+                    'Посолите по вкусу.'
+                ]
+            },
+            {
+                id: 'tuna-salad',
+                title: 'Салат с тунцом',
+                category: 'salads',
+                image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '25 мин',
+                servings: '4',
+                calories: '280 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Тунец консервированный', amount: '2 банки'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Огурцы свежие', amount: '2 шт'},
+                    {name: 'Лук красный', amount: '1 шт'},
+                    {name: 'Майонез', amount: '3 ст.л.'},
+                    {name: 'Лимонный сок', amount: '1 ст.л.'}
+                ],
+                instructions: [
+                    'Отварите яйца.',
+                    'Нарежьте все ингредиенты.',
+                    'Разомните тунц.',
+                    'Смешайте все.',
+                    'Заправьте майонезом с лимонным соком.'
+                ]
+            },
+            
+            // ДЕСЕРТЫ (15 рецептов)
+            {
+                id: 'medovik',
+                title: 'Торт Медовик',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '180 мин',
+                servings: '10',
+                calories: '450 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Мед', amount: '100 г'},
+                    {name: 'Сахар', amount: '200 г'},
+                    {name: 'Сливочное масло', amount: '100 г'},
+                    {name: 'Яйца', amount: '3 шт'},
+                    {name: 'Мука', amount: '500 г'},
+                    {name: 'Сметана', amount: '800 г'},
+                    {name: 'Сахарная пудра', amount: '200 г'}
+                ],
+                instructions: [
+                    'Растопите мед с маслом.',
+                    'Добавьте яйца и сахар.',
+                    'Постепенно введите муку.',
+                    'Замесите тесто.',
+                    'Разделите на 8 частей.',
+                    'Раскатайте коржи, выпекайте.',
+                    'Взбейте сметану с сахарной пудрой.',
+                    'Соберите торт, пропитайте.',
+                    'Украсьте крошкой.'
+                ]
+            },
+            {
+                id: 'napoleon',
+                title: 'Торт Наполеон',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '240 мин',
+                servings: '12',
+                calories: '480 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Маргарин', amount: '400 г'},
+                    {name: 'Мука', amount: '600 г'},
+                    {name: 'Вода холодная', amount: '200 мл'},
+                    {name: 'Уксус', amount: '1 ст.л.'},
+                    {name: 'Молоко', amount: '1 л'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Сахар', amount: '300 г'},
+                    {name: 'Мука для заварного крема', amount: '100 г'}
+                ],
+                instructions: [
+                    'Замесите слоеное тесто.',
+                    'Разделите на 8-10 частей.',
+                    'Раскатайте тонкие коржи.',
+                    'Выпекайте до золотистого цвета.',
+                    'Приготовьте заварной крем.',
+                    'Смажьте коржи кремом.',
+                    'Украсьте крошкой.',
+                    'Дайте пропитаться 8 часов.'
+                ]
+            },
+            {
+                id: 'charlotte',
+                title: 'Шарлотка с яблоками',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '6',
+                calories: '320 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Яблоки', amount: '5 шт'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Сахар', amount: '200 г'},
+                    {name: 'Мука', amount: '200 г'},
+                    {name: 'Разрыхлитель', amount: '1 ч.л.'},
+                    {name: 'Корица', amount: '1 ч.л.'}
+                ],
+                instructions: [
+                    'Взбейте яйца с сахаром.',
+                    'Добавьте муку и разрыхлитель.',
+                    'Нарежьте яблоки дольками.',
+                    'Выложите яблоки в форму.',
+                    'Залейте тестом.',
+                    'Посыпьте корицей.',
+                    'Выпекайте 40 минут при 180°C.'
+                ]
+            },
+            {
+                id: 'pancakes',
+                title: 'Блины тонкие',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '40 мин',
+                servings: '4',
+                calories: '280 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Молоко', amount: '500 мл'},
+                    {name: 'Яйца', amount: '3 шт'},
+                    {name: 'Мука', amount: '200 г'},
+                    {name: 'Сахар', amount: '2 ст.л.'},
+                    {name: 'Соль', amount: 'щепотка'},
+                    {name: 'Масло растительное', amount: '2 ст.л.'}
+                ],
+                instructions: [
+                    'Взбейте яйца с сахаром.',
+                    'Добавьте молоко.',
+                    'Постепенно введите муку.',
+                    'Добавьте масло.',
+                    'Дайте тесту постоять 20 минут.',
+                    'Жарьте на разогретой сковороде.'
+                ]
+            },
+            {
+                id: 'cheesecake',
+                title: 'Чизкейк Нью-Йорк',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '300 мин',
+                servings: '10',
+                calories: '520 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Печенье', amount: '300 г'},
+                    {name: 'Сливочное масло', amount: '100 г'},
+                    {name: 'Сыр Филадельфия', amount: '900 г'},
+                    {name: 'Сахар', amount: '200 г'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Сливки 33%', amount: '200 мл'},
+                    {name: 'Ванилин', amount: '1 ч.л.'}
+                ],
+                instructions: [
+                    'Измельчите печенье с маслом.',
+                    'Выложите в форму, утрамбуйте.',
+                    'Взбейте сыр с сахаром.',
+                    'Добавьте яйца по одному.',
+                    'Влейте сливки, добавьте ванилин.',
+                    'Вылейте на основу.',
+                    'Выпекайте на водяной бане 60 минут.',
+                    'Охладите, затем уберите в холодильник на 6 часов.'
+                ]
+            },
+            {
+                id: 'tiramisu',
+                title: 'Тирамису',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '6',
+                calories: '380 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Сыр маскарпоне', amount: '500 г'},
+                    {name: 'Яйца', amount: '3 шт'},
+                    {name: 'Сахар', amount: '100 г'},
+                    {name: 'Печенье савоярди', amount: '200 г'},
+                    {name: 'Кофе эспрессо', amount: '300 мл'},
+                    {name: 'Какао-порошок', amount: 'для посыпки'},
+                    {name: 'Ликер Амаретто', amount: '3 ст.л.'}
+                ],
+                instructions: [
+                    'Приготовьте кофе, остудите.',
+                    'Взбейте желтки с сахаром.',
+                    'Добавьте маскарпоне.',
+                    'Взбейте белки, аккуратно вмешайте.',
+                    'Обмакните печенье в кофе.',
+                    'Выложите слой печенья.',
+                    'Покройте кремом.',
+                    'Повторите слои.',
+                    'Уберите в холодильник на 6 часов.',
+                    'Перед подачей посыпьте какао.'
+                ]
+            },
+            {
+                id: 'apple-pie',
+                title: 'Яблочный пирог',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '8',
+                calories: '350 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Мука', amount: '300 г'},
+                    {name: 'Сливочное масло', amount: '200 г'},
+                    {name: 'Сахар', amount: '150 г'},
+                    {name: 'Яйцо', amount: '1 шт'},
+                    {name: 'Яблоки', amount: '6 шт'},
+                    {name: 'Корица', amount: '1 ч.л.'},
+                    {name: 'Лимонный сок', amount: '1 ст.л.'}
+                ],
+                instructions: [
+                    'Замесите песочное тесто.',
+                    'Раскатайте, выложите в форму.',
+                    'Нарежьте яблоки дольками.',
+                    'Смешайте яблоки с сахаром, корицей и лимонным соком.',
+                    'Выложите яблоки на тесто.',
+                    'Запекайте 45 минут при 180°C.',
+                    'Подавайте охлажденным.'
+                ]
+            },
+            {
+                id: 'chocolate-mousse',
+                title: 'Шоколадный мусс',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 мин + охлаждение',
+                servings: '4',
+                calories: '320 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Темный шоколад', amount: '200 г'},
+                    {name: 'Сливки 33%', amount: '200 мл'},
+                    {name: 'Яйца', amount: '3 шт'},
+                    {name: 'Сахар', amount: '50 г'},
+                    {name: 'Соль', amount: 'щепотка'}
+                ],
+                instructions: [
+                    'Растопите шоколад.',
+                    'Отделите желтки от белков.',
+                    'Взбейте сливки.',
+                    'Взбейте белки с сахаром и солью.',
+                    'Смешайте желтки с шоколадом.',
+                    'Аккуратно соедините все компоненты.',
+                    'Разлейте по креманкам.',
+                    'Уберите в холодильник на 4 часа.'
+                ]
+            },
+            {
+                id: 'creme-brulee',
+                title: 'Крем-брюле',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '120 мин',
+                servings: '4',
+                calories: '380 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Сливки 33%', amount: '500 мл'},
+                    {name: 'Яичные желтки', amount: '6 шт'},
+                    {name: 'Сахар', amount: '100 г'},
+                    {name: 'Ваниль', amount: '1 стручок'},
+                    {name: 'Сахар для карамели', amount: '4 ст.л.'}
+                ],
+                instructions: [
+                    'Нагрейте сливки с ванилью.',
+                    'Взбейте желтки с сахаром.',
+                    'Тонкой струйкой влейте сливки в желтки.',
+                    'Процедите через сито.',
+                    'Разлейте по формочкам.',
+                    'Запекайте на водяной бане 60 минут.',
+                    'Охладите, затем уберите в холодильник.',
+                    'Перед подачей посыпьте сахаром, карамелизуйте.'
+                ]
+            },
+            {
+                id: 'panna-cotta',
+                title: 'Панна-котта',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 мин + охлаждение',
+                servings: '4',
+                calories: '280 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Сливки 33%', amount: '500 мл'},
+                    {name: 'Сахар', amount: '80 г'},
+                    {name: 'Желатин', amount: '10 г'},
+                    {name: 'Ваниль', amount: '1 стручок'},
+                    {name: 'Ягодный соус', amount: 'для подачи'}
+                ],
+                instructions: [
+                    'Замочите желатин.',
+                    'Нагрейте сливки с сахаром и ванилью.',
+                    'Добавьте желатин, размешайте до растворения.',
+                    'Процедите через сито.',
+                    'Разлейте по формочкам.',
+                    'Охладите 4 часа.',
+                    'Подавайте с ягодным соусом.'
+                ]
+            },
+            {
+                id: 'eclair',
+                title: 'Эклеры с заварным кремом',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '12',
+                calories: '320 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Вода', amount: '250 мл'},
+                    {name: 'Сливочное масло', amount: '100 г'},
+                    {name: 'Мука', amount: '150 г'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Молоко', amount: '500 мл'},
+                    {name: 'Яичные желтки', amount: '4 шт'},
+                    {name: 'Сахар', amount: '150 г'},
+                    {name: 'Мука для крема', amount: '40 г'},
+                    {name: 'Шоколадная глазурь', amount: '200 г'}
+                ],
+                instructions: [
+                    'Приготовьте заварное тесто.',
+                    'Выдавите эклеры на противень.',
+                    'Выпекайте 25 минут при 200°C.',
+                    'Приготовьте заварной крем.',
+                    'Наполните эклеры кремом.',
+                    'Покройте шоколадной глазурью.'
+                ]
+            },
+            {
+                id: 'meringue',
+                title: 'Безе (меренги)',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '180 мин',
+                servings: '20',
+                calories: '50 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Яичные белки', amount: '4 шт'},
+                    {name: 'Сахар', amount: '200 г'},
+                    {name: 'Лимонный сок', amount: '1 ч.л.'},
+                    {name: 'Соль', amount: 'щепотка'}
+                ],
+                instructions: [
+                    'Взбейте белки с солью до пены.',
+                    'Постепенно добавляйте сахар.',
+                    'Добавьте лимонный сок.',
+                    'Взбивайте до устойчивых пиков.',
+                    'Выложите ложкой на противень.',
+                    'Сушите в духовке 2 часа при 100°C.',
+                    'Выключите духовку, оставьте до полного остывания.'
+                ]
+            },
+            {
+                id: 'fruit-salad',
+                title: 'Фруктовый салат',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '20 мин',
+                servings: '4',
+                calories: '150 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Киви', amount: '2 шт'},
+                    {name: 'Бананы', amount: '2 шт'},
+                    {name: 'Апельсины', amount: '2 шт'},
+                    {name: 'Яблоки', amount: '2 шт'},
+                    {name: 'Виноград', amount: '200 г'},
+                    {name: 'Йогурт натуральный', amount: '200 г'},
+                    {name: 'Мед', amount: '2 ст.л.'}
+                ],
+                instructions: [
+                    'Нарежьте все фрукты кубиками.',
+                    'Смешайте в миске.',
+                    'Заправьте йогуртом с медом.',
+                    'Подавайте охлажденным.'
+                ]
+            },
+            {
+                id: 'chocolate-fondant',
+                title: 'Шоколадный фондан',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 мин',
+                servings: '4',
+                calories: '450 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Темный шоколад', amount: '200 г'},
+                    {name: 'Сливочное масло', amount: '100 г'},
+                    {name: 'Яйца', amount: '3 шт'},
+                    {name: 'Сахар', amount: '100 г'},
+                    {name: 'Мука', amount: '50 г'}
+                ],
+                instructions: [
+                    'Растопите шоколад с маслом.',
+                    'Взбейте яйца с сахаром.',
+                    'Смешайте с шоколадом.',
+                    'Добавьте муку.',
+                    'Разлейте по формочкам.',
+                    'Выпекайте 10-12 минут при 200°C.',
+                    'Подавайте теплым.'
+                ]
+            },
+            {
+                id: 'berry-jelly',
+                title: 'Ягодное желе',
+                category: 'desserts',
+                image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 мин + застывание',
+                servings: '6',
+                calories: '120 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Смесь ягод', amount: '500 г'},
+                    {name: 'Сахар', amount: '150 г'},
+                    {name: 'Желатин', amount: '20 г'},
+                    {name: 'Вода', amount: '500 мл'},
+                    {name: 'Лимонный сок', amount: '1 ст.л.'}
+                ],
+                instructions: [
+                    'Замочите желатин.',
+                    'Приготовьте ягодное пюре.',
+                    'Добавьте сахар и лимонный сок.',
+                    'Добавьте желатин, размешайте.',
+                    'Разлейте по формочкам.',
+                    'Уберите в холодильник до застывания.'
+                ]
+            },
+            
+            // ВЫПЕЧКА (12 рецептов)
+            {
+                id: 'blini',
+                title: 'Блины с икрой',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '8',
+                calories: '350 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Молоко', amount: '1 л'},
+                    {name: 'Яйца', amount: '6 шт'},
+                    {name: 'Мука', amount: '400 г'},
+                    {name: 'Сахар', amount: '2 ст.л.'},
+                    {name: 'Соль', amount: '1 ч.л.'},
+                    {name: 'Масло растительное', amount: '4 ст.л.'},
+                    {name: 'Красная икра', amount: '200 г'},
+                    {name: 'Сметана', amount: '200 г'}
+                ],
+                instructions: [
+                    'Взбейте яйца с сахаром и солью.',
+                    'Добавьте молоко.',
+                    'Постепенно введите муку.',
+                    'Добавьте масло.',
+                    'Дайте тесту постоять 30 минут.',
+                    'Жарьте тонкие блины.',
+                    'Подавайте с икрой и сметаной.'
+                ]
+            },
+            {
+                id: 'pirozhki',
+                title: 'Пирожки с капустой',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '120 мин',
+                servings: '12',
+                calories: '280 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Молоко', amount: '500 мл'},
+                    {name: 'Дрожжи сухие', amount: '10 г'},
+                    {name: 'Сахар', amount: '2 ст.л.'},
+                    {name: 'Соль', amount: '1 ч.л.'},
+                    {name: 'Масло растительное', amount: '100 мл'},
+                    {name: 'Мука', amount: '800 г'},
+                    {name: 'Капуста', amount: '1 кг'},
+                    {name: 'Лук', amount: '2 шт'},
+                    {name: 'Яйца для смазки', amount: '2 шт'}
+                ],
+                instructions: [
+                    'Приготовьте дрожжевое тесто.',
+                    'Дайте подойти 1 час.',
+                    'Приготовьте начинку из капусты с луком.',
+                    'Разделите тесто на части.',
+                    'Сформируйте пирожки.',
+                    'Выложите на противень.',
+                    'Смажьте яйцом.',
+                    'Выпекайте 25 минут при 180°C.'
+                ]
+            },
+            {
+                id: 'syrniki',
+                title: 'Сырники',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '40 мин',
+                servings: '4',
+                calories: '320 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Творог', amount: '500 г'},
+                    {name: 'Яйца', amount: '2 шт'},
+                    {name: 'Сахар', amount: '3 ст.л.'},
+                    {name: 'Мука', amount: '5 ст.л.'},
+                    {name: 'Соль', amount: 'щепотка'},
+                    {name: 'Ванилин', amount: '1 ч.л.'},
+                    {name: 'Масло растительное', amount: 'для жарки'},
+                    {name: 'Сметана', amount: 'для подачи'}
+                ],
+                instructions: [
+                    'Протрите творог через сито.',
+                    'Добавьте яйца, сахар, соль, ванилин.',
+                    'Добавьте муку.',
+                    'Сформируйте сырники.',
+                    'Обваляйте в муке.',
+                    'Обжарьте на среднем огне.',
+                    'Подавайте со сметаной.'
+                ]
+            },
+            {
+                id: 'vatrushki',
+                title: 'Ватрушки с творогом',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '8',
+                calories: '300 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Молоко', amount: '250 мл'},
+                    {name: 'Дрожжи сухие', amount: '7 г'},
+                    {name: 'Сахар', amount: '3 ст.л.'},
+                    {name: 'Соль', amount: '1 ч.л.'},
+                    {name: 'Масло сливочное', amount: '80 г'},
+                    {name: 'Мука', amount: '500 г'},
+                    {name: 'Творог', amount: '400 г'},
+                    {name: 'Яйца', amount: '2 шт'},
+                    {name: 'Ванилин', amount: '1 ч.л.'}
+                ],
+                instructions: [
+                    'Приготовьте дрожжевое тесто.',
+                    'Дайте подойти 1 час.',
+                    'Смешайте творог с яйцами, сахаром и ванилью.',
+                    'Разделите тесто на части.',
+                    'Сформируйте ватрушки.',
+                    'Выложите начинку.',
+                    'Выпекайте 25 минут при 180°C.'
+                ]
+            },
+            {
+                id: 'kulebyaka',
+                title: 'Кулебяка с рыбой',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '180 мин',
+                servings: '8',
+                calories: '450 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Мука', amount: '600 г'},
+                    {name: 'Молоко', amount: '250 мл'},
+                    {name: 'Дрожжи', amount: '20 г'},
+                    {name: 'Яйца', amount: '3 шт'},
+                    {name: 'Сливочное масло', amount: '150 г'},
+                    {name: 'Лосось', amount: '500 г'},
+                    {name: 'Рис', amount: '200 г'},
+                    {name: 'Лук', amount: '3 шт'},
+                    {name: 'Укроп', amount: 'пучок'}
+                ],
+                instructions: [
+                    'Приготовьте дрожжевое тесто.',
+                    'Дайте подойти 1.5 часа.',
+                    'Приготовьте начинку из риса и рыбы.',
+                    'Раскатайте тесто.',
+                    'Выложите начинку.',
+                    'Защипните края.',
+                    'Сделайте узор на поверхности.',
+                    'Смажьте яйцом.',
+                    'Выпекайте 45 минут при 180°C.'
+                ]
+            },
+            {
+                id: 'kalach',
+                title: 'Калач московский',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '180 мин',
+                servings: '10',
+                calories: '350 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Мука', amount: '800 г'},
+                    {name: 'Молоко', amount: '400 мл'},
+                    {name: 'Дрожжи', amount: '30 г'},
+                    {name: 'Сахар', amount: '100 г'},
+                    {name: 'Соль', amount: '1 ч.л.'},
+                    {name: 'Яйца', amount: '3 шт'},
+                    {name: 'Сливочное масло', amount: '150 г'}
+                ],
+                instructions: [
+                    'Приготовьте опару.',
+                    'Замесите тесто.',
+                    'Дайте подойти 2 часа.',
+                    'Сформируйте калач.',
+                    'Дайте расстояться 30 минут.',
+                    'Сделайте надрезы.',
+                    'Смажьте яйцом.',
+                    'Выпекайте 40 минут при 200°C.'
+                ]
+            },
+            {
+                id: 'belyashi',
+                title: 'Беляши с мясом',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '120 мин',
+                servings: '10',
+                calories: '380 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Мука', amount: '600 г'},
+                    {name: 'Кефир', amount: '400 мл'},
+                    {name: 'Сода', amount: '1 ч.л.'},
+                    {name: 'Соль', amount: '1 ч.л.'},
+                    {name: 'Фарш говяжий', amount: '500 г'},
+                    {name: 'Лук', amount: '3 шт'},
+                    {name: 'Перец черный', amount: 'по вкусу'},
+                    {name: 'Масло растительное', amount: 'для жарки'}
+                ],
+                instructions: [
+                    'Замесите тесто на кефире.',
+                    'Дайте постоять 30 минут.',
+                    'Приготовьте фарш с луком.',
+                    'Разделите тесто на части.',
+                    'Сформируйте беляши.',
+                    'Жарьте во фритюре.',
+                    'Подавайте горячими.'
+                ]
+            },
+            {
+                id: 'chebureki',
+                title: 'Чебуреки',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '8',
+                calories: '420 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Мука', amount: '500 г'},
+                    {name: 'Вода', amount: '250 мл'},
+                    {name: 'Яйцо', amount: '1 шт'},
+                    {name: 'Соль', amount: '1 ч.л.'},
+                    {name: 'Фарш бараний', amount: '500 г'},
+                    {name: 'Лук', amount: '3 шт'},
+                    {name: 'Зелень', amount: 'пучок'},
+                    {name: 'Масло растительное', amount: 'для жарки'}
+                ],
+                instructions: [
+                    'Замесите крутое тесто.',
+                    'Дайте отдохнуть 30 минут.',
+                    'Приготовьте фарш с луком и зеленью.',
+                    'Раскатайте тесто тонко.',
+                    'Выложите начинку.',
+                    'Защипните края.',
+                    'Жарьте во фритюре.',
+                    'Подавайте горячими.'
+                ]
+            },
+            {
+                id: 'khachapuri',
+                title: 'Хачапури по-аджарски',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '120 мин',
+                servings: '4',
+                calories: '520 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Мука', amount: '400 г'},
+                    {name: 'Вода', amount: '200 мл'},
+                    {name: 'Дрожжи сухие', amount: '7 г'},
+                    {name: 'Соль', amount: '1 ч.л.'},
+                    {name: 'Сахар', amount: '1 ч.л.'},
+                    {name: 'Сыр сулугуни', amount: '400 г'},
+                    {name: 'Яйца', amount: '4 шт'},
+                    {name: 'Сливочное масло', amount: '50 г'}
+                ],
+                instructions: [
+                    'Приготовьте дрожжевое тесто.',
+                    'Дайте подойти 1 час.',
+                    'Натрите сыр.',
+                    'Разделите тесто на части.',
+                    'Сформируйте лодочки.',
+                    'Заполните сыром.',
+                    'Выпекайте 15 минут при 220°C.',
+                    'Добавьте яйцо, выпекайте еще 5 минут.',
+                    'Добавьте масло, подавайте горячими.'
+                ]
+            },
+            {
+                id: 'lavash',
+                title: 'Лаваш армянский',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '8',
+                calories: '250 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Мука', amount: '500 г'},
+                    {name: 'Вода теплая', amount: '300 мл'},
+                    {name: 'Соль', amount: '1 ч.л.'},
+                    {name: 'Растительное масло', amount: '2 ст.л.'}
+                ],
+                instructions: [
+                    'Замесите тугое тесто.',
+                    'Дайте отдохнуть 30 минут.',
+                    'Разделите на 8 частей.',
+                    'Раскатайте очень тонко.',
+                    'Жарьте на сухой сковороде 1-2 минуты с каждой стороны.',
+                    'Сложите стопкой, накройте полотенцем.'
+                ]
+            },
+            {
+                id: 'donuts',
+                title: 'Пончики с сахарной пудрой',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '12',
+                calories: '380 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Мука', amount: '500 г'},
+                    {name: 'Молоко', amount: '250 мл'},
+                    {name: 'Дрожжи сухие', amount: '10 г'},
+                    {name: 'Сахар', amount: '80 г'},
+                    {name: 'Яйца', amount: '2 шт'},
+                    {name: 'Сливочное масло', amount: '50 г'},
+                    {name: 'Сахарная пудра', amount: '100 г'},
+                    {name: 'Масло растительное', amount: 'для фритюра'}
+                ],
+                instructions: [
+                    'Приготовьте дрожжевое тесто.',
+                    'Дайте подойти 1 час.',
+                    'Раскатайте, вырежьте круги.',
+                    'Дайте расстояться 20 минут.',
+                    'Жарьте во фритюре.',
+                    'Обваляйте в сахарной пудре.'
+                ]
+            },
+            {
+                id: 'bagels',
+                title: 'Бублики с маком',
+                category: 'baking',
+                image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '90 мин',
+                servings: '10',
+                calories: '300 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Мука', amount: '500 г'},
+                    {name: 'Вода', amount: '250 мл'},
+                    {name: 'Дрожжи сухие', amount: '10 г'},
+                    {name: 'Сахар', amount: '50 г'},
+                    {name: 'Соль', amount: '1 ч.л.'},
+                    {name: 'Масло растительное', amount: '50 мл'},
+                    {name: 'Мак', amount: '100 г'},
+                    {name: 'Яйцо для смазки', amount: '1 шт'}
+                ],
+                instructions: [
+                    'Приготовьте дрожжевое тесто.',
+                    'Дайте подойти 1 час.',
+                    'Сформируйте бублики.',
+                    'Дайте расстояться 20 минут.',
+                    'Отварите в кипящей воде 30 секунд.',
+                    'Смажьте яйцом, посыпьте маком.',
+                    'Выпекайте 25 минут при 200°C.'
+                ]
+            },
+            
+            // НАПИТКИ (8 рецептов)
+            {
+                id: 'mors',
+                title: 'Морс клюквенный',
+                category: 'drinks',
+                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 мин',
+                servings: '4',
+                calories: '80 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Клюква', amount: '500 г'},
+                    {name: 'Вода', amount: '1.5 л'},
+                    {name: 'Сахар', amount: '150 г'},
+                    {name: 'Мед', amount: 'по вкусу'},
+                    {name: 'Мята', amount: 'для подачи'}
+                ],
+                instructions: [
+                    'Разомните клюкву.',
+                    'Отожмите сок через марлю.',
+                    'Жмых залейте водой, доведите до кипения.',
+                    'Процедите, добавьте сахар.',
+                    'Остудите, добавьте сок.',
+                    'Подавайте охлажденным с мятой.'
+                ]
+            },
+            {
+                id: 'sbiten',
+                title: 'Сбитень',
+                category: 'drinks',
+                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '40 мин',
+                servings: '6',
+                calories: '120 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Мед', amount: '200 г'},
+                    {name: 'Вода', amount: '1.5 л'},
+                    {name: 'Имбирь', amount: '30 г'},
+                    {name: 'Корица', amount: '1 палочка'},
+                    {name: 'Гвоздика', amount: '5 шт'},
+                    {name: 'Кардамон', amount: '3 шт'},
+                    {name: 'Лимон', amount: '1 шт'}
+                ],
+                instructions: [
+                    'Вскипятите воду со специями.',
+                    'Добавьте мед.',
+                    'Томите 20 минут на медленном огне.',
+                    'Добавьте лимонный сок.',
+                    'Процедите.',
+                    'Подавайте горячим.'
+                ]
+            },
+            {
+                id: 'kvass',
+                title: 'Квас хлебный',
+                category: 'drinks',
+                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '48 часов',
+                servings: '10',
+                calories: '50 ккал',
+                difficulty: 'Средняя',
+                ingredients: [
+                    {name: 'Ржаной хлеб', amount: '500 г'},
+                    {name: 'Вода', amount: '5 л'},
+                    {name: 'Сахар', amount: '200 г'},
+                    {name: 'Дрожжи', amount: '10 г'},
+                    {name: 'Изюм', amount: '50 г'},
+                    {name: 'Мята', amount: 'несколько веточек'}
+                ],
+                instructions: [
+                    'Подсушите хлеб в духовке.',
+                    'Залейте кипятком.',
+                    'Дайте настояться 6 часов.',
+                    'Процедите.',
+                    'Добавьте сахар, дрожжи, изюм.',
+                    'Оставьте бродить 12 часов.',
+                    'Разлейте по бутылкам.',
+                    'Дайте настояться еще 12 часов.',
+                    'Подавайте охлажденным.'
+                ]
+            },
+            {
+                id: 'compote',
+                title: 'Компот из сухофруктов',
+                category: 'drinks',
+                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '60 мин',
+                servings: '6',
+                calories: '100 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Смесь сухофруктов', amount: '500 г'},
+                    {name: 'Вода', amount: '3 л'},
+                    {name: 'Сахар', amount: '200 г'},
+                    {name: 'Лимон', amount: '1 шт'},
+                    {name: 'Мед', amount: 'по вкусу'}
+                ],
+                instructions: [
+                    'Промойте сухофрукты.',
+                    'Залейте водой.',
+                    'Доведите до кипения.',
+                    'Добавьте сахар.',
+                    'Варите 30 минут.',
+                    'Добавьте лимонный сок.',
+                    'Дайте настояться.',
+                    'Подавайте теплым или охлажденным.'
+                ]
+            },
+            {
+                id: 'kissel',
+                title: 'Кисель ягодный',
+                category: 'drinks',
+                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '40 мин',
+                servings: '4',
+                calories: '150 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Свежие или замороженные ягоды', amount: '400 г'},
+                    {name: 'Вода', amount: '1 л'},
+                    {name: 'Сахар', amount: '150 г'},
+                    {name: 'Крахмал картофельный', amount: '4 ст.л.'},
+                    {name: 'Лимонная кислота', amount: 'щепотка'}
+                ],
+                instructions: [
+                    'Разомните ягоды.',
+                    'Отожмите сок.',
+                    'Жмых залейте водой, варите 10 минут.',
+                    'Процедите, добавьте сахар.',
+                    'Разведите крахмал в холодной воде.',
+                    'Влейте в кипящий отвар, помешивая.',
+                    'Добавьте ягодный сок.',
+                    'Подавайте охлажденным.'
+                ]
+            },
+            {
+                id: 'tea-samovar',
+                title: 'Чай из самовара',
+                category: 'drinks',
+                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 мин',
+                servings: '8',
+                calories: '0 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Черный чай', amount: '4 ст.л.'},
+                    {name: 'Вода для самовара', amount: '5 л'},
+                    {name: 'Сахар', amount: 'по вкусу'},
+                    {name: 'Лимон', amount: '1 шт'},
+                    {name: 'Мед', amount: 'по вкусу'},
+                    {name: 'Варенье', amount: 'для подачи'}
+                ],
+                instructions: [
+                    'Затопите самовар.',
+                    'В заварочный чайник положите чай.',
+                    'Залейте кипятком из самовара.',
+                    'Дайте настояться 10 минут.',
+                    'Разливайте в чашки, разбавляя водой из самовара.',
+                    'Подавайте с лимоном, медом, вареньем.'
+                ]
+            },
+            {
+                id: 'medovukha',
+                title: 'Медовуха',
+                category: 'drinks',
+                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '30 дней',
+                servings: '20',
+                calories: '200 ккал',
+                difficulty: 'Сложная',
+                ingredients: [
+                    {name: 'Мед', amount: '1 кг'},
+                    {name: 'Вода', amount: '4 л'},
+                    {name: 'Дрожжи винные', amount: '20 г'},
+                    {name: 'Хмель', amount: '20 г'},
+                    {name: 'Корица', amount: '1 палочка'},
+                    {name: 'Гвоздика', amount: '5 шт'}
+                ],
+                instructions: [
+                    'Растворите мед в теплой воде.',
+                    'Добавьте специи.',
+                    'Доведите до кипения, снимите пену.',
+                    'Остудите до 30°C.',
+                    'Добавьте дрожжи и хмель.',
+                    'Перелейте в бутыль с гидрозатвором.',
+                    'Бродит 2-3 недели.',
+                    'Слейте с осадка.',
+                    'Выдержите еще неделю.',
+                    'Подавайте охлажденным.'
+                ]
+            },
+            {
+                id: 'smoothie',
+                title: 'Смузи ягодный',
+                category: 'drinks',
+                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                time: '10 мин',
+                servings: '2',
+                calories: '180 ккал',
+                difficulty: 'Легкая',
+                ingredients: [
+                    {name: 'Смесь ягод', amount: '300 г'},
+                    {name: 'Бананы', amount: '2 шт'},
+                    {name: 'Йогурт натуральный', amount: '200 мл'},
+                    {name: 'Мед', amount: '2 ст.л.'},
+                    {name: 'Лед', amount: 'по желанию'},
+                    {name: 'Мята', amount: 'для украшения'}
+                ],
+                instructions: [
+                    'Очистите бананы.',
+                    'Сложите все ингредиенты в блендер.',
+                    'Измельчите до однородности.',
+                    'Разлейте по бокалам.',
+                    'Украсьте мятой.',
+                    'Подавайте сразу.'
+                ]
+            }
+        ];
+
+        // Переменные для управления рецептами
+        let currentPage = 1;
+        const recipesPerPage = 12;
+        let currentCategory = 'all';
+        let filteredRecipes = [...recipes];
+
+        // Инициализация сайта
+        document.addEventListener('DOMContentLoaded', function() {
+            displayRecipes();
+            setupEventListeners();
+            updateRecipeCounter();
+        });
+
+        // Отображение рецептов
+        function displayRecipes() {
+            const recipesGrid = document.getElementById('recipes-grid');
+            const pagination = document.getElementById('pagination');
+            
+            // Фильтрация по категории
+            if (currentCategory !== 'all') {
+                filteredRecipes = recipes.filter(recipe => recipe.category === currentCategory);
+            } else {
+                filteredRecipes = [...recipes];
+            }
+            
+            // Обновление счетчика
+            updateRecipeCounter();
+            
+            // Расчет пагинации
+            const totalPages = Math.ceil(filteredRecipes.length / recipesPerPage);
+            const startIndex = (currentPage - 1) * recipesPerPage;
+            const endIndex = startIndex + recipesPerPage;
+            const recipesToShow = filteredRecipes.slice(startIndex, endIndex);
+            
+            // Очистка сетки рецептов
+            recipesGrid.innerHTML = '';
+            
+            // Отображение рецептов
+            recipesToShow.forEach(recipe => {
+                const recipeCard = document.createElement('div');
+                recipeCard.className = 'recipe-card';
+                recipeCard.innerHTML = `
+                    <img src="${recipe.image}" alt="${recipe.title}" class="recipe-img">
+                    <div class="recipe-content">
+                        <h3>${recipe.title}</h3>
+                        <div class="recipe-meta">
+                            <span><i class="fas fa-clock"></i> ${recipe.time}</span>
+                            <span><i class="fas fa-user-friends"></i> ${recipe.servings}</span>
+                            <span><i class="fas fa-signal"></i> ${recipe.difficulty}</span>
+                        </div>
+                        <button class="btn view-recipe-btn" data-id="${recipe.id}">Читать рецепт</button>
+                    </div>
+                `;
+                recipesGrid.appendChild(recipeCard);
+            });
+            
+            // Отображение пагинации
+            displayPagination(totalPages);
+            
+            // Добавление обработчиков для кнопок рецептов
+            document.querySelectorAll('.view-recipe-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const recipeId = this.getAttribute('data-id');
+                    openRecipeModal(recipeId);
+                });
+            });
+        }
+
+        // Отображение пагинации
+        function displayPagination(totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // Кнопка "Назад"
+            const prevButton = document.createElement('button');
+            prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayRecipes();
+                }
+            });
+            pagination.appendChild(prevButton);
+            
+            // Кнопки страниц
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.className = currentPage === i ? 'active' : '';
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    displayRecipes();
+                });
+                pagination.appendChild(pageButton);
+            }
+            
+            // Кнопка "Вперед"
+            const nextButton = document.createElement('button');
+            nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayRecipes();
+                }
+            });
+            pagination.appendChild(nextButton);
+        }
+
+        // Открытие модального окна с рецептом
+        function openRecipeModal(recipeId) {
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (!recipe) return;
+            
+            const modalContent = document.getElementById('modal-content');
+            
+            // Формирование HTML для ингредиентов
+            let ingredientsHTML = '';
+            recipe.ingredients.forEach(ingredient => {
+                ingredientsHTML += `
+                    <li>
+                        <span class="ingredient-name">${ingredient.name}</span>
+                        <span class="ingredient-amount">${ingredient.amount}</span>
+                    </li>
+                `;
+            });
+            
+            // Формирование HTML для инструкций
+            let instructionsHTML = '';
+            recipe.instructions.forEach((step, index) => {
+                instructionsHTML += `<li>${step}</li>`;
+            });
+            
+            // Сборка всего контента
+            const recipeHTML = `
+                <div class="modal-header">
+                    <img src="${recipe.image}" alt="${recipe.title}">
+                </div>
+                <div class="modal-body">
+                    <h2>${recipe.title}</h2>
+                    <div class="recipe-details">
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${recipe.time}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-user-friends"></i>
+                            <span>${recipe.servings} порции</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-fire"></i>
+                            <span>${recipe.calories}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-signal"></i>
+                            <span>${recipe.difficulty}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ingredients-section">
+                        <h3>Ингредиенты</h3>
+                        <ul class="ingredients-list">
+                            ${ingredientsHTML}
+                        </ul>
+                    </div>
+                    
+                    <div class="instructions-section">
+                        <h3>Способ приготовления</h3>
+                        <ol class="instructions-list">
+                            ${instructionsHTML}
+                        </ol>
+                    </div>
+                </div>
+            `;
+            
+            modalContent.innerHTML = recipeHTML;
+            document.getElementById('recipe-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Поиск рецептов
+            document.getElementById('search-btn').addEventListener('click', searchRecipes);
+            document.getElementById('search-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchRecipes();
+            });
+            
+            // Фильтрация по категориям
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentCategory = this.getAttribute('data-category');
+                    currentPage = 1;
+                    displayRecipes();
+                });
+            });
+            
+            // Клик по карточкам категорий
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelector(`.filter-btn[data-category="${category}"]`).classList.add('active');
+                    currentCategory = category;
+                    currentPage = 1;
+                    displayRecipes();
+                    
+                    // Прокрутка к рецептам
+                    document.getElementById('recipes').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            // Клик по рецептам в футере
+            document.querySelectorAll('footer a[data-recipe]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const recipeId = this.getAttribute('data-recipe');
+                    openRecipeModal(recipeId);
+                });
+            });
+            
+            // Клик по категориям в футере
+            document.querySelectorAll('footer a[data-category]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const category = this.getAttribute('data-category');
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelector(`.filter-btn[data-category="${category}"]`).classList.add('active');
+                    currentCategory = category;
+                    currentPage = 1;
+                    displayRecipes();
+                    
+                    // Прокрутка к рецептам
+                    document.getElementById('recipes').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            // Закрытие модального окна
+            document.querySelector('.close-modal').addEventListener('click', closeModal);
+            window.addEventListener('click', function(e) {
+                if (e.target === document.getElementById('recipe-modal')) {
+                    closeModal();
+                }
+            });
+            
+            // Плавная прокрутка для навигации
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    if (this.getAttribute('href') === '#') return;
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        }
+
+        // Поиск рецептов
+        function searchRecipes() {
+            const searchInput = document.getElementById('search-input');
+            const query = searchInput.value.toLowerCase().trim();
+            
+            if (!query) {
+                filteredRecipes = [...recipes];
+            } else {
+                filteredRecipes = recipes.filter(recipe => 
+                    recipe.title.toLowerCase().includes(query) ||
+                    recipe.ingredients.some(ing => ing.name.toLowerCase().includes(query)) ||
+                    recipe.category.includes(query)
+                );
+            }
+            
+            currentCategory = 'all';
+            currentPage = 1;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.filter-btn[data-category="all"]').classList.add('active');
+            
+            displayRecipes();
+            
+            if (filteredRecipes.length === 0) {
+                const recipesGrid = document.getElementById('recipes-grid');
+                recipesGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 1.2rem; color: #666;">Рецепты не найдены. Попробуйте другой запрос.</p>';
+                document.getElementById('pagination').innerHTML = '';
+            }
+        }
+
+        // Закрытие модального окна
+        function closeModal() {
+            document.getElementById('recipe-modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Обновление счетчика рецептов
+        function updateRecipeCounter() {
+            const totalRecipes = document.getElementById('total-recipes');
+            totalRecipes.textContent = recipes.length;
+        }
+    </script>
+</body>
+</html>

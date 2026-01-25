@@ -1,0 +1,2530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Космический защитник - Полная версия</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c0c2e 0%, #1a1a3e 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            #gameContainer {
+                max-width: 500px;
+            }
+        }
+        
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(10, 10, 30, 0.95);
+            z-index: 10;
+            padding: 20px;
+            text-align: center;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #4deeea;
+            text-shadow: 0 0 15px #4deeea;
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #4deeea; }
+            to { text-shadow: 0 0 20px #4deeea; }
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #74ee15;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #4deeea;
+        }
+        
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+        
+        /* Адаптивные стили для мобильных */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.2rem; }
+            p { font-size: 1rem; }
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(77, 238, 234, 0.3);
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #aaddff;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #74ee15;
+            text-shadow: 0 0 8px #74ee15;
+        }
+        
+        .btn {
+            background: linear-gradient(to bottom, #4deeea, #2a9d9a);
+            color: #0c0c2e;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            pointer-events: auto;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            min-width: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            .btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+                min-width: 180px;
+                margin: 8px;
+            }
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover::after {
+            left: 100%;
+        }
+        
+        .btn:hover, .btn:active {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to bottom, #5dfefa, #3abdb9);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            min-width: auto;
+        }
+        
+        .btn-disabled {
+            background: linear-gradient(to bottom, #666, #444);
+            color: #888;
+            cursor: not-allowed;
+        }
+        
+        .btn-disabled:hover {
+            transform: none !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4) !important;
+            background: linear-gradient(to bottom, #666, #444) !important;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Управление для мобильных */
+        .control-panel {
+            position: absolute;
+            bottom: 25px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 25px;
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        @media (min-width: 769px) {
+            .control-panel {
+                display: none;
+            }
+        }
+        
+        .control-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+            color: white;
+            pointer-events: auto;
+            border: 4px solid rgba(255, 255, 255, 0.4);
+            touch-action: manipulation;
+            transition: all 0.1s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 255, 255, 0.35);
+        }
+        
+        .fire-btn {
+            background: linear-gradient(to bottom, #ff4d4d, #cc0000);
+            border-color: rgba(255, 100, 100, 0.9);
+            box-shadow: 0 0 15px rgba(255, 100, 100, 0.5);
+        }
+        
+        .fire-btn:active {
+            background: linear-gradient(to bottom, #ff6666, #dd2222);
+            box-shadow: 0 0 25px rgba(255, 100, 100, 0.7);
+        }
+        
+        .joystick {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            pointer-events: auto;
+            touch-action: manipulation;
+        }
+        
+        .joystick-base {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 4px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 15px rgba(77, 238, 234, 0.3);
+        }
+        
+        .joystick-head {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(200,200,255,0.7) 100%);
+            top: 30px;
+            left: 30px;
+            transition: transform 0.05s;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        }
+        
+        /* Элементы UI */
+        .coin-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            z-index: 3;
+            pointer-events: none;
+        }
+        
+        .coin-icon {
+            font-size: 1.5rem;
+            margin-right: 8px;
+            color: gold;
+        }
+        
+        .coin-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: gold;
+        }
+        
+        .ship-info {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #4deeea;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        @media (max-width: 768px) {
+            .ship-info {
+                bottom: 120px;
+                right: 10px;
+                padding: 8px;
+            }
+        }
+        
+        .ship-icon {
+            width: 30px;
+            height: 30px;
+            background: #4deeea;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+        
+        .ship-text {
+            font-size: 1rem;
+        }
+        
+        .ship-level {
+            color: #74ee15;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        /* Прицел для ПК */
+        #crosshair {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            z-index: 3;
+            pointer-events: none;
+        }
+        
+        .crosshair-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #74ee15;
+            border-radius: 50%;
+            top: 7px;
+            left: 7px;
+            box-shadow: 0 0 8px #74ee15;
+        }
+        
+        .crosshair-line {
+            position: absolute;
+            background: rgba(116, 238, 21, 0.7);
+        }
+        
+        .crosshair-h {
+            width: 20px;
+            height: 2px;
+            top: 9px;
+            left: 0;
+        }
+        
+        .crosshair-v {
+            width: 2px;
+            height: 20px;
+            top: 0;
+            left: 9px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="crosshair">
+            <div class="crosshair-line crosshair-h"></div>
+            <div class="crosshair-line crosshair-v"></div>
+            <div class="crosshair-dot"></div>
+        </div>
+        
+        <div id="ui">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">УРОВЕНЬ</div>
+                    <div id="levelValue" class="stat-value">1</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">ЖИЗНИ</div>
+                    <div id="livesValue" class="stat-value">3</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">СКОРОСТРЕЛЬНОСТЬ</div>
+                    <div id="fireRateValue" class="stat-value">1.0x</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">УРОН</div>
+                    <div id="damageValue" class="stat-value">1.0x</div>
+                </div>
+            </div>
+            
+            <div class="coin-display">
+                <div class="coin-icon">🪙</div>
+                <div id="coinAmount" class="coin-amount">1000</div>
+            </div>
+            
+            <div class="ship-info" id="shipInfo">
+                <div class="ship-icon" id="shipIcon">🚀</div>
+                <div class="ship-text">
+                    Корабль: <span class="ship-level" id="shipName">Стартовый</span>
+                </div>
+            </div>
+            
+            <!-- Панель управления для мобильных -->
+            <div class="control-panel">
+                <div class="joystick" id="joystick">
+                    <div class="joystick-base"></div>
+                    <div class="joystick-head" id="joystickHead"></div>
+                </div>
+                <div class="control-btn fire-btn" id="fireBtn">FIRE</div>
+            </div>
+        </div>
+        
+        <!-- Главное меню -->
+        <div id="mainMenu" class="screen">
+            <div class="menu-buttons">
+                <h1>КОСМИЧЕСКИЙ ЗАЩИТНИК</h1>
+                <p>Зарабатывайте монеты, улучшайте корабли и защитите галактику!</p>
+                
+                <button id="startBtn" class="btn menu-btn">НОВАЯ ИГРА</button>
+                <button id="continueBtn" class="btn menu-btn" style="display: none;">ПРОДОЛЖИТЬ</button>
+                <button id="shopBtn" class="btn menu-btn">МАГАЗИН УЛУЧШЕНИЙ</button>
+                <button id="shipsBtn" class="btn menu-btn">ВЫБОР КОРАБЛЯ</button>
+                <button id="controlsBtn" class="btn menu-btn">УПРАВЛЕНИЕ</button>
+                <button id="soundToggle" class="btn menu-btn">ЗВУК: ВКЛ</button>
+                <button id="joystickToggle" class="btn menu-btn">ВКЛ ДЖОЙСТИК</button>
+            </div>
+        </div>
+        
+        <!-- Экран управления -->
+        <div id="controlsScreen" class="screen hidden">
+            <button class="back-btn btn btn-small" id="backFromControls">← НАЗАД</button>
+            <h2>УПРАВЛЕНИЕ</h2>
+            
+            <div class="instructions">
+                <div class="controls-info">
+                    <div class="control-group">
+                        <div class="control-item">
+                            <div class="key">W / ↑</div>
+                            <div>Движение вверх</div>
+                        </div>
+                        <div class="control-item">
+                            <div class="key">S / ↓</div>
+                            <div>Движение вниз</div>
+                        </div>
+                        <div class="control-item">
+                            <div class="key">A / ←</div>
+                            <div>Движение влево</div>
+                        </div>
+                        <div class="control-item">
+                            <div class="key">D / →</div>
+                            <div>Движение вправо</div>
+                        </div>
+                        <div class="control-item">
+                            <div class="key">SHIFT</div>
+                            <div>Ускорение</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-item">
+                            <div class="key-mouse">ЛКМ</div>
+                            <div>Стрельба</div>
+                        </div>
+                        <div class="control-item">
+                            <div class="key">ПРОБЕЛ</div>
+                            <div>Автострельба</div>
+                        </div>
+                        <div class="control-item">
+                            <div class="key">P</div>
+                            <div>Пауза</div>
+                        </div>
+                        <div class="control-item">
+                            <div class="key">ESC</div>
+                            <div>Главное меню</div>
+                        </div>
+                        <div class="control-item">
+                            <div class="key-mouse">СКМ</div>
+                            <div>Спец. атака</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3>Мобильное управление:</h3>
+                <ul>
+                    <li>Джойстик слева - движение корабля</li>
+                    <li>Кнопка FIRE - стрельба (удержание для автоогня)</li>
+                    <li>Касание экрана - пауза</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Экран магазина -->
+        <div id="shopScreen" class="screen hidden">
+            <div class="menu-header">
+                <button class="back-btn btn btn-small" id="backFromShop">← НАЗАД</button>
+                <div class="current-ship-display">
+                    <div class="current-ship-icon" id="currentShipIcon">🚀</div>
+                    <div class="current-ship-name" id="currentShipName">Стартовый</div>
+                </div>
+            </div>
+            
+            <h2>МАГАЗИН УЛУЧШЕНИЙ</h2>
+            <p>Улучшения применяются только к текущему кораблю</p>
+            
+            <div class="tab-container">
+                <div class="tab active" data-tab="weapons">Оружие</div>
+                <div class="tab" data-tab="defense">Защита</div>
+                <div class="tab" data-tab="special">Особые</div>
+            </div>
+            
+            <div class="shop-container">
+                <div class="shop-categories" id="shopCategories">
+                    <!-- Категории будут заполнены скриптом -->
+                </div>
+                
+                <div class="shop-items">
+                    <div class="shop-items-grid" id="shopItemsGrid">
+                        <!-- Товары будут загружены динамически -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Экран выбора корабля -->
+        <div id="shipSelectScreen" class="screen hidden">
+            <button class="back-btn btn btn-small" id="backFromShips">← НАЗАД</button>
+            <h2>ВЫБОР КОРАБЛЯ</h2>
+            <p>Каждый корабль имеет уникальные характеристики</p>
+            
+            <div class="ships-container" id="shipsContainer">
+                <!-- Корабли будут загружены динамически -->
+            </div>
+        </div>
+        
+        <!-- Экран паузы -->
+        <div id="pauseScreen" class="screen hidden">
+            <h2>ПАУЗА</h2>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">МОНЕТЫ</div>
+                    <div id="pauseCoinsValue" class="stat-value">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">ЖИЗНИ</div>
+                    <div id="pauseLivesValue" class="stat-value">3</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">УРОВЕНЬ</div>
+                    <div id="pauseLevelValue" class="stat-value">1</div>
+                </div>
+            </div>
+            <button id="resumeBtn" class="btn">ПРОДОЛЖИТЬ</button>
+            <button id="restartBtn" class="btn">НАЧАТЬ ЗАНОВО</button>
+            <button id="pauseMenuBtn" class="btn">ГЛАВНОЕ МЕНЮ</button>
+        </div>
+        
+        <!-- Экран завершения игры -->
+        <div id="gameOverScreen" class="screen hidden">
+            <h2>ИГРА ОКОНЧЕНА</h2>
+            <p>Ваш корабль был уничтожен!</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">ЗАРАБОТАНО МОНЕТ</div>
+                    <div id="finalCoinsValue" class="stat-value">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">ПРОЙДЕНО УРОВНЕЙ</div>
+                    <div id="finalLevelValue" class="stat-value">1</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">УНИЧТОЖЕНО ВРАГОВ</div>
+                    <div id="finalEnemiesValue" class="stat-value">0</div>
+                </div>
+            </div>
+            <button id="playAgainBtn" class="btn">ИГРАТЬ СНОВА</button>
+            <button id="gameOverMenuBtn" class="btn">ГЛАВНОЕ МЕНЮ</button>
+        </div>
+    </div>
+
+    <script>
+        // Система сохранения данных
+        const gameData = {
+            version: '2.0',
+            coins: 1000,
+            selectedShip: 'ship1',
+            unlockedShips: ['ship1'],
+            shipUpgrades: {
+                ship1: {
+                    damage: 0,
+                    fireRate: 0,
+                    bulletSpeed: 0,
+                    specialAttack: 0,
+                    health: 0,
+                    speed: 0,
+                    shield: 0
+                },
+                ship2: {
+                    damage: 0,
+                    fireRate: 0,
+                    bulletSpeed: 0,
+                    specialAttack: 0,
+                    health: 0,
+                    speed: 0,
+                    shield: 0
+                },
+                ship3: {
+                    damage: 0,
+                    fireRate: 0,
+                    bulletSpeed: 0,
+                    specialAttack: 0,
+                    health: 0,
+                    speed: 0,
+                    shield: 0
+                }
+            },
+            purchasedUpgrades: [],
+            useJoystick: false
+        };
+
+        // Загрузка данных из localStorage
+        function loadGameData() {
+            const savedData = localStorage.getItem('spaceDefenderData');
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    if (parsedData.version === gameData.version) {
+                        Object.assign(gameData, parsedData);
+                    }
+                } catch (e) {
+                    console.error('Ошибка загрузки данных:', e);
+                }
+            }
+            updateCoinDisplay();
+            updateCurrentShipDisplay();
+            updateJoystickToggle();
+        }
+
+        // Сохранение данных в localStorage
+        function saveGameData() {
+            localStorage.setItem('spaceDefenderData', JSON.stringify(gameData));
+        }
+
+        // Основные переменные игры
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const crosshair = document.getElementById('crosshair');
+        const coinAmount = document.getElementById('coinAmount');
+        const shipInfo = document.getElementById('shipInfo');
+        const shipIcon = document.getElementById('shipIcon');
+        const shipName = document.getElementById('shipName');
+        
+        // Элементы отображения статистики
+        const levelValue = document.getElementById('levelValue');
+        const livesValue = document.getElementById('livesValue');
+        const fireRateValue = document.getElementById('fireRateValue');
+        const damageValue = document.getElementById('damageValue');
+        
+        // Элементы экранов
+        const pauseCoinsValue = document.getElementById('pauseCoinsValue');
+        const pauseLivesValue = document.getElementById('pauseLivesValue');
+        const pauseLevelValue = document.getElementById('pauseLevelValue');
+        const finalCoinsValue = document.getElementById('finalCoinsValue');
+        const finalLevelValue = document.getElementById('finalLevelValue');
+        const finalEnemiesValue = document.getElementById('finalEnemiesValue');
+        const currentShipIcon = document.getElementById('currentShipIcon');
+        const currentShipName = document.getElementById('currentShipName');
+        
+        // Элементы мобильного управления
+        const fireBtn = document.getElementById('fireBtn');
+        const joystick = document.getElementById('joystick');
+        const joystickHead = document.getElementById('joystickHead');
+        const joystickToggle = document.getElementById('joystickToggle');
+        
+        // Состояние игры
+        let game = {
+            running: false,
+            paused: false,
+            coinsEarned: 0,
+            level: 1,
+            enemiesDestroyed: 0,
+            soundEnabled: true,
+            mouseX: 0,
+            mouseY: 0,
+            mouseDown: false,
+            spaceDown: false,
+            middleMouseDown: false,
+            keys: {},
+            player: null,
+            enemies: [],
+            bullets: [],
+            enemyBullets: [],
+            particles: [],
+            lastEnemySpawn: 0,
+            enemySpawnRate: 2000,
+            enemySpawnCount: 0,
+            specialAttackCharge: 0,
+            maxSpecialAttackCharge: 100,
+            joystick: { x: 0, y: 0, active: false },
+            autoFire: false,
+            autoFireInterval: null
+        };
+
+        // Определение кораблей
+        const ships = {
+            ship1: {
+                id: 'ship1',
+                name: 'Стартовый',
+                description: 'Базовый корабль с сбалансированными характеристиками',
+                price: 0,
+                baseStats: {
+                    speed: 5,
+                    boostSpeed: 8,
+                    health: 3,
+                    damage: 1.0,
+                    fireRate: 1.0,
+                    bulletSpeed: 12,
+                    specialAttackPower: 1.0,
+                    model: '🚀'
+                },
+                color: '#4deeea'
+            },
+            ship2: {
+                id: 'ship2',
+                name: 'Скоростной',
+                description: 'Быстрый корабль с повышенной скорострельностью',
+                price: 500,
+                baseStats: {
+                    speed: 7,
+                    boostSpeed: 10,
+                    health: 2,
+                    damage: 0.8,
+                    fireRate: 1.5,
+                    bulletSpeed: 15,
+                    specialAttackPower: 0.8,
+                    model: '🛸'
+                },
+                color: '#74ee15'
+            },
+            ship3: {
+                id: 'ship3',
+                name: 'Тяжелый',
+                description: 'Мощный корабль с высокой защитой и уроном',
+                price: 1000,
+                baseStats: {
+                    speed: 3,
+                    boostSpeed: 5,
+                    health: 5,
+                    damage: 1.5,
+                    fireRate: 0.7,
+                    bulletSpeed: 10,
+                    specialAttackPower: 1.5,
+                    model: '🛰️'
+                },
+                color: '#ff4d6d'
+            }
+        };
+
+        // Полная система улучшений с всеми уровнями
+        const upgrades = {
+            weapons: {
+                damage: [
+                    { 
+                        id: 'damage1', 
+                        name: 'Усиление оружия I', 
+                        description: 'Увеличивает урон на 20%', 
+                        price: 100, 
+                        effectValue: 0.2, 
+                        maxLevel: 5,
+                        currentLevel: 0
+                    },
+                    { 
+                        id: 'damage2', 
+                        name: 'Усиление оружия II', 
+                        description: 'Увеличивает урон на 40%', 
+                        price: 200, 
+                        effectValue: 0.4, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'damage1'
+                    },
+                    { 
+                        id: 'damage3', 
+                        name: 'Усиление оружия III', 
+                        description: 'Увеличивает урон на 60%', 
+                        price: 300, 
+                        effectValue: 0.6, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'damage2'
+                    },
+                    { 
+                        id: 'damage4', 
+                        name: 'Усиление оружия IV', 
+                        description: 'Увеличивает урон на 80%', 
+                        price: 400, 
+                        effectValue: 0.8, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'damage3'
+                    },
+                    { 
+                        id: 'damage5', 
+                        name: 'Усиление оружия V', 
+                        description: 'Увеличивает урон на 100%', 
+                        price: 500, 
+                        effectValue: 1.0, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'damage4'
+                    }
+                ],
+                fireRate: [
+                    { 
+                        id: 'fireRate1', 
+                        name: 'Быстрая перезарядка I', 
+                        description: 'Увеличивает скорострельность на 10%', 
+                        price: 150, 
+                        effectValue: 0.1, 
+                        maxLevel: 5,
+                        currentLevel: 0
+                    },
+                    { 
+                        id: 'fireRate2', 
+                        name: 'Быстрая перезарядка II', 
+                        description: 'Увеличивает скорострельность на 20%', 
+                        price: 250, 
+                        effectValue: 0.2, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'fireRate1'
+                    },
+                    { 
+                        id: 'fireRate3', 
+                        name: 'Быстрая перезарядка III', 
+                        description: 'Увеличивает скорострельность на 30%', 
+                        price: 350, 
+                        effectValue: 0.3, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'fireRate2'
+                    },
+                    { 
+                        id: 'fireRate4', 
+                        name: 'Быстрая перезарядка IV', 
+                        description: 'Увеличивает скорострельность на 40%', 
+                        price: 450, 
+                        effectValue: 0.4, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'fireRate3'
+                    },
+                    { 
+                        id: 'fireRate5', 
+                        name: 'Быстрая перезарядка V', 
+                        description: 'Увеличивает скорострельность на 50%', 
+                        price: 550, 
+                        effectValue: 0.5, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'fireRate4'
+                    }
+                ],
+                bulletSpeed: [
+                    { 
+                        id: 'bulletSpeed1', 
+                        name: 'Ускоренные патроны I', 
+                        description: 'Увеличивает скорость пуль на 15%', 
+                        price: 120, 
+                        effectValue: 0.15, 
+                        maxLevel: 3,
+                        currentLevel: 0
+                    },
+                    { 
+                        id: 'bulletSpeed2', 
+                        name: 'Ускоренные патроны II', 
+                        description: 'Увеличивает скорость пуль на 30%', 
+                        price: 240, 
+                        effectValue: 0.3, 
+                        maxLevel: 3,
+                        currentLevel: 0,
+                        requires: 'bulletSpeed1'
+                    },
+                    { 
+                        id: 'bulletSpeed3', 
+                        name: 'Ускоренные патроны III', 
+                        description: 'Увеличивает скорость пуль на 45%', 
+                        price: 360, 
+                        effectValue: 0.45, 
+                        maxLevel: 3,
+                        currentLevel: 0,
+                        requires: 'bulletSpeed2'
+                    }
+                ],
+                specialAttack: [
+                    { 
+                        id: 'specialAttack1', 
+                        name: 'Усиление спец. атаки I', 
+                        description: 'Увеличивает мощность спец. атаки на 25%', 
+                        price: 200, 
+                        effectValue: 0.25, 
+                        maxLevel: 3,
+                        currentLevel: 0
+                    },
+                    { 
+                        id: 'specialAttack2', 
+                        name: 'Усиление спец. атаки II', 
+                        description: 'Увеличивает мощность спец. атаки на 50%', 
+                        price: 400, 
+                        effectValue: 0.5, 
+                        maxLevel: 3,
+                        currentLevel: 0,
+                        requires: 'specialAttack1'
+                    },
+                    { 
+                        id: 'specialAttack3', 
+                        name: 'Усиление спец. атаки III', 
+                        description: 'Увеличивает мощность спец. атаки на 75%', 
+                        price: 600, 
+                        effectValue: 0.75, 
+                        maxLevel: 3,
+                        currentLevel: 0,
+                        requires: 'specialAttack2'
+                    }
+                ]
+            },
+            defense: {
+                health: [
+                    { 
+                        id: 'health1', 
+                        name: 'Усиленный корпус I', 
+                        description: 'Увеличивает здоровье на 1', 
+                        price: 150, 
+                        effectValue: 1, 
+                        maxLevel: 5,
+                        currentLevel: 0
+                    },
+                    { 
+                        id: 'health2', 
+                        name: 'Усиленный корпус II', 
+                        description: 'Увеличивает здоровье на 2', 
+                        price: 250, 
+                        effectValue: 2, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'health1'
+                    },
+                    { 
+                        id: 'health3', 
+                        name: 'Усиленный корпус III', 
+                        description: 'Увеличивает здоровье на 3', 
+                        price: 350, 
+                        effectValue: 3, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'health2'
+                    },
+                    { 
+                        id: 'health4', 
+                        name: 'Усиленный корпус IV', 
+                        description: 'Увеличивает здоровье на 4', 
+                        price: 450, 
+                        effectValue: 4, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'health3'
+                    },
+                    { 
+                        id: 'health5', 
+                        name: 'Усиленный корпус V', 
+                        description: 'Увеличивает здоровье на 5', 
+                        price: 550, 
+                        effectValue: 5, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'health4'
+                    }
+                ],
+                shield: [
+                    { 
+                        id: 'shield1', 
+                        name: 'Энергетический щит I', 
+                        description: 'Добавляет щит, поглощающий 1 урон', 
+                        price: 300, 
+                        effectValue: 1, 
+                        maxLevel: 3,
+                        currentLevel: 0
+                    },
+                    { 
+                        id: 'shield2', 
+                        name: 'Энергетический щит II', 
+                        description: 'Добавляет щит, поглощающий 2 урона', 
+                        price: 600, 
+                        effectValue: 2, 
+                        maxLevel: 3,
+                        currentLevel: 0,
+                        requires: 'shield1'
+                    },
+                    { 
+                        id: 'shield3', 
+                        name: 'Энергетический щит III', 
+                        description: 'Добавляет щит, поглощающий 3 урона', 
+                        price: 900, 
+                        effectValue: 3, 
+                        maxLevel: 3,
+                        currentLevel: 0,
+                        requires: 'shield2'
+                    }
+                ]
+            },
+            special: {
+                speed: [
+                    { 
+                        id: 'speed1', 
+                        name: 'Улучшенные двигатели I', 
+                        description: 'Увеличивает скорость на 10%', 
+                        price: 100, 
+                        effectValue: 0.1, 
+                        maxLevel: 5,
+                        currentLevel: 0
+                    },
+                    { 
+                        id: 'speed2', 
+                        name: 'Улучшенные двигатели II', 
+                        description: 'Увеличивает скорость на 20%', 
+                        price: 200, 
+                        effectValue: 0.2, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'speed1'
+                    },
+                    { 
+                        id: 'speed3', 
+                        name: 'Улучшенные двигатели III', 
+                        description: 'Увеличивает скорость на 30%', 
+                        price: 300, 
+                        effectValue: 0.3, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'speed2'
+                    },
+                    { 
+                        id: 'speed4', 
+                        name: 'Улучшенные двигатели IV', 
+                        description: 'Увеличивает скорость на 40%', 
+                        price: 400, 
+                        effectValue: 0.4, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'speed3'
+                    },
+                    { 
+                        id: 'speed5', 
+                        name: 'Улучшенные двигатели V', 
+                        description: 'Увеличивает скорость на 50%', 
+                        price: 500, 
+                        effectValue: 0.5, 
+                        maxLevel: 5,
+                        currentLevel: 0,
+                        requires: 'speed4'
+                    }
+                ]
+            }
+        };
+
+        // Инициализация канваса
+        function initCanvas() {
+            const container = document.getElementById('gameContainer');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            // Показываем/скрываем элементы управления
+            if (gameData.useJoystick) {
+                crosshair.style.display = 'none';
+                document.querySelector('.control-panel').style.display = 'flex';
+            } else {
+                crosshair.style.display = 'block';
+                document.querySelector('.control-panel').style.display = 'none';
+            }
+        }
+
+        // Класс игрока
+        class Player {
+            constructor(shipId) {
+                this.shipId = shipId;
+                this.shipData = ships[shipId];
+                this.upgrades = gameData.shipUpgrades[shipId];
+                
+                // Рассчитываем характеристики с учетом улучшений
+                const stats = this.calculateStats();
+                
+                this.x = canvas.width / 2;
+                this.y = canvas.height - 120;
+                this.width = 50;
+                this.height = 70;
+                this.speed = stats.speed;
+                this.boostSpeed = stats.boostSpeed;
+                this.color = this.shipData.color;
+                this.maxHealth = stats.health;
+                this.health = this.maxHealth;
+                this.shield = stats.shield;
+                this.maxShield = stats.shield;
+                this.lastShot = 0;
+                this.shootDelay = 300 / stats.fireRate;
+                this.bulletSpeed = stats.bulletSpeed;
+                this.damageMultiplier = stats.damage;
+                this.specialAttackPower = stats.specialAttackPower;
+                this.invincible = false;
+                this.invincibleTime = 0;
+                this.specialAttackCharging = false;
+                this.specialAttackReady = false;
+            }
+            
+            calculateStats() {
+                const base = this.shipData.baseStats;
+                const upgrades = this.upgrades;
+                
+                return {
+                    speed: base.speed * (1 + upgrades.speed * 0.1),
+                    boostSpeed: base.boostSpeed * (1 + upgrades.speed * 0.1),
+                    health: base.health + upgrades.health,
+                    damage: base.damage * (1 + upgrades.damage * 0.2),
+                    fireRate: base.fireRate * (1 + upgrades.fireRate * 0.1),
+                    bulletSpeed: base.bulletSpeed * (1 + upgrades.bulletSpeed * 0.15),
+                    specialAttackPower: base.specialAttackPower * (1 + upgrades.specialAttack * 0.25),
+                    shield: upgrades.shield
+                };
+            }
+            
+            draw() {
+                ctx.save();
+                
+                // Рисуем щит, если есть
+                if (this.shield > 0) {
+                    ctx.strokeStyle = `rgba(77, 238, 234, ${0.3 + this.shield / this.maxShield * 0.3})`;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, Math.max(this.width, this.height) + 10, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                
+                // Рисуем корпус корабля
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y - this.height/2);
+                ctx.lineTo(this.x - this.width/2, this.y + this.height/2);
+                ctx.lineTo(this.x + this.width/2, this.y + this.height/2);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Рисуем кабину
+                ctx.fillStyle = '#74ee15';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y - 15, 15, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Рисуем двигатели
+                ctx.fillStyle = '#ff4d4d';
+                ctx.fillRect(this.x - 15, this.y + this.height/2 - 10, 10, 15);
+                ctx.fillRect(this.x + 5, this.y + this.height/2 - 10, 10, 15);
+                
+                // Эффект невидимости
+                if (this.invincible && Math.floor(Date.now() / 200) % 2 === 0) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+                
+                // Индикатор специальной атаки
+                if (this.specialAttackReady) {
+                    ctx.fillStyle = 'rgba(255, 215, 0, 0.7)';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y - this.height/2 - 20, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'gold';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('!', this.x, this.y - this.height/2 - 20);
+                }
+                
+                ctx.restore();
+            }
+            
+            update() {
+                // Перемещение
+                let speed = game.keys['Shift'] ? this.boostSpeed : this.speed;
+                
+                if (gameData.useJoystick && game.joystick.active) {
+                    // Управление джойстиком
+                    this.x += game.joystick.x * speed;
+                    this.y += game.joystick.y * speed;
+                } else {
+                    // Управление клавиатурой (WASD или стрелочки)
+                    if (game.keys['w'] || game.keys['ArrowUp']) {
+                        this.y -= speed;
+                    }
+                    if (game.keys['s'] || game.keys['ArrowDown']) {
+                        this.y += speed;
+                    }
+                    if (game.keys['a'] || game.keys['ArrowLeft']) {
+                        this.x -= speed;
+                    }
+                    if (game.keys['d'] || game.keys['ArrowRight']) {
+                        this.x += speed;
+                    }
+                }
+                
+                // Ограничение движения
+                this.x = Math.max(this.width/2, Math.min(canvas.width - this.width/2, this.x));
+                this.y = Math.max(this.height/2, Math.min(canvas.height - this.height/2, this.y));
+                
+                // Обновление времени невидимости
+                if (this.invincible && Date.now() > this.invincibleTime) {
+                    this.invincible = false;
+                }
+                
+                // Стрельба
+                if ((game.autoFire || game.spaceDown || game.mouseDown) && 
+                    Date.now() - this.lastShot > this.shootDelay) {
+                    this.shoot();
+                }
+                
+                // Зарядка специальной атаки
+                if (game.middleMouseDown && !this.specialAttackReady) {
+                    this.specialAttackCharging = true;
+                    game.specialAttackCharge = Math.min(game.maxSpecialAttackCharge, game.specialAttackCharge + 1);
+                    
+                    if (game.specialAttackCharge >= game.maxSpecialAttackCharge) {
+                        this.specialAttackReady = true;
+                        this.specialAttackCharging = false;
+                    }
+                } else {
+                    this.specialAttackCharging = false;
+                }
+                
+                // Активация специальной атаки
+                if (!game.middleMouseDown && this.specialAttackReady) {
+                    this.useSpecialAttack();
+                    this.specialAttackReady = false;
+                    game.specialAttackCharge = 0;
+                }
+                
+                // Обновление UI
+                livesValue.textContent = this.health;
+                fireRateValue.textContent = (1 / (this.shootDelay / 300)).toFixed(1) + 'x';
+                damageValue.textContent = this.damageMultiplier.toFixed(1) + 'x';
+            }
+            
+            shoot() {
+                const now = Date.now();
+                if (now - this.lastShot < this.shootDelay) return;
+                
+                this.lastShot = now;
+                
+                if (gameData.useJoystick) {
+                    // Стрельба прямо вверх при использовании джойстика
+                    game.bullets.push(new Bullet(
+                        this.x, 
+                        this.y - this.height/2, 
+                        0, 
+                        -this.bulletSpeed, 
+                        this.color, 
+                        this.damageMultiplier
+                    ));
+                } else {
+                    // Стрельба в направлении курсора
+                    const dx = game.mouseX - this.x;
+                    const dy = game.mouseY - this.y;
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if (distance === 0) return;
+                    
+                    const speed = this.bulletSpeed;
+                    const vx = (dx / distance) * speed;
+                    const vy = (dy / distance) * speed;
+                    
+                    game.bullets.push(new Bullet(
+                        this.x, 
+                        this.y - this.height/2, 
+                        vx, 
+                        vy, 
+                        this.color, 
+                        this.damageMultiplier
+                    ));
+                }
+            }
+            
+            useSpecialAttack() {
+                // Создание мощной волновой атаки
+                for (let i = 0; i < 360; i += 15) {
+                    const angle = (i * Math.PI) / 180;
+                    const vx = Math.cos(angle) * 8;
+                    const vy = Math.sin(angle) * 8;
+                    game.bullets.push(new Bullet(
+                        this.x, 
+                        this.y, 
+                        vx, 
+                        vy, 
+                        '#ff4d4d', 
+                        this.damageMultiplier * this.specialAttackPower, 
+                        true
+                    ));
+                }
+                
+                // Создание эффекта взрыва
+                for (let i = 0; i < 30; i++) {
+                    game.particles.push(new Particle(
+                        this.x, 
+                        this.y, 
+                        '#ff4d4d',
+                        (Math.random() - 0.5) * 15,
+                        (Math.random() - 0.5) * 15,
+                        6
+                    ));
+                }
+            }
+            
+            takeDamage() {
+                if (this.invincible) return;
+                
+                // Сначала поглощаем урон щитом
+                if (this.shield > 0) {
+                    this.shield--;
+                    return;
+                }
+                
+                // Затем здоровье
+                this.health--;
+                
+                if (this.health <= 0) {
+                    gameOver();
+                } else {
+                    // Временная невидимость после получения урона
+                    this.invincible = true;
+                    this.invincibleTime = Date.now() + 2000;
+                }
+            }
+        }
+
+        // Класс пули
+        class Bullet {
+            constructor(x, y, vx, vy, color, damageMultiplier = 1.0, special = false) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.width = special ? 8 : 6;
+                this.height = special ? 25 : 20;
+                this.color = color;
+                this.damageMultiplier = damageMultiplier;
+                this.special = special;
+                this.active = true;
+            }
+        
+            draw() {
+                ctx.save();
+                
+                if (this.special) {
+                    // Специальная пуля
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.shadowColor = this.color;
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Обычная пуля
+                    ctx.fillStyle = this.color;
+                    
+                    const angle = Math.atan2(this.vy, this.vx);
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(angle + Math.PI/2);
+                    
+                    ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+                    
+                    ctx.shadowColor = this.color;
+                    ctx.shadowBlur = 10;
+                    ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+                }
+                
+                ctx.restore();
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Проверка выхода за пределы экрана
+                if (this.y < -50 || this.y > canvas.height + 50 || 
+                    this.x < -50 || this.x > canvas.width + 50) {
+                    this.active = false;
+                }
+            }
+        }
+
+        // Класс врага
+        class Enemy {
+            constructor(x, y, type = 1) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.width = type === 1 ? 40 : (type === 2 ? 60 : 80);
+                this.height = type === 1 ? 40 : (type === 2 ? 60 : 80);
+                this.speed = type === 1 ? 2.5 : (type === 2 ? 1.8 : 1.2);
+                this.color = type === 1 ? '#ff4d6d' : (type === 2 ? '#ffaa00' : '#aa00ff');
+                this.health = type === 1 ? 1 : (type === 2 ? 3 : 10);
+                this.maxHealth = this.health;
+                this.lastShot = 0;
+                this.shootDelay = type === 1 ? 2000 : (type === 2 ? 1500 : 3000);
+                this.coinReward = type === 1 ? 10 : (type === 2 ? 25 : 50);
+                this.pattern = Math.floor(Math.random() * 3);
+                this.patternTime = 0;
+            }
+            
+            draw() {
+                ctx.save();
+                
+                // Рисуем вражеский корабль
+                if (this.type === 1) {
+                    // Маленький враг
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y - this.height/2);
+                    ctx.lineTo(this.x - this.width/2, this.y + this.height/2);
+                    ctx.lineTo(this.x + this.width/2, this.y + this.height/2);
+                    ctx.closePath();
+                    ctx.fill();
+                } else if (this.type === 2) {
+                    // Средний враг
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Детали
+                    ctx.fillStyle = '#ffdd99';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.width/4, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Большой враг (босс)
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.roundRect(this.x - this.width/2, this.y - this.height/2, this.width, this.height, 10);
+                    ctx.fill();
+                    
+                    // Окна
+                    ctx.fillStyle = '#ff99ff';
+                    for (let i = 0; i < 3; i++) {
+                        ctx.beginPath();
+                        ctx.arc(this.x - 15 + i * 15, this.y, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                
+                // Отображение здоровья для врагов 2 и 3 типа
+                if (this.type > 1) {
+                    const barWidth = this.width;
+                    const barHeight = 6;
+                    const barX = this.x - barWidth/2;
+                    const barY = this.y - this.height/2 - 10;
+                    
+                    // Фон полоски здоровья
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(barX, barY, barWidth, barHeight);
+                    
+                    // Здоровье
+                    const healthWidth = (this.health / this.maxHealth) * barWidth;
+                    ctx.fillStyle = this.type === 2 ? '#ffaa00' : '#aa00ff';
+                    ctx.fillRect(barX, barY, healthWidth, barHeight);
+                }
+                
+                ctx.restore();
+            }
+            
+            update() {
+                this.patternTime += 0.05;
+                
+                // Движение в зависимости от паттерна
+                if (this.pattern === 0) {
+                    // Прямое движение вниз
+                    this.y += this.speed;
+                } else if (this.pattern === 1) {
+                    // Синусоидальное движение
+                    this.y += this.speed;
+                    this.x += Math.sin(this.patternTime) * 2;
+                } else {
+                    // Движение по спирали
+                    this.y += this.speed * 0.7;
+                    this.x += Math.cos(this.patternTime) * 3;
+                }
+                
+                // Проверка выхода за пределы экрана
+                return this.y > canvas.height + this.height;
+            }
+            
+            takeDamage(damage = 1) {
+                this.health -= damage;
+                return this.health <= 0;
+            }
+        }
+
+        // Класс частиц для эффектов
+        class Particle {
+            constructor(x, y, color, vx = 0, vy = 0, radius = null) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx || (Math.random() - 0.5) * 6;
+                this.vy = vy || (Math.random() - 0.5) * 6;
+                this.radius = radius || Math.random() * 4 + 2;
+                this.color = color;
+                this.life = 1;
+                this.decay = 0.02;
+            }
+            
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+                return this.life > 0;
+            }
+        }
+
+        // Инициализация игры
+        function initGame() {
+            // Сброс состояния игры
+            game.coinsEarned = 0;
+            game.level = 1;
+            game.enemiesDestroyed = 0;
+            game.enemies = [];
+            game.bullets = [];
+            game.enemyBullets = [];
+            game.particles = [];
+            game.lastEnemySpawn = Date.now();
+            game.enemySpawnRate = 2000;
+            game.enemySpawnCount = 0;
+            game.specialAttackCharge = 0;
+            game.joystick = { x: 0, y: 0, active: false };
+            
+            // Создание игрока с выбранным кораблем
+            game.player = new Player(gameData.selectedShip);
+            
+            // Обновление UI
+            levelValue.textContent = game.level;
+            livesValue.textContent = game.player.health;
+            fireRateValue.textContent = (1 / (game.player.shootDelay / 300)).toFixed(1) + 'x';
+            damageValue.textContent = game.player.damageMultiplier.toFixed(1) + 'x';
+            
+            // Обновление информации о корабле
+            updateShipInfo();
+            
+            // Скрытие всех экранов
+            hideAllScreens();
+            
+            // Показать игровые элементы
+            if (!gameData.useJoystick) {
+                crosshair.style.display = 'block';
+            }
+            shipInfo.style.display = 'flex';
+            
+            // Запуск игрового цикла
+            game.running = true;
+            game.paused = false;
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Игровой цикл
+        function gameLoop() {
+            if (!game.running || game.paused) return;
+            
+            // Очистка канваса
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисование фона
+            drawBackground();
+            
+            // Обновление и отрисовка игрока
+            game.player.update();
+            game.player.draw();
+            
+            // Спавн врагов
+            const now = Date.now();
+            if (now - game.lastEnemySpawn > game.enemySpawnRate) {
+                spawnEnemy();
+                game.lastEnemySpawn = now;
+                game.enemySpawnCount++;
+                
+                // Увеличение частоты спавна со временем
+                if (game.enemySpawnCount % 5 === 0) {
+                    game.enemySpawnRate = Math.max(800, game.enemySpawnRate - 100);
+                }
+            }
+            
+            // Обновление и отрисовка врагов
+            for (let i = game.enemies.length - 1; i >= 0; i--) {
+                const enemy = game.enemies[i];
+                
+                if (enemy.update()) {
+                    // Удаление врагов, вышедших за пределы экрана
+                    game.enemies.splice(i, 1);
+                    continue;
+                }
+                
+                enemy.draw();
+                
+                // Проверка столкновения с игроком
+                if (!game.player.invincible && checkCollision(game.player, enemy)) {
+                    game.player.takeDamage();
+                    createExplosion(enemy.x, enemy.y, enemy.color);
+                    game.enemies.splice(i, 1);
+                    continue;
+                }
+                
+                // Проверка столкновения с пулями игрока
+                for (let j = game.bullets.length - 1; j >= 0; j--) {
+                    const bullet = game.bullets[j];
+                    
+                    if (checkCollision(bullet, enemy)) {
+                        const damage = bullet.special ? 3 * bullet.damageMultiplier : bullet.damageMultiplier;
+                        if (enemy.takeDamage(damage)) {
+                            // Уничтожение врага
+                            game.coinsEarned += enemy.coinReward;
+                            game.enemiesDestroyed++;
+                            updateCoinDisplay();
+                            createExplosion(enemy.x, enemy.y, enemy.color);
+                            game.enemies.splice(i, 1);
+                        }
+                        
+                        if (!bullet.special) {
+                            game.bullets.splice(j, 1);
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            // Обновление и отрисовка пуль игрока
+            for (let i = game.bullets.length - 1; i >= 0; i--) {
+                const bullet = game.bullets[i];
+                bullet.update();
+                
+                if (!bullet.active) {
+                    game.bullets.splice(i, 1);
+                } else {
+                    bullet.draw();
+                }
+            }
+            
+            // Обновление и отрисовка частиц
+            for (let i = game.particles.length - 1; i >= 0; i--) {
+                const particle = game.particles[i];
+                
+                if (!particle.update()) {
+                    game.particles.splice(i, 1);
+                } else {
+                    particle.draw();
+                }
+            }
+            
+            // Проверка перехода на следующий уровень
+            if (game.enemiesDestroyed >= game.level * 10) {
+                nextLevel();
+            }
+            
+            // Обновление позиции прицела (только для ПК)
+            if (!gameData.useJoystick) {
+                updateCrosshair();
+            }
+            
+            // Продолжение игрового цикла
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Функция отрисовки фона
+        function drawBackground() {
+            // Темный фон
+            ctx.fillStyle = '#0a0a1e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем звезды
+            ctx.fillStyle = 'white';
+            for (let i = 0; i < 200; i++) {
+                const alpha = 0.3 + 0.7 * Math.sin(Date.now() / 1000 + i * 0.1);
+                ctx.globalAlpha = alpha;
+                
+                const x = (i * 23) % canvas.width;
+                const y = (i * 17) % canvas.height;
+                const size = (i % 4) + 1;
+                
+                ctx.fillRect(x, y, size, size);
+            }
+            
+            ctx.globalAlpha = 1;
+        }
+
+        // Создание взрыва
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                game.particles.push(new Particle(x, y, color));
+            }
+        }
+
+        // Проверка столкновений
+        function checkCollision(obj1, obj2) {
+            return obj1.x - obj1.width/2 < obj2.x + obj2.width/2 &&
+                   obj1.x + obj1.width/2 > obj2.x - obj2.width/2 &&
+                   obj1.y - obj1.height/2 < obj2.y + obj2.height/2 &&
+                   obj1.y + obj1.height/2 > obj2.y - obj2.height/2;
+        }
+
+        // Спавн врага
+        function spawnEnemy() {
+            let type;
+            const rand = Math.random();
+            
+            if (game.level < 3) {
+                type = rand < 0.7 ? 1 : 2;
+            } else if (game.level < 5) {
+                type = rand < 0.5 ? 1 : (rand < 0.9 ? 2 : 3);
+            } else {
+                type = rand < 0.3 ? 1 : (rand < 0.7 ? 2 : 3);
+            }
+            
+            const x = Math.random() * (canvas.width - 100) + 50;
+            const y = -50;
+            
+            game.enemies.push(new Enemy(x, y, type));
+        }
+
+        // Переход на следующий уровень
+        function nextLevel() {
+            game.level++;
+            levelValue.textContent = game.level;
+            
+            // Сброс позиции игрока
+            game.player.x = canvas.width / 2;
+            game.player.y = canvas.height - 120;
+            game.player.invincible = true;
+            game.player.invincibleTime = Date.now() + 2000;
+            
+            // Увеличение скорости врагов
+            game.enemySpawnRate = Math.max(600, game.enemySpawnRate - 100);
+        }
+
+        // Обновление отображения монет
+        function updateCoinDisplay() {
+            coinAmount.textContent = gameData.coins + game.coinsEarned;
+        }
+
+        // Обновление информации о корабле
+        function updateShipInfo() {
+            const ship = ships[gameData.selectedShip];
+            shipIcon.textContent = ship.baseStats.model;
+            shipName.textContent = ship.name;
+        }
+
+        // Обновление отображения текущего корабля
+        function updateCurrentShipDisplay() {
+            const ship = ships[gameData.selectedShip];
+            currentShipIcon.textContent = ship.baseStats.model;
+            currentShipName.textContent = ship.name;
+        }
+
+        // Обновление позиции прицела
+        function updateCrosshair() {
+            crosshair.style.left = (game.mouseX - 10) + 'px';
+            crosshair.style.top = (game.mouseY - 10) + 'px';
+        }
+
+        // Обновление кнопки джойстика
+        function updateJoystickToggle() {
+            if (joystickToggle) {
+                joystickToggle.textContent = gameData.useJoystick ? 'ВЫКЛ ДЖОЙСТИК' : 'ВКЛ ДЖОЙСТИК';
+            }
+        }
+
+        // Конец игры
+        function gameOver() {
+            game.running = false;
+            clearInterval(game.autoFireInterval);
+            
+            // Добавление заработанных монет
+            gameData.coins += game.coinsEarned;
+            saveGameData();
+            
+            // Обновление финальной статистики
+            finalCoinsValue.textContent = game.coinsEarned;
+            finalLevelValue.textContent = game.level;
+            finalEnemiesValue.textContent = game.enemiesDestroyed;
+            
+            // Скрытие игровых элементов
+            crosshair.style.display = 'none';
+            shipInfo.style.display = 'none';
+            
+            // Показ экрана завершения игры
+            showScreen('gameOverScreen');
+        }
+
+        // Пауза игры
+        function pauseGame() {
+            if (!game.running) return;
+            
+            game.paused = !game.paused;
+            
+            if (game.paused) {
+                // Обновление статистики на экране паузы
+                pauseCoinsValue.textContent = gameData.coins + game.coinsEarned;
+                pauseLivesValue.textContent = game.player.health;
+                pauseLevelValue.textContent = game.level;
+                
+                // Скрытие игровых элементов
+                crosshair.style.display = 'none';
+                
+                // Показ экрана паузы
+                showScreen('pauseScreen');
+            } else {
+                // Скрытие экрана паузы
+                hideAllScreens();
+                
+                // Показать игровые элементы
+                if (!gameData.useJoystick) {
+                    crosshair.style.display = 'block';
+                }
+                
+                // Продолжение игры
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // Показать определенный экран
+        function showScreen(screenId) {
+            // Скрыть все экраны
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            
+            // Показать нужный экран
+            document.getElementById(screenId).classList.remove('hidden');
+            
+            // Если показываем главное меню, остановить игру
+            if (screenId === 'mainMenu') {
+                game.running = false;
+                game.paused = false;
+                clearInterval(game.autoFireInterval);
+                crosshair.style.display = 'none';
+                shipInfo.style.display = 'none';
+                
+                // Показать кнопку продолжения, если игра была запущена
+                const continueBtn = document.getElementById('continueBtn');
+                continueBtn.style.display = game.player ? 'block' : 'none';
+            }
+            
+            // Обновление данных, если показываем магазин или выбор кораблей
+            if (screenId === 'shopScreen') {
+                loadShop();
+                updateCurrentShipDisplay();
+            } else if (screenId === 'shipSelectScreen') {
+                loadShips();
+            }
+        }
+
+        // Скрыть все экраны
+        function hideAllScreens() {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+        }
+
+        // Загрузка магазина
+        function loadShop() {
+            // Очистка категорий
+            const shopCategories = document.getElementById('shopCategories');
+            shopCategories.innerHTML = '';
+            
+            // Очистка товаров
+            const shopItemsGrid = document.getElementById('shopItemsGrid');
+            shopItemsGrid.innerHTML = '';
+            
+            // Получение активной вкладки
+            const activeTab = document.querySelector('.tab.active');
+            if (!activeTab) return;
+            
+            const tabType = activeTab.dataset.tab;
+            const categoryUpgrades = upgrades[tabType];
+            
+            // Создание категорий
+            Object.keys(categoryUpgrades).forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'shop-category';
+                categoryDiv.dataset.category = category;
+                
+                // Название категории
+                let categoryName = '';
+                switch(category) {
+                    case 'damage': categoryName = 'Урон'; break;
+                    case 'fireRate': categoryName = 'Скорострельность'; break;
+                    case 'bulletSpeed': categoryName = 'Скорость пуль'; break;
+                    case 'specialAttack': categoryName = 'Спец. атака'; break;
+                    case 'health': categoryName = 'Здоровье'; break;
+                    case 'shield': categoryName = 'Щит'; break;
+                    case 'speed': categoryName = 'Скорость'; break;
+                }
+                
+                categoryDiv.textContent = categoryName;
+                
+                // Активируем первую категорию
+                if (Object.keys(categoryUpgrades)[0] === category) {
+                    categoryDiv.classList.add('active');
+                    loadCategoryItems(category, categoryUpgrades[category]);
+                }
+                
+                categoryDiv.addEventListener('click', function() {
+                    document.querySelectorAll('.shop-category').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    loadCategoryItems(category, categoryUpgrades[category]);
+                });
+                
+                shopCategories.appendChild(categoryDiv);
+            });
+        }
+
+        // Загрузка товаров категории
+        function loadCategoryItems(category, items) {
+            const shopItemsGrid = document.getElementById('shopItemsGrid');
+            shopItemsGrid.innerHTML = '';
+            
+            const currentLevel = gameData.shipUpgrades[gameData.selectedShip][category] || 0;
+            
+            items.forEach(upgrade => {
+                // Обновляем текущий уровень улучшения из данных игры
+                const upgradeLevel = currentLevel >= upgrade.maxLevel ? upgrade.maxLevel : currentLevel;
+                
+                // Проверяем, куплено ли это улучшение
+                const isPurchased = currentLevel >= upgrade.maxLevel;
+                
+                // Проверяем требования
+                let requirementsMet = true;
+                if (upgrade.requires) {
+                    const requiredUpgrade = items.find(u => u.id === upgrade.requires);
+                    if (requiredUpgrade) {
+                        requirementsMet = gameData.purchasedUpgrades.includes(upgrade.requires) || 
+                                         gameData.shipUpgrades[gameData.selectedShip][category] >= 
+                                         items.findIndex(u => u.id === upgrade.id);
+                    }
+                }
+                
+                // Проверяем, можно ли купить
+                const canPurchase = !isPurchased && gameData.coins >= upgrade.price && requirementsMet && 
+                                  currentLevel === items.findIndex(u => u.id === upgrade.id);
+                
+                const shopItem = document.createElement('div');
+                shopItem.className = 'shop-item';
+                shopItem.innerHTML = `
+                    <div class="shop-item-header">
+                        <div class="shop-item-title">${upgrade.name}</div>
+                        <div class="shop-item-price">
+                            <span class="coin-small">🪙</span>${upgrade.price}
+                        </div>
+                    </div>
+                    <div class="shop-item-description">${upgrade.description}</div>
+                    <div class="shop-item-stats">
+                        <div class="stat-bar">
+                            <div>Текущий уровень:</div>
+                            <div class="upgrade-level">
+                                <div class="level-indicator">
+                                    ${Array.from({length: upgrade.maxLevel}, (_, i) => 
+                                        `<div class="level-dot ${i < upgradeLevel ? 'active' : ''}"></div>`
+                                    ).join('')}
+                                </div>
+                                <div class="stat-value-bar">${upgradeLevel}/${upgrade.maxLevel}</div>
+                            </div>
+                        </div>
+                    </div>
+                    ${isPurchased ? 
+                        '<div class="purchased-badge">МАКСИМАЛЬНЫЙ УРОВЕНЬ</div>' :
+                        (!requirementsMet ? 
+                            '<div class="btn btn-small btn-disabled">ТРЕБУЕТСЯ ПРЕДЫДУЩЕЕ УЛУЧШЕНИЕ</div>' :
+                            `<button class="btn btn-small ${canPurchase ? '' : 'btn-disabled'}" 
+                                    data-upgrade="${upgrade.id}" data-price="${upgrade.price}" data-category="${category}">
+                                ${canPurchase ? 'КУПИТЬ' : 'НЕДОСТАТОЧНО МОНЕТ'}
+                            </button>`
+                        )
+                    }
+                `;
+                
+                shopItemsGrid.appendChild(shopItem);
+            });
+            
+            // Добавление обработчиков для кнопок покупки
+            document.querySelectorAll('.shop-item .btn:not(.btn-disabled)').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const upgradeId = this.dataset.upgrade;
+                    const price = parseInt(this.dataset.price);
+                    const category = this.dataset.category;
+                    
+                    if (gameData.coins >= price) {
+                        gameData.coins -= price;
+                        
+                        // Добавляем улучшение в список купленных
+                        if (!gameData.purchasedUpgrades.includes(upgradeId)) {
+                            gameData.purchasedUpgrades.push(upgradeId);
+                        }
+                        
+                        // Увеличиваем уровень улучшения в категории
+                        gameData.shipUpgrades[gameData.selectedShip][category] += 1;
+                        
+                        saveGameData();
+                        updateCoinDisplay();
+                        
+                        // Перезагружаем текущую категорию
+                        const activeTab = document.querySelector('.tab.active');
+                        if (activeTab) {
+                            const tabType = activeTab.dataset.tab;
+                            loadCategoryItems(category, upgrades[tabType][category]);
+                        }
+                    }
+                });
+            });
+        }
+
+        // Загрузка списка кораблей
+        function loadShips() {
+            const shipsContainer = document.getElementById('shipsContainer');
+            shipsContainer.innerHTML = '';
+            
+            Object.values(ships).forEach(ship => {
+                const isUnlocked = gameData.unlockedShips.includes(ship.id);
+                const isSelected = gameData.selectedShip === ship.id;
+                const canPurchase = !isUnlocked && gameData.coins >= ship.price;
+                
+                const shipCard = document.createElement('div');
+                shipCard.className = `ship-card ${isSelected ? 'selected' : ''} ${!isUnlocked ? 'ship-locked' : ''}`;
+                shipCard.innerHTML = `
+                    <div class="ship-name">${ship.name}</div>
+                    <div class="ship-preview">
+                        <div class="ship-model">${ship.baseStats.model}</div>
+                    </div>
+                    <div class="ship-description">${ship.description}</div>
+                    <div class="ship-stats">
+                        <div class="ship-stat">
+                            <div class="ship-stat-name">Скорость:</div>
+                            <div class="ship-stat-value">${ship.baseStats.speed}</div>
+                        </div>
+                        <div class="ship-stat">
+                            <div class="ship-stat-name">Здоровье:</div>
+                            <div class="ship-stat-value">${ship.baseStats.health}</div>
+                        </div>
+                        <div class="ship-stat">
+                            <div class="ship-stat-name">Урон:</div>
+                            <div class="ship-stat-value">${ship.baseStats.damage.toFixed(1)}</div>
+                        </div>
+                        <div class="ship-stat">
+                            <div class="ship-stat-name">Скорострельность:</div>
+                            <div class="ship-stat-value">${ship.baseStats.fireRate.toFixed(1)}</div>
+                        </div>
+                    </div>
+                    ${isUnlocked ? 
+                        (isSelected ? 
+                            '<div class="selected-badge">ВЫБРАН</div>' :
+                            `<button class="btn btn-small select-ship-btn" data-ship="${ship.id}">ВЫБРАТЬ</button>`
+                        ) :
+                        `<div class="ship-price">🪙 ${ship.price}</div>
+                         <button class="btn btn-small purchase-ship-btn ${canPurchase ? '' : 'btn-disabled'}" 
+                                 data-ship="${ship.id}" data-price="${ship.price}">
+                            ${canPurchase ? 'КУПИТЬ' : 'НЕДОСТАТОЧНО МОНЕТ'}
+                         </button>`
+                    }
+                `;
+                
+                shipsContainer.appendChild(shipCard);
+            });
+            
+            // Добавление обработчиков для кнопок выбора корабля
+            document.querySelectorAll('.select-ship-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const shipId = this.dataset.ship;
+                    gameData.selectedShip = shipId;
+                    saveGameData();
+                    updateShipInfo();
+                    updateCurrentShipDisplay();
+                    loadShips();
+                });
+            });
+            
+            // Добавление обработчиков для кнопок покупки корабля
+            document.querySelectorAll('.purchase-ship-btn:not(.btn-disabled)').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const shipId = this.dataset.ship;
+                    const price = parseInt(this.dataset.price);
+                    
+                    if (gameData.coins >= price) {
+                        gameData.coins -= price;
+                        gameData.unlockedShips.push(shipId);
+                        gameData.selectedShip = shipId;
+                        
+                        // Инициализация улучшений для нового корабля
+                        if (!gameData.shipUpgrades[shipId]) {
+                            gameData.shipUpgrades[shipId] = {
+                                damage: 0,
+                                fireRate: 0,
+                                bulletSpeed: 0,
+                                specialAttack: 0,
+                                health: 0,
+                                speed: 0,
+                                shield: 0
+                            };
+                        }
+                        
+                        saveGameData();
+                        updateCoinDisplay();
+                        updateShipInfo();
+                        updateCurrentShipDisplay();
+                        loadShips();
+                    }
+                });
+            });
+        }
+
+        // Инициализация управления
+        function initControls() {
+            // Отслеживание движения мыши (только для ПК)
+            document.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                game.mouseX = e.clientX - rect.left;
+                game.mouseY = e.clientY - rect.top;
+                
+                // Обновление позиции прицела
+                if (game.running && !game.paused && !gameData.useJoystick) {
+                    updateCrosshair();
+                }
+            });
+            
+            // Нажатие ЛКМ (ПК)
+            document.addEventListener('mousedown', (e) => {
+                if (e.button === 0 && !gameData.useJoystick) {
+                    game.mouseDown = true;
+                } else if (e.button === 1 && !gameData.useJoystick) {
+                    game.middleMouseDown = true;
+                    e.preventDefault();
+                }
+            });
+            
+            // Отпускание ЛКМ (ПК)
+            document.addEventListener('mouseup', (e) => {
+                if (e.button === 0 && !gameData.useJoystick) {
+                    game.mouseDown = false;
+                } else if (e.button === 1 && !gameData.useJoystick) {
+                    game.middleMouseDown = false;
+                }
+            });
+            
+            // Отслеживание нажатий клавиш (ПК)
+            document.addEventListener('keydown', (e) => {
+                const key = e.key.toLowerCase();
+                game.keys[key] = true;
+                
+                // Пробел для автострельбы
+                if (key === ' ' && game.running && !game.paused) {
+                    game.spaceDown = true;
+                    e.preventDefault();
+                }
+                
+                // Пауза по P
+                if ((key === 'p' || key === 'escape') && game.running) {
+                    pauseGame();
+                    e.preventDefault();
+                }
+                
+                // ESC для возврата в меню
+                if (key === 'escape' && !game.running) {
+                    showScreen('mainMenu');
+                    e.preventDefault();
+                }
+            });
+            
+            // Отслеживание отпускания клавиш (ПК)
+            document.addEventListener('keyup', (e) => {
+                const key = e.key.toLowerCase();
+                game.keys[key] = false;
+                
+                if (key === ' ') {
+                    game.spaceDown = false;
+                }
+            });
+            
+            // Предотвращение контекстного меню по ПКМ
+            canvas.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Инициализация джойстика для мобильных или при включенном джойстике
+            if (gameData.useJoystick) {
+                initJoystick();
+            }
+        }
+
+        // Инициализация джойстика
+        function initJoystick() {
+            let joystickPressed = false;
+            const joystickRect = joystick.getBoundingClientRect();
+            const joystickCenterX = joystickRect.width / 2;
+            const joystickCenterY = joystickRect.height / 2;
+            const maxDistance = 40;
+            
+            // Обработка касаний для джойстика
+            joystick.addEventListener('touchstart', handleJoystickStart);
+            joystick.addEventListener('touchmove', handleJoystickMove);
+            joystick.addEventListener('touchend', handleJoystickEnd);
+            
+            // Для поддержки мыши на ПК при включенном джойстике
+            joystick.addEventListener('mousedown', handleJoystickStart);
+            document.addEventListener('mousemove', handleJoystickMove);
+            document.addEventListener('mouseup', handleJoystickEnd);
+            
+            function handleJoystickStart(e) {
+                e.preventDefault();
+                joystickPressed = true;
+                game.joystick.active = true;
+                updateJoystick(e);
+            }
+            
+            function handleJoystickMove(e) {
+                if (!joystickPressed) return;
+                e.preventDefault();
+                updateJoystick(e);
+            }
+            
+            function handleJoystickEnd(e) {
+                e.preventDefault();
+                joystickPressed = false;
+                game.joystick.active = false;
+                game.joystick.x = 0;
+                game.joystick.y = 0;
+                joystickHead.style.transform = 'translate(0, 0)';
+            }
+            
+            function updateJoystick(e) {
+                const rect = joystick.getBoundingClientRect();
+                let clientX, clientY;
+                
+                if (e.type.includes('touch')) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                
+                const x = clientX - rect.left - joystickCenterX;
+                const y = clientY - rect.top - joystickCenterY;
+                const distance = Math.sqrt(x*x + y*y);
+                
+                if (distance > maxDistance) {
+                    const angle = Math.atan2(y, x);
+                    game.joystick.x = Math.cos(angle);
+                    game.joystick.y = Math.sin(angle);
+                    
+                    const limitedX = Math.cos(angle) * maxDistance;
+                    const limitedY = Math.sin(angle) * maxDistance;
+                    joystickHead.style.transform = `translate(${limitedX}px, ${limitedY}px)`;
+                } else {
+                    game.joystick.x = x / maxDistance;
+                    game.joystick.y = y / maxDistance;
+                    joystickHead.style.transform = `translate(${x}px, ${y}px)`;
+                }
+            }
+            
+            // Кнопка огня с автострельбой
+            fireBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (game.running && !game.paused) {
+                    game.autoFire = true;
+                    clearInterval(game.autoFireInterval);
+                    game.autoFireInterval = setInterval(() => {
+                        if (game.running && !game.paused && game.autoFire) {
+                            if (game.player) game.player.shoot();
+                        }
+                    }, game.player ? game.player.shootDelay : 300);
+                }
+            });
+            
+            fireBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                game.autoFire = false;
+                clearInterval(game.autoFireInterval);
+            });
+            
+            fireBtn.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                game.autoFire = false;
+                clearInterval(game.autoFireInterval);
+            });
+            
+            // Для ПК при включенном джойстике
+            fireBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                if (game.running && !game.paused) {
+                    game.autoFire = true;
+                    clearInterval(game.autoFireInterval);
+                    game.autoFireInterval = setInterval(() => {
+                        if (game.running && !game.paused && game.autoFire) {
+                            if (game.player) game.player.shoot();
+                        }
+                    }, game.player ? game.player.shootDelay : 300);
+                }
+            });
+            
+            document.addEventListener('mouseup', (e) => {
+                game.autoFire = false;
+                clearInterval(game.autoFireInterval);
+            });
+        }
+
+        // Инициализация интерфейса
+        function initUI() {
+            // Кнопка "Новая игра"
+            document.getElementById('startBtn').addEventListener('click', () => {
+                initGame();
+            });
+            
+            // Кнопка "Продолжить"
+            document.getElementById('continueBtn').addEventListener('click', () => {
+                if (game.player) {
+                    hideAllScreens();
+                    if (!gameData.useJoystick) {
+                        crosshair.style.display = 'block';
+                    }
+                    shipInfo.style.display = 'flex';
+                    game.running = true;
+                    game.paused = false;
+                    requestAnimationFrame(gameLoop);
+                }
+            });
+            
+            // Кнопка "Магазин"
+            document.getElementById('shopBtn').addEventListener('click', () => {
+                showScreen('shopScreen');
+            });
+            
+            // Кнопка "Корабли"
+            document.getElementById('shipsBtn').addEventListener('click', () => {
+                showScreen('shipSelectScreen');
+            });
+            
+            // Кнопка "Управление"
+            document.getElementById('controlsBtn').addEventListener('click', () => {
+                showScreen('controlsScreen');
+            });
+            
+            // Кнопка "Звук"
+            document.getElementById('soundToggle').addEventListener('click', function() {
+                game.soundEnabled = !game.soundEnabled;
+                this.textContent = game.soundEnabled ? 'ЗВУК: ВКЛ' : 'ЗВУК: ВЫКЛ';
+            });
+            
+            // Кнопка "Джойстик"
+            if (joystickToggle) {
+                joystickToggle.addEventListener('click', function() {
+                    gameData.useJoystick = !gameData.useJoystick;
+                    saveGameData();
+                    
+                    // Обновление видимости элементов
+                    if (gameData.useJoystick) {
+                        crosshair.style.display = 'none';
+                        document.querySelector('.control-panel').style.display = 'flex';
+                        initJoystick(); // Инициализировать джойстик
+                    } else {
+                        crosshair.style.display = 'block';
+                        document.querySelector('.control-panel').style.display = 'none';
+                        // Сбросить состояние джойстика
+                        game.joystick = { x: 0, y: 0, active: false };
+                        joystickHead.style.transform = 'translate(0, 0)';
+                    }
+                    
+                    updateJoystickToggle();
+                });
+            }
+            
+            // Кнопка "Продолжить" в паузе
+            document.getElementById('resumeBtn').addEventListener('click', () => {
+                pauseGame();
+            });
+            
+            // Кнопка "Начать заново" в паузе
+            document.getElementById('restartBtn').addEventListener('click', () => {
+                initGame();
+            });
+            
+            // Кнопка "Главное меню" в паузе
+            document.getElementById('pauseMenuBtn').addEventListener('click', () => {
+                showScreen('mainMenu');
+            });
+            
+            // Кнопка "Играть снова" в конце игры
+            document.getElementById('playAgainBtn').addEventListener('click', () => {
+                initGame();
+            });
+            
+            // Кнопка "Главное меню" в конце игры
+            document.getElementById('gameOverMenuBtn').addEventListener('click', () => {
+                showScreen('mainMenu');
+            });
+            
+            // Кнопка "Назад" из управления
+            document.getElementById('backFromControls').addEventListener('click', () => {
+                showScreen('mainMenu');
+            });
+            
+            // Кнопка "Назад" из магазина
+            document.getElementById('backFromShop').addEventListener('click', () => {
+                showScreen('mainMenu');
+            });
+            
+            // Кнопка "Назад" из выбора кораблей
+            document.getElementById('backFromShips').addEventListener('click', () => {
+                showScreen('mainMenu');
+            });
+            
+            // Обработка вкладок в магазине
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    loadShop();
+                });
+            });
+        }
+
+        // Инициализация при загрузке страницы
+        window.addEventListener('load', () => {
+            initCanvas();
+            initControls();
+            initUI();
+            loadGameData();
+            
+            // Показать главное меню
+            showScreen('mainMenu');
+            
+            // Адаптация к изменению размера экрана
+            window.addEventListener('resize', initCanvas);
+            
+            // Предотвращение скролла на мобильных устройствах
+            document.addEventListener('touchmove', (e) => {
+                if (e.target.closest('.joystick') || e.target.closest('.control-btn') || 
+                    e.target === canvas) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City SkeyLine 2.0 - Deluxe Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS Переменные и Дизайн --- */
+        :root {
+            --font-main: 'Roboto', sans-serif;
+            --bg-app: #121212;
+            --bg-panel: #1e1e1e;
+            --bg-panel-header: #2c2c2c;
+            
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            
+            --accent: #3b82f6; /* Blue */
+            --accent-hover: #2563eb;
+            --success: #10b981; /* Green */
+            --danger: #ef4444; /* Red */
+            --warning: #f59e0b; /* Orange */
+
+            /* Карта */
+            --cell-size: 36px; /* Чуть крупнее */
+            --grid-dim: 25;
+            
+            --c-grass: #365e32;
+            --c-water: #0ea5e9;
+            --c-road: #4b5563;
+            --c-avenue: #374151;
+            
+            --c-res: #4ade80;
+            --c-com: #60a5fa;
+            --c-ind: #a8a29e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body { height: 100vh; font-family: var(--font-main); background: var(--bg-app); color: var(--text-main); overflow: hidden; }
+
+        /* --- Layout --- */
+        #game-layout {
+            display: grid;
+            height: 100vh;
+            grid-template-areas:
+                "header header header"
+                "tools map info"
+                "tools logs info";
+            grid-template-rows: 60px 1fr 180px;
+            grid-template-columns: 240px 1fr 280px;
+            gap: 4px;
+            background: #000;
+        }
+
+        .panel { background: var(--bg-panel); border-right: 1px solid #333; display: flex; flex-direction: column; }
+        
+        /* --- Header --- */
+        #header { 
+            grid-area: header; 
+            background: var(--bg-panel-header); 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; border-bottom: 2px solid #333;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        
+        .resource-group { display: flex; gap: 20px; }
+        .res-item { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.95rem; padding: 5px 10px; border-radius: 6px; transition: background 0.3s; }
+        .res-item.critical { background: rgba(239, 68, 68, 0.2); color: var(--danger); animation: pulse 1s infinite; }
+        .res-icon { font-size: 1.2rem; }
+
+        /* --- Tools (Left) --- */
+        #tools-panel { grid-area: tools; padding: 10px; gap: 8px; overflow-y: auto; }
+        .tool-btn {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px; background: #2a2a2a; border-radius: 8px;
+            cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+            position: relative;
+        }
+        .tool-btn:hover { background: #3a3a3a; transform: translateX(2px); }
+        .tool-btn.active { border-color: var(--accent); background: #333; box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+        .tool-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+        
+        /* Tooltip */
+        .tool-btn::after {
+            content: attr(data-tip); position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+            background: #000; border: 1px solid #444; color: #fff; padding: 8px 12px;
+            width: 200px; font-size: 0.8rem; border-radius: 6px; z-index: 100;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s; margin-left: 10px; visibility: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); white-space: pre-wrap;
+        }
+        .tool-btn:hover::after { opacity: 1; visibility: visible; }
+
+        /* --- Map (Center) --- */
+        #map-area { 
+            grid-area: map; 
+            background: #1a1a1a; 
+            display: flex; align-items: center; justify-content: center; 
+            overflow: auto; position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(var(--grid-dim), var(--cell-size));
+            grid-template-rows: repeat(var(--grid-dim), var(--cell-size));
+            gap: 0; border: 4px solid #333;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        
+        .cell {
+            width: var(--cell-size); height: var(--cell-size);
+            background-color: var(--c-grass);
+            /* Текстура травы */
+            background-image: radial-gradient(#43703e 15%, transparent 16%);
+            background-size: 8px 8px;
+            
+            position: relative; border: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .cell:hover::before { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.2); z-index: 5; }
+        
+        /* Типы клеток */
+        .cell.water { background: var(--c-water); background-image: url('data:image/svg+xml;utf8,<svg width="10" height="10" xmlns="http://www.w3.org/2000/svg"><path d="M0 5 Q5 0 10 5" stroke="rgba(255,255,255,0.2)" fill="none"/></svg>'); animation: wave 3s linear infinite; border: none; }
+        .cell.road { background: var(--c-road); background-image: none; border: 1px dashed #666; }
+        .cell.avenue { background: var(--c-avenue); background-image: none; border: 2px solid #888; }
+        
+        .cell.res { background: var(--c-res); box-shadow: inset 0 0 5px rgba(0,0,0,0.3); }
+        .cell.com { background: var(--c-com); }
+        .cell.ind { background: var(--c-ind); }
+        
+        /* Здания (псевдоэлементы для "объема") */
+        .cell.res::after, .cell.com::after, .cell.ind::after {
+            content: ''; width: 70%; height: 70%; 
+            background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.3);
+            position: absolute;
+        }
+        .cell.res.lvl2::after { background: rgba(255,255,255,0.3); height: 80%; width: 80%; border: 2px solid #fff; }
+        .cell.res.lvl3::after { background: #14532d; height: 90%; width: 90%; border: 2px solid #fff; box-shadow: 0 0 5px black; }
+
+        /* Индикаторы проблем */
+        .problem-icon { position: absolute; top: -5px; right: -5px; font-size: 14px; z-index: 10; animation: bounce 1s infinite; }
+
+        /* Машинки */
+        .car {
+            position: absolute; width: 10px; height: 6px; 
+            background: #fff; border-radius: 2px; box-shadow: 0 1px 2px black;
+            z-index: 4; pointer-events: none;
+        }
+        .car.red { background: #ff5252; }
+        .car.yellow { background: #ffd740; }
+
+        /* --- Info (Right) --- */
+        #info-panel { grid-area: info; padding: 15px; border-left: 1px solid #333; }
+        .panel-header { font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #444; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        .btn { width: 100%; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 5px; color: white; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-red { background: var(--danger); }
+        .btn-blue { background: var(--accent); }
+
+        /* --- Logs (Bottom Right) --- */
+        #logs-panel { grid-area: logs; border-top: 1px solid #333; padding: 10px; overflow-y: auto; font-size: 0.8rem; background: #181818; }
+        .log-msg { margin-bottom: 4px; padding-left: 8px; border-left: 2px solid #555; }
+        .log-msg.good { border-color: var(--success); color: #86efac; }
+        .log-msg.bad { border-color: var(--danger); color: #fca5a5; }
+
+        /* Анимации */
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        @keyframes wave { 0% { background-position: 0 0; } 100% { background-position: 10px 10px; } }
+
+    </style>
+</head>
+<body>
+
+<div id="game-layout">
+    <header id="header">
+        <div class="resource-group">
+            <div class="res-item" id="res-budget" title="Бюджет"><span class="res-icon">💰</span> <span id="val-budget">50,000</span></div>
+            <div class="res-item" id="res-pop" title="Население"><span class="res-icon">👥</span> <span id="val-pop">0</span></div>
+            <div class="res-item" id="res-happy" title="Счастье"><span class="res-icon">😊</span> <span id="val-happy">100%</span></div>
+        </div>
+        <div class="resource-group">
+            <div class="res-item" id="res-power" title="Электричество (Производство / Потребление)">
+                <span class="res-icon">⚡</span> 
+                <span id="val-power">0 / 0</span>
+            </div>
+            <div class="res-item" id="res-water" title="Вода (Производство / Потребление)">
+                <span class="res-icon">💧</span> 
+                <span id="val-water">0 / 0</span>
+            </div>
+        </div>
+        <div style="font-size: 0.8rem; color: #777;">
+            Месяц: <span id="val-month">1</span> | <span id="speed-indicator">▶ 1x</span>
+        </div>
+    </header>
+
+    <aside id="tools-panel" class="panel">
+        </aside>
+
+    <main id="map-area">
+        <div id="grid">
+            </div>
+    </main>
+
+    <aside id="info-panel" class="panel">
+        <div class="panel-header">Инспектор</div>
+        <div id="info-content" style="color: #777; text-align: center; margin-top: 20px;">
+            Наведите на здание или выберите инструмент для строительства.
+        </div>
+    </aside>
+
+    <section id="logs-panel">
+        </section>
+</div>
+
+<script>
+    /* --- CONFIG --- */
+    const CONFIG = {
+        gridSize: 25,
+        tickRate: 3000, // 3 секунды = 1 месяц
+        colors: {
+            grass: '#365e32',
+            water: '#0ea5e9'
+        }
+    };
+
+    /* --- GAME DATA --- */
+    const BUILDINGS = {
+        road:  { id: 'road', name: 'Дорога', cost: 100, icon: '🛣️', desc: 'Нужна для доступа к зданиям.', maintenance: 1 },
+        avenue:{ id: 'avenue', name: 'Шоссе', cost: 500, icon: '🛣️', desc: 'Красивая дорога. Ускоряет трафик.', maintenance: 5 },
+        res:   { id: 'res', name: 'Жилая зона', cost: 200, icon: '🏠', desc: 'Здесь живут люди. Требует дороги.', levels: ['Пустырь', 'Дом', 'Коттедж', 'Высотка'], tax: [0, 5, 15, 40], maxPop: [0, 4, 12, 50] },
+        com:   { id: 'com', name: 'Магазины', cost: 300, icon: '🏪', desc: 'Приносят доход. Требуют товары.', income: 20, jobs: 10 },
+        ind:   { id: 'ind', name: 'Завод', cost: 600, icon: '🏭', desc: 'Дает работу. Загрязняет среду.', income: 40, jobs: 15, pollution: 3 },
+        power: { id: 'power', name: 'Ветряк', cost: 1500, icon: '⚡', desc: 'Вырабатывает 50 ед. энергии на ВСЮ карту.', maintenance: 50, output: 50 },
+        pump:  { id: 'pump', name: 'Насос', cost: 2000, icon: '💧', desc: 'Качает 60 ед. воды. Ставить РЯДОМ с водой.', maintenance: 80, output: 60 },
+        park:  { id: 'park', name: 'Парк', cost: 400, icon: '🌳', desc: 'Повышает счастье вокруг.', maintenance: 10 },
+        bull:  { id: 'bull', name: 'Снос', cost: 50, icon: '🚜', desc: 'Очистить клетку.' }
+    };
+
+    const TOOLS_ORDER = ['road', 'res', 'com', 'ind', 'power', 'pump', 'park', 'bull'];
+
+    /* --- STATE --- */
+    let state = {
+        budget: 50000,
+        month: 1,
+        population: 0,
+        happiness: 100,
+        grid: [], // Данные карты
+        domGrid: [], // DOM элементы
+        selectedTool: null,
+        
+        // Глобальные ресурсы
+        power: { prod: 0, demand: 0, status: true },
+        water: { prod: 0, demand: 0, status: true },
+        
+        running: true,
+        cars: [] 
+    };
+
+    /* --- INIT --- */
+    function init() {
+        createGrid();
+        renderTools();
+        updateUI();
+        log("Добро пожаловать, Мэр! Постройте дорогу, затем электростанцию и жилые зоны.", 'good');
+        
+        // Game Loop
+        setInterval(tick, CONFIG.tickRate);
+        // Traffic Loop (чаще)
+        setInterval(trafficTick, 100);
+    }
+
+    /* --- GRID SYSTEM --- */
+    function createGrid() {
+        const gridEl = document.getElementById('grid');
+        for (let y = 0; y < CONFIG.gridSize; y++) {
+            let row = [];
+            let domRow = [];
+            for (let x = 0; x < CONFIG.gridSize; x++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                
+                // Генерация карты: вода по краям (река)
+                let isWater = (x < 2 || x > CONFIG.gridSize - 3);
+                if (isWater) cell.classList.add('water');
+
+                cell.onclick = () => onCellClick(x, y);
+                cell.onmouseover = () => showInfo(x, y); // Предпросмотр
+                
+                gridEl.appendChild(cell);
+                
+                row.push({
+                    x, y, 
+                    isWater, 
+                    type: null, 
+                    lvl: 0, 
+                    pop: 0,
+                    data: {} // Доп. данные
+                });
+                domRow.push(cell);
+            }
+            state.grid.push(row);
+            state.domGrid.push(domRow);
+        }
+    }
+
+    function renderTools() {
+        const panel = document.getElementById('tools-panel');
+        TOOLS_ORDER.forEach(id => {
+            const t = BUILDINGS[id];
+            const btn = document.createElement('div');
+            btn.className = 'tool-btn';
+            btn.id = `tool-${id}`;
+            btn.innerHTML = `<span style="font-size:1.5rem">${t.icon}</span> <div><div>${t.name}</div><div class="tool-desc">${t.cost}₽</div></div>`;
+            btn.setAttribute('data-tip', t.desc + (t.maintenance ? `\nСодержание: -${t.maintenance}₽` : ''));
+            btn.onclick = () => selectTool(id);
+            panel.appendChild(btn);
+        });
+    }
+
+    function selectTool(id) {
+        if (state.selectedTool) document.getElementById(`tool-${state.selectedTool}`).classList.remove('active');
+        state.selectedTool = id;
+        document.getElementById(`tool-${id}`).classList.add('active');
+    }
+
+    /* --- INTERACTION --- */
+    function onCellClick(x, y) {
+        const cell = state.grid[y][x];
+        const toolId = state.selectedTool;
+
+        if (!toolId) return;
+
+        // СНОС
+        if (toolId === 'bull') {
+            if (cell.type) {
+                demolish(x, y);
+            }
+            return;
+        }
+
+        const buildInfo = BUILDINGS[toolId];
+
+        // ПРОВЕРКИ
+        if (state.budget < buildInfo.cost) {
+            log("Недостаточно средств!", 'bad');
+            return;
+        }
+        if (cell.isWater && toolId !== 'road') { // Мосты разрешены (условно)
+            log("Нельзя строить на воде!", 'bad');
+            return;
+        }
+        if (cell.type) {
+            log("Место занято.", 'bad');
+            return;
+        }
+        // Спец. проверка для насоса (должен быть РЯДОМ с водой, но НЕ на воде)
+        if (toolId === 'pump') {
+            const nearWater = checkNeighbors(x, y, c => c.isWater);
+            if (!nearWater) {
+                log("Насос должен быть рядом с водой!", 'bad');
+                return;
+            }
+        }
+
+        // СТРОИТЕЛЬСТВО
+        state.budget -= buildInfo.cost;
+        cell.type = toolId;
+        cell.lvl = 1;
+        cell.pop = 0;
+        
+        updateCellVisual(x, y);
+        log(`Построено: ${buildInfo.name}`);
+        updateUI();
+    }
+
+    function demolish(x, y) {
+        const cell = state.grid[y][x];
+        state.budget += 50; // Возврат малый
+        cell.type = null;
+        cell.lvl = 0;
+        cell.pop = 0;
+        updateCellVisual(x, y);
+        // Удалить машинки на этой клетке
+        const dom = state.domGrid[y][x];
+        const cars = dom.querySelectorAll('.car');
+        cars.forEach(c => c.remove());
+    }
+
+    function updateCellVisual(x, y) {
+        const cell = state.grid[y][x];
+        const dom = state.domGrid[y][x];
+        
+        // Очистка классов
+        dom.className = 'cell';
+        dom.innerHTML = ''; // Удаляем иконки/машинки
+        
+        if (cell.isWater) dom.classList.add('water');
+        
+        if (cell.type) {
+            dom.classList.add(cell.type);
+            
+            // Уровни для жилья
+            if (cell.type === 'res') {
+                if (cell.lvl >= 2) dom.classList.add('lvl2');
+                if (cell.lvl >= 3) dom.classList.add('lvl3');
+            } 
+            // Иконки для сервисов
+            else if (['power', 'pump', 'park'].includes(cell.type)) {
+                dom.innerHTML = `<span style="font-size:1.4rem; z-index:2; position:relative;">${BUILDINGS[cell.type].icon}</span>`;
+            }
+        }
+    }
+
+    /* --- LOGIC LOOP --- */
+    function tick() {
+        if (!state.running) return;
+        state.month++;
+
+        // 1. Подсчет глобальных мощностей
+        let powerProd = 0, powerCons = 0;
+        let waterProd = 0, waterCons = 0;
+        let income = 0, expenses = 0;
+        let totalPop = 0;
+
+        // Сбор данных
+        for (let y = 0; y < CONFIG.gridSize; y++) {
+            for (let x = 0; x < CONFIG.gridSize; x++) {
+                const cell = state.grid[y][x];
+                if (!cell.type) continue;
+                
+                const meta = BUILDINGS[cell.type];
+
+                // Содержание
+                if (meta.maintenance) expenses += meta.maintenance;
+
+                // Производство ресурсов
+                if (cell.type === 'power') powerProd += meta.output;
+                if (cell.type === 'pump') waterProd += meta.output;
+
+                // Потребление (Жилье и Бизнес)
+                if (['res', 'com', 'ind'].includes(cell.type)) {
+                    powerCons += (cell.lvl * 2); // Чем выше уровень, тем больше жрет
+                    if (cell.type !== 'ind') waterCons += (cell.lvl * 2); // Заводы пьют мало
+                }
+            }
+        }
+
+        // 2. Определение дефицита
+        state.power.status = (powerProd >= powerCons);
+        state.water.status = (waterProd >= waterCons);
+        
+        // Обновляем UI ресурсов
+        state.power.prod = powerProd; state.power.demand = powerCons;
+        state.water.prod = waterProd; state.water.demand = waterCons;
+
+        // 3. Обновление клеток (Рост / Упадок)
+        for (let y = 0; y < CONFIG.gridSize; y++) {
+            for (let x = 0; x < CONFIG.gridSize; x++) {
+                const cell = state.grid[y][x];
+                const dom = state.domGrid[y][x];
+                
+                // Удаляем старые значки проблем
+                const existingIcon = dom.querySelector('.problem-icon');
+                if(existingIcon) existingIcon.remove();
+
+                if (!cell.type) continue;
+
+                // Проверка дороги (обязательна для RCI)
+                let hasRoad = checkNeighbors(x, y, c => (c.type === 'road' || c.type === 'avenue'));
+                
+                if (['res', 'com', 'ind'].includes(cell.type)) {
+                    // Проверка проблем
+                    let problems = [];
+                    if (!hasRoad) problems.push('🛣️'); // Нет дороги
+                    if (!state.power.status) problems.push('⚡');
+                    if (!state.water.status && cell.type !== 'ind') problems.push('💧');
+                    
+                    if (problems.length > 0) {
+                        // Показать проблему
+                        const icon = document.createElement('div');
+                        icon.className = 'problem-icon';
+                        icon.innerText = problems[0];
+                        dom.appendChild(icon);
+                        
+                        // Деградация
+                        if (cell.pop > 0) cell.pop--;
+                        state.happiness -= 1;
+                    } else {
+                        // Развитие
+                        if (cell.type === 'res') {
+                            const meta = BUILDINGS.res;
+                            // Если есть место, растем
+                            if (cell.pop < meta.maxPop[cell.lvl]) {
+                                cell.pop++;
+                            } 
+                            // Апгрейд (если полный и счастлив)
+                            else if (cell.lvl < 3 && state.happiness > 80 && Math.random() > 0.7) {
+                                cell.lvl++;
+                                cell.pop = 0; // Заселяются новые
+                                updateCellVisual(x, y);
+                                log(`Здание улучшено до уровня ${cell.lvl}!`, 'good');
+                            }
+                            // Налоги
+                            income += meta.tax[cell.lvl];
+                        } 
+                        else if (cell.type === 'com' || cell.type === 'ind') {
+                            income += BUILDINGS[cell.type].income;
+                        }
+                    }
+                    totalPop += cell.pop;
+                }
+            }
+        }
+
+        // Финал хода
+        state.budget += (income - expenses);
+        state.population = totalPop;
+        
+        // Коррекция счастья
+        if (state.power.status && state.water.status) state.happiness = Math.min(100, state.happiness + 2);
+        if (totalPop > 0 && !state.power.status) log("Городу нужно электричество!", 'bad');
+        if (totalPop > 0 && !state.water.status) log("Городу нужна вода!", 'bad');
+
+        updateUI();
+    }
+
+    /* --- TRAFFIC SYSTEM --- */
+    function trafficTick() {
+        // Удаляем доехавшие машины
+        const activeCars = document.querySelectorAll('.car');
+        activeCars.forEach(car => {
+            // Простая проверка анимации (через opacity или время) - здесь упростим:
+            // CSS animation делает всю работу, JS просто спавнит новые
+        });
+
+        // Спавн новых машин (если есть население и дороги)
+        if (state.population > 0 && Math.random() > 0.8) { 
+            // Найти все дороги
+            let roads = [];
+            state.grid.forEach(row => row.forEach(cell => {
+                if (cell.type === 'road' || cell.type === 'avenue') roads.push(cell);
+            }));
+
+            if (roads.length > 0) {
+                // Выбрать случайную дорогу
+                const randomCell = roads[Math.floor(Math.random() * roads.length)];
+                const dom = state.domGrid[randomCell.y][randomCell.x];
+                
+                // Создать машинку
+                const car = document.createElement('div');
+                car.className = 'car ' + (Math.random() > 0.5 ? 'red' : 'yellow');
+                
+                // Случайное направление и позиция
+                const isVertical = Math.random() > 0.5;
+                
+                // Анимация через Web Animations API для контроля
+                dom.appendChild(car);
+                
+                const anim = car.animate([
+                    { transform: isVertical ? 'translateY(-15px)' : 'translateX(-15px)', opacity: 0 },
+                    { transform: isVertical ? 'translateY(0)' : 'translateX(0)', opacity: 1, offset: 0.2 },
+                    { transform: isVertical ? 'translateY(15px)' : 'translateX(15px)', opacity: 0 }
+                ], {
+                    duration: randomCell.type === 'avenue' ? 1000 : 2000, // По шоссе быстрее
+                    iterations: 1
+                });
+                
+                anim.onfinish = () => car.remove();
+            }
+        }
+    }
+
+    /* --- UTILS --- */
+    function checkNeighbors(x, y, conditionFn) {
+        const dirs = [[0,1], [0,-1], [1,0], [-1,0]];
+        for (let d of dirs) {
+            const nx = x + d[0];
+            const ny = y + d[1];
+            if (nx >= 0 && nx < CONFIG.gridSize && ny >= 0 && ny < CONFIG.gridSize) {
+                if (conditionFn(state.grid[ny][nx])) return true;
+            }
+        }
+        return false;
+    }
+
+    function updateUI() {
+        document.getElementById('val-budget').innerText = state.budget.toLocaleString();
+        document.getElementById('val-pop').innerText = state.population;
+        
+        // Счастье цвет
+        const hVal = document.getElementById('val-happy');
+        hVal.innerText = Math.round(state.happiness) + '%';
+        hVal.style.color = state.happiness > 70 ? 'var(--success)' : 'var(--danger)';
+
+        document.getElementById('val-month').innerText = state.month;
+
+        // Ресурсы
+        updateResUI('power', state.power);
+        updateResUI('water', state.water);
+    }
+
+    function updateResUI(id, obj) {
+        const el = document.getElementById(`res-${id}`);
+        const val = document.getElementById(`val-${id}`);
+        val.innerText = `${obj.prod} / ${obj.demand}`;
+        
+        if (!obj.status && obj.demand > 0) el.classList.add('critical');
+        else el.classList.remove('critical');
+    }
+
+    function showInfo(x, y) {
+        const cell = state.grid[y][x];
+        const panel = document.getElementById('info-content');
+        
+        let html = `<div>Координаты: ${x}:${y}</div>`;
+        
+        if (cell.type) {
+            const meta = BUILDINGS[cell.type];
+            html += `<h3 style="color:white; margin:10px 0;">${meta.icon} ${meta.name}</h3>`;
+            
+            if (cell.type === 'res') {
+                html += `<div>Уровень: ${cell.lvl}</div>`;
+                html += `<div>Жители: ${cell.pop} / ${meta.maxPop[cell.lvl]}</div>`;
+                if(cell.lvl < 3) html += `<div style="font-size:0.8rem; margin-top:5px; color:#aaa;">Авто-улучшение при счастье > 80%</div>`;
+            }
+            if (meta.output) html += `<div style="color:var(--success)">Выработка: +${meta.output}</div>`;
+            if (meta.income) html += `<div style="color:var(--success)">Доход: +${meta.income}₽</div>`;
+            if (meta.maintenance) html += `<div style="color:var(--danger)">Расход: -${meta.maintenance}₽</div>`;
+            
+            // Кнопка улучшения для дороги
+            if (cell.type === 'road') {
+                html += `<button class="btn btn-blue" onclick="upgradeRoad(${x},${y})">Улучшить до Шоссе (500₽)</button>`;
+            }
+        } else {
+            if (cell.isWater) html += `<h3 style="color:var(--c-water)">🌊 Вода</h3>`;
+            else html += `<h3>🌲 Пустырь</h3>`;
+        }
+        
+        panel.innerHTML = html;
+    }
+
+    function upgradeRoad(x, y) {
+        if (state.budget >= 400) { // Разница в цене
+            state.budget -= 400;
+            state.grid[y][x].type = 'avenue';
+            updateCellVisual(x, y);
+            showInfo(x, y); // обновить панель
+        } else {
+            log("Мало денег!", 'bad');
+        }
+    }
+
+    function log(msg, type = '') {
+        const box = document.getElementById('logs-panel');
+        const line = document.createElement('div');
+        line.className = `log-msg ${type}`;
+        line.innerText = msg;
+        box.prepend(line);
+        if (box.children.length > 20) box.lastChild.remove();
+    }
+
+    /* ЗАПУСК */
+    init();
+
+</script>
+</body>
+</html>

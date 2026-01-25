@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ГРАНД ПИКСЕЛЬ АВТО: РОССИЯ 90-Х</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            font-family: 'Courier New', Courier, monospace;
+            color: white;
+            user-select: none;
+        }
+        #gameCanvas {
+            display: block;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .hud-element {
+            position: absolute;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid white;
+            font-weight: bold;
+        }
+        #wanted-level { top: 20px; right: 20px; color: yellow; font-size: 24px; text-shadow: 2px 2px 0 #000; }
+        #health-display { top: 20px; left: 20px; color: #ff3333; font-size: 24px; text-shadow: 2px 2px 0 #000; }
+        #cash-display { top: 50px; left: 20px; color: #85bb65; font-size: 24px; text-shadow: 2px 2px 0 #000; }
+        #weapon-display { bottom: 20px; left: 20px; color: #00ff00; font-size: 20px; text-shadow: 2px 2px 0 #000; }
+        
+        #mission-text { 
+            bottom: 80px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            text-align: center; 
+            color: cyan; 
+            font-size: 20px; 
+            display: none;
+            width: 70%;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid cyan;
+            padding: 10px;
+        }
+        
+        #notification-area {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        #start-screen, #wasted-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: all;
+            z-index: 100;
+        }
+        h1 { font-size: 48px; text-shadow: 4px 4px #ff0000; margin-bottom: 10px; text-transform: uppercase; text-align: center;}
+        h2 { color: #aaa; margin-top: 0; }
+        .controls { text-align: left; margin-top: 20px; line-height: 1.8; font-size: 18px; border: 1px solid #555; padding: 20px; background: #222; }
+        .key { color: yellow; font-weight: bold; }
+        .btn {
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 24px;
+            background: #cc0000;
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+        }
+        .btn:hover { background: #ff0000; }
+        #wasted-screen { display: none; }
+        #wasted-text { color: red; font-size: 80px; font-weight: bold; text-shadow: 0 0 20px red; }
+    </style>
+</head>
+<body>
+
+    <div id="ui-layer">
+        <div id="health-display">ЖИЗНЬ: 100</div>
+        <div id="cash-display">$0</div>
+        <div id="wanted-level"></div>
+        <div id="weapon-display">КУЛАКИ</div>
+        <div id="mission-text">МИССИЯ</div>
+        <div id="notification-area"></div>
+    </div>
+
+    <div id="start-screen">
+        <h1>ГРАНД ПИКСЕЛЬ АВТО</h1>
+        <h2>БЕСПРЕДЕЛ В ГОРОДЕ</h2>
+        <div class="controls">
+            <span class="key">[СТРЕЛКИ]</span> Бегать / Рулить<br>
+            <span class="key">[E]</span> Сесть в машину / Выйти / Взять задание<br>
+            <span class="key">[ПРОБЕЛ]</span> Стрелять / Ручной тормоз<br>
+            -------------------------------------<br>
+            <span style="color:cyan">ТЕЛЕФОНЫ (Желтые)</span> - Брать задания<br>
+            <span style="color:#00ff00">МАСТЕРСКИЕ (Зеленые)</span> - Починка и снятие звезд ($200)<br>
+        </div>
+        <button class="btn" onclick="startGame()">ИГРАТЬ</button>
+    </div>
+
+    <div id="wasted-screen">
+        <div id="wasted-text">ПОТРАЧЕНО</div>
+        <button class="btn" onclick="location.reload()">ЗАНОВО</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+<script>
+/**
+ * ГРАНД ПИКСЕЛЬ АВТО - HTML5 Canvas Game
+ */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let SCREEN_WIDTH = window.innerWidth;
+let SCREEN_HEIGHT = window.innerHeight;
+canvas.width = SCREEN_WIDTH;
+canvas.height = SCREEN_HEIGHT;
+
+const WORLD_WIDTH = 4000;
+const WORLD_HEIGHT = 4000;
+const BLOCK_SIZE = 100;
+
+// Game State
+let gameRunning = false;
+let keys = {};
+let particles = [];
+let bullets = [];
+let cars = [];
+let peds = [];
+let buildings = [];
+let pickups = [];
+let phoneBooths = [];
+let shops = []; // Paint N Spray
+let tireTracks = [];
+
+let camera = { x: 0, y: 0 };
+let currentMission = null;
+
+// Player
+const player = {
+    x: 2000, y: 2000,
+    width: 14, height: 14,
+    angle: 0,
+    speed: 0,
+    maxSpeed: 4,
+    hp: 100,
+    cash: 0,
+    weapon: 'fists', // fists, pistol, machinegun
+    ammo: 0,
+    inCar: null,
+    wanted: 0,
+    wantedTimer: 0,
+    dx: 0, dy: 0,
+    dead: false
+};
+
+// District definitions
+const DISTRICTS = {
+    DOWNTOWN: { color: '#2a2a40', bldgColor: '#505070', name: 'Центр' },
+    SLUMS: { color: '#2b2218', bldgColor: '#524030', name: 'Трущобы' },
+    INDUSTRIAL: { color: '#202020', bldgColor: '#404040', name: 'Промзона' },
+    PARK: { color: '#1a301a', bldgColor: '#2d502d', name: 'Парк' }
+};
+
+// --- Utilities ---
+function dist(x1, y1, x2, y2) { return Math.sqrt((x2-x1)**2 + (y2-y1)**2); }
+function rand(min, max) { return Math.random() * (max - min) + min; }
+function showNotification(text, color) {
+    const el = document.getElementById('notification-area');
+    el.innerText = text;
+    el.style.color = color || 'white';
+    el.style.opacity = 1;
+    setTimeout(() => { el.style.opacity = 0; }, 2000);
+}
+
+// --- Generation ---
+function generateCity() {
+    buildings = [];
+    phoneBooths = [];
+    shops = [];
+    
+    // Create grid
+    for (let y = 0; y < WORLD_HEIGHT; y += BLOCK_SIZE) {
+        for (let x = 0; x < WORLD_WIDTH; x += BLOCK_SIZE) {
+            
+            // Determine District
+            let type = DISTRICTS.SLUMS;
+            if (x < 1500 && y < 1500) type = DISTRICTS.INDUSTRIAL;
+            else if (x > 2500 && y > 2500) type = DISTRICTS.DOWNTOWN;
+            else if (x > 1500 && x < 2500 && y > 1500 && y < 2500) type = DISTRICTS.PARK;
+
+            let isRoad = (x % (BLOCK_SIZE * 3) === 0) || (y % (BLOCK_SIZE * 3) === 0);
+            
+            if (!isRoad && type !== DISTRICTS.PARK) {
+                // Buildings
+                if (Math.random() > 0.15) {
+                    buildings.push({
+                        x: x + 5, y: y + 5,
+                        w: BLOCK_SIZE - 10, h: BLOCK_SIZE - 10,
+                        color: type.bldgColor,
+                        type: type
+                    });
+                } else if (Math.random() < 0.05) {
+                    // Chance for Shop (in empty lots)
+                    shops.push({x: x + 10, y: y + 10, w: BLOCK_SIZE-20, h: BLOCK_SIZE-20});
+                }
+            } else if (isRoad && Math.random() < 0.03) {
+                phoneBooths.push({x: x + 50, y: y + 50, active: true});
+            }
+        }
+    }
+
+    // Force at least one shop near spawn
+    shops.push({x: 2150, y: 2150, w: 80, h: 80});
+
+    // Spawn Initial Entities (Increased count for "Life")
+    for(let i=0; i<40; i++) spawnCar();
+    for(let i=0; i<60; i++) spawnPed();
+    for(let i=0; i<15; i++) spawnPickup();
+}
+
+function spawnCar(forcePolice = false, x, y) {
+    let carX = x || rand(100, WORLD_WIDTH-100);
+    let carY = y || rand(100, WORLD_HEIGHT-100);
+    
+    if(!x) {
+        let valid = false;
+        while(!valid) {
+            carX = rand(100, WORLD_WIDTH-100);
+            carY = rand(100, WORLD_HEIGHT-100);
+            valid = true;
+            for(let b of buildings) {
+                if(carX > b.x && carX < b.x+b.w && carY > b.y && carY < b.y+b.h) valid = false;
+            }
+        }
+    }
+
+    cars.push({
+        x: carX, y: carY,
+        w: 24, h: 44, // Physical size
+        angle: rand(0, Math.PI*2),
+        speed: 0,
+        maxSpeed: forcePolice ? 11 : rand(7, 9.5),
+        color: forcePolice ? '#ffffff' : `hsl(${rand(0,360)}, 60%, 40%)`,
+        type: forcePolice ? 'police' : 'civilian',
+        hp: 100,
+        driver: forcePolice ? 'police' : (Math.random() > 0.4 ? 'ped' : null),
+        turnSpeed: 0.06
+    });
+}
+
+function spawnPed() {
+    let pX, pY, valid=false;
+    while(!valid) {
+        pX = rand(0, WORLD_WIDTH);
+        pY = rand(0, WORLD_HEIGHT);
+        valid = true;
+        for(let b of buildings) if(pX > b.x && pX < b.x+b.w && pY > b.y && pY < b.y+b.h) valid = false;
+    }
+    peds.push({
+        x: pX, y: pY,
+        angle: rand(0, Math.PI*2),
+        speed: 1,
+        maxSpeed: rand(1, 1.5),
+        color: '#dcb',
+        shirt: `hsl(${rand(0,360)}, 50%, 50%)`,
+        state: 'wander',
+        panicTimer: 0,
+        hp: 20
+    });
+}
+
+function spawnPickup(x, y) {
+    let type = Math.random() > 0.6 ? 'health' : 'machinegun';
+    pickups.push({
+        x: x || rand(0, WORLD_WIDTH),
+        y: y || rand(0, WORLD_HEIGHT),
+        type: type,
+        active: true
+    });
+}
+
+// --- Inputs ---
+window.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if(e.key.toLowerCase() === 'e' || e.key.toLowerCase() === 'у') handleInteraction();
+    if(e.key === ' ') handleAction();
+});
+window.addEventListener('keyup', e => keys[e.key] = false);
+
+function handleInteraction() {
+    if(!gameRunning) return;
+
+    // Mission Phone
+    for(let booth of phoneBooths) {
+        if(dist(player.x, player.y, booth.x, booth.y) < 40) {
+            startMission();
+            return;
+        }
+    }
+
+    // Enter/Exit Car
+    if (player.inCar) {
+        // Exit
+        const car = player.inCar;
+        player.x = car.x + Math.cos(car.angle + Math.PI/2) * 30;
+        player.y = car.y + Math.sin(car.angle + Math.PI/2) * 30;
+        player.inCar.driver = null;
+        player.inCar.speed = 0;
+        player.inCar = null;
+    } else {
+        // Enter
+        let closestCar = null;
+        let minDist = 50;
+        for (let car of cars) {
+            let d = dist(player.x, player.y, car.x, car.y);
+            if (d < minDist) {
+                closestCar = car;
+                minDist = d;
+            }
+        }
+        if(closestCar) {
+            player.inCar = closestCar;
+            closestCar.driver = 'player';
+        }
+    }
+}
+
+function handleAction() {
+    if(!gameRunning) return;
+    if (player.inCar) return; 
+
+    // Shooting
+    if (keys[' ']) {
+        if(player.weapon === 'pistol' || (player.weapon === 'machinegun' && player.ammo > 0)) {
+            bullets.push({
+                x: player.x, y: player.y,
+                angle: player.angle + rand(-0.05, 0.05),
+                speed: 18,
+                owner: 'player',
+                life: 50
+            });
+            if(player.weapon === 'machinegun') player.ammo--;
+            triggerPanic(player.x, player.y, 300);
+        }
+    }
+}
+
+function triggerPanic(x, y, radius) {
+    peds.forEach(ped => {
+        if(dist(ped.x, ped.y, x, y) < radius) {
+            ped.state = 'flee';
+            ped.panicTimer = 180; // Run for 3 seconds
+            // Run away from source
+            ped.angle = Math.atan2(ped.y - y, ped.x - x);
+        }
+    });
+}
+
+// --- Mission System ---
+function startMission() {
+    if(currentMission) {
+        showNotification("Сначала закончи текущее задание!", "orange");
+        return;
+    }
+    
+    const types = ['kill', 'steal'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    
+    if(type === 'kill') {
+        spawnPed();
+        const target = peds[peds.length-1];
+        target.isTarget = true;
+        currentMission = {
+            type: 'kill',
+            target: target,
+            text: "УБЕЙ ЦЕЛЬ (Красная стрелка)"
+        };
+    } else {
+        spawnCar();
+        const target = cars[cars.length-1];
+        target.isTarget = true;
+        target.color = 'gold';
+        currentMission = {
+            type: 'steal',
+            target: target,
+            text: "УГОНИ ЗОЛОТУЮ ТАЧКУ"
+        };
+    }
+    
+    document.getElementById('mission-text').style.display = 'block';
+    document.getElementById('mission-text').innerText = currentMission.text;
+}
+
+function updateMission() {
+    if(!currentMission) {
+        document.getElementById('mission-text').style.display = 'none';
+        return;
+    }
+
+    if(currentMission.type === 'kill') {
+        if(currentMission.target.hp <= 0 || !peds.includes(currentMission.target)) {
+            completeMission("ЦЕЛЬ УСТРАНЕНА! +$500");
+        }
+    } else if (currentMission.type === 'steal') {
+        if(player.inCar === currentMission.target) {
+            completeMission("МАШИНА ДОСТАВЛЕНА! +$1000");
+        }
+        if(currentMission.target.hp <= 0) {
+            failMission("МАШИНА УНИЧТОЖЕНА");
+        }
+    }
+}
+
+function completeMission(msg) {
+    currentMission = null;
+    player.cash += 500;
+    if(msg.includes('1000')) player.cash += 500; // Extra for cars
+    showNotification(msg, "#00ff00");
+    document.getElementById('mission-text').innerText = msg;
+    setTimeout(() => { document.getElementById('mission-text').style.display = 'none'; }, 3000);
+    player.wanted = Math.max(0, player.wanted - 1);
+}
+
+function failMission(msg) {
+    currentMission = null;
+    showNotification(msg, "red");
+    document.getElementById('mission-text').innerText = msg;
+    document.getElementById('mission-text').style.color = 'red';
+    setTimeout(() => { 
+        document.getElementById('mission-text').style.display = 'none'; 
+        document.getElementById('mission-text').style.color = 'cyan';
+    }, 3000);
+}
+
+// --- Physics & Update ---
+function update() {
+    if(!gameRunning || player.dead) return;
+
+    // Player Movement (On Foot)
+    if (!player.inCar) {
+        let moveSpeed = 3.5;
+        player.dx = 0; player.dy = 0;
+        
+        if (keys['ArrowUp']) { player.dx += Math.cos(player.angle)*moveSpeed; player.dy += Math.sin(player.angle)*moveSpeed; }
+        if (keys['ArrowDown']) { player.dx -= Math.cos(player.angle)*moveSpeed; player.dy -= Math.sin(player.angle)*moveSpeed; }
+        if (keys['ArrowLeft']) player.angle -= 0.1;
+        if (keys['ArrowRight']) player.angle += 0.1;
+
+        let nextX = player.x + player.dx;
+        let nextY = player.y + player.dy;
+        if (!checkWallCollision(nextX, nextY, 10)) {
+            player.x = nextX;
+            player.y = nextY;
+        }
+    } else {
+        // Car Controls
+        const car = player.inCar;
+        player.x = car.x;
+        player.y = car.y;
+        player.angle = car.angle; 
+
+        if (keys['ArrowUp']) car.speed += 0.25;
+        if (keys['ArrowDown']) car.speed -= 0.2;
+        if (keys[' ']) {
+             car.speed *= 0.92; // Brake
+             // Add skid marks if braking hard
+             if(Math.abs(car.speed) > 4) addTireTrack(car.x, car.y, car.angle);
+        }
+        
+        if (Math.abs(car.speed) > 0.5) {
+            if (keys['ArrowLeft']) car.angle -= car.turnSpeed * Math.sign(car.speed);
+            if (keys['ArrowRight']) car.angle += car.turnSpeed * Math.sign(car.speed);
+        }
+
+        // Shop Logic
+        shops.forEach(shop => {
+            if (car.x > shop.x && car.x < shop.x + shop.w && car.y > shop.y && car.y < shop.y + shop.h) {
+                if (Math.abs(car.speed) < 1) {
+                    if (player.cash >= 200) {
+                        if (car.hp < 100 || player.wanted > 0) {
+                            player.cash -= 200;
+                            car.hp = 100;
+                            player.wanted = 0;
+                            showNotification("РЕМОНТ И ПОКРАСКА: -$200", "#00ff00");
+                            car.color = `hsl(${rand(0,360)}, 70%, 50%)`; // Change color
+                        }
+                    } else {
+                        showNotification("НУЖНО $200", "red");
+                    }
+                }
+            }
+        });
+    }
+
+    // Update Cars
+    cars.forEach((car, index) => {
+        car.x += Math.cos(car.angle) * car.speed;
+        car.y += Math.sin(car.angle) * car.speed;
+        car.speed *= 0.95; // Friction
+
+        // Wall Collision
+        if (checkWallCollision(car.x, car.y, 15)) {
+            car.speed *= -0.5;
+            car.x -= Math.cos(car.angle) * car.speed * 2; 
+            car.y -= Math.sin(car.angle) * car.speed * 2;
+            car.hp -= Math.abs(car.speed) * 8;
+        }
+
+        // Car vs Car
+        cars.forEach(other => {
+            if (car !== other && dist(car.x, car.y, other.x, other.y) < 30) {
+                let angle = Math.atan2(other.y - car.y, other.x - car.x);
+                car.speed *= -0.5;
+                other.speed += 3;
+                other.angle = angle;
+                car.hp -= 5;
+                other.hp -= 5;
+            }
+        });
+
+        // AI
+        if(car.driver === 'police' && player.wanted > 0) {
+            let targetAngle = Math.atan2(player.y - car.y, player.x - car.x);
+            let diff = targetAngle - car.angle;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            car.angle += diff * 0.08;
+            if(car.speed < car.maxSpeed) car.speed += 0.15;
+
+            if(dist(car.x, car.y, player.x, player.y) < 250 && Math.random() < 0.03) {
+                bullets.push({
+                    x: car.x, y: car.y,
+                    angle: car.angle,
+                    speed: 15,
+                    owner: 'police',
+                    life: 60
+                });
+            }
+        } else if (car.driver === 'ped') {
+            if(Math.random() < 0.02) car.speed = 6;
+            if(Math.random() < 0.05) car.angle += rand(-0.3, 0.3);
+            if(checkWallCollision(car.x + Math.cos(car.angle)*30, car.y+Math.sin(car.angle)*30, 20)) {
+                car.angle += Math.PI; // Turn around if wall ahead
+            }
+        }
+
+        if (car.hp <= 0) {
+            createExplosion(car.x, car.y);
+            if(player.inCar === car) player.hp = 0;
+            cars.splice(index, 1);
+        }
+    });
+
+    // Update Peds
+    peds.forEach((ped, index) => {
+        let speed = ped.state === 'flee' ? 2.5 : ped.speed;
+        
+        // Flee logic
+        if (ped.state === 'flee') {
+            ped.panicTimer--;
+            if (ped.panicTimer <= 0) ped.state = 'wander';
+            // Avoid walls while fleeing
+             if(checkWallCollision(ped.x + Math.cos(ped.angle)*20, ped.y+Math.sin(ped.angle)*20, 10)) {
+                ped.angle += Math.PI/2;
+            }
+        }
+
+        ped.x += Math.cos(ped.angle) * speed;
+        ped.y += Math.sin(ped.angle) * speed;
+        
+        if(ped.state === 'wander') {
+            if(Math.random() < 0.02) ped.angle = rand(0, Math.PI*2);
+            if(checkWallCollision(ped.x, ped.y, 5)) ped.angle += Math.PI;
+        }
+        
+        // Ped getting run over
+        cars.forEach(car => {
+            if(Math.abs(car.speed) > 2 && dist(ped.x, ped.y, car.x, car.y) < 20) {
+                ped.hp = 0;
+                for(let i=0; i<5; i++) particles.push({x: ped.x, y: ped.y, vx: rand(-2,2), vy: rand(-2,2), life: 100, color: 'red'});
+                if(car === player.inCar) {
+                    increaseWanted(1);
+                    showNotification("ВЫ СБИЛИ ЧЕЛОВЕКА!", "red");
+                    triggerPanic(ped.x, ped.y, 200);
+                }
+            }
+        });
+
+        if(ped.hp <= 0) peds.splice(index, 1);
+    });
+
+    // Bullets
+    bullets.forEach((b, index) => {
+        b.x += Math.cos(b.angle) * b.speed;
+        b.y += Math.sin(b.angle) * b.speed;
+        b.life--;
+        let hit = false;
+        
+        if(checkWallCollision(b.x, b.y, 2)) hit = true;
+
+        peds.forEach(ped => {
+            if(!hit && dist(b.x, b.y, ped.x, ped.y) < 12) {
+                ped.hp -= 20;
+                hit = true;
+                particles.push({x: b.x, y: b.y, vx: rand(-1,1), vy: rand(-1,1), life: 20, color: 'red'});
+                if(b.owner === 'player') {
+                    increaseWanted(1);
+                    triggerPanic(ped.x, ped.y, 200);
+                }
+            }
+        });
+
+        if(!hit && b.owner !== 'player' && dist(b.x, b.y, player.x, player.y) < 12) {
+            player.hp -= 5;
+            hit = true;
+            particles.push({x: b.x, y: b.y, vx: rand(-1,1), vy: rand(-1,1), life: 20, color: 'red'});
+        }
+
+        cars.forEach(car => {
+            if(!hit && dist(b.x, b.y, car.x, car.y) < 20) {
+                car.hp -= 4;
+                hit = true;
+                particles.push({x: b.x, y: b.y, vx: rand(-2,2), vy: rand(-2,2), life: 10, color: '#ccc'});
+                if(b.owner === 'player') increaseWanted(0.2);
+            }
+        });
+
+        if (b.life <= 0 || hit) bullets.splice(index, 1);
+    });
+
+    // Particles
+    particles.forEach((p, index) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        if(p.life <= 0) particles.splice(index, 1);
+    });
+
+    // Tire Tracks
+    if(tireTracks.length > 200) tireTracks.shift(); // Limit tracks
+
+    pickups.forEach((p, index) => {
+        if(p.active && dist(player.x, player.y, p.x, p.y) < 20) {
+            if(p.type === 'health') {
+                player.hp = Math.min(100, player.hp + 50);
+                showNotification("АПТЕЧКА");
+            } else if (p.type === 'machinegun') {
+                player.weapon = 'machinegun';
+                player.ammo += 100;
+                showNotification("АВТОМАТ ПОДОБРАН");
+            }
+            p.active = false;
+            pickups.splice(index, 1);
+        }
+    });
+
+    if(player.wanted > 0) {
+        player.wantedTimer++;
+        if(player.wantedTimer > 800) {
+            player.wanted -= 1;
+            player.wantedTimer = 0;
+            showNotification("ПОЛИЦИЯ ТЕРЯЕТ ИНТЕРЕС...", "cyan");
+        }
+        if(cars.filter(c => c.type === 'police').length < player.wanted * 2 && Math.random() < 0.015) {
+            let offset = 700;
+            spawnCar(true, player.x + (Math.random()>0.5?offset:-offset), player.y + (Math.random()>0.5?offset:-offset));
+        }
+    }
+
+    if(player.hp <= 0) {
+        player.dead = true;
+        gameRunning = false;
+        createExplosion(player.x, player.y);
+        document.getElementById('wasted-screen').style.display = 'flex';
+    }
+
+    camera.x = player.x - SCREEN_WIDTH/2;
+    camera.y = player.y - SCREEN_HEIGHT/2;
+
+    updateUI();
+    updateMission();
+}
+
+function checkWallCollision(x, y, radius) {
+    for (let b of buildings) {
+        if (x + radius > b.x && x - radius < b.x + b.w &&
+            y + radius > b.y && y - radius < b.y + b.h) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function createExplosion(x, y) {
+    for(let i=0; i<40; i++) {
+        particles.push({
+            x: x, y: y,
+            vx: rand(-6, 6), vy: rand(-6, 6),
+            life: 50,
+            color: Math.random()>0.3 ? 'orange' : '#ffff00'
+        });
+    }
+}
+
+function addTireTrack(x, y, angle) {
+    // Simple tracks logic
+    tireTracks.push({
+        x: x - Math.cos(angle)*10, 
+        y: y - Math.sin(angle)*10, 
+        angle: angle,
+        life: 1000 // Last for a while
+    });
+}
+
+function increaseWanted(amount) {
+    player.wanted = Math.min(6, player.wanted + amount);
+    player.wantedTimer = 0;
+}
+
+// --- Rendering ---
+function draw() {
+    ctx.fillStyle = '#181818'; 
+    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    ctx.save();
+    ctx.translate(-camera.x, -camera.y);
+
+    // Grid
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    let startX = Math.floor(camera.x / BLOCK_SIZE) * BLOCK_SIZE;
+    let startY = Math.floor(camera.y / BLOCK_SIZE) * BLOCK_SIZE;
+    for(let x=startX; x<startX+SCREEN_WIDTH+100; x+=BLOCK_SIZE) { ctx.moveTo(x, camera.y); ctx.lineTo(x, camera.y+SCREEN_HEIGHT); }
+    for(let y=startY; y<startY+SCREEN_HEIGHT+100; y+=BLOCK_SIZE) { ctx.moveTo(camera.x, y); ctx.lineTo(camera.x+SCREEN_WIDTH, y); }
+    ctx.stroke();
+
+    // Tire Tracks
+    ctx.fillStyle = '#111';
+    tireTracks.forEach(t => {
+        ctx.save();
+        ctx.translate(t.x, t.y);
+        ctx.rotate(t.angle);
+        ctx.fillRect(-8, -2, 4, 4);
+        ctx.fillRect(8, -2, 4, 4);
+        ctx.restore();
+    });
+
+    // Shops
+    shops.forEach(s => {
+        ctx.fillStyle = 'rgba(0, 100, 0, 0.5)';
+        ctx.fillRect(s.x, s.y, s.w, s.h);
+        ctx.strokeStyle = '#00ff00';
+        ctx.strokeRect(s.x, s.y, s.w, s.h);
+        ctx.fillStyle = '#00ff00';
+        ctx.font = '20px Arial';
+        ctx.fillText("РЕМОНТ", s.x + 5, s.y + 30);
+        ctx.fillText("$200", s.x + 5, s.y + 50);
+    });
+
+    // Phone Booths
+    phoneBooths.forEach(pb => {
+        ctx.fillStyle = 'yellow';
+        ctx.fillRect(pb.x-10, pb.y-10, 20, 20);
+        if(Math.floor(Date.now() / 500) % 2 === 0) {
+            ctx.strokeStyle = 'orange';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(pb.x-15, pb.y-15, 30, 30);
+        }
+    });
+
+    // Pickups
+    pickups.forEach(p => {
+        ctx.fillStyle = p.type === 'health' ? 'red' : '#00ff00';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 10, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText(p.type === 'health' ? '+' : 'AK', p.x-6, p.y+4);
+    });
+
+    // Buildings
+    buildings.forEach(b => {
+        if(b.x + b.w < camera.x || b.x > camera.x + SCREEN_WIDTH || b.y + b.h < camera.y || b.y > camera.y + SCREEN_HEIGHT) return;
+        ctx.fillStyle = b.color;
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(b.x+8, b.y+8, b.w-16, b.h-16);
+    });
+
+    // Particles
+    particles.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 4, 4);
+    });
+
+    // Peds
+    peds.forEach(ped => {
+        ctx.save();
+        ctx.translate(ped.x, ped.y);
+        ctx.rotate(ped.angle);
+        ctx.fillStyle = '#f8c291'; 
+        ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = ped.shirt; 
+        ctx.fillRect(-6, -4, 12, 8);
+        if(ped.isTarget) {
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI*2); ctx.stroke();
+            // Arrow above target
+            ctx.fillStyle = 'red';
+            ctx.beginPath(); ctx.moveTo(0, -25); ctx.lineTo(-5, -35); ctx.lineTo(5, -35); ctx.fill();
+        }
+        ctx.restore();
+    });
+
+    // Cars
+    cars.forEach(car => {
+        ctx.save();
+        ctx.translate(car.x, car.y);
+        // FIX: Rotate 90 degrees so the graphic matches the movement vector
+        ctx.rotate(car.angle + Math.PI/2); 
+        
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(-10, -20, 24, 44);
+
+        ctx.fillStyle = car.color;
+        ctx.fillRect(-12, -22, 24, 44);
+
+        ctx.fillStyle = '#111';
+        ctx.fillRect(-10, -12, 20, 8); // Front Windshield
+        ctx.fillRect(-10, 16, 20, 6);  // Back Windshield
+
+        if (car.type === 'police') {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(-12, -2, 24, 15);
+            ctx.fillStyle = (Math.floor(Date.now()/150)%2===0) ? 'blue' : 'red';
+            ctx.fillRect(-4, 0, 8, 4);
+        } else {
+             ctx.fillStyle = car.color; 
+             ctx.globalAlpha = 0.8;
+             ctx.fillRect(-11, -2, 22, 16);
+             ctx.globalAlpha = 1.0;
+        }
+
+        if(car.isTarget) {
+            ctx.strokeStyle = 'gold';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(-16, -26, 32, 52);
+        }
+
+        ctx.restore();
+    });
+
+    // Player (On Foot)
+    if (!player.inCar && !player.dead) {
+        ctx.save();
+        ctx.translate(player.x, player.y);
+        ctx.rotate(player.angle);
+        ctx.fillStyle = '#f8c291'; 
+        ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#0088ff'; // Blue shirt for player
+        ctx.fillRect(-6, -4, 12, 8);
+        if(player.weapon !== 'fists') {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(4, 2, 10, 3);
+        }
+        ctx.restore();
+    }
+
+    // Bullets
+    ctx.fillStyle = 'yellow';
+    bullets.forEach(b => ctx.fillRect(b.x-2, b.y-2, 4, 4));
+
+    // Objective Arrow
+    if(currentMission) {
+        let tx = currentMission.target.x;
+        let ty = currentMission.target.y;
+        let distToTarget = dist(player.x, player.y, tx, ty);
+        
+        if(distToTarget > 300) {
+            let angle = Math.atan2(ty - player.y, tx - player.x);
+            let arrowX = player.x + Math.cos(angle) * 150;
+            let arrowY = player.y + Math.sin(angle) * 150;
+            
+            ctx.save();
+            ctx.translate(arrowX, arrowY);
+            ctx.rotate(angle);
+            ctx.fillStyle = currentMission.target.isTarget ? 'red' : 'gold';
+            ctx.beginPath();
+            ctx.moveTo(15, 0);
+            ctx.lineTo(-15, 15);
+            ctx.lineTo(-15, -15);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    ctx.restore();
+}
+
+function updateUI() {
+    document.getElementById('health-display').innerText = `ЖИЗНЬ: ${Math.ceil(player.hp)}`;
+    document.getElementById('cash-display').innerText = `$${player.cash}`;
+    
+    let stars = "";
+    for(let i=0; i<Math.ceil(player.wanted); i++) stars += "★";
+    document.getElementById('wanted-level').innerText = stars;
+    
+    let wpn = player.weapon === 'fists' ? 'КУЛАКИ' : (player.weapon === 'pistol' ? 'ПИСТОЛЕТ' : `АВТОМАТ (${player.ammo})`);
+    document.getElementById('weapon-display').innerText = wpn;
+}
+
+function loop() {
+    if(gameRunning) {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+}
+
+function startGame() {
+    document.getElementById('start-screen').style.display = 'none';
+    generateCity();
+    gameRunning = true;
+    loop();
+}
+
+window.onresize = () => {
+    SCREEN_WIDTH = window.innerWidth;
+    SCREEN_HEIGHT = window.innerHeight;
+    canvas.width = SCREEN_WIDTH;
+    canvas.height = SCREEN_HEIGHT;
+}
+</script>
+</body>
+</html>

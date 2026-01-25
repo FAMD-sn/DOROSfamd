@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Angry Birds: Ultra Edition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Arial Black', sans-serif;
+            color: white;
+        }
+        #game-container {
+            width: 1024px;
+            height: 600px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+            border: 4px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container"></div>
+
+<script>
+/**
+ * Ultra-Fidelity Angry Birds Clone
+ * Logic: Preserved 100%
+ * Design: Enhanced textures & character models
+ * Levels: Slight remixes
+ */
+
+const CONFIG = {
+    width: 1024,
+    height: 600,
+    worldWidth: 2200,
+    gravity: 1200,
+    groundY: 530, 
+    slingshotX: 250,
+    slingshotY: 530, 
+    birdRadius: 20,
+    pigRadius: 18,
+    launchVelocity: 9.5
+};
+
+class AngryBirds {
+    constructor() {
+        this.currentBird = null;
+        this.waitingBirds = []; 
+        this.isDragging = false;
+        this.score = 0;
+        this.birdTrail = [];
+        this.isSettling = true;
+        this.currentLevel = 0;
+        this.birdsRemaining = 3;
+        
+        // --- УРОВНИ ---
+        this.levels = [
+            // Уровень 1: Классическая пирамида
+            [
+                { x: 740, y: 480, type: 'wood', w: 30, h: 100 }, 
+                { x: 860, y: 480, type: 'wood', w: 30, h: 100 },
+                { x: 800, y: 420, type: 'wood', w: 180, h: 20 }, 
+                { x: 800, y: 380, type: 'pig' },
+                // Добавил маленькие блоки сверху для красоты
+                { x: 760, y: 400, type: 'wood', w: 20, h: 40 },
+                { x: 840, y: 400, type: 'wood', w: 20, h: 40 }
+            ],
+            // Уровень 2: Ледяной бункер
+            [
+                { x: 680, y: 480, type: 'wood', w: 25, h: 100 },
+                { x: 800, y: 480, type: 'wood', w: 25, h: 100 },
+                { x: 920, y: 480, type: 'wood', w: 25, h: 100 },
+                { x: 740, y: 420, type: 'ice', w: 140, h: 20 },
+                { x: 860, y: 420, type: 'ice', w: 140, h: 20 },
+                { x: 740, y: 390, type: 'pig' },
+                { x: 860, y: 390, type: 'pig' },
+                { x: 800, y: 350, type: 'wood', w: 20, h: 100 } // Центральная защита
+            ],
+            // Уровень 3: Крепость
+            [
+                { x: 750, y: 470, type: 'wood', w: 40, h: 120 },
+                { x: 950, y: 470, type: 'wood', w: 40, h: 120 },
+                { x: 850, y: 400, type: 'ice', w: 260, h: 25 }, 
+                { x: 800, y: 345, type: 'wood', w: 30, h: 80 },
+                { x: 900, y: 345, type: 'wood', w: 30, h: 80 },
+                { x: 850, y: 295, type: 'wood', w: 160, h: 20 },
+                { x: 850, y: 260, type: 'pig' }, // Король наверху
+                { x: 780, y: 360, type: 'pig' },
+                { x: 920, y: 360, type: 'pig' },
+                { x: 850, y: 470, type: 'ice', w: 40, h: 120 } // Опора по центру
+            ]
+        ];
+
+        this.game = new Phaser.Game(CONFIG.width, CONFIG.height, Phaser.CANVAS, 'game-container', {
+            preload: this.preload.bind(this),
+            create: this.create.bind(this),
+            update: this.update.bind(this)
+        });
+    }
+
+    preload() {
+        this.game.physics.startSystem(Phaser.Physics.P2JS);
+        this.game.physics.p2.gravity.y = CONFIG.gravity;
+        this.game.physics.p2.restitution = 0.2;
+        this.game.physics.p2.friction = 5.0;
+        this.game.physics.p2.setImpactEvents(true);
+        this.game.world.setBounds(0, 0, CONFIG.worldWidth, CONFIG.height);
+        this.game.physics.p2.world.defaultContactMaterial.relaxation = 12;
+        this.game.physics.p2.world.defaultContactMaterial.stiffness = 2e7;
+        this.generateTextures();
+    }
+
+    generateTextures() {
+        const register = (key, bmd) => this.game.cache.addBitmapData(key, bmd);
+
+        // --- НЕБО  ---
+        const sky = this.game.add.bitmapData(CONFIG.worldWidth, CONFIG.height);
+        const sctx = sky.context;
+        const sGrad = sctx.createLinearGradient(0, 0, 0, CONFIG.height);
+        sGrad.addColorStop(0, '#7ec6ee');
+        sGrad.addColorStop(0.6, '#c5e6f5');
+        sGrad.addColorStop(1, '#e1f1f9');
+        sctx.fillStyle = sGrad;
+        sctx.fillRect(0, 0, CONFIG.worldWidth, CONFIG.height);
+        
+        // Облака
+        sctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        for(let i=0; i<4; i++) {
+            sctx.beginPath();
+            sctx.moveTo(0, CONFIG.height);
+            for(let x=0; x<=CONFIG.worldWidth; x+=80) {
+                sctx.lineTo(x, 100 + i*60 + Math.sin(x*0.005 + i)*40);
+            }
+            sctx.lineTo(CONFIG.worldWidth, CONFIG.height); sctx.closePath(); sctx.fill();
+        }
+        register('sky', sky);
+
+        // --- ХОЛМЫ ---
+        const hill1 = this.game.add.bitmapData(1024, 300);
+        hill1.context.fillStyle = '#d8e5f8';
+        hill1.context.beginPath(); hill1.context.moveTo(0, 300);
+        const p1 = [0, 150, 250, 100, 500, 190, 750, 120, 1024, 170];
+        for(let i=0; i<p1.length; i+=2) hill1.context.lineTo(p1[i], 300-p1[i+1]);
+        hill1.context.lineTo(1024, 300); hill1.context.closePath(); hill1.context.fill();
+        register('hill1', hill1);
+
+        const hill2 = this.game.add.bitmapData(1024, 300);
+        hill2.context.fillStyle = '#c6d9f3';
+        hill2.context.beginPath(); hill2.context.moveTo(0, 300);
+        const p2 = [0, 50, 200, 110, 450, 70, 700, 130, 900, 80, 1024, 100];
+        for(let i=0; i<p2.length; i+=2) hill2.context.lineTo(p2[i], 300-p2[i+1]);
+        hill2.context.lineTo(1024, 300); hill2.context.closePath(); hill2.context.fill();
+        register('hill2', hill2);
+
+        // --- ЗЕМЛЯ ---
+        const ground = this.game.add.bitmapData(CONFIG.worldWidth, 140);
+        const gctx = ground.context;
+        gctx.fillStyle = '#3a2e22'; // Более темный грунт
+        gctx.fillRect(0, 15, CONFIG.worldWidth, 125);
+        // Трава
+        gctx.fillStyle = '#7bc711';
+        gctx.beginPath(); gctx.moveTo(0, 15);
+        for(let x=0; x<=CONFIG.worldWidth; x+=20) gctx.lineTo(x, 15 + Math.sin(x*0.1)*3);
+        gctx.lineTo(CONFIG.worldWidth, 15); gctx.closePath(); gctx.fill();
+        // Детали травы
+        gctx.fillStyle = '#65a50d';
+        for(let x=0; x<=CONFIG.worldWidth; x+=10) {
+            gctx.beginPath(); gctx.moveTo(x, 15);
+            gctx.lineTo(x - 3, 2); gctx.lineTo(x + 3, 15);
+            gctx.closePath(); gctx.fill();
+        }
+        register('ground', ground);
+
+        // --- ПТИЦА ---
+        const bird = this.game.add.bitmapData(110, 110);
+        const ctx = bird.context;
+        const cx = 55, cy = 60;
+        
+        // Хохолок (новое)
+        ctx.fillStyle = '#d30000';
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 30);
+        ctx.quadraticCurveTo(cx - 15, cy - 55, cx - 5, cy - 35);
+        ctx.quadraticCurveTo(cx + 10, cy - 55, cx + 15, cy - 35);
+        ctx.fill();
+
+        // Тело
+        ctx.fillStyle = '#e50000'; 
+        ctx.beginPath(); ctx.arc(cx, cy, 32, 0, Math.PI * 2); ctx.fill();
+        
+        // Животик
+        ctx.fillStyle = '#efd9b8';
+        ctx.beginPath(); 
+        ctx.arc(cx, cy + 12, 20, 0, Math.PI * 2); 
+        ctx.fill();
+        
+        // Глаза
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(cx - 10, cy - 8, 10, 0, Math.PI * 2); ctx.fill(); // Левый
+        ctx.beginPath(); ctx.arc(cx + 10, cy - 8, 10, 0, Math.PI * 2); ctx.fill(); // Правый
+        
+        // Зрачки
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(cx - 7, cy - 8, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + 7, cy - 8, 3, 0, Math.PI * 2); ctx.fill();
+
+        // Брови
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 9; ctx.lineCap = 'round';
+        ctx.beginPath(); 
+        ctx.moveTo(cx - 28, cy - 18); 
+        ctx.lineTo(cx, cy - 5); 
+        ctx.lineTo(cx + 28, cy - 18); 
+        ctx.stroke();
+
+        // Клюв
+        ctx.fillStyle = '#fdb813'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(cx, cy - 5); ctx.lineTo(cx + 20, cy + 8); ctx.lineTo(cx - 5, cy + 12); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#eb950c';
+        ctx.beginPath(); ctx.moveTo(cx - 5, cy + 12); ctx.lineTo(cx + 15, cy + 14); ctx.lineTo(cx - 2, cy + 18); ctx.closePath(); ctx.fill(); ctx.stroke();
+        
+        register('bird', bird);
+
+        // --- СВИНЬЯ ---
+        const pig = this.game.add.bitmapData(100, 100);
+        const pctx = pig.context;
+        const pcx = 50, pcy = 50;
+        
+        // Уши
+        pctx.fillStyle = '#548c08';
+        pctx.beginPath(); pctx.ellipse(pcx - 25, pcy - 25, 10, 15, -0.5, 0, Math.PI*2); pctx.fill();
+        pctx.beginPath(); pctx.ellipse(pcx + 25, pcy - 25, 10, 15, 0.5, 0, Math.PI*2); pctx.fill();
+        pctx.fillStyle = '#7bc711';
+        pctx.beginPath(); pctx.ellipse(pcx - 25, pcy - 25, 7, 10, -0.5, 0, Math.PI*2); pctx.fill();
+        pctx.beginPath(); pctx.ellipse(pcx + 25, pcy - 25, 7, 10, 0.5, 0, Math.PI*2); pctx.fill();
+
+        // Тело
+        pctx.fillStyle = '#7bc711'; pctx.beginPath(); pctx.arc(pcx, pcy, 36, 0, Math.PI * 2); pctx.fill();
+        pctx.strokeStyle = '#416a06'; pctx.lineWidth = 2; pctx.stroke();
+
+        // Пятачок (Овальный)
+        pctx.fillStyle = '#8ed826'; 
+        pctx.beginPath(); pctx.ellipse(pcx, pcy + 8, 18, 14, 0, 0, Math.PI * 2); pctx.fill();
+        pctx.strokeStyle = '#3e6307'; pctx.lineWidth = 1; pctx.stroke();
+        
+        // Ноздри
+        pctx.fillStyle = '#2f4d04'; 
+        pctx.beginPath(); pctx.arc(pcx - 7, pcy + 8, 4, 0, Math.PI * 2); pctx.fill(); 
+        pctx.beginPath(); pctx.arc(pcx + 7, pcy + 8, 4, 0, Math.PI * 2); pctx.fill();
+
+        // Глаза (Широко расставлены)
+        pctx.fillStyle = '#fff'; pctx.beginPath(); pctx.arc(pcx - 18, pcy - 8, 10, 0, Math.PI * 2); pctx.fill(); pctx.beginPath(); pctx.arc(pcx + 18, pcy - 8, 10, 0, Math.PI * 2); pctx.fill();
+        pctx.fillStyle = '#000'; pctx.beginPath(); pctx.arc(pcx - 18, pcy - 8, 3, 0, Math.PI * 2); pctx.fill(); pctx.beginPath(); pctx.arc(pcx + 18, pcy - 8, 3, 0, Math.PI * 2); pctx.fill();
+        
+        register('pig', pig);
+
+        // --- РОГАТКА ---
+        const sling = this.game.add.bitmapData(60, 160);
+        sling.context.fillStyle = '#4a2e18';
+        sling.context.fillRect(25, 50, 10, 110);
+        sling.context.beginPath(); 
+        sling.context.moveTo(25,50); sling.context.lineTo(5,0); sling.context.lineTo(15,0); sling.context.lineTo(30,40);
+        sling.context.lineTo(45,0); sling.context.lineTo(55,0); sling.context.lineTo(35,50); 
+        sling.context.closePath(); sling.context.fill();
+        register('slingshot', sling);
+
+        // --- БЛОК ДЕРЕВА ---
+        const createWoodBlock = (key) => {
+            const bmd = this.game.add.bitmapData(128, 128);
+            const bctx = bmd.context;
+            bctx.fillStyle = '#e67e22'; bctx.fillRect(0, 0, 128, 128);
+            bctx.strokeStyle = '#d35400'; bctx.lineWidth = 8; bctx.strokeRect(4, 4, 120, 120);
+            
+            // Текстура дерева "X"
+            bctx.strokeStyle = 'rgba(120, 50, 0, 0.2)'; bctx.lineWidth = 4;
+            bctx.beginPath(); bctx.moveTo(10,10); bctx.lineTo(118,118); bctx.stroke();
+            bctx.beginPath(); bctx.moveTo(118,10); bctx.lineTo(10,118); bctx.stroke();
+            
+            // Гвоздики
+            bctx.fillStyle = 'rgba(0,0,0,0.3)';
+            bctx.fillRect(8, 8, 6, 6); bctx.fillRect(114, 8, 6, 6);
+            bctx.fillRect(8, 114, 6, 6); bctx.fillRect(114, 114, 6, 6);
+            register(key, bmd);
+        };
+        createWoodBlock('wood');
+
+        // --- БЛОК ЛЬДА ---
+        const createIceBlock = (key) => {
+            const bmd = this.game.add.bitmapData(128, 128);
+            const bctx = bmd.context;
+            bctx.fillStyle = 'rgba(130, 230, 255, 0.8)'; bctx.fillRect(0, 0, 128, 128);
+            bctx.strokeStyle = '#ffffff'; bctx.lineWidth = 6; bctx.strokeRect(4, 4, 120, 120);
+            
+            // Блики
+            bctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            bctx.beginPath(); bctx.moveTo(0,0); bctx.lineTo(60,0); bctx.lineTo(0,60); bctx.fill();
+            
+            register(key, bmd);
+        };
+        createIceBlock('ice');
+
+        const part = this.game.add.bitmapData(64, 64);
+        part.context.fillStyle = 'rgba(255,255,255,0.7)';
+        part.context.beginPath(); part.context.arc(32,32,25,0,Math.PI*2); part.context.fill();
+        register('particle', part);
+    }
+
+    create() {
+        this.game.add.sprite(0, 0, this.game.cache.getBitmapData('sky')).fixedToCamera = true;
+        
+        for (let i = 0; i < 3; i++) {
+            this.game.add.sprite(i * 1024, CONFIG.groundY - 200, this.game.cache.getBitmapData('hill1')).alpha = 0.8;
+            this.game.add.sprite(i * 1024, CONFIG.groundY - 140, this.game.cache.getBitmapData('hill2')).alpha = 0.9;
+        }
+
+        const ground = this.game.add.sprite(0, CONFIG.groundY - 15, this.game.cache.getBitmapData('ground'));
+        this.game.physics.p2.enable(ground);
+        ground.body.static = true;
+        ground.body.x = CONFIG.worldWidth / 2;
+        ground.body.y = CONFIG.groundY + 65; 
+
+        const sling = this.game.add.sprite(CONFIG.slingshotX, CONFIG.slingshotY, this.game.cache.getBitmapData('slingshot'));
+        sling.anchor.setTo(0.5, 1);
+        
+        this.blocks = this.game.add.group();
+        this.pigs = this.game.add.group();
+        
+        this.trailGraphics = this.game.add.graphics(0, 0);
+        this.slingshotGraphics = this.game.add.graphics(0, 0);
+
+        this.loadLevel(this.currentLevel);
+
+        const style = { font: "40px 'Arial Black'", fill: "#fff", stroke: "#000", strokeThickness: 6 };
+        this.scoreText = this.game.add.text(20, 20, "SCORE: 0", style);
+        this.scoreText.fixedToCamera = true;
+        this.levelText = this.game.add.text(CONFIG.width - 180, 20, "LVL: 1", style);
+        this.levelText.fixedToCamera = true;
+        
+        this.game.input.onDown.add(this.onMouseDown, this);
+        this.game.input.onUp.add(this.onMouseUp, this);
+        this.game.physics.p2.setPostBroadphaseCallback(this.onCollision, this);
+
+        this.initBirdQueue();
+    }
+
+    initBirdQueue() {
+        this.birdsRemaining = 3;
+        this.waitingBirds.forEach(b => b.destroy());
+        this.waitingBirds = [];
+        for (let i = 0; i < 2; i++) {
+            const b = this.game.add.sprite(CONFIG.slingshotX - 70 - (i * 50), CONFIG.groundY - 15, this.game.cache.getBitmapData('bird'));
+            b.anchor.setTo(0.5, 1);
+            b.scale.setTo(0.45);
+            this.waitingBirds.push(b);
+        }
+        this.spawnBird();
+    }
+
+    loadLevel(idx) {
+        this.blocks.removeAll(true);
+        this.pigs.removeAll(true);
+        this.currentLevel = idx;
+        if(this.levelText) this.levelText.text = "LVL: " + (idx + 1);
+        const lvlData = this.levels[idx % this.levels.length];
+        lvlData.forEach(obj => {
+            if(obj.type === 'pig') this.createPig(obj.x, obj.y);
+            else this.createBlock(obj.x, obj.y, obj.type, obj.w, obj.h);
+        });
+        this.isSettling = true;
+        this.game.time.events.add(1000, () => { this.isSettling = false; });
+    }
+
+    createBlock(x, y, type, w, h) {
+        const b = this.game.add.sprite(x, y, this.game.cache.getBitmapData(type));
+        b.width = w; b.height = h;
+        this.game.physics.p2.enable(b);
+        b.body.mass = type === 'wood' ? 6 : 3;
+        this.blocks.add(b);
+    }
+
+    createPig(x, y) {
+        const p = this.game.add.sprite(x, y, this.game.cache.getBitmapData('pig'));
+        p.anchor.setTo(0.5); p.scale.setTo(0.60);
+        this.game.physics.p2.enable(p);
+        p.body.setCircle(CONFIG.pigRadius + 5);
+        p.health = 100;
+        this.pigs.add(p);
+    }
+
+    spawnBird() {
+        if (this.currentBird || this.birdsRemaining <= 0) {
+            if (this.birdsRemaining <= 0 && !this.currentBird && this.pigs.countLiving() > 0) {
+                this.game.time.events.add(2000, () => this.loadLevel(this.currentLevel)); 
+                this.initBirdQueue();
+            }
+            return;
+        }
+        this.birdsRemaining--;
+        this.currentBird = this.game.add.sprite(CONFIG.slingshotX - 60, CONFIG.groundY - 15, this.game.cache.getBitmapData('bird'));
+        this.currentBird.anchor.setTo(0.5);
+        this.currentBird.scale.setTo(0.55); 
+        this.birdTrail = [];
+        const nextWaiting = this.waitingBirds.shift();
+        if (nextWaiting) nextWaiting.destroy();
+        const targetY = CONFIG.slingshotY - 128;
+        this.game.add.tween(this.currentBird).to({ x: CONFIG.slingshotX, y: targetY }, 600, Phaser.Easing.Quadratic.Out, true);
+        this.game.add.tween(this.game.camera).to({ x: 0 }, 1000, Phaser.Easing.Quadratic.Out, true);
+    }
+
+    onMouseDown() {
+        const targetY = CONFIG.slingshotY - 128;
+        if (!this.currentBird || this.currentBird.body || this.game.camera.x > 50) return;
+        if (Phaser.Math.distance(this.game.input.x, this.game.input.y, CONFIG.slingshotX, targetY) < 120) {
+            this.isDragging = true;
+        }
+    }
+
+    onMouseUp() {
+        const targetY = CONFIG.slingshotY - 128;
+        if (this.isDragging && this.currentBird) {
+            this.isDragging = false;
+            const dx = CONFIG.slingshotX - this.currentBird.x;
+            const dy = targetY - this.currentBird.y;
+            this.game.physics.p2.enable(this.currentBird);
+            this.currentBird.body.setCircle(CONFIG.birdRadius);
+            this.currentBird.body.velocity.x = dx * CONFIG.launchVelocity;
+            this.currentBird.body.velocity.y = dy * CONFIG.launchVelocity;
+            const bird = this.currentBird;
+            this.currentBird = null;
+            this.game.time.events.add(6000, () => { if (bird.alive) this.triggerBirdExplosion(bird); });
+        }
+    }
+
+    triggerBirdExplosion(bird) {
+        if (!bird || !bird.alive) return;
+        this.explode(bird.x, bird.y, true); 
+        bird.destroy(); 
+        this.game.time.events.add(1000, () => {
+            if (this.pigs.countLiving() > 0) this.spawnBird(); 
+            else this.checkLevelComplete();
+        });
+    }
+
+    checkLevelComplete() {
+        if (this.pigs.countLiving() === 0) {
+            this.game.time.events.add(1500, () => {
+                this.loadLevel(this.currentLevel + 1);
+                this.initBirdQueue();
+            });
+        }
+    }
+
+    onCollision(b1, b2) {
+        if (this.isSettling) return true;
+        const relVel = Math.sqrt(Math.pow(b1.velocity.x - b2.velocity.x, 2) + Math.pow(b1.velocity.y - b2.velocity.y, 2));
+        if (relVel > 300) {
+            [b1, b2].forEach(b => {
+                if(b && b.sprite && this.pigs.children.indexOf(b.sprite) > -1) {
+                    b.sprite.health -= relVel * 0.45;
+                    if(b.sprite.health <= 0) {
+                        this.explode(b.x, b.y, false);
+                        b.sprite.destroy();
+                    }
+                }
+            });
+        }
+        return true;
+    }
+
+    explode(x, y, isBird) {
+        const e = this.game.add.emitter(x, y, 15);
+        e.makeParticles(this.game.cache.getBitmapData('particle'));
+        e.minParticleScale = 0.3; e.maxParticleScale = 1.0;
+        e.start(true, 700, null, 15);
+        if (!isBird) {
+            this.score += 5000;
+            this.scoreText.text = "SCORE: " + this.score;
+        }
+    }
+
+    update() {
+        const flyingBird = this.game.world.children.find(c => c.key && c.key.key === 'bird' && c.body);
+        if (flyingBird) {
+            const targetX = Math.max(0, Math.min(flyingBird.x - CONFIG.width/2, CONFIG.worldWidth - CONFIG.width));
+            this.game.camera.x = targetX;
+            const vel = Math.sqrt(flyingBird.body.velocity.x**2 + flyingBird.body.velocity.y**2);
+            if (vel < 5 && this.game.time.frame % 60 === 0) { 
+                if (flyingBird.body.static === false) this.game.time.events.add(1000, () => this.triggerBirdExplosion(flyingBird));
+            }
+        }
+        const targetY = CONFIG.slingshotY - 128;
+        if (this.isDragging && this.currentBird) {
+            const angle = Phaser.Math.angleBetween(CONFIG.slingshotX, targetY, this.game.input.x, this.game.input.y);
+            const dist = Math.min(Phaser.Math.distance(this.game.input.x, this.game.input.y, CONFIG.slingshotX, targetY), 140);
+            this.currentBird.x = CONFIG.slingshotX + Math.cos(angle) * dist;
+            this.currentBird.y = targetY + Math.sin(angle) * dist;
+        }
+        this.slingshotGraphics.clear();
+        if (this.isDragging && this.currentBird) {
+            this.slingshotGraphics.lineStyle(14, 0x23140a, 1);
+            this.slingshotGraphics.moveTo(CONFIG.slingshotX + 18, CONFIG.slingshotY - 145);
+            this.slingshotGraphics.lineTo(this.currentBird.x, this.currentBird.y);
+            this.slingshotGraphics.lineStyle(12, 0x4e2f1f, 1);
+            this.slingshotGraphics.moveTo(CONFIG.slingshotX - 18, CONFIG.slingshotY - 145);
+            this.slingshotGraphics.lineTo(this.currentBird.x, this.currentBird.y);
+        }
+        this.trailGraphics.clear();
+        this.trailGraphics.beginFill(0xffffff, 0.4);
+        if (flyingBird) {
+            if(this.game.time.frame % 3 === 0) {
+                this.birdTrail.push({x: flyingBird.x, y: flyingBird.y});
+                if(this.birdTrail.length > 50) this.birdTrail.shift();
+            }
+        }
+        this.birdTrail.forEach(p => this.trailGraphics.drawCircle(p.x, p.y, 10));
+    }
+}
+
+// Запуск при загрузке окна
+window.onload = () => new AngryBirds();
+</script>
+</body>
+</html>

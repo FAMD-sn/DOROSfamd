@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ультра-шифровщик Соль–Ω–X</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: #a0d2ff;
+            margin-bottom: 5px;
+        }
+        
+        .tagline {
+            color: #88aacc;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(20, 30, 48, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .panel-title {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: #4fc3f7;
+            border-bottom: 2px solid rgba(79, 195, 247, 0.3);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-title i {
+            font-size: 1.2em;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            background: rgba(10, 20, 40, 0.7);
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            border-radius: 10px;
+            color: #f0f0f0;
+            font-size: 16px;
+            resize: vertical;
+            line-height: 1.5;
+            transition: all 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 15px rgba(79, 195, 247, 0.2);
+        }
+        
+        .key-input {
+            margin: 15px 0;
+        }
+        
+        .key-input label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a0d2ff;
+            font-weight: 500;
+        }
+        
+        .key-input input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(10, 20, 40, 0.7);
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            border-radius: 10px;
+            color: #f0f0f0;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .key-input input:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 10px rgba(79, 195, 247, 0.2);
+        }
+        
+        .key-input .hint {
+            font-size: 0.9em;
+            color: #88aacc;
+            margin-top: 5px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1976D2, #1565C0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #F57C00, #EF6C00);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+        
+        .btn-clear {
+            background: linear-gradient(135deg, #757575, #616161);
+            color: white;
+        }
+        
+        .btn-clear:hover {
+            background: linear-gradient(135deg, #616161, #424242);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(117, 117, 117, 0.4);
+        }
+        
+        .result-container {
+            margin-top: 25px;
+        }
+        
+        .result-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .result-label span {
+            color: #a0d2ff;
+            font-weight: 500;
+        }
+        
+        .copy-btn {
+            background: rgba(79, 195, 247, 0.2);
+            color: #4fc3f7;
+            border: 1px solid rgba(79, 195, 247, 0.5);
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(79, 195, 247, 0.3);
+        }
+        
+        .rules-panel {
+            margin-top: 40px;
+            background: rgba(20, 30, 48, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .rules-title {
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            color: #4fc3f7;
+            text-align: center;
+        }
+        
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .rule-item {
+            background: rgba(10, 20, 40, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .rule-item h4 {
+            color: #4fc3f7;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .rule-item p {
+            color: #ccd6f6;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(100, 150, 255, 0.2);
+            color: #88aacc;
+            font-size: 0.9em;
+        }
+        
+        .status-message {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #81C784;
+            border-left: 4px solid #4CAF50;
+            display: block;
+        }
+        
+        .status-error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #E57373;
+            border-left: 4px solid #F44336;
+            display: block;
+        }
+        
+        .algorithm-info {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #88aacc;
+            padding: 10px;
+            background: rgba(10, 20, 40, 0.3);
+            border-radius: 5px;
+            border-left: 3px solid #FF9800;
+        }
+        
+        .symbol {
+            color: #FF9800;
+            font-weight: bold;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Ультра-шифровщик Соль–Ω–X</h1>
+            <div class="subtitle">Криптографическая система с многоуровневым преобразованием</div>
+            <div class="tagline">Шифрование с ключевым словом, нестабильными гласными и дрейфом согласных</div>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-keyboard"></i> Исходный текст
+                </div>
+                <textarea id="inputText" placeholder="Введите текст для шифрования или расшифровки...">Пример текста для шифрования. Москва - столица России. 2024 год.</textarea>
+                
+                <div class="key-input">
+                    <label for="keyWord">Ключевое слово:</label>
+                    <input type="text" id="keyWord" value="ЛИМОН" maxlength="20" placeholder="Введите ключевое слово">
+                    <div class="hint">Используется как основа для шифрования. Чем длиннее, тем сложнее шифр.</div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-primary" onclick="encryptText()">
+                        <i class="fas fa-lock"></i> Русский → Соль–Ω–X
+                    </button>
+                    <button class="btn btn-secondary" onclick="decryptText()">
+                        <i class="fas fa-unlock"></i> Соль–Ω–X → Русский
+                    </button>
+                    <button class="btn btn-clear" onclick="clearAll()">
+                        <i class="fas fa-broom"></i> Очистить
+                    </button>
+                </div>
+                
+                <div id="encryptStatus" class="status-message"></div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-code"></i> Результат
+                </div>
+                <div class="result-label">
+                    <span>Преобразованный текст:</span>
+                    <button class="copy-btn" onclick="copyResult()">
+                        <i class="fas fa-copy"></i> Копировать
+                    </button>
+                </div>
+                <textarea id="outputText" readonly placeholder="Здесь появится результат шифрования или расшифровки..."></textarea>
+                
+                <div class="algorithm-info">
+                    <i class="fas fa-info-circle"></i> Алгоритм использует ключ <span id="currentKeyDisplay">ЛИМОН</span> для преобразования.
+                    <span id="algorithmDetails"></span>
+                </div>
+                
+                <div id="decryptStatus" class="status-message"></div>
+            </div>
+        </div>
+        
+        <div class="rules-panel">
+            <div class="rules-title">
+                <i class="fas fa-book"></i> Правила шифра Соль–Ω–X
+            </div>
+            
+            <div class="rules-grid">
+                <div class="rule-item">
+                    <h4>Ключевое слово</h4>
+                    <p>Каждое шифрование начинается с ключевого слова (например, «ЛИМОН»), которое определяет преобразования.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h4>Нестабильные гласные</h4>
+                    <p>Чётная позиция буквы → "z" + предыдущая гласная. Нечётная позиция → "s" + следующая гласная по ключу.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h4>Дрейф согласных</h4>
+                    <p>Каждая согласная смещается на +1, +2 или +3 по алфавиту, в зависимости от позиции в слове.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h4>Ложные слоги</h4>
+                    <p>Слова длиннее 4 букв → добавляется случайный «фальш-слог» (например, "ре", "та", "со").</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h4>Позиционные маркеры</h4>
+                    <p>Слово в начале предложения → префикс "qx". Слово в конце предложения → суффикс "pq".</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h4>Регистровый шум</h4>
+                    <p>Заглавные буквы → каждая вторая буква становится заглавной случайным образом.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h4>Контекстные замены</h4>
+                    <p>Часто повторяющиеся слова заменяются на символы / короткие коды, зависящие от ключа.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h4>Имена собственные</h4>
+                    <p>Имена собственные не шифруются, сохраняя читаемость важных названий.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h4>Числа и знаки препинания</h4>
+                    <p>Числа и знаки препинания сохраняются без изменений.</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Ультра-шифровщик Соль–Ω–X • Криптографическая система с многоуровневым преобразованием • 2024</p>
+            <p style="margin-top: 5px;">Алгоритм: Соль (ключ) – Ω (нестабильные гласные) – X (дрейф согласных)</p>
+        </footer>
+    </div>
+
+    <script>
+        // Константы шифра
+        const RUSSIAN_ALPHABET = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ';
+        const RUSSIAN_VOWELS = 'АЕЁИОУЫЭЮЯ';
+        const RUSSIAN_CONSONANTS = 'БВГДЖЗЙКЛМНПРСТФХЦЧШЩ';
+        
+        // Ложные слоги для добавления
+        const FALSE_SYLLABLES = ['ре', 'та', 'со', 'ни', 'во', 'ка', 'ме', 'ти', 'по', 'ла'];
+        
+        // Коды для часто повторяющихся слов
+        const COMMON_WORDS = {
+            'и': '&',
+            'в': '#',
+            'не': '!',
+            'на': '@',
+            'я': '$',
+            'он': '%',
+            'что': '?',
+            'это': '*',
+            'как': '+',
+            'по': '=',
+            'но': '-'
+        };
+        
+        // Имена собственные (примеры, можно расширять)
+        const PROPER_NOUNS = ['Москва', 'Россия', 'Петров', 'Иванов', 'Волга', 'Урал', 'Европа', 'Азия'];
+        
+        // Глобальные переменные
+        let currentKey = 'ЛИМОН';
+        let commonWordsMap = {};
+        let reverseCommonWordsMap = {};
+        
+        // Инициализация карты часто используемых слов
+        function initCommonWordsMap(key) {
+            commonWordsMap = {...COMMON_WORDS};
+            reverseCommonWordsMap = {};
+            
+            // Добавляем замены, зависящие от ключа
+            const keyChars = key.toUpperCase().split('');
+            keyChars.forEach((char, index) => {
+                if (index < 10) { // Ограничим количество замен
+                    const word = ['этот', 'такой', 'который', 'другой', 'первый', 'второй', 'новый', 'старый', 'большой', 'маленький'][index];
+                    if (word) {
+                        const code = `[${char}${index}]`;
+                        commonWordsMap[word] = code;
+                        reverseCommonWordsMap[code] = word;
+                    }
+                }
+            });
+            
+            // Создаем обратную карту для декодирования
+            for (const [word, code] of Object.entries(commonWordsMap)) {
+                reverseCommonWordsMap[code] = word;
+            }
+        }
+        
+        // Проверка, является ли буква гласной
+        function isVowel(char) {
+            return RUSSIAN_VOWELS.includes(char.toUpperCase());
+        }
+        
+        // Проверка, является ли буква согласной
+        function isConsonant(char) {
+            return RUSSIAN_CONSONANTS.includes(char.toUpperCase());
+        }
+        
+        // Получить следующую гласную из ключа
+        function getNextVowelFromKey(key, position) {
+            const keyUpper = key.toUpperCase();
+            const keyVowels = keyUpper.split('').filter(c => isVowel(c));
+            
+            if (keyVowels.length === 0) return 'А'; // По умолчанию
+            
+            const index = position % keyVowels.length;
+            return keyVowels[index];
+        }
+        
+        // Получить предыдущую гласную в тексте
+        function getPreviousVowel(text, position) {
+            for (let i = position - 1; i >= 0; i--) {
+                if (isVowel(text[i])) {
+                    return text[i].toUpperCase();
+                }
+            }
+            return 'А'; // По умолчанию
+        }
+        
+        // Смещение согласной
+        function shiftConsonant(char, position) {
+            if (!isConsonant(char)) return char;
+            
+            const upperChar = char.toUpperCase();
+            const index = RUSSIAN_CONSONANTS.indexOf(upperChar);
+            if (index === -1) return char;
+            
+            // Определяем смещение в зависимости от позиции
+            const shiftAmount = (position % 3) + 1; // +1, +2 или +3
+            const newIndex = (index + shiftAmount) % RUSSIAN_CONSONANTS.length;
+            const newChar = RUSSIAN_CONSONANTS[newIndex];
+            
+            // Сохраняем регистр
+            return char === char.toUpperCase() ? newChar : newChar.toLowerCase();
+        }
+        
+        // Обратное смещение согласной
+        function unshiftConsonant(char, position) {
+            if (!isConsonant(char)) return char;
+            
+            const upperChar = char.toUpperCase();
+            const index = RUSSIAN_CONSONANTS.indexOf(upperChar);
+            if (index === -1) return char;
+            
+            // Определяем смещение в зависимости от позиции
+            const shiftAmount = (position % 3) + 1;
+            const newIndex = (index - shiftAmount + RUSSIAN_CONSONANTS.length) % RUSSIAN_CONSONANTS.length;
+            const newChar = RUSSIAN_CONSONANTS[newIndex];
+            
+            // Сохраняем регистр
+            return char === char.toUpperCase() ? newChar : newChar.toLowerCase();
+        }
+        
+        // Добавление регистрового шума
+        function addCaseNoise(text) {
+            let result = '';
+            let makeUpper = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                
+                if (char === char.toUpperCase() && char.match(/[А-Я]/i)) {
+                    // Исходная заглавная буква
+                    if (makeUpper) {
+                        result += char.toUpperCase();
+                    } else {
+                        result += char.toLowerCase();
+                    }
+                    makeUpper = !makeUpper;
+                } else {
+                    result += char;
+                }
+            }
+            
+            return result;
+        }
+        
+        // Удаление регистрового шума
+        function removeCaseNoise(text) {
+            let result = '';
+            let wasUpper = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                
+                if (char.match(/[А-Я]/i)) {
+                    // Восстанавливаем исходный регистр на основе контекста
+                    if (i === 0 || text[i-1] === ' ' || text[i-1] === '.') {
+                        result += char.toUpperCase();
+                        wasUpper = true;
+                    } else if (wasUpper) {
+                        result += char.toLowerCase();
+                        wasUpper = false;
+                    } else {
+                        result += char.toLowerCase();
+                    }
+                } else {
+                    result += char;
+                    wasUpper = false;
+                }
+            }
+            
+            return result;
+        }
+        
+        // Шифрование слова
+        function encryptWord(word, key, isFirstInSentence = false, isLastInSentence = false) {
+            // Проверка на имя собственное
+            if (PROPER_NOUNS.includes(word)) {
+                return word;
+            }
+            
+            // Проверка на часто встречающееся слово
+            const lowerWord = word.toLowerCase();
+            if (commonWordsMap[lowerWord]) {
+                return commonWordsMap[lowerWord];
+            }
+            
+            let result = '';
+            
+            // Добавляем префикс для первого слова в предложении
+            if (isFirstInSentence) {
+                result += 'qx';
+            }
+            
+            // Обрабатываем каждую букву
+            for (let i = 0; i < word.length; i++) {
+                const char = word[i];
+                const position = i + 1; // Позиция начинается с 1
+                
+                if (isVowel(char)) {
+                    // Нестабильные гласные
+                    if (position % 2 === 0) {
+                        // Чётная позиция: z + предыдущая гласная
+                        result += 'z' + getPreviousVowel(word, i);
+                    } else {
+                        // Нечётная позиция: s + следующая гласная по ключу
+                        result += 's' + getNextVowelFromKey(key, i);
+                    }
+                } else if (isConsonant(char)) {
+                    // Дрейф согласных
+                    result += shiftConsonant(char, i);
+                } else {
+                    // Не буква (цифра, знак препинания и т.д.)
+                    result += char;
+                }
+            }
+            
+            // Добавляем ложный слог для длинных слов
+            if (word.length > 4) {
+                const randomIndex = Math.floor(Math.random() * FALSE_SYLLABLES.length);
+                result += FALSE_SYLLABLES[randomIndex];
+            }
+            
+            // Добавляем суффикс для последнего слова в предложении
+            if (isLastInSentence) {
+                result += 'pq';
+            }
+            
+            return result;
+        }
+        
+        // Расшифровка слова
+        function decryptWord(encryptedWord, key) {
+            // Проверка на имя собственное
+            if (PROPER_NOUNS.includes(encryptedWord)) {
+                return encryptedWord;
+            }
+            
+            // Проверка на код часто встречающегося слова
+            if (reverseCommonWordsMap[encryptedWord]) {
+                return reverseCommonWordsMap[encryptedWord];
+            }
+            
+            // Удаляем позиционные маркеры
+            let word = encryptedWord;
+            let wasFirst = false;
+            let wasLast = false;
+            
+            if (word.startsWith('qx')) {
+                word = word.substring(2);
+                wasFirst = true;
+            }
+            
+            if (word.endsWith('pq')) {
+                word = word.substring(0, word.length - 2);
+                wasLast = true;
+            }
+            
+            // Удаляем ложный слог (если есть)
+            for (const syllable of FALSE_SYLLABLES) {
+                if (word.endsWith(syllable)) {
+                    word = word.substring(0, word.length - syllable.length);
+                    break;
+                }
+            }
+            
+            let result = '';
+            let i = 0;
+            
+            while (i < word.length) {
+                const char = word[i];
+                
+                if (char === 'z' || char === 's') {
+                    // Нестабильные гласные
+                    i++; // Пропускаем 'z' или 's'
+                    if (i < word.length) {
+                        // Добавляем гласную (восстанавливаем оригинальную гласную)
+                        result += word[i];
+                    }
+                    i++;
+                } else if (isConsonant(char)) {
+                    // Обратный дрейф согласных
+                    const position = result.length; // Текущая позиция в результате
+                    result += unshiftConsonant(char, position);
+                    i++;
+                } else {
+                    // Не буква
+                    result += char;
+                    i++;
+                }
+            }
+            
+            return result;
+        }
+        
+        // Шифрование текста
+        function encryptText() {
+            const input = document.getElementById('inputText').value;
+            const key = document.getElementById('keyWord').value || 'ЛИМОН';
+            
+            if (!input.trim()) {
+                showStatus('encryptStatus', 'Введите текст для шифрования', 'error');
+                return;
+            }
+            
+            if (!key.trim()) {
+                showStatus('encryptStatus', 'Введите ключевое слово', 'error');
+                return;
+            }
+            
+            currentKey = key.toUpperCase();
+            initCommonWordsMap(currentKey);
+            
+            // Обновляем отображение ключа
+            document.getElementById('currentKeyDisplay').textContent = currentKey;
+            
+            // Разбиваем текст на предложения
+            const sentences = input.split(/(?<=[.!?])\s+/);
+            let result = '';
+            
+            sentences.forEach(sentence => {
+                if (!sentence.trim()) return;
+                
+                // Разбиваем предложение на слова
+                const words = sentence.split(/(\s+)/);
+                const processedWords = [];
+                
+                for (let i = 0; i < words.length; i++) {
+                    const word = words[i];
+                    
+                    if (word.trim() === '' || word.match(/^\s+$/)) {
+                        // Пробелы остаются без изменений
+                        processedWords.push(word);
+                        continue;
+                    }
+                    
+                    // Определяем, является ли слово первым или последним в предложении
+                    const isFirstInSentence = i === 0 || (i > 0 && words[i-1].match(/^\s+$/));
+                    const isLastInSentence = i === words.length - 1 || 
+                                            (i < words.length - 1 && words[i+1].match(/^\s+$/) && 
+                                             words.slice(i+1).every(w => !w.trim()));
+                    
+                    // Шифруем слово
+                    const encryptedWord = encryptWord(word, currentKey, isFirstInSentence, isLastInSentence);
+                    processedWords.push(encryptedWord);
+                }
+                
+                result += processedWords.join('');
+            });
+            
+            // Добавляем регистровый шум
+            result = addCaseNoise(result);
+            
+            // Выводим результат
+            document.getElementById('outputText').value = result;
+            
+            // Показываем информацию об алгоритме
+            document.getElementById('algorithmDetails').innerHTML = 
+                ` | Зашифровано слов: ${input.split(/\s+/).filter(w => w.trim()).length}`;
+            
+            showStatus('encryptStatus', 'Текст успешно зашифрован', 'success');
+        }
+        
+        // Расшифровка текста
+        function decryptText() {
+            const input = document.getElementById('inputText').value;
+            const key = document.getElementById('keyWord').value || 'ЛИМОН';
+            
+            if (!input.trim()) {
+                showStatus('decryptStatus', 'Введите текст для расшифровки', 'error');
+                return;
+            }
+            
+            if (!key.trim()) {
+                showStatus('decryptStatus', 'Введите ключевое слово', 'error');
+                return;
+            }
+            
+            currentKey = key.toUpperCase();
+            initCommonWordsMap(currentKey);
+            
+            // Обновляем отображение ключа
+            document.getElementById('currentKeyDisplay').textContent = currentKey;
+            
+            // Удаляем регистровый шум
+            let text = removeCaseNoise(input);
+            
+            // Разбиваем текст на предложения (по позиционным маркерам)
+            const sentences = [];
+            let currentSentence = '';
+            let words = text.split(/(\s+)/);
+            
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i];
+                currentSentence += word;
+                
+                // Проверяем, заканчивается ли слово на 'pq' (маркер конца предложения)
+                if (word.endsWith('pq') || i === words.length - 1) {
+                    sentences.push(currentSentence);
+                    currentSentence = '';
+                }
+            }
+            
+            let result = '';
+            
+            sentences.forEach(sentence => {
+                if (!sentence.trim()) return;
+                
+                // Разбиваем предложение на слова
+                const words = sentence.split(/(\s+)/);
+                const processedWords = [];
+                
+                for (let i = 0; i < words.length; i++) {
+                    const word = words[i];
+                    
+                    if (word.trim() === '' || word.match(/^\s+$/)) {
+                        // Пробелы остаются без изменений
+                        processedWords.push(word);
+                        continue;
+                    }
+                    
+                    // Расшифровываем слово
+                    const decryptedWord = decryptWord(word, currentKey);
+                    processedWords.push(decryptedWord);
+                }
+                
+                result += processedWords.join('');
+            });
+            
+            // Выводим результат
+            document.getElementById('outputText').value = result;
+            
+            // Показываем информацию об алгоритме
+            document.getElementById('algorithmDetails').innerHTML = 
+                ` | Расшифровано слов: ${result.split(/\s+/).filter(w => w.trim()).length}`;
+            
+            showStatus('decryptStatus', 'Текст успешно расшифрован', 'success');
+        }
+        
+        // Очистка всех полей
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('keyWord').value = 'ЛИМОН';
+            document.getElementById('encryptStatus').className = 'status-message';
+            document.getElementById('decryptStatus').className = 'status-message';
+            document.getElementById('algorithmDetails').innerHTML = '';
+            
+            showStatus('encryptStatus', 'Все поля очищены', 'success');
+        }
+        
+        // Копирование результата в буфер обмена
+        function copyResult() {
+            const outputText = document.getElementById('outputText');
+            
+            if (!outputText.value.trim()) {
+                showStatus('encryptStatus', 'Нет текста для копирования', 'error');
+                return;
+            }
+            
+            outputText.select();
+            outputText.setSelectionRange(0, 99999); // Для мобильных устройств
+            
+            try {
+                document.execCommand('copy');
+                
+                // Визуальная обратная связь
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
+                copyBtn.style.background = 'rgba(76, 175, 80, 0.3)';
+                copyBtn.style.borderColor = 'rgba(76, 175, 80, 0.7)';
+                copyBtn.style.color = '#81C784';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.background = '';
+                    copyBtn.style.borderColor = '';
+                    copyBtn.style.color = '';
+                }, 2000);
+                
+                showStatus('encryptStatus', 'Текст скопирован в буфер обмена', 'success');
+            } catch (err) {
+                showStatus('encryptStatus', 'Ошибка при копировании', 'error');
+            }
+        }
+        
+        // Показать статус
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status-message status-${type}`;
+            
+            // Автоскрытие для успешных сообщений
+            if (type === 'success') {
+                setTimeout(() => {
+                    element.className = 'status-message';
+                }, 5000);
+            }
+        }
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initCommonWordsMap('ЛИМОН');
+            
+            // Обработка нажатия Enter в поле ключа
+            document.getElementById('keyWord').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    encryptText();
+                }
+            });
+            
+            // Пример шифрования при загрузке
+            setTimeout(() => {
+                document.getElementById('algorithmDetails').innerHTML = 
+                    ' | Алгоритм готов к работе. Введите текст и нажмите кнопку шифрования.';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

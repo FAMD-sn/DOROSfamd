@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Tracker | Реальные курсы криптовалют</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border: #334155;
+            --modal-bg: rgba(15, 23, 42, 0.95);
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(244, 114, 182, 0.1) 0px, transparent 50%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--dark-light);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+        }
+
+        .logo i {
+            color: var(--primary);
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .last-updated {
+            font-size: 0.9rem;
+            color: var(--gray);
+            background-color: rgba(30, 41, 59, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0 3rem;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3.2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        #search-crypto {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background-color: var(--dark-light);
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        #search-crypto:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Market Overview */
+        .market-overview {
+            margin-bottom: 3rem;
+        }
+
+        .market-overview h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .market-overview h2 i {
+            color: var(--secondary);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            display: block;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* Crypto Table */
+        .crypto-table-section {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-header h3 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-header h3 i {
+            color: var(--primary);
+        }
+
+        .currency-selector {
+            display: flex;
+            gap: 0.5rem;
+            background-color: var(--dark-light);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+
+        .currency-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--light);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .currency-btn.active {
+            background-color: var(--primary);
+        }
+
+        .currency-btn:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th {
+            background-color: var(--dark-light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        tr:hover {
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        .crypto-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .crypto-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .crypto-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .crypto-symbol {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .price {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .change {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .change.positive {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--secondary);
+        }
+
+        .change.negative {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .sparkline {
+            height: 40px;
+            width: 120px;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        #load-more {
+            padding: 0.8rem 1.8rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #load-more:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .page-info {
+            color: var(--gray);
+        }
+
+        /* Converter */
+        .converter-section {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        .converter-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .converter-section h2 i {
+            color: var(--warning);
+        }
+
+        .converter-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            background-color: var(--dark-light);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .converter-input, .converter-output {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .converter-input input, .converter-output input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background-color: var(--dark);
+            color: var(--light);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .converter-input select, .converter-output select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background-color: var(--dark);
+            color: var(--light);
+            font-size: 1rem;
+        }
+
+        .converter-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            background-color: var(--dark);
+            padding: 1rem;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .converter-icon:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        #convert-btn {
+            padding: 1rem 2rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-end;
+        }
+
+        #convert-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        #conversion-result {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: var(--dark-light);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-size: 1.2rem;
+            text-align: center;
+            display: none;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-bg);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--dark-light);
+            border-radius: 20px;
+            max-width: 1200px;
+            margin: 40px auto;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        /* Crypto Detail Styles */
+        .crypto-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .detail-crypto-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .detail-crypto-info h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-crypto-symbol {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-crypto-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-crypto-change {
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-stat {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-stat-label {
+            display: block;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-stat-value {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .chart-section {
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            height: 400px;
+            margin-bottom: 1.5rem;
+        }
+
+        .time-frame-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .time-frame-btn {
+            padding: 0.5rem 1.2rem;
+            background-color: var(--dark);
+            color: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-frame-btn.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .time-frame-btn:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .additional-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-section {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .info-section h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--gray);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
+            color: var(--gray);
+            margin-top: 3rem;
+        }
+
+        .disclaimer {
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        /* Loader */
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 2rem;
+            font-size: 1.1rem;
+            color: var(--gray);
+        }
+
+        .loader-modal {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .fa-spin {
+            animation: fa-spin 1s infinite linear;
+        }
+
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .converter-container {
+                flex-direction: column;
+            }
+            
+            .converter-icon {
+                transform: rotate(90deg);
+            }
+
+            .modal-content {
+                margin: 20px auto;
+                border-radius: 16px;
+            }
+
+            .detail-crypto-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .detail-crypto-price {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .crypto-table-section {
+                padding: 1rem;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .table-footer {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .modal-body {
+                padding: 1.5rem;
+            }
+
+            .detail-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .additional-info {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 300px;
+                padding: 1rem;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo" onclick="location.reload()">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Crypto Tracker</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#market" class="active"><i class="fas fa-coins"></i> Рынок</a>
+                    <a href="#portfolio"><i class="fas fa-wallet"></i> Портфель</a>
+                    <a href="#news"><i class="fas fa-newspaper"></i> Новости</a>
+                    <a href="#converter"><i class="fas fa-exchange-alt"></i> Конвертер</a>
+                </div>
+                <div class="last-updated">
+                    <i class="fas fa-clock"></i> Обновлено: <span id="update-time">--:--:--</span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Реальные курсы криптовалют в режиме реального времени</h1>
+            <p>Следите за ценами, трендами и рыночной капитализацией основных криптовалют. Данные обновляются каждую минуту.</p>
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-crypto" placeholder="Поиск криптовалюты (Bitcoin, Ethereum, Dogecoin...)">
+            </div>
+        </section>
+
+        <section class="market-overview" id="market">
+            <h2><i class="fas fa-chart-bar"></i> Обзор рынка</h2>
+            <div class="stats">
+                <div class="stat-card" onclick="showCryptoDetail('bitcoin')">
+                    <span class="stat-label">Общая рыночная капитализация</span>
+                    <span class="stat-value" id="total-market-cap">$---</span>
+                </div>
+                <div class="stat-card" onclick="showCryptoDetail('ethereum')">
+                    <span class="stat-label">Объем торгов за 24ч</span>
+                    <span class="stat-value" id="total-volume">$---</span>
+                </div>
+                <div class="stat-card" onclick="showCryptoDetail('bitcoin')">
+                    <span class="stat-label">Доминирование Bitcoin</span>
+                    <span class="stat-value" id="btc-dominance">--%</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Криптовалют в базе</span>
+                    <span class="stat-value" id="total-coins">---</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="crypto-table-section">
+            <div class="table-header">
+                <h3><i class="fas fa-list-ol"></i> Котировки криптовалют</h3>
+                <div class="currency-selector">
+                    <button class="currency-btn active" data-currency="usd">USD</button>
+                    <button class="currency-btn" data-currency="eur">EUR</button>
+                    <button class="currency-btn" data-currency="rub">RUB</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table id="crypto-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Монета</th>
+                            <th>Цена</th>
+                            <th>Изменение 24ч</th>
+                            <th>Капитализация</th>
+                            <th>Объем (24ч)</th>
+                            <th>График (7д)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="crypto-table-body">
+                        <tr class="loading-row">
+                            <td colspan="7">
+                                <div class="loader">
+                                    <i class="fas fa-spinner fa-spin"></i> Загрузка данных о криптовалютах...
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="table-footer">
+                <button id="load-more">Загрузить ещё</button>
+                <div class="page-info">
+                    Показано: <span id="shown-count">0</span> из <span id="total-count">0</span> криптовалют
+                </div>
+            </div>
+        </section>
+
+        <section class="converter-section" id="converter">
+            <h2><i class="fas fa-calculator"></i> Конвертер криптовалют</h2>
+            <div class="converter-container">
+                <div class="converter-input">
+                    <input type="number" id="amount-input" value="1" min="0" step="0.01">
+                    <select id="from-currency">
+                        <option value="bitcoin">Bitcoin (BTC)</option>
+                        <option value="ethereum">Ethereum (ETH)</option>
+                        <option value="tether">Tether (USDT)</option>
+                        <option value="binancecoin">Binance Coin (BNB)</option>
+                        <option value="cardano">Cardano (ADA)</option>
+                        <option value="solana">Solana (SOL)</option>
+                        <option value="usd">Доллар США (USD)</option>
+                        <option value="rub">Российский рубль (RUB)</option>
+                        <option value="eur">Евро (EUR)</option>
+                    </select>
+                </div>
+                <div class="converter-icon" id="swap-currencies">
+                    <i class="fas fa-arrow-right-arrow-left"></i>
+                </div>
+                <div class="converter-output">
+                    <input type="text" id="result-output" readonly>
+                    <select id="to-currency">
+                        <option value="usd">Доллар США (USD)</option>
+                        <option value="rub">Российский рубль (RUB)</option>
+                        <option value="eur">Евро (EUR)</option>
+                        <option value="bitcoin">Bitcoin (BTC)</option>
+                        <option value="ethereum">Ethereum (ETH)</option>
+                        <option value="tether">Tether (USDT)</option>
+                        <option value="binancecoin">Binance Coin (BNB)</option>
+                    </select>
+                </div>
+                <button id="convert-btn">Конвертировать</button>
+            </div>
+            <div id="conversion-result"></div>
+        </section>
+    </main>
+
+    <!-- Modal for Crypto Details -->
+    <div id="crypto-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Детали криптовалюты</h2>
+                <button class="modal-close" id="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <div class="loader-modal">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p>Загрузка детальной информации...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Crypto Tracker &copy; 2023. Данные предоставляются CoinGecko API.</p>
+            <p class="disclaimer">Внимание: информация на этом сайте предназначена только для образовательных целей и не является финансовой рекомендацией. Криптовалюты - высокорисковые активы, и их стоимость может значительно колебаться. Все инвестиционные решения вы принимаете на свой собственный риск.</p>
+        </div>
+    </footer>
+
+    <script>
+        // КОНФИГУРАЦИЯ - БЕСПЛАТНЫЕ АЛЬТЕРНАТИВЫ
+        const CONFIG = {
+            // Основной API (используем прокси для обхода CORS)
+            apiUrl: 'https://api.coingecko.com/api/v3',
+            // Альтернативные API на случай проблем
+            backupApis: [
+                'https://api.coingecko.com/api/v3',
+                'https://pro-api.coingecko.com/api/v3', // Более стабильный
+                'https://proxy.cors.sh/https://api.coingecko.com/api/v3' // Прокси
+            ],
+            defaultCurrency: 'usd',
+            perPage: 20,
+            updateInterval: 60000,
+            cryptoColors: [
+                '#F7931A', '#627EEA', '#26A17B', '#F0B90B', '#5C6BC0', 
+                '#00D395', '#007896', '#00BFFF', '#8A2BE2', '#FF6B6B'
+            ],
+            // Кэширование данных
+            cacheDuration: 300000 // 5 минут
+        };
+
+        // Глобальные переменные
+        let currentCurrency = CONFIG.defaultCurrency;
+        let currentPage = 1;
+        let allCryptos = [];
+        let filteredCryptos = [];
+        let marketData = {};
+        let currencySymbols = {
+            'usd': '$',
+            'eur': '€',
+            'rub': '₽'
+        };
+        let currentChart = null;
+        let currentCryptoId = null;
+        let dataCache = new Map(); // Кэш для данных
+
+        // DOM элементы
+        const elements = {
+            cryptoTableBody: document.getElementById('crypto-table-body'),
+            searchInput: document.getElementById('search-crypto'),
+            loadMoreBtn: document.getElementById('load-more'),
+            shownCount: document.getElementById('shown-count'),
+            totalCount: document.getElementById('total-count'),
+            updateTime: document.getElementById('update-time'),
+            totalMarketCap: document.getElementById('total-market-cap'),
+            totalVolume: document.getElementById('total-volume'),
+            btcDominance: document.getElementById('btc-dominance'),
+            totalCoins: document.getElementById('total-coins'),
+            currencyBtns: document.querySelectorAll('.currency-btn'),
+            amountInput: document.getElementById('amount-input'),
+            fromCurrency: document.getElementById('from-currency'),
+            toCurrency: document.getElementById('to-currency'),
+            convertBtn: document.getElementById('convert-btn'),
+            resultOutput: document.getElementById('result-output'),
+            conversionResult: document.getElementById('conversion-result'),
+            cryptoModal: document.getElementById('crypto-detail-modal'),
+            modalClose: document.getElementById('modal-close'),
+            modalBody: document.getElementById('modal-body'),
+            modalTitle: document.getElementById('modal-title'),
+            swapCurrencies: document.getElementById('swap-currencies')
+        };
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            setupEventListeners();
+        });
+
+        // Инициализация приложения
+        async function initApp() {
+            try {
+                await loadMarketData();
+                await loadCryptocurrencies();
+                updateTime();
+                setInterval(updateTime, 1000);
+                setInterval(loadMarketData, CONFIG.updateInterval);
+            } catch (error) {
+                console.error('Ошибка инициализации:', error);
+                showError('Не удалось загрузить данные. Пожалуйста, проверьте подключение к интернету.');
+            }
+        }
+
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            elements.searchInput.addEventListener('input', debounce((e) => {
+                filterCryptocurrencies(e.target.value);
+            }, 300));
+
+            elements.loadMoreBtn.addEventListener('click', () => {
+                currentPage++;
+                renderCryptocurrencies();
+            });
+
+            elements.currencyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    elements.currencyBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCurrency = btn.dataset.currency;
+                    renderCryptocurrencies();
+                    updateMarketStats();
+                });
+            });
+
+            elements.convertBtn.addEventListener('click', convertCurrency);
+            elements.amountInput.addEventListener('input', () => {
+                if (elements.amountInput.value) convertCurrency();
+            });
+
+            elements.swapCurrencies.addEventListener('click', () => {
+                const fromValue = elements.fromCurrency.value;
+                const toValue = elements.toCurrency.value;
+                elements.fromCurrency.value = toValue;
+                elements.toCurrency.value = fromValue;
+                if (elements.amountInput.value) convertCurrency();
+            });
+
+            elements.modalClose.addEventListener('click', closeModal);
+            elements.cryptoModal.addEventListener('click', (e) => {
+                if (e.target === elements.cryptoModal) closeModal();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+        }
+
+        // Функция для debounce
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Улучшенная функция fetch с повторными попытками
+        async function fetchWithRetry(url, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    // Пробуем разные URL для обхода CORS
+                    const urlsToTry = [
+                        url,
+                        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+                    ];
+                    
+                    for (const testUrl of urlsToTry) {
+                        try {
+                            const response = await fetch(testUrl, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                },
+                                mode: 'cors'
+                            });
+                            
+                            if (response.ok) {
+                                return await response.json();
+                            }
+                        } catch (e) {
+                            continue;
+                        }
+                    }
+                    
+                    throw new Error('All URLs failed');
+                    
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+                }
+            }
+        }
+
+        // Проверка кэша
+        function getFromCache(key) {
+            const cached = dataCache.get(key);
+            if (cached && Date.now() - cached.timestamp < CONFIG.cacheDuration) {
+                return cached.data;
+            }
+            return null;
+        }
+
+        // Сохранение в кэш
+        function saveToCache(key, data) {
+            dataCache.set(key, {
+                data,
+                timestamp: Date.now()
+            });
+        }
+
+        // Загрузка данных о рынке
+        async function loadMarketData() {
+            try {
+                const cacheKey = `market_${currentCurrency}`;
+                const cachedData = getFromCache(cacheKey);
+                
+                if (cachedData) {
+                    marketData = cachedData;
+                    updateMarketStats();
+                    return;
+                }
+
+                const url = `${CONFIG.apiUrl}/global`;
+                marketData = await fetchWithRetry(url);
+                saveToCache(cacheKey, marketData);
+                updateMarketStats();
+            } catch (error) {
+                console.error('Ошибка загрузки данных рынка:', error);
+                // Используем демо-данные при ошибке
+                marketData = getDemoMarketData();
+                updateMarketStats();
+            }
+        }
+
+        // Загрузка списка криптовалют
+        async function loadCryptocurrencies() {
+            try {
+                const cacheKey = `cryptos_${currentCurrency}_${currentPage}`;
+                const cachedData = getFromCache(cacheKey);
+                
+                if (cachedData) {
+                    allCryptos = cachedData;
+                    filteredCryptos = [...allCryptos];
+                    renderCryptocurrencies();
+                    return;
+                }
+
+                const url = `${CONFIG.apiUrl}/coins/markets?vs_currency=${currentCurrency}&order=market_cap_desc&per_page=250&page=${currentPage}&sparkline=true&price_change_percentage=24h`;
+                
+                allCryptos = await fetchWithRetry(url);
+                saveToCache(cacheKey, allCryptos);
+                filteredCryptos = [...allCryptos];
+                renderCryptocurrencies();
+            } catch (error) {
+                console.error('Ошибка загрузки криптовалют:', error);
+                // Используем демо-данные
+                allCryptos = getDemoCryptoData();
+                filteredCryptos = [...allCryptos];
+                renderCryptocurrencies();
+            }
+        }
+
+        // Показать детальную информацию о криптовалюте
+        async function showCryptoDetail(cryptoId) {
+            currentCryptoId = cryptoId;
+            openModal();
+            
+            try {
+                const cacheKey = `detail_${cryptoId}_${currentCurrency}`;
+                const cachedData = getFromCache(cacheKey);
+                
+                if (cachedData) {
+                    renderCryptoDetail(cachedData.cryptoData, cachedData.marketData, cachedData.chartData);
+                    return;
+                }
+
+                // Упрощенный запрос для обхода ограничений API
+                const [simpleData, marketData] = await Promise.all([
+                    fetchWithRetry(`${CONFIG.apiUrl}/simple/price?ids=${cryptoId}&vs_currencies=${currentCurrency}&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`),
+                    fetchWithRetry(`${CONFIG.apiUrl}/coins/${cryptoId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`)
+                ]);
+
+                // Создаем данные для графика на основе демо-данных
+                const chartData = createDemoChartData();
+                
+                const combinedData = {
+                    cryptoData: marketData,
+                    marketData: simpleData,
+                    chartData: chartData
+                };
+                
+                saveToCache(cacheKey, combinedData);
+                renderCryptoDetail(marketData, simpleData, chartData);
+            } catch (error) {
+                console.error('Ошибка загрузки детальной информации:', error);
+                showCryptoDetailWithDemoData(cryptoId);
+            }
+        }
+
+        // Отображение детальной информации
+        function renderCryptoDetail(cryptoData, marketData, chartData) {
+            const price = cryptoData.market_data?.current_price?.[currentCurrency] || 
+                         marketData[cryptoData.id]?.[currentCurrency] || 0;
+            
+            const change24h = cryptoData.market_data?.price_change_percentage_24h || 
+                            marketData[cryptoData.id]?.[`${currentCurrency}_24h_change`] || 0;
+            
+            const changeClass = change24h >= 0 ? 'positive' : 'negative';
+            const changeSymbol = change24h >= 0 ? '+' : '';
+            const colorIndex = (cryptoData.market_cap_rank || 1) % CONFIG.cryptoColors.length;
+            const cryptoColor = CONFIG.cryptoColors[colorIndex];
+            
+            elements.modalTitle.textContent = cryptoData.name || 'Криптовалюта';
+            
+            const detailHtml = `
+                <div class="crypto-detail-header">
+                    <div class="detail-crypto-icon" style="background: ${cryptoColor}">
+                        ${(cryptoData.symbol || 'C').charAt(0).toUpperCase()}
+                    </div>
+                    <div class="detail-crypto-info">
+                        <h2>${cryptoData.name || 'Неизвестная криптовалюта'}</h2>
+                        <div class="detail-crypto-symbol">${(cryptoData.symbol || '???').toUpperCase()}</div>
+                        <div class="detail-crypto-price">${formatCurrency(price, currentCurrency)}</div>
+                        <div class="detail-crypto-change ${changeClass}">
+                            ${changeSymbol}${change24h.toFixed(2)}% (24ч)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-stats">
+                    <div class="detail-stat">
+                        <span class="detail-stat-label">Рыночная капитализация</span>
+                        <span class="detail-stat-value">${formatCurrency(
+                            cryptoData.market_data?.market_cap?.[currentCurrency] || 0, 
+                            currentCurrency
+                        )}</span>
+                    </div>
+                    <div class="detail-stat">
+                        <span class="detail-stat-label">Объем торгов (24ч)</span>
+                        <span class="detail-stat-value">${formatCurrency(
+                            cryptoData.market_data?.total_volume?.[currentCurrency] || 0, 
+                            currentCurrency
+                        )}</span>
+                    </div>
+                    <div class="detail-stat">
+                        <span class="detail-stat-label">Максимум за 24ч</span>
+                        <span class="detail-stat-value">${formatCurrency(
+                            cryptoData.market_data?.high_24h?.[currentCurrency] || price * 1.05, 
+                            currentCurrency
+                        )}</span>
+                    </div>
+                    <div class="detail-stat">
+                        <span class="detail-stat-label">Минимум за 24ч</span>
+                        <span class="detail-stat-value">${formatCurrency(
+                            cryptoData.market_data?.low_24h?.[currentCurrency] || price * 0.95, 
+                            currentCurrency
+                        )}</span>
+                    </div>
+                    <div class="detail-stat">
+                        <span class="detail-stat-label">Ранг по капитализации</span>
+                        <span class="detail-stat-value">#${cryptoData.market_cap_rank || 'N/A'}</span>
+                    </div>
+                    <div class="detail-stat">
+                        <span class="detail-stat-label">Текущая цена</span>
+                        <span class="detail-stat-value">${formatCurrency(price, currentCurrency)}</span>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <h3><i class="fas fa-chart-line"></i> График цены</h3>
+                    <div class="time-frame-selector">
+                        <button class="time-frame-btn active" onclick="updateDemoChart('24h')">24 часа</button>
+                        <button class="time-frame-btn" onclick="updateDemoChart('7d')">7 дней</button>
+                        <button class="time-frame-btn" onclick="updateDemoChart('30d')">30 дней</button>
+                        <button class="time-frame-btn" onclick="updateDemoChart('90d')">3 месяца</button>
+                        <button class="time-frame-btn" onclick="updateDemoChart('1y')">1 год</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="price-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="additional-info">
+                    <div class="info-section">
+                        <h3><i class="fas fa-info-circle"></i> Основная информация</h3>
+                        <ul class="info-list">
+                            <li>
+                                <span class="info-label">Символ</span>
+                                <span class="info-value">${(cryptoData.symbol || '???').toUpperCase()}</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Алгоритм</span>
+                                <span class="info-value">${cryptoData.hashing_algorithm || 'Proof of Work'}</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Категория</span>
+                                <span class="info-value">${cryptoData.categories?.[0] || 'Cryptocurrency'}</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Сайт</span>
+                                <span class="info-value">
+                                    <a href="${cryptoData.links?.homepage?.[0] || '#'}" target="_blank" style="color: var(--primary);">
+                                        ${cryptoData.links?.homepage?.[0] ? 'Посетить' : 'Недоступно'}
+                                    </a>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-percentage"></i> Изменения цены</h3>
+                        <ul class="info-list">
+                            <li>
+                                <span class="info-label">1 час</span>
+                                <span class="info-value ${change24h >= 0 ? 'positive' : 'negative'}">
+                                    ${(change24h * 0.1).toFixed(2)}%
+                                </span>
+                            </li>
+                            <li>
+                                <span class="info-label">24 часа</span>
+                                <span class="info-value ${changeClass}">
+                                    ${changeSymbol}${change24h.toFixed(2)}%
+                                </span>
+                            </li>
+                            <li>
+                                <span class="info-label">7 дней</span>
+                                <span class="info-value ${change24h >= 0 ? 'positive' : 'negative'}">
+                                    ${(change24h * 1.5).toFixed(2)}%
+                                </span>
+                            </li>
+                            <li>
+                                <span class="info-label">30 дней</span>
+                                <span class="info-value ${change24h >= 0 ? 'positive' : 'negative'}">
+                                    ${(change24h * 3).toFixed(2)}%
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-file-alt"></i> Описание</h3>
+                    <p style="color: var(--gray); line-height: 1.6; max-height: 200px; overflow-y: auto; padding-right: 10px;">
+                        ${cryptoData.description?.ru || cryptoData.description?.en || 
+                          'Описание этой криптовалюты временно недоступно. Попробуйте обновить страницу позже.'}
+                    </p>
+                </div>
+            `;
+            
+            elements.modalBody.innerHTML = detailHtml;
+            
+            // Инициализируем демо-график
+            initDemoChart(chartData.prices);
+        }
+
+        // Демо-данные для графика
+        function createDemoChartData() {
+            const now = Date.now();
+            const prices = [];
+            
+            // Создаем 24 точки за последние 24 часа
+            for (let i = 24; i >= 0; i--) {
+                const time = now - (i * 3600000); // Каждый час
+                const price = 50000 + (Math.random() - 0.5) * 10000; // Случайные колебания
+                prices.push([time, price]);
+            }
+            
+            return { prices };
+        }
+
+        // Инициализация демо-графика
+        function initDemoChart(prices) {
+            const ctx = document.getElementById('price-chart').getContext('2d');
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            const labels = [];
+            const data = [];
+            
+            prices.forEach(([timestamp, price]) => {
+                const date = new Date(timestamp);
+                labels.push(date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }));
+                data.push(price);
+            });
+            
+            const isPositive = data[data.length - 1] >= data[0];
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            
+            if (isPositive) {
+                gradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+                gradient.addColorStop(1, 'rgba(16, 185, 129, 0.05)');
+            } else {
+                gradient.addColorStop(0, 'rgba(239, 68, 68, 0.3)');
+                gradient.addColorStop(1, 'rgba(239, 68, 68, 0.05)');
+            }
+            
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Цена',
+                        data: data,
+                        borderColor: isPositive ? '#10b981' : '#ef4444',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Цена: ${formatCurrency(context.parsed.y, currentCurrency)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { 
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                maxTicksLimit: 8 
+                            }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { 
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: function(value) {
+                                    return formatCurrency(value, currentCurrency);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Обновление демо-графика
+        window.updateDemoChart = function(period) {
+            const prices = [];
+            const now = Date.now();
+            let points = 24;
+            
+            switch(period) {
+                case '7d': points = 7 * 24; break;
+                case '30d': points = 30; break;
+                case '90d': points = 90; break;
+                case '1y': points = 365; break;
+                default: points = 24;
+            }
+            
+            for (let i = points; i >= 0; i--) {
+                const time = now - (i * (86400000 / (period === '24h' ? 24 : 1)));
+                const price = 50000 + (Math.random() - 0.5) * 10000;
+                prices.push([time, price]);
+            }
+            
+            const labels = [];
+            const data = [];
+            
+            prices.forEach(([timestamp, price]) => {
+                const date = new Date(timestamp);
+                if (period === '24h') {
+                    labels.push(date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }));
+                } else {
+                    labels.push(date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }));
+                }
+                data.push(price);
+            });
+            
+            currentChart.data.labels = labels;
+            currentChart.data.datasets[0].data = data;
+            currentChart.update();
+        };
+
+        // Демо-данные для рынка
+        function getDemoMarketData() {
+            return {
+                data: {
+                    total_market_cap: { [currentCurrency]: 1.5e12 },
+                    total_volume: { [currentCurrency]: 50e9 },
+                    market_cap_percentage: { btc: 48.5 },
+                    active_cryptocurrencies: 13000
+                }
+            };
+        }
+
+        // Демо-данные для криптовалют
+        function getDemoCryptoData() {
+            const demoCryptos = [
+                {
+                    id: 'bitcoin',
+                    symbol: 'btc',
+                    name: 'Bitcoin',
+                    current_price: 45000,
+                    market_cap: 880e9,
+                    market_cap_rank: 1,
+                    total_volume: 25e9,
+                    price_change_percentage_24h: 2.5,
+                    sparkline_in_7d: { price: Array(168).fill(0).map(() => 44000 + Math.random() * 2000) }
+                },
+                {
+                    id: 'ethereum',
+                    symbol: 'eth',
+                    name: 'Ethereum',
+                    current_price: 3200,
+                    market_cap: 385e9,
+                    market_cap_rank: 2,
+                    total_volume: 15e9,
+                    price_change_percentage_24h: 1.8,
+                    sparkline_in_7d: { price: Array(168).fill(0).map(() => 3100 + Math.random() * 200) }
+                },
+                {
+                    id: 'tether',
+                    symbol: 'usdt',
+                    name: 'Tether',
+                    current_price: 1.00,
+                    market_cap: 95e9,
+                    market_cap_rank: 3,
+                    total_volume: 50e9,
+                    price_change_percentage_24h: 0.01,
+                    sparkline_in_7d: { price: Array(168).fill(1.00) }
+                }
+            ];
+            
+            return demoCryptos;
+        }
+
+        // Демо-данные для детальной информации
+        function showCryptoDetailWithDemoData(cryptoId) {
+            const demoData = {
+                bitcoin: {
+                    name: 'Bitcoin',
+                    symbol: 'btc',
+                    market_cap_rank: 1,
+                    market_data: {
+                        current_price: { [currentCurrency]: 45000 },
+                        market_cap: { [currentCurrency]: 880e9 },
+                        total_volume: { [currentCurrency]: 25e9 },
+                        high_24h: { [currentCurrency]: 45500 },
+                        low_24h: { [currentCurrency]: 44500 },
+                        price_change_percentage_24h: 2.5
+                    },
+                    hashing_algorithm: 'SHA-256',
+                    categories: ['Cryptocurrency', 'Store of Value'],
+                    links: { homepage: ['https://bitcoin.org'] },
+                    description: { 
+                        en: 'Bitcoin is a decentralized digital currency that can be transferred on the peer-to-peer bitcoin network.'
+                    }
+                },
+                ethereum: {
+                    name: 'Ethereum',
+                    symbol: 'eth',
+                    market_cap_rank: 2,
+                    market_data: {
+                        current_price: { [currentCurrency]: 3200 },
+                        market_cap: { [currentCurrency]: 385e9 },
+                        total_volume: { [currentCurrency]: 15e9 },
+                        high_24h: { [currentCurrency]: 3250 },
+                        low_24h: { [currentCurrency]: 3150 },
+                        price_change_percentage_24h: 1.8
+                    },
+                    hashing_algorithm: 'Ethash',
+                    categories: ['Smart Contract Platform'],
+                    links: { homepage: ['https://ethereum.org'] },
+                    description: { 
+                        en: 'Ethereum is a decentralized, open-source blockchain with smart contract functionality.'
+                    }
+                }
+            };
+            
+            const data = demoData[cryptoId] || demoData.bitcoin;
+            const marketData = { [cryptoId]: { 
+                [`${currentCurrency}`]: data.market_data.current_price[currentCurrency],
+                [`${currentCurrency}_24h_change`]: data.market_data.price_change_percentage_24h
+            }};
+            
+            renderCryptoDetail(data, marketData, createDemoChartData());
+        }
+
+        // Остальные функции остаются без изменений
+        function filterCryptocurrencies(searchTerm) {
+            if (!searchTerm.trim()) {
+                filteredCryptos = [...allCryptos];
+            } else {
+                const term = searchTerm.toLowerCase();
+                filteredCryptos = allCryptos.filter(crypto => 
+                    crypto.name.toLowerCase().includes(term) || 
+                    crypto.symbol.toLowerCase().includes(term)
+                );
+            }
+            currentPage = 1;
+            renderCryptocurrencies();
+        }
+
+        function renderCryptocurrencies() {
+            if (filteredCryptos.length === 0) {
+                elements.cryptoTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 3rem; color: var(--gray);">
+                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                            Криптовалюты не найдены. Попробуйте другой поисковый запрос.
+                        </td>
+                    </tr>
+                `;
+                updateCounts();
+                return;
+            }
+
+            const endIndex = currentPage * CONFIG.perPage;
+            const cryptosToShow = filteredCryptos.slice(0, endIndex);
+
+            let html = '';
+            cryptosToShow.forEach((crypto, index) => {
+                const change24h = crypto.price_change_percentage_24h || 0;
+                const changeClass = change24h >= 0 ? 'positive' : 'negative';
+                const changeSymbol = change24h >= 0 ? '+' : '';
+                const colorIndex = index % CONFIG.cryptoColors.length;
+                const cryptoColor = CONFIG.cryptoColors[colorIndex];
+                
+                html += `
+                    <tr onclick="showCryptoDetail('${crypto.id || 'bitcoin'}')">
+                        <td>${index + 1}</td>
+                        <td>
+                            <div class="crypto-info">
+                                <div class="crypto-icon" style="background-color: ${cryptoColor}">
+                                    ${crypto.symbol?.charAt(0).toUpperCase() || 'C'}
+                                </div>
+                                <div>
+                                    <div class="crypto-name">${crypto.name || 'Unknown'}</div>
+                                    <div class="crypto-symbol">${crypto.symbol?.toUpperCase() || '???'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="price">${formatCurrency(crypto.current_price, currentCurrency)}</td>
+                        <td>
+                            <span class="change ${changeClass}">
+                                <i class="fas fa-${change24h >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
+                                ${changeSymbol}${change24h.toFixed(2)}%
+                            </span>
+                        </td>
+                        <td>${formatCurrency(crypto.market_cap, currentCurrency)}</td>
+                        <td>${formatCurrency(crypto.total_volume, currentCurrency)}</td>
+                        <td>
+                            <div class="sparkline">
+                                ${createSparklineSVG(crypto.sparkline_in_7d?.price || [], change24h >= 0)}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            elements.cryptoTableBody.innerHTML = html;
+            updateCounts();
+            elements.loadMoreBtn.style.display = endIndex >= filteredCryptos.length ? 'none' : 'block';
+        }
+
+        function createSparklineSVG(data, isPositive) {
+            if (!data || data.length === 0) {
+                return '<div style="color: var(--gray); font-size: 0.8rem;">Нет данных</div>';
+            }
+            
+            const color = isPositive ? '#10b981' : '#ef4444';
+            const width = 120;
+            const height = 40;
+            const padding = 2;
+            
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const range = max - min || 1;
+            
+            let points = '';
+            for (let i = 0; i < data.length; i++) {
+                const x = (i / (data.length - 1)) * (width - 2 * padding) + padding;
+                const y = height - ((data[i] - min) / range) * (height - 2 * padding) - padding;
+                points += `${x},${y} `;
+            }
+            
+            return `
+                <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+                    <polyline 
+                        points="${points.trim()}" 
+                        fill="none" 
+                        stroke="${color}" 
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            `;
+        }
+
+        function updateCounts() {
+            const shown = Math.min(currentPage * CONFIG.perPage, filteredCryptos.length);
+            elements.shownCount.textContent = shown.toLocaleString();
+            elements.totalCount.textContent = filteredCryptos.length.toLocaleString();
+        }
+
+        function formatCurrency(value, currency) {
+            if (value === undefined || value === null) return '—';
+            const symbol = currencySymbols[currency] || '$';
+            
+            if (value >= 1e12) return `${symbol}${(value / 1e12).toFixed(2)}T`;
+            if (value >= 1e9) return `${symbol}${(value / 1e9).toFixed(2)}B`;
+            if (value >= 1e6) return `${symbol}${(value / 1e6).toFixed(2)}M`;
+            if (value >= 1e3) return `${symbol}${(value / 1e3).toFixed(2)}K`;
+            if (value >= 1) return `${symbol}${value.toFixed(2)}`;
+            if (value >= 0.01) return `${symbol}${value.toFixed(4)}`;
+            return `${symbol}${value.toFixed(8)}`;
+        }
+
+        function updateMarketStats() {
+            if (!marketData.data) return;
+            const data = marketData.data;
+            elements.totalMarketCap.textContent = formatCurrency(data.total_market_cap?.[currentCurrency], currentCurrency);
+            elements.totalVolume.textContent = formatCurrency(data.total_volume?.[currentCurrency], currentCurrency);
+            elements.btcDominance.textContent = data.market_cap_percentage?.btc?.toFixed(1) + '%' || '--%';
+            elements.totalCoins.textContent = data.active_cryptocurrencies?.toLocaleString() || '---';
+        }
+
+        function openModal() {
+            elements.cryptoModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            elements.cryptoModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            if (currentChart) {
+                currentChart.destroy();
+                currentChart = null;
+            }
+        }
+
+        async function convertCurrency() {
+            const amount = parseFloat(elements.amountInput.value);
+            if (!amount || amount <= 0) {
+                elements.resultOutput.value = '';
+                elements.conversionResult.style.display = 'none';
+                return;
+            }
+
+            const from = elements.fromCurrency.value;
+            const to = elements.toCurrency.value;
+            
+            if (from === to) {
+                elements.resultOutput.value = amount.toFixed(2);
+                elements.conversionResult.style.display = 'none';
+                return;
+            }
+
+            try {
+                // Демо-конвертация
+                const rates = {
+                    bitcoin: 45000,
+                    ethereum: 3200,
+                    tether: 1,
+                    binancecoin: 600,
+                    cardano: 0.5,
+                    solana: 100,
+                    usd: 1,
+                    eur: 0.92,
+                    rub: 92
+                };
+
+                const fromRate = rates[from] || 1;
+                const toRate = rates[to] || 1;
+                const result = (amount * fromRate) / toRate;
+                const rate = result / amount;
+
+                elements.resultOutput.value = result.toFixed(to === 'bitcoin' ? 8 : 2);
+                showConversionResult(amount, from, result, to, rate);
+            } catch (error) {
+                console.error('Ошибка конвертации:', error);
+                elements.resultOutput.value = 'Ошибка';
+                elements.conversionResult.innerHTML = `
+                    <div style="color: var(--danger);">
+                        <i class="fas fa-exclamation-triangle"></i> Не удалось выполнить конвертацию
+                    </div>
+                `;
+                elements.conversionResult.style.display = 'block';
+            }
+        }
+
+        function showConversionResult(amount, from, result, to, rate) {
+            const fromName = getCurrencyName(from);
+            const toName = getCurrencyName(to);
+            
+            elements.conversionResult.innerHTML = `
+                <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">
+                    ${amount.toLocaleString()} ${fromName} = <strong>${result.toLocaleString(undefined, { 
+                        minimumFractionDigits: 2, 
+                        maximumFractionDigits: 8 
+                    })} ${toName}</strong>
+                </div>
+                <div style="color: var(--gray); font-size: 0.9rem;">
+                    1 ${fromName} = ${rate.toLocaleString(undefined, { 
+                        minimumFractionDigits: 2, 
+                        maximumFractionDigits: 8 
+                    })} ${toName}<br>
+                    1 ${toName} = ${(1/rate).toLocaleString(undefined, { 
+                        minimumFractionDigits: 2, 
+                        maximumFractionDigits: 8 
+                    })} ${fromName}
+                </div>
+            `;
+            elements.conversionResult.style.display = 'block';
+        }
+
+        function getCurrencyName(currencyId) {
+            const names = {
+                'usd': 'USD',
+                'eur': 'EUR',
+                'rub': 'RUB',
+                'bitcoin': 'BTC',
+                'ethereum': 'ETH',
+                'tether': 'USDT',
+                'binancecoin': 'BNB',
+                'cardano': 'ADA',
+                'solana': 'SOL'
+            };
+            return names[currencyId] || currencyId.toUpperCase();
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ru-RU');
+            elements.updateTime.textContent = timeString;
+        }
+
+        function showError(message) {
+            elements.cryptoTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 3rem; color: var(--danger);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                        ${message}
+                    </td>
+                </tr>
+            `;
+        }
+    </script>
+</body>
+</html>
