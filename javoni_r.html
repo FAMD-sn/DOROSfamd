@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инновационный лицей «Джавони» - Онлайн-заявка в лицей</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(67, 97, 238, 0.15);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+            margin-bottom: 40px;
+            transition: var(--transition);
+        }
+        
+        .form-container:hover {
+            box-shadow: 0 15px 40px rgba(67, 97, 238, 0.2);
+        }
+        
+        .form-section {
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--gray-light);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s forwards;
+        }
+        
+        .form-section:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .form-section:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .section-icon {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .section-subtitle {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            transition: var(--transition);
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--accent);
+        }
+        
+        .input-container {
+            position: relative;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--gray-light);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .input-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            pointer-events: none;
+        }
+        
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .radio-option:hover, .checkbox-option:hover {
+            transform: translateY(-2px);
+        }
+        
+        .radio-option input, .checkbox-option input {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .radio-label, .checkbox-label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        
+        .hidden-field {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--gray-light);
+            border-radius: 10px;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .consent-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(to right, #f8f9ff, #f0f4ff);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .consent-group input {
+            width: auto;
+            margin-right: 15px;
+            margin-top: 4px;
+        }
+        
+        .consent-label {
+            font-weight: 400;
+            line-height: 1.7;
+        }
+        
+        .submit-section {
+            text-align: center;
+            padding-top: 20px;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 20px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+            background: linear-gradient(to right, var(--primary-dark), var(--secondary));
+        }
+        
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .error-message {
+            color: var(--accent);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .success-message {
+            background: linear-gradient(to right, #d4edda, #c3e6cb);
+            color: #155724;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+            animation: slideUp 0.5s ease-out;
+            border-left: 4px solid #28a745;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .success-icon {
+            font-size: 3rem;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: var(--gray-light);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary);
+            width: 0%;
+            transition: width 0.8s ease-out;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .radio-group, .checkbox-group {
+                gap: 15px;
+            }
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            color: var(--primary);
+            cursor: help;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            font-weight: 400;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .floating-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border-left: 4px solid var(--success);
+        }
+        
+        .floating-notification.show {
+            transform: translateX(0);
+        }
+        
+        .character-count {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        
+        .character-count.warning {
+            color: #ff9800;
+        }
+        
+        .character-count.error {
+            color: var(--accent);
+        }
+        
+        .application-number {
+            background: linear-gradient(135deg, var(--warning), #ff6b6b);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+            box-shadow: 0 5px 15px rgba(248, 150, 30, 0.3);
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 5px 15px rgba(248, 150, 30, 0.3);
+            }
+            50% {
+                box-shadow: 0 5px 25px rgba(248, 150, 30, 0.5);
+            }
+            100% {
+                box-shadow: 0 5px 15px rgba(248, 150, 30, 0.3);
+            }
+        }
+        
+        .application-number-icon {
+            font-size: 2rem;
+        }
+        
+        .application-number-content {
+            text-align: left;
+        }
+        
+        .application-number-title {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .application-number-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        
+        .application-number-hint {
+            font-size: 0.8rem;
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+        }
+        
+        .number-badge {
+            display: inline-block;
+            background: var(--warning);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1>Инновационный лицей «Джавони»</h1>
+                    <p class="subtitle">Заполните форму ниже для подачи заявки на поступление вашего ребёнка в Инновационный лицей</p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="form-container">
+            <form id="applicationForm">
+                <!-- 1️⃣ Информация о ребёнке -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-child"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">Информация о ребёнке</h2>
+                            <p class="section-subtitle">Основные данные будущего ученика</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="childName" class="required">Фамилия и имя ребёнка</label>
+                            <div class="input-container">
+                                <input type="text" id="childName" name="childName" placeholder="Иванов Иван">
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="childNameError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, введите ФИО ребёнка
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="birthDate" class="required">Дата рождения</label>
+                            <div class="input-container">
+                                <input type="date" id="birthDate" name="birthDate">
+                                <div class="input-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="birthDateError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, укажите дату рождения
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required">Пол</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="genderMale" name="gender" value="мужской">
+                                    <label for="genderMale" class="radio-label">Мужской</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="genderFemale" name="gender" value="женский">
+                                    <label for="genderFemale" class="radio-label">Женский</label>
+                                </div>
+                            </div>
+                            <div class="error-message" id="genderError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, выберите пол
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="citizenship" class="required">Гражданство</label>
+                            <div class="input-container">
+                                <input type="text" id="citizenship" name="citizenship" placeholder="Таджикистан">
+                                <div class="input-icon">
+                                    <i class="fas fa-passport"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="citizenshipError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, укажите гражданство
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nativeLanguage" class="required">Родной язык</label>
+                            <div class="input-container">
+                                <input type="text" id="nativeLanguage" name="nativeLanguage" placeholder="Русский">
+                                <div class="input-icon">
+                                    <i class="fas fa-language"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="nativeLanguageError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, укажите родной язык
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required">Посещал ли детский сад / подготовительную группу</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="kindergartenYes" name="kindergarten" value="да">
+                                    <label for="kindergartenYes" class="radio-label">Да</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="kindergartenNo" name="kindergarten" value="нет">
+                                    <label for="kindergartenNo" class="radio-label">Нет</label>
+                                </div>
+                            </div>
+                            <div class="error-message" id="kindergartenError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, выберите ответ
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 2️⃣ Информация о родителях -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">Информация о родителях</h2>
+                            <p class="section-subtitle">Контактные данные законного представителя</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="parentName" class="required">ФИО родителя</label>
+                            <div class="input-container">
+                                <input type="text" id="parentName" name="parentName" placeholder="Иванова Мария Петровна">
+                                <div class="input-icon">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="parentNameError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, введите ФИО родителя
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="parentRole" class="required">Кем вы приходитесь ребёнку</label>
+                            <div class="input-container">
+                                <select id="parentRole" name="parentRole">
+                                    <option value="" disabled selected>Выберите</option>
+                                    <option value="мать">Мать</option>
+                                    <option value="отец">Отец</option>
+                                    <option value="опекун">Опекун</option>
+                                </select>
+                                <div class="input-icon">
+                                    <i class="fas fa-user-tag"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="parentRoleError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, выберите ваш статус
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone" class="required">Контактный номер телефона</label>
+                            <div class="input-container">
+                                <input type="tel" id="phone" name="phone" placeholder="+992 876619999">
+                                <div class="input-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="phoneError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, введите номер телефона
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="messenger" class="required">WhatsApp или Telegram</label>
+                            <div class="input-container">
+                                <input type="text" id="messenger" name="messenger" placeholder="@username или номер телефона">
+                                <div class="input-icon">
+                                    <i class="fas fa-comment-dots"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="messengerError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, укажите контакт для мессенджера
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="required">Электронная почта</label>
+                            <div class="input-container">
+                                <input type="email" id="email" name="email" placeholder="example@mail.ru">
+                                <div class="input-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="emailError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, введите корректный email
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address" class="required">Адрес проживания (город, район)</label>
+                            <div class="input-container">
+                                <input type="text" id="address" name="address" placeholder="Москва, Центральный район">
+                                <div class="input-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                            </div>
+                            <div class="error-message" id="addressError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, укажите адрес проживания
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 3️⃣ Дополнительная информация -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">Дополнительная информация</h2>
+                            <p class="section-subtitle">Данные для организации учебного процесса</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Есть ли медицинские ограничения</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="medicalNo" name="medical" value="нет" checked>
+                                    <label for="medicalNo" class="radio-label">Нет</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="medicalYes" name="medical" value="да">
+                                    <label for="medicalYes" class="radio-label">Да</label>
+                                </div>
+                            </div>
+                            <div class="hidden-field" id="medicalDetailsField">
+                                <label for="medicalDetails">Укажите медицинские ограничения</label>
+                                <textarea id="medicalDetails" name="medicalDetails" rows="3" placeholder="Опишите подробнее"></textarea>
+                                <div class="character-count" id="medicalCount">0/200</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Аллергия</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="allergyNo" name="allergy" value="нет" checked>
+                                    <label for="allergyNo" class="radio-label">Нет</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="allergyYes" name="allergy" value="да">
+                                    <label for="allergyYes" class="radio-label">Да</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Нуждается ли ребёнок в особом внимании</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="attentionNo" name="specialAttention" value="нет" checked>
+                                    <label for="attentionNo" class="radio-label">Нет</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="attentionYes" name="specialAttention" value="да">
+                                    <label for="attentionYes" class="radio-label">Да</label>
+                                </div>
+                            </div>
+                            <div class="hidden-field" id="attentionDetailsField">
+                                <label for="attentionDetails">Укажите, в чём именно</label>
+                                <textarea id="attentionDetails" name="attentionDetails" rows="3" placeholder="Опишите подробнее"></textarea>
+                                <div class="character-count" id="attentionCount">0/200</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required">Как вы узнали о нашей школе</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="sourceNeighbors" name="source" value="соседи">
+                                    <label for="sourceNeighbors" class="radio-label">Соседи</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="sourceFriends" name="source" value="друзья">
+                                    <label for="sourceFriends" class="radio-label">Друзья</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="sourceAds" name="source" value="реклама">
+                                    <label for="sourceAds" class="radio-label">Реклама</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="sourceOther" name="source" value="другое">
+                                    <label for="sourceOther" class="radio-label">Другое</label>
+                                </div>
+                            </div>
+                            <div class="error-message" id="sourceError">
+                                <i class="fas fa-exclamation-circle"></i> Пожалуйста, выберите вариант
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Согласие и кнопка отправки -->
+                <div class="submit-section">
+                    <div class="consent-group">
+                        <input type="checkbox" id="consent" name="consent">
+                        <label for="consent" class="consent-label required">
+                            Я даю согласие на обработку персональных данных в соответствии со статьёй №277 «О персональных данных» и подтверждаю достоверность предоставленной информации
+                            <span class="tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltip-text">Согласие необходимо для рассмотрения заявки и дальнейшего взаимодействия</span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="error-message" id="consentError">
+                        <i class="fas fa-exclamation-circle"></i> Необходимо дать согласие на обработку данных
+                    </div>
+                    
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Отправить заявку
+                    </button>
+                    
+                    <div class="success-message" id="successMessage">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>Заявка успешно отправлена!</h3>
+                        <p>Мы получили вашу заявку и свяжемся с вами в течение 2 рабочих дней для уточнения деталей.</p>
+                        
+                        <div id="applicationNumberContainer" style="display: none;">
+                            <!-- Здесь будет отображаться номер заявки -->
+                        </div>
+                        
+                        <p style="margin-top: 15px; font-size: 0.9rem;"><i class="fas fa-clock"></i> Дата подачи: <span id="submissionDate"></span></p>
+                        <p style="margin-top: 10px; font-size: 0.85rem; color: #666;"><i class="fas fa-info-circle"></i> Сохраните номер заявки для отслеживания статуса</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="floating-notification" id="floatingNotification">
+            <i class="fas fa-check-circle" style="color: var(--success);"></i>
+            <div>
+                <strong>Прогресс сохранён</strong>
+                <p>Ваши данные автоматически сохраняются</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Telegram данные
+        const BOT_TOKEN = '8099469214:AAFl1yj09Ikhhin_oqyCQSOCEHvhnePdV5Y';
+        const CHAT_ID = '-1003785869356';
+        const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        
+        // DOM элементы
+        const form = document.getElementById('applicationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+        const progressFill = document.getElementById('progressFill');
+        const floatingNotification = document.getElementById('floatingNotification');
+        const applicationNumberContainer = document.getElementById('applicationNumberContainer');
+        
+        // Генерация случайного номера заявки
+        function generateApplicationNumber() {
+            // Генерируем случайное число от 1 до 1000
+            // Используем текущее время для большей случайности
+            const timestamp = Date.now();
+            const randomSeed = Math.sin(timestamp) * 10000;
+            const randomFraction = randomSeed - Math.floor(randomSeed);
+            
+            // Генерируем число от 1 до 1000 с использованием случайного сида
+            let randomNumber = Math.floor(randomFraction * 1000) + 1;
+            
+            // Если получилось 0 (маловероятно), пробуем еще раз
+            if (randomNumber === 0) {
+                randomNumber = Math.floor(Math.random() * 1000) + 1;
+            }
+            
+            // Добавляем префикс "JAV-" для идентификации школы
+            return {
+                number: randomNumber,
+                fullNumber: `JAV-${String(randomNumber).padStart(4, '0')}`
+            };
+        }
+        
+        // Отображение номера заявки
+        function displayApplicationNumber(appNumber) {
+            applicationNumberContainer.innerHTML = `
+                <div class="application-number">
+                    <div class="application-number-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="application-number-content">
+                        <div class="application-number-title">Ваш номер заявки</div>
+                        <div class="application-number-value">${appNumber.fullNumber}</div>
+                        <div class="application-number-hint">Сохраните этот номер для связи с администрацией</div>
+                    </div>
+                </div>
+            `;
+            applicationNumberContainer.style.display = 'block';
+        }
+        
+        // Инициализация с localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFormData();
+            updateProgress();
+            
+            // Настройка счетчиков символов
+            setupCharacterCounters();
+            
+            // Анимация появления формы
+            setTimeout(() => {
+                document.querySelectorAll('.form-section').forEach((section, index) => {
+                    section.style.animationDelay = `${index * 0.15}s`;
+                });
+            }, 300);
+        });
+        
+        // Настройка счетчиков символов
+        function setupCharacterCounters() {
+            const medicalTextarea = document.getElementById('medicalDetails');
+            const attentionTextarea = document.getElementById('attentionDetails');
+            const medicalCount = document.getElementById('medicalCount');
+            const attentionCount = document.getElementById('attentionCount');
+            
+            if (medicalTextarea) {
+                medicalTextarea.addEventListener('input', function() {
+                    updateCharacterCount(this, medicalCount, 200);
+                    saveFormData();
+                });
+            }
+            
+            if (attentionTextarea) {
+                attentionTextarea.addEventListener('input', function() {
+                    updateCharacterCount(this, attentionCount, 200);
+                    saveFormData();
+                });
+            }
+        }
+        
+        function updateCharacterCount(textarea, counterElement, maxLength) {
+            const length = textarea.value.length;
+            counterElement.textContent = `${length}/${maxLength}`;
+            
+            counterElement.classList.remove('warning', 'error');
+            if (length > maxLength * 0.8 && length <= maxLength * 0.95) {
+                counterElement.classList.add('warning');
+            } else if (length > maxLength * 0.95) {
+                counterElement.classList.add('error');
+            }
+        }
+        
+        // Показать/скрыть дополнительные поля
+        document.getElementById('medicalYes').addEventListener('change', function() {
+            toggleField('medicalDetailsField', this.checked);
+            saveFormData();
+        });
+        
+        document.getElementById('medicalNo').addEventListener('change', function() {
+            toggleField('medicalDetailsField', false);
+            saveFormData();
+        });
+        
+        document.getElementById('attentionYes').addEventListener('change', function() {
+            toggleField('attentionDetailsField', this.checked);
+            saveFormData();
+        });
+        
+        document.getElementById('attentionNo').addEventListener('change', function() {
+            toggleField('attentionDetailsField', false);
+            saveFormData();
+        });
+        
+        function toggleField(fieldId, show) {
+            const field = document.getElementById(fieldId);
+            if (show) {
+                field.style.display = 'block';
+                setTimeout(() => field.style.opacity = '1', 10);
+            } else {
+                field.style.opacity = '0';
+                setTimeout(() => field.style.display = 'none', 300);
+            }
+        }
+        
+        // Сохранение данных в localStorage
+        function saveFormData() {
+            const formData = new FormData(form);
+            const data = {};
+            
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            // Сохраняем состояние радио-кнопок
+            data['gender'] = document.querySelector('input[name="gender"]:checked')?.value || '';
+            data['kindergarten'] = document.querySelector('input[name="kindergarten"]:checked')?.value || '';
+            data['medical'] = document.querySelector('input[name="medical"]:checked')?.value || '';
+            data['allergy'] = document.querySelector('input[name="allergy"]:checked')?.value || '';
+            data['specialAttention'] = document.querySelector('input[name="specialAttention"]:checked')?.value || '';
+            data['source'] = document.querySelector('input[name="source"]:checked')?.value || '';
+            data['consent'] = document.getElementById('consent').checked;
+            
+            localStorage.setItem('schoolApplicationData', JSON.stringify(data));
+            
+            // Показываем уведомление о сохранении
+            showFloatingNotification();
+            
+            // Обновляем прогресс
+            updateProgress();
+        }
+        
+        // Загрузка данных из localStorage
+        function loadFormData() {
+            const savedData = localStorage.getItem('schoolApplicationData');
+            if (!savedData) return;
+            
+            const data = JSON.parse(savedData);
+            
+            // Заполняем текстовые поля
+            Object.keys(data).forEach(key => {
+                const element = document.getElementById(key);
+                if (element && element.type !== 'radio' && element.type !== 'checkbox') {
+                    element.value = data[key] || '';
+                }
+            });
+            
+            // Заполняем радио-кнопки
+            if (data.gender) {
+                document.querySelector(`input[name="gender"][value="${data.gender}"]`).checked = true;
+            }
+            
+            if (data.kindergarten) {
+                document.querySelector(`input[name="kindergarten"][value="${data.kindergarten}"]`).checked = true;
+            }
+            
+            if (data.medical) {
+                document.querySelector(`input[name="medical"][value="${data.medical}"]`).checked = true;
+                toggleField('medicalDetailsField', data.medical === 'да');
+            }
+            
+            if (data.allergy) {
+                document.querySelector(`input[name="allergy"][value="${data.allergy}"]`).checked = true;
+            }
+            
+            if (data.specialAttention) {
+                document.querySelector(`input[name="specialAttention"][value="${data.specialAttention}"]`).checked = true;
+                toggleField('attentionDetailsField', data.specialAttention === 'да');
+            }
+            
+            if (data.source) {
+                document.querySelector(`input[name="source"][value="${data.source}"]`).checked = true;
+            }
+            
+            if (data.consent) {
+                document.getElementById('consent').checked = true;
+            }
+            
+            // Обновляем счетчики символов
+            updateCharacterCount(document.getElementById('medicalDetails'), document.getElementById('medicalCount'), 200);
+            updateCharacterCount(document.getElementById('attentionDetails'), document.getElementById('attentionCount'), 200);
+        }
+        
+        // Показать плавающее уведомление
+        function showFloatingNotification() {
+            floatingNotification.classList.add('show');
+            
+            setTimeout(() => {
+                floatingNotification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Обновление прогресс-бара
+        function updateProgress() {
+            const formElements = form.elements;
+            let filledCount = 0;
+            let totalCount = 0;
+            
+            for (let i = 0; i < formElements.length; i++) {
+                const element = formElements[i];
+                
+                // Пропускаем кнопки и скрытые поля
+                if (element.type === 'submit' || element.type === 'button' || 
+                    element.style.display === 'none' || element.tagName === 'FIELDSET') {
+                    continue;
+                }
+                
+                if (element.type === 'text' || element.type === 'email' || 
+                    element.type === 'tel' || element.type === 'date' ||
+                    element.type === 'textarea' || element.tagName === 'SELECT') {
+                    totalCount++;
+                    if (element.value.trim() !== '') {
+                        filledCount++;
+                    }
+                } else if (element.type === 'radio' || element.type === 'checkbox') {
+                    // Для радио-кнопок учитываем только одну группу один раз
+                    if (element.type === 'radio' && !document.querySelector(`input[name="${element.name}"]:checked`)) {
+                        totalCount++;
+                    } else if (element.type === 'radio' && document.querySelector(`input[name="${element.name}"]:checked`)) {
+                        totalCount++;
+                        filledCount++;
+                    }
+                }
+            }
+            
+            const progress = totalCount > 0 ? (filledCount / totalCount) * 100 : 0;
+            progressFill.style.width = `${progress}%`;
+        }
+        
+        // Валидация формы
+        function validateForm() {
+            let isValid = true;
+            
+            // Очистка предыдущих ошибок
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            // Проверка обязательных полей
+            const requiredFields = [
+                { id: 'childName', errorId: 'childNameError' },
+                { id: 'birthDate', errorId: 'birthDateError' },
+                { id: 'citizenship', errorId: 'citizenshipError' },
+                { id: 'nativeLanguage', errorId: 'nativeLanguageError' },
+                { id: 'parentName', errorId: 'parentNameError' },
+                { id: 'phone', errorId: 'phoneError' },
+                { id: 'messenger', errorId: 'messengerError' },
+                { id: 'email', errorId: 'emailError' },
+                { id: 'address', errorId: 'addressError' }
+            ];
+            
+            requiredFields.forEach(field => {
+                const input = document.getElementById(field.id);
+                if (!input.value.trim()) {
+                    document.getElementById(field.errorId).style.display = 'flex';
+                    isValid = false;
+                    
+                    // Анимация ошибки
+                    input.style.borderColor = 'var(--accent)';
+                    setTimeout(() => {
+                        if (input.style.borderColor === 'var(--accent)') {
+                            input.style.borderColor = '';
+                        }
+                    }, 2000);
+                }
+            });
+            
+            // Валидация email
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                document.getElementById('emailError').textContent = 'Пожалуйста, введите корректный email';
+                document.getElementById('emailError').style.display = 'flex';
+                isValid = false;
+            }
+            
+            // Проверка радиокнопок
+            if (!document.querySelector('input[name="gender"]:checked')) {
+                document.getElementById('genderError').style.display = 'flex';
+                isValid = false;
+            }
+            
+            if (!document.querySelector('input[name="kindergarten"]:checked')) {
+                document.getElementById('kindergartenError').style.display = 'flex';
+                isValid = false;
+            }
+            
+            if (!document.getElementById('parentRole').value) {
+                document.getElementById('parentRoleError').style.display = 'flex';
+                isValid = false;
+            }
+            
+            if (!document.querySelector('input[name="source"]:checked')) {
+                document.getElementById('sourceError').style.display = 'flex';
+                isValid = false;
+            }
+            
+            // Проверка согласия
+            if (!document.getElementById('consent').checked) {
+                document.getElementById('consentError').style.display = 'flex';
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // Форматирование сообщения для Telegram
+        function formatTelegramMessage(formData, applicationNumber) {
+            return `<b>🏫 ЗАЯВКА В ШКОЛУ «ДЖАВОНИ»</b>
+
+<b>📋 НОМЕР ЗАЯВКИ:</b> <code>${applicationNumber.fullNumber}</code>
+
+<b>👶 РЕБЁНОК:</b>
+<b>ФИО:</b> ${formData.childName}
+<b>Дата рождения:</b> ${formData.birthDate}
+<b>Пол:</b> ${formData.gender}
+<b>Гражданство:</b> ${formData.citizenship}
+<b>Родной язык:</b> ${formData.nativeLanguage}
+<b>Детский сад:</b> ${formData.kindergarten}
+
+<b>👨‍👩‍👦 РОДИТЕЛЬ:</b>
+<b>ФИО:</b> ${formData.parentName}
+<b>Статус:</b> ${formData.parentRole}
+<b>Телефон:</b> ${formData.phone}
+<b>Мессенджер:</b> ${formData.messenger}
+<b>Email:</b> ${formData.email}
+<b>Адрес:</b> ${formData.address}
+
+<b>🩺 ДОПОЛНИТЕЛЬНО:</b>
+<b>Медицинские ограничения:</b> ${formData.medical}${formData.medical === 'да' ? ' (' + (formData.medicalDetails || 'не указано') + ')' : ''}
+<b>Аллергия:</b> ${formData.allergy}
+<b>Особое внимание:</b> ${formData.specialAttention}${formData.specialAttention === 'да' ? ' (' + (formData.attentionDetails || 'не указано') + ')' : ''}
+<b>Откуда узнали о школе:</b> ${formData.source}
+
+<b>✅ Согласие на обработку данных:</b> Да
+<b>📅 Дата подачи:</b> ${new Date().toLocaleString('ru-RU')}
+<b>🔢 Номер заявки:</b> <code>${applicationNumber.fullNumber}</code>`;
+        }
+        
+        // Отправка данных в Telegram
+        async function sendToTelegram(message) {
+            try {
+                const response = await fetch(TELEGRAM_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                const data = await response.json();
+                return data.ok;
+            } catch (error) {
+                console.error('Ошибка при отправке в Telegram:', error);
+                return false;
+            }
+        }
+        
+        // Обработка отправки формы
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                // Анимация тряски для кнопки
+                submitBtn.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    submitBtn.style.animation = '';
+                }, 500);
+                return;
+            }
+            
+            // Генерируем номер заявки
+            const applicationNumber = generateApplicationNumber();
+            
+            // Получение данных формы
+            const formData = {
+                childName: document.getElementById('childName').value,
+                birthDate: document.getElementById('birthDate').value,
+                gender: document.querySelector('input[name="gender"]:checked').value,
+                citizenship: document.getElementById('citizenship').value,
+                nativeLanguage: document.getElementById('nativeLanguage').value,
+                kindergarten: document.querySelector('input[name="kindergarten"]:checked').value,
+                parentName: document.getElementById('parentName').value,
+                parentRole: document.getElementById('parentRole').value,
+                phone: document.getElementById('phone').value,
+                messenger: document.getElementById('messenger').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                medical: document.querySelector('input[name="medical"]:checked').value,
+                medicalDetails: document.getElementById('medicalDetails').value,
+                allergy: document.querySelector('input[name="allergy"]:checked').value,
+                specialAttention: document.querySelector('input[name="specialAttention"]:checked').value,
+                attentionDetails: document.getElementById('attentionDetails').value,
+                source: document.querySelector('input[name="source"]:checked').value,
+                applicationNumber: applicationNumber.fullNumber
+            };
+            
+            // Форматирование и отправка сообщения
+            const message = formatTelegramMessage(formData, applicationNumber);
+            
+            // Блокировка кнопки отправки
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+            
+            // Отправка в Telegram
+            const isSent = await sendToTelegram(message);
+            
+            if (isSent) {
+                // Показ сообщения об успехе
+                document.getElementById('submissionDate').textContent = new Date().toLocaleString('ru-RU');
+                
+                // Отображение номера заявки
+                displayApplicationNumber(applicationNumber);
+                
+                successMessage.style.display = 'block';
+                
+                // Очистка формы и localStorage
+                form.reset();
+                localStorage.removeItem('schoolApplicationData');
+                
+                // Скрытие дополнительных полей
+                toggleField('medicalDetailsField', false);
+                toggleField('attentionDetailsField', false);
+                
+                // Сброс прогресс-бара
+                progressFill.style.width = '0%';
+                
+                // Прокрутка к сообщению об успехе
+                successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Анимация успешной отправки
+                successMessage.style.animation = 'slideUp 0.5s ease-out';
+                
+                // Через 10 секунд скрыть сообщение об успехе
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 10000);
+            } else {
+                // Показ ошибки
+                const errorNotification = document.createElement('div');
+                errorNotification.className = 'floating-notification';
+                errorNotification.style.borderLeftColor = 'var(--accent)';
+                errorNotification.innerHTML = `
+                    <i class="fas fa-exclamation-circle" style="color: var(--accent);"></i>
+                    <div>
+                        <strong>Ошибка отправки</strong>
+                        <p>Попробуйте ещё раз или свяжитесь с нами</p>
+                    </div>
+                `;
+                document.querySelector('.container').appendChild(errorNotification);
+                
+                setTimeout(() => {
+                    errorNotification.classList.add('show');
+                    setTimeout(() => {
+                        errorNotification.classList.remove('show');
+                        setTimeout(() => errorNotification.remove(), 500);
+                    }, 3000);
+                }, 100);
+            }
+            
+            // Разблокировка кнопки отправки
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заявку';
+        });
+        
+        // Автосохранение при изменении полей
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('input', function() {
+                saveFormData();
+                
+                // Скрытие ошибок при вводе
+                const errorId = this.id + 'Error';
+                const errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+                
+                // Особые случаи для радиокнопок
+                if (this.type === 'radio') {
+                    const name = this.name;
+                    const errorElement = document.getElementById(name + 'Error');
+                    if (errorElement) {
+                        errorElement.style.display = 'none';
+                    }
+                }
+            });
+            
+            input.addEventListener('change', saveFormData);
+        });
+        
+        // Обработка изменения чекбокса согласия
+        document.getElementById('consent').addEventListener('change', function() {
+            document.getElementById('consentError').style.display = 'none';
+            saveFormData();
+        });
+        
+        // Добавление CSS анимации для тряски
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 5px 15px rgba(248, 150, 30, 0.3);
+                }
+                50% {
+                    box-shadow: 0 5px 25px rgba(248, 150, 30, 0.5);
+                }
+                100% {
+                    box-shadow: 0 5px 15px rgba(248, 150, 30, 0.3);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
