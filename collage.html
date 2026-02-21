@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Создание коллажа</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #2b7a2b;
+      margin-bottom: 20px;
+    }
+    input {
+      margin-bottom: 20px;
+    }
+    #preview {
+      margin-top: 20px;
+      max-width: 90%;
+      border: 3px solid #2b7a2b;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #2b7a2b;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #256325;
+    }
+  </style>
+</head>
+<body>
+  <h1>Создание коллажа</h1>
+  <input type="file" id="images" multiple accept="image/*">
+  <canvas id="canvas" style="display:none;"></canvas>
+  <img id="preview" alt="Ваш коллаж"/>
+  <br>
+  <a id="download" class="btn" style="display:none;" download="collage.jpg">Скачать коллаж</a>
+
+  <script>
+    document.getElementById("images").addEventListener("change", function(event) {
+      const files = event.target.files;
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const preview = document.getElementById("preview");
+      const downloadBtn = document.getElementById("download");
+
+      let images = [];
+      let loaded = 0;
+
+      for (let i = 0; i < files.length; i++) {
+        let img = new Image();
+        img.src = URL.createObjectURL(files[i]);
+        img.onload = () => {
+          images.push(img);
+          loaded++;
+          if (loaded === files.length) {
+            // создаём коллаж
+            makeCollage(images, canvas, ctx, preview, downloadBtn);
+          }
+        };
+      }
+    });
+
+    function makeCollage(images, canvas, ctx, preview, downloadBtn) {
+      const size = 300; // размер одной ячейки
+      const cols = Math.ceil(Math.sqrt(images.length)); // кол-во колонок
+      const rows = Math.ceil(images.length / cols);
+
+      canvas.width = cols * size;
+      canvas.height = rows * size;
+
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      images.forEach((img, i) => {
+        let x = (i % cols) * size;
+        let y = Math.floor(i / cols) * size;
+        ctx.drawImage(img, x, y, size, size);
+      });
+
+      // показать превью
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+      preview.src = dataUrl;
+
+      // показать кнопку скачать
+      downloadBtn.style.display = "inline-block";
+      downloadBtn.href = dataUrl;
+    }
+  </script>
+</body>
+</html>

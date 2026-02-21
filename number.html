@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простая игра</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .game-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+        .game-area {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Игра "Угадай число"</h1>
+        <div class="game-area">
+            <p>Я загадал число от 1 до 100. Попробуй угадать!</p>
+            <input type="number" id="guessInput" placeholder="Введите число" style="width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #667eea; border-radius: 5px; font-size: 18px;">
+            <button onclick="checkGuess()">Проверить</button>
+            <button onclick="resetGame()" style="background: #6c757d;">Начать заново</button>
+            <div id="message" class="message"></div>
+            <div class="score">Попыток: <span id="attempts">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        let secretNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+
+        function checkGuess() {
+            const input = document.getElementById('guessInput');
+            const messageDiv = document.getElementById('message');
+            const attemptsSpan = document.getElementById('attempts');
+            
+            const guess = parseInt(input.value);
+            
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Введите число от 1 до 100!';
+                return;
+            }
+
+            attempts++;
+            attemptsSpan.textContent = attempts;
+            input.value = '';
+
+            if (guess === secretNumber) {
+                messageDiv.className = 'message success';
+                messageDiv.textContent = `Поздравляем! Вы угадали за ${attempts} попыток!`;
+                input.disabled = true;
+            } else if (guess < secretNumber) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Моё число больше!';
+            } else {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Моё число меньше!';
+            }
+        }
+
+        function resetGame() {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            document.getElementById('attempts').textContent = attempts;
+            document.getElementById('message').textContent = '';
+            document.getElementById('guessInput').disabled = false;
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').focus();
+        }
+    </script>
+</body>
+</html>
