@@ -3,32 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MegaMarket - Современный маркетплейс</title>
-    <!-- Font Awesome 6 (бесплатная версия) -->
+    <title>MegaMarket - Твой маркетплейс</title>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background-color: #f8f9fa;
         }
 
         /* Шапка */
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding: 15px 30px;
-            position: fixed;
+            position: sticky;
             top: 0;
-            left: 0;
-            right: 0;
             z-index: 100;
         }
 
@@ -38,31 +34,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 30px;
         }
 
         .logo {
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #4361ee;
         }
 
         .logo i {
-            font-size: 32px;
-            color: #667eea;
-        }
-
-        .logo span {
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 28px;
         }
 
         .search-bar {
             flex: 1;
             max-width: 500px;
-            margin: 0 30px;
             position: relative;
         }
 
@@ -70,16 +60,16 @@
             width: 100%;
             padding: 12px 20px;
             padding-left: 45px;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 15px;
             transition: all 0.3s;
         }
 
         .search-bar input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
 
         .search-bar i {
@@ -87,269 +77,148 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #999;
+            color: #adb5bd;
         }
 
         .add-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #4361ee;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .add-button:hover {
+            background: #3046bf;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         }
 
         /* Фильтры */
-        .filters-section {
-            background: white;
-            padding: 20px 30px;
-            margin: 90px 30px 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-
-        .filters-title {
+        .filters {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 30px;
             display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            font-size: 18px;
-            color: #333;
-        }
-
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-        }
-
-        .filter-group {
-            position: relative;
-        }
-
-        .filter-group input,
-        .filter-group select {
-            width: 100%;
-            padding: 10px;
-            padding-left: 35px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .filter-group i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #667eea;
-        }
-
-        .price-range {
-            display: flex;
-            gap: 10px;
-        }
-
-        .price-range input {
-            width: 50%;
-            padding-left: 10px;
-        }
-
-        .active-filters {
-            display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
         }
 
-        .filter-tag {
-            background: #f0f0f0;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .filter-tag i {
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            min-width: 150px;
             cursor: pointer;
-            color: #999;
+            background: white;
         }
 
-        .filter-tag i:hover {
-            color: #ff4444;
+        .filter-select:focus {
+            outline: none;
+            border-color: #4361ee;
+        }
+
+        .price-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .price-inputs input {
+            width: 100px;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
         }
 
         /* Основной контент */
-        .main-content {
+        .container {
             max-width: 1400px;
             margin: 0 auto 50px;
             padding: 0 30px;
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 30px;
-        }
-
-        /* Категории */
-        .categories-sidebar {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            height: fit-content;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-
-        .categories-title {
-            font-size: 18px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #333;
-        }
-
-        .category-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px;
-            margin-bottom: 5px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #666;
-        }
-
-        .category-item:hover {
-            background: #f5f5f5;
-            color: #667eea;
-        }
-
-        .category-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .category-item i {
-            width: 20px;
-        }
-
-        .category-count {
-            margin-left: auto;
-            font-size: 12px;
-            color: #999;
-        }
-
-        /* Сетка товаров */
-        .products-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
 
         .products-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 25px;
         }
 
         .products-count {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .sort-select {
-            padding: 8px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
+            color: #6c757d;
+            font-size: 15px;
         }
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 25px;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
+        /* Карточка товара */
         .product-card {
             background: white;
-            border-radius: 15px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             transition: all 0.3s;
-            border: 1px solid #f0f0f0;
-            position: relative;
+            border: 1px solid #e9ecef;
         }
 
         .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-
-        .product-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            z-index: 1;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
         .product-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            transition: all 0.5s;
+            height: 220px;
+            background: #f8f9fa;
+            position: relative;
+            overflow: hidden;
         }
 
-        .product-card:hover .product-image {
-            transform: scale(1.05);
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-category {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4361ee;
+            backdrop-filter: blur(5px);
         }
 
         .product-info {
             padding: 20px;
         }
 
-        .product-category {
-            color: #667eea;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
         .product-name {
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 8px;
-            color: #333;
+            color: #212529;
         }
 
         .product-description {
-            color: #666;
             font-size: 14px;
+            color: #6c757d;
             margin-bottom: 15px;
             line-height: 1.5;
             display: -webkit-box;
@@ -360,101 +229,60 @@
 
         .product-price {
             font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 10px;
+            font-weight: 700;
+            color: #4361ee;
+            margin-bottom: 15px;
         }
 
         .product-price small {
             font-size: 14px;
-            color: #999;
+            color: #adb5bd;
             font-weight: normal;
         }
 
-        .product-meta {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .product-city {
+        .product-location {
             display: flex;
             align-items: center;
             gap: 5px;
-            color: #666;
+            color: #6c757d;
             font-size: 14px;
+            margin-bottom: 15px;
         }
 
-        .product-city i {
-            color: #667eea;
-        }
-
-        .product-rating {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #ffc107;
+        .product-location i {
+            color: #4361ee;
         }
 
         .product-contacts {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
         }
 
-        .contact-icon {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
+        .contact-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-decoration: none;
+            color: white;
             transition: all 0.3s;
         }
 
-        .contact-icon:hover {
+        .contact-btn:hover {
             transform: translateY(-3px);
         }
 
-        .contact-icon.whatsapp { background: #25D366; color: white; }
-        .contact-icon.telegram { background: #0088cc; color: white; }
-        .contact-icon.instagram { background: linear-gradient(45deg, #f09433, #d62976, #962fbf, #4f5bd5); color: white; }
-        .contact-icon.tiktok { background: #000000; color: white; }
-        .contact-icon.phone { background: #667eea; color: white; }
-
-        /* Пагинация */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        .pagination button {
-            width: 40px;
-            height: 40px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .pagination button:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .pagination button.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
+        .contact-btn.whatsapp { background: #25D366; }
+        .contact-btn.telegram { background: #0088cc; }
+        .contact-btn.instagram { background: linear-gradient(45deg, #f09433, #d62976, #962fbf); }
+        .contact-btn.tiktok { background: #000000; }
+        .contact-btn.phone { background: #4361ee; }
 
         /* Модальное окно */
         .modal {
@@ -475,15 +303,14 @@
             margin: 50px auto;
             padding: 40px;
             border-radius: 20px;
-            max-width: 700px;
+            max-width: 600px;
             position: relative;
-            animation: slideUp 0.5s ease;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            animation: modalSlide 0.3s ease;
         }
 
-        @keyframes slideUp {
+        @keyframes modalSlide {
             from {
-                transform: translateY(100px);
+                transform: translateY(-50px);
                 opacity: 0;
             }
             to {
@@ -492,129 +319,106 @@
             }
         }
 
-        .close-button {
+        .close-btn {
             position: absolute;
             top: 20px;
             right: 25px;
-            font-size: 28px;
+            font-size: 24px;
             cursor: pointer;
-            color: #999;
+            color: #adb5bd;
             transition: all 0.3s;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
         }
 
-        .close-button:hover {
-            background: #f0f0f0;
-            color: #333;
-            transform: rotate(90deg);
+        .close-btn:hover {
+            background: #f1f3f5;
+            color: #212529;
         }
 
         .modal h2 {
             margin-bottom: 30px;
-            color: #333;
+            color: #212529;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .modal h2 i {
-            color: #667eea;
+            color: #4361ee;
         }
 
         /* Форма */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
         .form-group {
             margin-bottom: 20px;
         }
 
-        .form-group.full-width {
-            grid-column: span 2;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
 
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            color: #495057;
         }
 
-        label i {
-            color: #667eea;
-        }
-
-        .required-asterisk {
-            color: #ff4444;
+        .required {
+            color: #dc3545;
             margin-left: 3px;
         }
 
         input, textarea, select {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #e9ecef;
             border-radius: 10px;
             font-size: 15px;
             transition: all 0.3s;
-            background: #f9f9f9;
         }
 
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #4361ee;
         }
 
         textarea {
-            height: 120px;
+            height: 100px;
             resize: vertical;
         }
 
-        /* Загрузка изображения */
-        .image-upload-area {
-            border: 2px dashed #e0e0e0;
+        .image-upload {
+            border: 2px dashed #e9ecef;
             border-radius: 10px;
-            padding: 20px;
+            padding: 30px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: #f9f9f9;
         }
 
-        .image-upload-area:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
+        .image-upload:hover {
+            border-color: #4361ee;
+            background: #f8f9fa;
         }
 
-        .image-upload-area i {
+        .image-upload i {
             font-size: 40px;
-            color: #667eea;
+            color: #4361ee;
             margin-bottom: 10px;
-        }
-
-        .image-upload-area p {
-            color: #666;
         }
 
         .image-preview {
             margin-top: 15px;
             max-width: 200px;
-            max-height: 200px;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .image-preview img {
@@ -623,16 +427,16 @@
             object-fit: cover;
         }
 
-        .submit-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .submit-btn {
+            background: #4361ee;
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 15px;
             border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 600;
             width: 100%;
+            cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
@@ -641,40 +445,27 @@
             margin-top: 20px;
         }
 
-        .submit-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .submit-button i {
-            font-size: 20px;
+        .submit-btn:hover {
+            background: #3046bf;
         }
 
         /* Уведомления */
         .notification {
             position: fixed;
-            top: 100px;
+            top: 30px;
             right: 30px;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            padding: 15px 25px;
             z-index: 2000;
-            animation: slideInRight 0.5s ease;
+            animation: notificationSlide 0.3s ease;
             max-width: 400px;
+            border-left: 4px solid #4361ee;
         }
 
-        .notification.success {
-            border-left: 4px solid #4CAF50;
-        }
-
-        .notification.error {
-            border-left: 4px solid #ff4444;
-        }
-
-        .notification.info {
-            border-left: 4px solid #667eea;
-        }
+        .notification.success { border-left-color: #28a745; }
+        .notification.error { border-left-color: #dc3545; }
 
         .notification-content {
             display: flex;
@@ -683,33 +474,13 @@
         }
 
         .notification i {
-            font-size: 24px;
+            font-size: 20px;
         }
 
-        .notification.success i { color: #4CAF50; }
-        .notification.error i { color: #ff4444; }
-        .notification.info i { color: #667eea; }
+        .notification.success i { color: #28a745; }
+        .notification.error i { color: #dc3545; }
 
-        .notification-text {
-            flex: 1;
-        }
-
-        .notification-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .notification-message {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .notification-close {
-            cursor: pointer;
-            color: #999;
-        }
-
-        @keyframes slideInRight {
+        @keyframes notificationSlide {
             from {
                 transform: translateX(100%);
                 opacity: 0;
@@ -720,44 +491,16 @@
             }
         }
 
-        /* Кнопка "Наверх" */
-        .scroll-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .scroll-top.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .scroll-top:hover {
-            transform: translateY(-5px);
-        }
-
         /* Загрузка */
-        .loading-spinner {
+        .loading {
             text-align: center;
             padding: 50px;
+            grid-column: 1/-1;
         }
 
-        .loading-spinner i {
+        .loading i {
             font-size: 40px;
-            color: #667eea;
+            color: #4361ee;
             animation: spin 1s linear infinite;
         }
 
@@ -766,23 +509,78 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Адаптивность */
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .categories-sidebar {
-                display: none;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-group.full-width {
-                grid-column: span 1;
-            }
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .page-btn:hover {
+            border-color: #4361ee;
+            color: #4361ee;
+        }
+
+        .page-btn.active {
+            background: #4361ee;
+            color: white;
+            border-color: #4361ee;
+        }
+
+        /* Нет товаров */
+        .no-products {
+            text-align: center;
+            padding: 50px;
+            grid-column: 1/-1;
+            color: #6c757d;
+        }
+
+        .no-products i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: #adb5bd;
+        }
+
+        /* Категории */
+        .categories {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .category-tag {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .category-tag:hover {
+            border-color: #4361ee;
+            color: #4361ee;
+        }
+
+        .category-tag.active {
+            background: #4361ee;
+            color: white;
+            border-color: #4361ee;
         }
     </style>
 </head>
@@ -797,282 +595,387 @@
             
             <div class="search-bar">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Поиск товаров..." oninput="filterProducts()">
+                <input type="text" id="searchInput" placeholder="Поиск товаров...">
             </div>
             
             <button class="add-button" onclick="openModal()">
-                <i class="fas fa-plus-circle"></i>
+                <i class="fas fa-plus"></i>
                 Добавить товар
             </button>
         </div>
     </header>
 
     <!-- Фильтры -->
-    <div class="filters-section">
-        <div class="filters-title">
-            <i class="fas fa-sliders-h"></i>
-            <span>Фильтры</span>
+    <div class="filters">
+        <select class="filter-select" id="categoryFilter">
+            <option value="">Все категории</option>
+            <option value="technics">Техника</option>
+            <option value="transport">Транспорт</option>
+            <option value="kids">Для детей</option>
+            <option value="animals">Животные</option>
+            <option value="food">Еда</option>
+            <option value="clothing">Одежда</option>
+            <option value="other">Другое</option>
+        </select>
+        
+        <div class="price-inputs">
+            <input type="number" id="minPrice" placeholder="Цена от" min="0">
+            <input type="number" id="maxPrice" placeholder="Цена до" min="0">
         </div>
         
-        <div class="filters-grid">
-            <div class="filter-group">
-                <i class="fas fa-map-marker-alt"></i>
-                <input type="text" id="cityFilter" placeholder="Город" oninput="filterProducts()">
-            </div>
-            
-            <div class="filter-group">
-                <i class="fas fa-tag"></i>
-                <select id="categoryFilter" onchange="filterProducts()">
-                    <option value="">Все категории</option>
-                    <option value="technics">Техника</option>
-                    <option value="transport">Транспорт</option>
-                    <option value="kids">Для детей</option>
-                    <option value="animals">Животные и растения</option>
-                    <option value="food">Еда</option>
-                    <option value="clothing">Одежда</option>
-                    <option value="other">Другое</option>
-                </select>
-            </div>
-            
-            <div class="filter-group price-range">
-                <i class="fas fa-ruble-sign"></i>
-                <input type="number" id="minPrice" placeholder="Цена от" oninput="filterProducts()">
-                <input type="number" id="maxPrice" placeholder="Цена до" oninput="filterProducts()">
-            </div>
+        <select class="filter-select" id="sortSelect">
+            <option value="newest">Сначала новые</option>
+            <option value="priceAsc">Сначала дешевые</option>
+            <option value="priceDesc">Сначала дорогие</option>
+        </select>
+    </div>
+
+    <!-- Категории -->
+    <div class="container">
+        <div class="categories" id="categories">
+            <span class="category-tag active" onclick="filterByCategory('')">Все</span>
+            <span class="category-tag" onclick="filterByCategory('technics')">Техника</span>
+            <span class="category-tag" onclick="filterByCategory('transport')">Транспорт</span>
+            <span class="category-tag" onclick="filterByCategory('kids')">Для детей</span>
+            <span class="category-tag" onclick="filterByCategory('animals')">Животные</span>
+            <span class="category-tag" onclick="filterByCategory('food')">Еда</span>
+            <span class="category-tag" onclick="filterByCategory('clothing')">Одежда</span>
+            <span class="category-tag" onclick="filterByCategory('other')">Другое</span>
         </div>
-        
-        <div class="active-filters" id="activeFilters"></div>
     </div>
 
     <!-- Основной контент -->
-    <div class="main-content">
-        <!-- Категории -->
-        <div class="categories-sidebar">
-            <div class="categories-title">
-                <i class="fas fa-list"></i>
-                <span>Категории</span>
-            </div>
-            
-            <div class="category-item active" onclick="selectCategory('all')">
-                <i class="fas fa-th-large"></i>
-                <span>Все товары</span>
-                <span class="category-count" id="totalCount">0</span>
-            </div>
-            <div class="category-item" onclick="selectCategory('technics')">
-                <i class="fas fa-laptop"></i>
-                <span>Техника</span>
-                <span class="category-count" id="technicsCount">0</span>
-            </div>
-            <div class="category-item" onclick="selectCategory('transport')">
-                <i class="fas fa-car"></i>
-                <span>Транспорт</span>
-                <span class="category-count" id="transportCount">0</span>
-            </div>
-            <div class="category-item" onclick="selectCategory('kids')">
-                <i class="fas fa-child"></i>
-                <span>Для детей</span>
-                <span class="category-count" id="kidsCount">0</span>
-            </div>
-            <div class="category-item" onclick="selectCategory('animals')">
-                <i class="fas fa-paw"></i>
-                <span>Животные и растения</span>
-                <span class="category-count" id="animalsCount">0</span>
-            </div>
-            <div class="category-item" onclick="selectCategory('food')">
-                <i class="fas fa-utensils"></i>
-                <span>Еда</span>
-                <span class="category-count" id="foodCount">0</span>
-            </div>
-            <div class="category-item" onclick="selectCategory('clothing')">
-                <i class="fas fa-tshirt"></i>
-                <span>Одежда</span>
-                <span class="category-count" id="clothingCount">0</span>
-            </div>
-            <div class="category-item" onclick="selectCategory('other')">
-                <i class="fas fa-question"></i>
-                <span>Другое</span>
-                <span class="category-count" id="otherCount">0</span>
+    <div class="container">
+        <div class="products-header">
+            <h2>Товары</h2>
+            <span class="products-count" id="productsCount">Загрузка...</span>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <div class="loading">
+                <i class="fas fa-spinner"></i>
+                <p>Загрузка товаров...</p>
             </div>
         </div>
 
-        <!-- Товары -->
-        <div class="products-section">
-            <div class="products-header">
-                <div>
-                    <h2><i class="fas fa-product-hunt"></i> Товары</h2>
-                    <span class="products-count" id="productsCount">Найдено: 0 товаров</span>
-                </div>
-                
-                <select class="sort-select" id="sortSelect" onchange="filterProducts()">
-                    <option value="newest">Сначала новые</option>
-                    <option value="priceAsc">Сначала дешевые</option>
-                    <option value="priceDesc">Сначала дорогие</option>
-                    <option value="nameAsc">По названию (А-Я)</option>
-                    <option value="nameDesc">По названию (Я-А)</option>
-                </select>
-            </div>
-
-            <div id="productsGrid" class="products-grid">
-                <!-- Товары будут загружаться сюда -->
-            </div>
-
-            <div class="pagination" id="pagination">
-                <!-- Пагинация -->
-            </div>
-        </div>
+        <div class="pagination" id="pagination"></div>
     </div>
 
     <!-- Модальное окно -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeModal()">&times;</span>
+            <span class="close-btn" onclick="closeModal()">&times;</span>
             <h2>
                 <i class="fas fa-plus-circle"></i>
-                Добавить новый товар
+                Добавить товар
             </h2>
             
             <form id="productForm">
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>
-                            <i class="fas fa-tag"></i>
-                            Название товара
-                            <span class="required-asterisk">*</span>
-                        </label>
-                        <input type="text" id="productName" placeholder="Например: iPhone 13 Pro Max" required>
-                    </div>
+                <div class="form-group">
+                    <label>Название товара <span class="required">*</span></label>
+                    <input type="text" id="productName" required>
+                </div>
 
-                    <div class="form-group full-width">
-                        <label>
-                            <i class="fas fa-align-left"></i>
-                            Описание товара
-                            <span class="required-asterisk">*</span>
-                        </label>
-                        <textarea id="description" placeholder="Подробное описание товара..." required></textarea>
-                    </div>
+                <div class="form-group">
+                    <label>Описание <span class="required">*</span></label>
+                    <textarea id="description" required></textarea>
+                </div>
 
-                    <div class="form-group full-width">
-                        <label>
-                            <i class="fas fa-image"></i>
-                            Фотография товара
-                            <span class="required-asterisk">*</span>
-                        </label>
-                        <div class="image-upload-area" onclick="document.getElementById('image').click()">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p>Нажмите для выбора изображения</p>
-                            <p style="font-size: 12px; color: #999;">Поддерживаются JPG, PNG, GIF</p>
-                        </div>
-                        <input type="file" id="image" accept="image/*" required onchange="previewImage(this)" style="display: none;">
-                        <div class="image-preview" id="imagePreview"></div>
+                <div class="form-group">
+                    <label>Фото <span class="required">*</span></label>
+                    <div class="image-upload" onclick="document.getElementById('image').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Нажмите для выбора фото</p>
+                    </div>
+                    <input type="file" id="image" accept="image/*" required style="display: none;" onchange="previewImage(this)">
+                    <div class="image-preview" id="imagePreview"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Цена (₽) <span class="required">*</span></label>
+                        <input type="number" id="price" required min="0">
                     </div>
 
                     <div class="form-group">
-                        <label>
-                            <i class="fas fa-ruble-sign"></i>
-                            Цена
-                            <span class="required-asterisk">*</span>
-                        </label>
-                        <input type="number" id="price" placeholder="9990" required min="0" step="0.01">
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-map-marker-alt"></i>
-                            Город
-                            <span class="required-asterisk">*</span>
-                        </label>
-                        <input type="text" id="city" placeholder="Москва" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-phone"></i>
-                            Телефон
-                            <span class="required-asterisk">*</span>
-                        </label>
-                        <input type="tel" id="phone" placeholder="+7 (999) 999-99-99" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-list"></i>
-                            Категория
-                            <span class="required-asterisk">*</span>
-                        </label>
-                        <select id="category" required>
-                            <option value="">Выберите категорию</option>
-                            <option value="technics">📱 Техника</option>
-                            <option value="transport">🚗 Транспорт</option>
-                            <option value="kids">🧸 Для детей</option>
-                            <option value="animals">🐾 Животные и растения</option>
-                            <option value="food">🍔 Еда</option>
-                            <option value="clothing">👕 Одежда</option>
-                            <option value="other">❓ Другое</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fab fa-tiktok"></i>
-                            TikTok
-                        </label>
-                        <input type="url" id="tiktok" placeholder="https://tiktok.com/@username">
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fab fa-whatsapp"></i>
-                            WhatsApp
-                        </label>
-                        <input type="url" id="whatsapp" placeholder="https://wa.me/1234567890">
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fab fa-telegram"></i>
-                            Telegram
-                        </label>
-                        <input type="url" id="telegram" placeholder="https://t.me/username">
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fab fa-instagram"></i>
-                            Instagram
-                        </label>
-                        <input type="url" id="instagram" placeholder="https://instagram.com/username">
+                        <label>Город <span class="required">*</span></label>
+                        <input type="text" id="city" required>
                     </div>
                 </div>
 
-                <button type="submit" class="submit-button">
-                    <i class="fas fa-check-circle"></i>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Телефон <span class="required">*</span></label>
+                        <input type="tel" id="phone" required placeholder="+79991234567">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Категория <span class="required">*</span></label>
+                        <select id="category" required>
+                            <option value="">Выберите</option>
+                            <option value="technics">Техника</option>
+                            <option value="transport">Транспорт</option>
+                            <option value="kids">Для детей</option>
+                            <option value="animals">Животные</option>
+                            <option value="food">Еда</option>
+                            <option value="clothing">Одежда</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>TikTok (необязательно)</label>
+                        <input type="url" id="tiktok" placeholder="@username">
+                    </div>
+
+                    <div class="form-group">
+                        <label>WhatsApp (необязательно)</label>
+                        <input type="url" id="whatsapp" placeholder="wa.me/1234567890">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Telegram (необязательно)</label>
+                        <input type="url" id="telegram" placeholder="@username">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Instagram (необязательно)</label>
+                        <input type="url" id="instagram" placeholder="@username">
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-check"></i>
                     Добавить товар
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Кнопка "Наверх" -->
-    <div class="scroll-top" onclick="scrollToTop()">
-        <i class="fas fa-arrow-up"></i>
-    </div>
-
     <script>
-        // URL твоего Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFntlGwhrkuv374oniIm9BY4NAo6kZhjk-VhVKfDKwaShh6E_qkQsNXEN9kfAPgUTm6g/exec';
+        // Конфигурация
+        const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
         
+        // Переменные
         let allProducts = [];
         let filteredProducts = [];
         let currentPage = 1;
         const productsPerPage = 12;
+        let currentCategory = '';
+        let currentSearch = '';
+        let currentMinPrice = '';
+        let currentMaxPrice = '';
+        let currentSort = 'newest';
 
-        // Открыть модальное окно
+        // Загрузка товаров
+        async function loadProducts() {
+            try {
+                const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
+                const products = await response.json();
+                
+                allProducts = products;
+                filterProducts();
+                
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                document.getElementById('productsGrid').innerHTML = `
+                    <div class="no-products">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Ошибка загрузки</h3>
+                        <p>Проверьте подключение к интернету</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Фильтрация товаров
+        function filterProducts() {
+            currentSearch = document.getElementById('searchInput').value.toLowerCase();
+            currentCategory = document.getElementById('categoryFilter').value;
+            currentMinPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+            currentMaxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+            currentSort = document.getElementById('sortSelect').value;
+
+            filteredProducts = allProducts.filter(product => {
+                const matchesSearch = product.productName.toLowerCase().includes(currentSearch) ||
+                                     product.description.toLowerCase().includes(currentSearch);
+                const matchesCategory = !currentCategory || product.category === currentCategory;
+                const matchesPrice = product.price >= currentMinPrice && product.price <= currentMaxPrice;
+                
+                return matchesSearch && matchesCategory && matchesPrice;
+            });
+
+            // Сортировка
+            filteredProducts.sort((a, b) => {
+                switch(currentSort) {
+                    case 'priceAsc':
+                        return a.price - b.price;
+                    case 'priceDesc':
+                        return b.price - a.price;
+                    default:
+                        return new Date(b.timestamp) - new Date(a.timestamp);
+                }
+            });
+
+            document.getElementById('productsCount').textContent = `Найдено: ${filteredProducts.length} товаров`;
+            currentPage = 1;
+            renderProducts();
+            updateCategoryCounts();
+        }
+
+        // Обновление счетчиков категорий
+        function updateCategoryCounts() {
+            const counts = {};
+            allProducts.forEach(p => {
+                counts[p.category] = (counts[p.category] || 0) + 1;
+            });
+
+            document.querySelectorAll('.category-tag').forEach(tag => {
+                const category = tag.getAttribute('onclick')?.match(/'([^']*)'/)?.[1] || '';
+                if (category) {
+                    const count = counts[category] || 0;
+                    tag.innerHTML = `${tag.innerHTML.split('<')[0]} (${count})`;
+                } else {
+                    tag.innerHTML = `Все (${allProducts.length})`;
+                }
+            });
+        }
+
+        // Фильтр по категории
+        function filterByCategory(category) {
+            document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('categoryFilter').value = category;
+            filterProducts();
+        }
+
+        // Отображение товаров
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-products">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Товаров не найдено</h3>
+                        <p>Попробуйте изменить параметры поиска</p>
+                    </div>
+                `;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            // Пагинация
+            const start = (currentPage - 1) * productsPerPage;
+            const end = start + productsPerPage;
+            const pageProducts = filteredProducts.slice(start, end);
+
+            grid.innerHTML = pageProducts.map(product => `
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="${product.image || 'https://via.placeholder.com/300'}" 
+                             onerror="this.src='https://via.placeholder.com/300'"
+                             alt="${product.productName}">
+                        <span class="product-category">${getCategoryName(product.category)}</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">${product.productName}</h3>
+                        <p class="product-description">${product.description}</p>
+                        <div class="product-price">
+                            ${product.price.toLocaleString()} ₽
+                            <small>за шт.</small>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${product.city}
+                        </div>
+                        <div class="product-contacts">
+                            ${product.whatsapp ? `
+                                <a href="https://${product.whatsapp.replace('https://', '')}" 
+                                   target="_blank" class="contact-btn whatsapp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            ` : ''}
+                            ${product.telegram ? `
+                                <a href="https://${product.telegram.replace('https://', '')}" 
+                                   target="_blank" class="contact-btn telegram">
+                                    <i class="fab fa-telegram"></i>
+                                </a>
+                            ` : ''}
+                            ${product.instagram ? `
+                                <a href="https://${product.instagram.replace('https://', '')}" 
+                                   target="_blank" class="contact-btn instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            ` : ''}
+                            ${product.tiktok ? `
+                                <a href="https://${product.tiktok.replace('https://', '')}" 
+                                   target="_blank" class="contact-btn tiktok">
+                                    <i class="fab fa-tiktok"></i>
+                                </a>
+                            ` : ''}
+                            <a href="tel:${product.phone}" class="contact-btn phone">
+                                <i class="fas fa-phone"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            renderPagination();
+        }
+
+        // Название категории
+        function getCategoryName(category) {
+            const names = {
+                'technics': 'Техника',
+                'transport': 'Транспорт',
+                'kids': 'Для детей',
+                'animals': 'Животные',
+                'food': 'Еда',
+                'clothing': 'Одежда',
+                'other': 'Другое'
+            };
+            return names[category] || category;
+        }
+
+        // Пагинация
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let buttons = '';
+            for (let i = 1; i <= totalPages; i++) {
+                buttons += `<button class="page-btn ${i === currentPage ? 'active' : ''}" 
+                                  onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            pagination.innerHTML = buttons;
+        }
+
+        // Смена страницы
+        function changePage(page) {
+            currentPage = page;
+            renderProducts();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Модальное окно
         function openModal() {
             document.getElementById('modal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
 
-        // Закрыть модальное окно
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
             document.body.style.overflow = 'auto';
@@ -1087,74 +990,58 @@
             
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                
-                reader.onload = function(e) {
+                reader.onload = (e) => {
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     preview.appendChild(img);
                 }
-                
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // Показать уведомление
-        function showNotification(title, message, type = 'success') {
+        // Уведомления
+        function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
-            
-            const icon = {
-                'success': 'fa-check-circle',
-                'error': 'fa-exclamation-circle',
-                'info': 'fa-info-circle'
-            }[type];
-            
             notification.innerHTML = `
                 <div class="notification-content">
-                    <i class="fas ${icon}"></i>
-                    <div class="notification-text">
-                        <div class="notification-title">${title}</div>
-                        <div class="notification-message">${message}</div>
-                    </div>
-                    <i class="fas fa-times notification-close" onclick="this.parentElement.parentElement.remove()"></i>
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    <span>${message}</span>
                 </div>
             `;
             
             document.body.appendChild(notification);
             
-            setTimeout(() => {
-                notification.remove();
-            }, 5000);
+            setTimeout(() => notification.remove(), 3000);
         }
 
         // Отправка формы
-        document.getElementById('productForm').addEventListener('submit', async function(e) {
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             // Проверка обязательных полей
-            const requiredFields = ['productName', 'description', 'image', 'price', 'city', 'phone', 'category'];
-            for (const field of requiredFields) {
-                const element = document.getElementById(field);
-                if (!element.value) {
-                    showNotification('Ошибка', 'Пожалуйста, заполните все обязательные поля', 'error');
+            const required = ['productName', 'description', 'image', 'price', 'city', 'phone', 'category'];
+            for (const field of required) {
+                if (!document.getElementById(field).value) {
+                    showNotification('Заполните все обязательные поля', 'error');
                     return;
                 }
             }
 
             try {
-                // Конвертация изображения в Base64
-                const imageFile = document.getElementById('image').files[0];
-                const imageBase64 = await new Promise((resolve) => {
+                // Конвертация изображения
+                const file = document.getElementById('image').files[0];
+                const base64 = await new Promise(resolve => {
                     const reader = new FileReader();
                     reader.onloadend = () => resolve(reader.result);
-                    reader.readAsDataURL(imageFile);
+                    reader.readAsDataURL(file);
                 });
 
                 // Подготовка данных
-                const formData = {
+                const data = {
                     productName: document.getElementById('productName').value,
                     description: document.getElementById('description').value,
-                    image: imageBase64,
+                    image: base64,
                     price: document.getElementById('price').value,
                     city: document.getElementById('city').value,
                     phone: document.getElementById('phone').value,
@@ -1165,349 +1052,35 @@
                     instagram: document.getElementById('instagram').value
                 };
 
-                // Отправка данных
+                // Отправка
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
                 });
 
-                showNotification(
-                    'Товар добавлен!', 
-                    'Товар успешно добавлен. Обновите страницу, чтобы увидеть его в списке.',
-                    'success'
-                );
-                
+                showNotification('Товар успешно добавлен! Обновите страницу', 'success');
                 closeModal();
-                
+
             } catch (error) {
-                showNotification('Ошибка', 'Не удалось добавить товар', 'error');
-                console.error('Error:', error);
+                showNotification('Ошибка при добавлении', 'error');
             }
         });
 
-        // Загрузка товаров
-        async function loadProducts() {
-            try {
-                const productsGrid = document.getElementById('productsGrid');
-                productsGrid.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner"></i><p>Загрузка товаров...</p></div>';
-                
-                // Здесь нужно сделать GET запрос к твоему Google Apps Script
-                // Пока используем тестовые данные
-                
-                // Тестовые данные для демонстрации
-                allProducts = [
-                    {
-                        id: 1,
-                        productName: 'iPhone 13 Pro Max',
-                        description: 'Отличное состояние, новый аккумулятор',
-                        image: 'https://via.placeholder.com/300',
-                        price: 89990,
-                        city: 'Москва',
-                        phone: '+79991234567',
-                        category: 'technics',
-                        whatsapp: 'https://wa.me/79991234567',
-                        telegram: 'https://t.me/username',
-                        rating: 4.8,
-                        reviews: 124
-                    },
-                    {
-                        id: 2,
-                        productName: 'Велосипед Stels',
-                        description: 'Горный велосипед, размер рамы 18"',
-                        image: 'https://via.placeholder.com/300',
-                        price: 25000,
-                        city: 'Санкт-Петербург',
-                        phone: '+79997654321',
-                        category: 'transport',
-                        whatsapp: 'https://wa.me/79997654321',
-                        rating: 4.5,
-                        reviews: 32
-                    },
-                    {
-                        id: 3,
-                        productName: 'Диван угловой',
-                        description: 'Новый, в упаковке, цвет серый',
-                        image: 'https://via.placeholder.com/300',
-                        price: 45000,
-                        city: 'Казань',
-                        phone: '+79995554433',
-                        category: 'other',
-                        telegram: 'https://t.me/username2',
-                        rating: 5.0,
-                        reviews: 8
-                    }
-                ];
-                
-                filterProducts();
-                
-            } catch (error) {
-                console.error('Error loading products:', error);
-                document.getElementById('productsGrid').innerHTML = '<p style="text-align: center;">Ошибка загрузки товаров</p>';
-            }
-        }
+        // События
+        document.getElementById('searchInput').addEventListener('input', filterProducts);
+        document.getElementById('categoryFilter').addEventListener('change', filterProducts);
+        document.getElementById('minPrice').addEventListener('input', filterProducts);
+        document.getElementById('maxPrice').addEventListener('input', filterProducts);
+        document.getElementById('sortSelect').addEventListener('change', filterProducts);
 
-        // Фильтрация товаров
-        function filterProducts() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const cityFilter = document.getElementById('cityFilter').value.toLowerCase();
-            const categoryFilter = document.getElementById('categoryFilter').value;
-            const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
-            const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
-            const sortBy = document.getElementById('sortSelect').value;
-            
-            filteredProducts = allProducts.filter(product => {
-                const matchesSearch = product.productName.toLowerCase().includes(searchTerm) ||
-                                     product.description.toLowerCase().includes(searchTerm);
-                const matchesCity = !cityFilter || product.city.toLowerCase().includes(cityFilter);
-                const matchesCategory = !categoryFilter || product.category === categoryFilter;
-                const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
-                
-                return matchesSearch && matchesCity && matchesCategory && matchesPrice;
-            });
-            
-            // Сортировка
-            filteredProducts.sort((a, b) => {
-                switch(sortBy) {
-                    case 'priceAsc': return a.price - b.price;
-                    case 'priceDesc': return b.price - a.price;
-                    case 'nameAsc': return a.productName.localeCompare(b.productName);
-                    case 'nameDesc': return b.productName.localeCompare(a.productName);
-                    default: return b.id - a.id; // newest
-                }
-            });
-            
-            updateCounters();
-            updateActiveFilters();
-            renderProducts();
-        }
-
-        // Обновление счетчиков категорий
-        function updateCounters() {
-            document.getElementById('totalCount').textContent = allProducts.length;
-            document.getElementById('technicsCount').textContent = allProducts.filter(p => p.category === 'technics').length;
-            document.getElementById('transportCount').textContent = allProducts.filter(p => p.category === 'transport').length;
-            document.getElementById('kidsCount').textContent = allProducts.filter(p => p.category === 'kids').length;
-            document.getElementById('animalsCount').textContent = allProducts.filter(p => p.category === 'animals').length;
-            document.getElementById('foodCount').textContent = allProducts.filter(p => p.category === 'food').length;
-            document.getElementById('clothingCount').textContent = allProducts.filter(p => p.category === 'clothing').length;
-            document.getElementById('otherCount').textContent = allProducts.filter(p => p.category === 'other').length;
-        }
-
-        // Обновление активных фильтров
-        function updateActiveFilters() {
-            const activeFilters = document.getElementById('activeFilters');
-            const filters = [];
-            
-            const searchTerm = document.getElementById('searchInput').value;
-            if (searchTerm) {
-                filters.push(`<span class="filter-tag">Поиск: ${searchTerm} <i class="fas fa-times" onclick="clearFilter('search')"></i></span>`);
-            }
-            
-            const cityFilter = document.getElementById('cityFilter').value;
-            if (cityFilter) {
-                filters.push(`<span class="filter-tag">Город: ${cityFilter} <i class="fas fa-times" onclick="clearFilter('city')"></i></span>`);
-            }
-            
-            const categoryFilter = document.getElementById('categoryFilter').value;
-            if (categoryFilter) {
-                const categoryNames = {
-                    'technics': 'Техника',
-                    'transport': 'Транспорт',
-                    'kids': 'Для детей',
-                    'animals': 'Животные и растения',
-                    'food': 'Еда',
-                    'clothing': 'Одежда',
-                    'other': 'Другое'
-                };
-                filters.push(`<span class="filter-tag">Категория: ${categoryNames[categoryFilter]} <i class="fas fa-times" onclick="clearFilter('category')"></i></span>`);
-            }
-            
-            const minPrice = document.getElementById('minPrice').value;
-            const maxPrice = document.getElementById('maxPrice').value;
-            if (minPrice || maxPrice) {
-                filters.push(`<span class="filter-tag">Цена: ${minPrice || '0'} - ${maxPrice || '∞'} <i class="fas fa-times" onclick="clearFilter('price')"></i></span>`);
-            }
-            
-            activeFilters.innerHTML = filters.join('');
-        }
-
-        // Очистка фильтра
-        function clearFilter(type) {
-            switch(type) {
-                case 'search':
-                    document.getElementById('searchInput').value = '';
-                    break;
-                case 'city':
-                    document.getElementById('cityFilter').value = '';
-                    break;
-                case 'category':
-                    document.getElementById('categoryFilter').value = '';
-                    break;
-                case 'price':
-                    document.getElementById('minPrice').value = '';
-                    document.getElementById('maxPrice').value = '';
-                    break;
-            }
-            filterProducts();
-        }
-
-        // Выбор категории
-        function selectCategory(category) {
-            document.querySelectorAll('.category-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-            
-            if (category === 'all') {
-                document.getElementById('categoryFilter').value = '';
-            } else {
-                document.getElementById('categoryFilter').value = category;
-            }
-            
-            filterProducts();
-        }
-
-        // Отображение товаров
-        function renderProducts() {
-            const productsGrid = document.getElementById('productsGrid');
-            const productsCount = document.getElementById('productsCount');
-            
-            productsCount.textContent = `Найдено: ${filteredProducts.length} товаров`;
-            
-            if (filteredProducts.length === 0) {
-                productsGrid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
-                        <i class="fas fa-search" style="font-size: 50px; color: #ddd; margin-bottom: 20px;"></i>
-                        <h3>Товары не найдены</h3>
-                        <p style="color: #666;">Попробуйте изменить параметры поиска</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Пагинация
-            const start = (currentPage - 1) * productsPerPage;
-            const end = start + productsPerPage;
-            const pageProducts = filteredProducts.slice(start, end);
-            
-            productsGrid.innerHTML = pageProducts.map(product => `
-                <div class="product-card">
-                    ${product.rating >= 4.8 ? '<div class="product-badge"><i class="fas fa-crown"></i> Топ продаж</div>' : ''}
-                    <img src="${product.image}" alt="${product.productName}" class="product-image">
-                    <div class="product-info">
-                        <div class="product-category">
-                            ${getCategoryIcon(product.category)} ${getCategoryName(product.category)}
-                        </div>
-                        <div class="product-name">${product.productName}</div>
-                        <div class="product-description">${product.description}</div>
-                        <div class="product-price">
-                            ${product.price.toLocaleString()} ₽
-                            <small>за шт.</small>
-                        </div>
-                        <div class="product-meta">
-                            <div class="product-city">
-                                <i class="fas fa-map-marker-alt"></i>
-                                ${product.city}
-                            </div>
-                            <div class="product-rating">
-                                <i class="fas fa-star"></i>
-                                ${product.rating} (${product.reviews})
-                            </div>
-                        </div>
-                        <div class="product-contacts">
-                            ${product.whatsapp ? `<a href="${product.whatsapp}" target="_blank" class="contact-icon whatsapp"><i class="fab fa-whatsapp"></i></a>` : ''}
-                            ${product.telegram ? `<a href="${product.telegram}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram"></i></a>` : ''}
-                            ${product.instagram ? `<a href="${product.instagram}" target="_blank" class="contact-icon instagram"><i class="fab fa-instagram"></i></a>` : ''}
-                            ${product.tiktok ? `<a href="${product.tiktok}" target="_blank" class="contact-icon tiktok"><i class="fab fa-tiktok"></i></a>` : ''}
-                            <a href="tel:${product.phone}" class="contact-icon phone"><i class="fas fa-phone"></i></a>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            renderPagination();
-        }
-
-        // Получение иконки категории
-        function getCategoryIcon(category) {
-            const icons = {
-                'technics': 'fa-laptop',
-                'transport': 'fa-car',
-                'kids': 'fa-child',
-                'animals': 'fa-paw',
-                'food': 'fa-utensils',
-                'clothing': 'fa-tshirt',
-                'other': 'fa-question'
-            };
-            return `<i class="fas ${icons[category] || 'fa-tag'}"></i>`;
-        }
-
-        // Получение названия категории
-        function getCategoryName(category) {
-            const names = {
-                'technics': 'Техника',
-                'transport': 'Транспорт',
-                'kids': 'Для детей',
-                'animals': 'Животные и растения',
-                'food': 'Еда',
-                'clothing': 'Одежда',
-                'other': 'Другое'
-            };
-            return names[category] || category;
-        }
-
-        // Пагинация
-        function renderPagination() {
-            const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-            
-            if (totalPages <= 1) {
-                pagination.innerHTML = '';
-                return;
-            }
-            
-            let buttons = '';
-            for (let i = 1; i <= totalPages; i++) {
-                buttons += `<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
-            }
-            
-            pagination.innerHTML = buttons;
-        }
-
-        // Смена страницы
-        function changePage(page) {
-            currentPage = page;
-            renderProducts();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Скролл наверх
-        window.onscroll = function() {
-            const scrollTop = document.querySelector('.scroll-top');
-            if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
-                scrollTop.classList.add('show');
-            } else {
-                scrollTop.classList.remove('show');
-            }
+        window.onclick = (event) => {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) closeModal();
         };
 
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Закрытие модального окна по клику вне его
-        window.onclick = function(event) {
-            const modal = document.getElementById('modal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
-
-        // Загрузка товаров при открытии страницы
+        // Загрузка при старте
         document.addEventListener('DOMContentLoaded', loadProducts);
     </script>
 </body>
