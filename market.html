@@ -757,8 +757,8 @@
     </div>
 
     <script>
-        // Конфигурация
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFntlGwhrkuv374oniIm9BY4NAo6kZhjk-VhVKfDKwaShh6E_qkQsNXEN9kfAPgUTm6g/exec';
+        // Конфигурация - ЗДЕСЬ ТВОЙ URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgVEtrSgOx5jLZ_js8sMc36FFkfXEHYZBLP97_P7_NoVSsL3plOyih2tsyujlyio40Ow/exec';
         
         // Переменные
         let allProducts = [];
@@ -771,25 +771,55 @@
         let currentMaxPrice = '';
         let currentSort = 'newest';
 
-        // Загрузка товаров
-        async function loadProducts() {
-            try {
-                const response = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
-                const products = await response.json();
+        // Загрузка товаров через JSONP
+        function loadProducts() {
+            document.getElementById('productsGrid').innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Загрузка товаров...</p>
+                </div>
+            `;
+
+            // Создаем тег script для JSONP запроса
+            const script = document.createElement('script');
+            const callbackName = 'jsonp_callback_' + Date.now();
+            
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
                 
-                allProducts = products;
-                filterProducts();
-                
-            } catch (error) {
-                console.error('Ошибка загрузки:', error);
-                document.getElementById('productsGrid').innerHTML = `
-                    <div class="no-products">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <h3>Ошибка загрузки</h3>
-                        <p>Проверьте подключение к интернету</p>
-                    </div>
-                `;
-            }
+                if (data && Array.isArray(data)) {
+                    allProducts = data;
+                    filterProducts();
+                } else {
+                    showError('Не удалось загрузить товары');
+                }
+            };
+
+            script.src = `${SCRIPT_URL}?callback=${callbackName}`;
+            document.body.appendChild(script);
+
+            // Таймаут на случай ошибки
+            setTimeout(() => {
+                if (window[callbackName]) {
+                    window[callbackName] = function() {};
+                    delete window[callbackName];
+                    showError('Таймаут загрузки. Проверьте интернет.');
+                }
+            }, 10000);
+        }
+
+        function showError(message) {
+            document.getElementById('productsGrid').innerHTML = `
+                <div class="no-products">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Ошибка загрузки</h3>
+                    <p>${message}</p>
+                    <button onclick="loadProducts()" style="margin-top: 20px; padding: 10px 20px; background: #4361ee; color: white; border: none; border-radius: 10px; cursor: pointer;">
+                        <i class="fas fa-sync-alt"></i> Повторить
+                    </button>
+                </div>
+            `;
         }
 
         // Фильтрация товаров
@@ -835,10 +865,14 @@
             });
 
             document.querySelectorAll('.category-tag').forEach(tag => {
-                const category = tag.getAttribute('onclick')?.match(/'([^']*)'/)?.[1] || '';
-                if (category) {
-                    const count = counts[category] || 0;
-                    tag.innerHTML = `${tag.innerHTML.split('<')[0]} (${count})`;
+                const onclick = tag.getAttribute('onclick');
+                if (onclick) {
+                    const match = onclick.match(/'([^']*)'/);
+                    if (match) {
+                        const category = match[1];
+                        const count = counts[category] || 0;
+                        tag.innerHTML = tag.innerHTML.split('<')[0] + ` (${count})`;
+                    }
                 } else {
                     tag.innerHTML = `Все (${allProducts.length})`;
                 }
@@ -887,41 +921,43 @@
                         <h3 class="product-name">${product.productName}</h3>
                         <p class="product-description">${product.description}</p>
                         <div class="product-price">
-                            ${product.price.toLocaleString()} ₽
+                            ${Number(product.price).toLocaleString()} ₽
                             <small>за шт.</small>
                         </div>
                         <div class="product-location">
                             <i class="fas fa-map-marker-alt"></i>
-                            ${product.city}
+                            ${product.city || 'Не указан'}
                         </div>
                         <div class="product-contacts">
                             ${product.whatsapp ? `
-                                <a href="https://${product.whatsapp.replace('https://', '')}" 
+                                <a href="https://${product.whatsapp.replace(/^https?:\/\//, '')}" 
                                    target="_blank" class="contact-btn whatsapp">
                                     <i class="fab fa-whatsapp"></i>
                                 </a>
                             ` : ''}
                             ${product.telegram ? `
-                                <a href="https://${product.telegram.replace('https://', '')}" 
+                                <a href="https://${product.telegram.replace(/^https?:\/\//, '')}" 
                                    target="_blank" class="contact-btn telegram">
                                     <i class="fab fa-telegram"></i>
                                 </a>
                             ` : ''}
                             ${product.instagram ? `
-                                <a href="https://${product.instagram.replace('https://', '')}" 
+                                <a href="https://${product.instagram.replace(/^https?:\/\//, '')}" 
                                    target="_blank" class="contact-btn instagram">
                                     <i class="fab fa-instagram"></i>
                                 </a>
                             ` : ''}
                             ${product.tiktok ? `
-                                <a href="https://${product.tiktok.replace('https://', '')}" 
+                                <a href="https://${product.tiktok.replace(/^https?:\/\//, '')}" 
                                    target="_blank" class="contact-btn tiktok">
                                     <i class="fab fa-tiktok"></i>
                                 </a>
                             ` : ''}
-                            <a href="tel:${product.phone}" class="contact-btn phone">
-                                <i class="fas fa-phone"></i>
-                            </a>
+                            ${product.phone ? `
+                                <a href="tel:${product.phone}" class="contact-btn phone">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                            ` : ''}
                         </div>
                     </div>
                 </div>
@@ -1052,7 +1088,7 @@
                     instagram: document.getElementById('instagram').value
                 };
 
-                // Отправка
+                // Отправка через fetch с mode: 'no-cors'
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -1064,6 +1100,7 @@
                 closeModal();
 
             } catch (error) {
+                console.error('Error:', error);
                 showNotification('Ошибка при добавлении', 'error');
             }
         });
