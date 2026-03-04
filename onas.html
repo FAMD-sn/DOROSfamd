@@ -3,746 +3,714 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DOROSfamd — проект из 20 фронтенд-сайтов, от 'Словаря' 2020 года до запусков в Google в апреле 2025.">
-    <meta name="keywords" content="DOROSfamd, фронтенд, веб-разработка, Словарь, сайты">
-    <meta property="og:title" content="DOROSfamd | Фронтенд-творчество">
-    <meta property="og:description" content="20 фронтенд-сайтов, созданных с 2020 по 2025 год, от 'Словаря' до запусков в Google.">
-    <meta property="og:image" content="gerb.png">
-    <meta property="og:url" content="https://dorosfamd.com">
-    <title>DOROSfamd | Фронтенд-творчество</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>О нас — DOROSfamd: цифровая вселенная разработчика</title>
+    <meta name="description" content="100+ фронтенд-проектов, созданных одним разработчиком. Игры, инструменты, образование, бизнес, финтех, творчество. 6 лет развития.">
+    <meta name="keywords" content="DOROSfamd, экосистема, фронтенд, разработчик, Х. Дориуш, проекты, игры, инструменты">
+    <meta name="author" content="Х. Дориуш">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://dorosfamd.com/logof.png" type="image/png">
+    
     <style>
-        :root {
-            --gold: #FFD700;
-            --teal: #20B2AA;
-            --charcoal: #2F2F2F;
-            --silver: #E0E0E0;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --diamond: #b9f2ff;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #111116;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --text-light: #f0f0f0;
+            --text-dim: #a0a0b0;
+            --border-dim: #22222a;
+            --gradient-1: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --gradient-2: linear-gradient(135deg, #3b82f6, #2dd4bf);
+            --font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            
+            --space-2: 8px;
+            --space-4: 16px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-12: 48px;
+            --space-16: 64px;
+            --space-20: 80px;
+            
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 30px;
+        }
 
         body {
-            font-family: 'Montserrat', sans-serif;
-            background: var(--charcoal);
-            color: var(--silver);
-            min-height: 100vh;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: var(--font-family);
+            line-height: 1.6;
             overflow-x: hidden;
         }
 
-        .animated-bg {
+        /* Плавный параллакс-фон */
+        .parallax-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--teal), var(--charcoal), var(--gold));
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(139,92,246,0.12) 0%, transparent 50%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: -1;
-            opacity: 0.4;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .navbar-logo {
-            font-size: 2rem;
-            font-family: 'Cinzel Decorative', cursive;
-            color: var(--gold);
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-
-        .nav-links { display: flex; list-style: none; }
-        .nav-links li { margin-left: 2rem; }
-        .nav-links a {
-            color: var(--silver);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        .nav-links a:hover { color: var(--gold); }
-        .hamburger { display: none; font-size: 1.8rem; cursor: pointer; color: var(--gold); }
-
-        .header {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-            background: url('hero-bg.jpg') center/cover no-repeat;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 0;
-        }
-
-        .header-content { z-index: 1; }
-
-        .logo-container {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 2rem;
-        }
-
-        .logo-circle {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 3px solid var(--gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-            transition: all 0.5s ease;
-        }
-
-        .logo-circle:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
-        }
-
-        .logo-circle img {
-            width: 120px;
-            height: 120px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
-        }
-
-        h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, var(--gold), var(--silver));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-family: 'Cinzel Decorative', cursive;
-        }
-
-        .tagline {
-            font-size: 1.4rem;
-            opacity: 0.9;
-            font-weight: 300;
-            letter-spacing: 1px;
-            font-family: 'Playfair Display', serif;
+            pointer-events: none;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 0 var(--space-4);
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
-        .about-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 3rem;
-            margin-bottom: 4rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            text-align: center;
-        }
-
-        .about-content p {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .glowing-text {
-            color: var(--gold);
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
-            font-weight: 700;
-        }
-
-        .contacts-title {
-            text-align: center;
-            font-size: 3rem;
-            margin: 4rem 0;
-            color: var(--gold);
-            font-family: 'Cinzel Decorative', cursive;
-        }
-
-        .contacts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 4rem 0;
-        }
-
-        .contact-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem 2rem;
-            border-radius: 15px;
-            text-decoration: none;
-            color: var(--silver);
-            font-weight: 700;
-            font-size: 1.2rem;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--gold);
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        .contact-btn:hover {
-            background: var(--gold);
-            color: var(--charcoal);
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-        }
-
-        .contact-btn i {
-            margin-right: 10px;
-            color: var(--silver);
-            animation: pulse 2s infinite;
-        }
-        .contact-btn:hover i { color: var(--charcoal); }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .values-section { margin: 6rem 0; text-align: center; }
-
-        .values-title {
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: var(--gold);
-            font-family: 'Cinzel Decorative', cursive;
-        }
-
-        .values-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2rem;
-        }
-
-        .value-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 2rem;
-            border: 1px solid transparent;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-            min-height: 250px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.5s ease;
-        }
-
-        .value-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            border-color: var(--gold);
-        }
-
-        .value-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--gold);
-            transition: all 0.5s ease;
-            animation: bounce 2s infinite;
-        }
-
-        .value-card:hover .value-icon {
-            transform: scale(1.2);
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        .value-name {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            font-family: 'Playfair Display', serif;
-            color: var(--gold);
-        }
-
-        .value-desc {
-            font-size: 1rem;
-            line-height: 1.6;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .mission-section { margin: 6rem 0; text-align: center; }
-
-        .mission-title {
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: var(--gold);
-            font-family: 'Cinzel Decorative', cursive;
-        }
-
-        .mission-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .mission-content p {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .timeline-section { margin: 6rem 0; text-align: center; }
-
-        .timeline-title {
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: var(--gold);
-            font-family: 'Cinzel Decorative', cursive;
-        }
-
-        .timeline {
-            position: relative;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .timeline::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            background: var(--gold);
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .timeline-item {
-            padding: 10px 30px;
-            position: relative;
-            background: inherit;
-            width: 50%;
-        }
-
-        .timeline-item:nth-child(odd) { left: 0; }
-        .timeline-item:nth-child(even) { left: 50%; }
-
-        .timeline-item::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--gold);
-            border: 3px solid var(--charcoal);
-            top: 15px;
-            border-radius: 50%;
-            z-index: 1;
-            animation: spin 4s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .timeline-item:nth-child(odd)::after { right: -13px; }
-        .timeline-item:nth-child(even)::after { left: -13px; }
-
-        .timeline-content {
-            padding: 15px 25px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        .timeline-content h3 {
-            font-family: 'Playfair Display', serif;
-            color: var(--gold);
-            margin-bottom: 0.8rem;
-        }
-
-        .timeline-content p {
-            font-size: 1rem;
-            line-height: 1.6;
-            font-family: 'Playfair Display', serif;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 6rem;
-            padding: 4rem 0;
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .footer-logo {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(to right, var(--gold), var(--silver));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-family: 'Cinzel Decorative', cursive;
-        }
-
-        .footer-quote {
-            font-style: italic;
-            font-size: 1.2rem;
-            margin: 1.5rem auto;
-            max-width: 600px;
-            line-height: 1.6;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .social-link {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--gold);
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
-        }
-
-        .social-link:hover {
-            background: var(--gold);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        }
-
-        .social-link i {
-            color: var(--silver);
-            font-size: 1.5rem;
-            animation: pulse 2s infinite;
-        }
-        .social-link:hover i { color: var(--charcoal); }
-
-        .back-to-top {
+        /* Header */
+        .header {
             position: fixed;
-            bottom: 15px;
-            right: 15px;
-            background: var(--gold);
-            color: var(--charcoal);
-            padding: 0.8rem;
-            border-radius: 50%;
-            cursor: pointer;
-            display: none;
-            z-index: 1000;
+            top: 0; left: 0; right: 0;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 15, 0.7);
+            border-bottom: 1px solid var(--border-dim);
+            z-index: 100;
+            padding: var(--space-4) 0;
         }
 
-        .diamond-effect {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: -1;
+        .header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: url('https://dorosfamd.com/logof.png') center/cover no-repeat, var(--gradient-1);
+            border-radius: var(--radius-md);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-6);
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
             overflow: hidden;
         }
 
-        .diamond {
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-4);
+            background: linear-gradient(135deg, #fff, #c0c0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h1 span {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .hero-sub {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: var(--text-dim);
+            margin-bottom: var(--space-6);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stats-mini {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-8);
+            margin-bottom: var(--space-8);
+            font-size: 1.1rem;
+        }
+
+        .hero-stats-mini div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-stats-mini strong {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: var(--space-4) var(--space-8);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 10px 20px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px var(--primary-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: rgba(99,102,241,0.1);
+            border-color: var(--primary);
+        }
+
+        /* Sections */
+        .section {
+            padding: var(--space-20) 0;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: var(--space-12);
+            text-align: center;
+            background: linear-gradient(135deg, #fff, #a0a0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: var(--text-dim);
+            max-width: 800px;
+            margin: 0 auto var(--space-12);
+            font-size: 1.2rem;
+        }
+
+        /* Cards */
+        .grid-2, .grid-3, .grid-4 {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 30px rgba(99,102,241,0.2);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .category-item {
+            background: rgba(99,102,241,0.05);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-md);
+            padding: var(--space-6);
+            transition: all 0.3s;
+        }
+
+        .category-item:hover {
+            background: rgba(99,102,241,0.1);
+            border-color: var(--primary);
+        }
+
+        .category-item i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .category-item h3 {
+            font-size: 1.3rem;
+            margin-bottom: var(--space-2);
+        }
+
+        .category-item p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
             position: absolute;
-            width: 8px;
-            height: 8px;
-            background: var(--diamond);
-            transform: rotate(45deg);
-            animation: diamondFall linear infinite;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--primary), transparent);
         }
 
-        @keyframes diamondFall {
-            0% { transform: translateY(-100vh) rotate(45deg); }
-            100% { transform: translateY(100vh) rotate(45deg); }
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+            position: relative;
         }
 
-        @media (max-width: 992px) {
-            h1 { font-size: 3rem; }
-            .contacts-title { font-size: 2.5rem; }
-            .values-title, .mission-title, .timeline-title { font-size: 2rem; }
+        .timeline-year {
+            width: 120px;
+            text-align: right;
+            padding-right: var(--space-6);
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--primary);
         }
 
+        .timeline-content {
+            width: calc(50% - 60px);
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-md);
+            padding: var(--space-6);
+            margin-left: var(--space-6);
+        }
+
+        .timeline-content h4 {
+            font-size: 1.3rem;
+            margin-bottom: var(--space-2);
+        }
+
+        /* Quote */
+        .quote-block {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 500;
+            line-height: 1.4;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--space-12);
+            background: rgba(99,102,241,0.05);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-dim);
+            position: relative;
+        }
+
+        .quote-block i {
+            color: var(--primary);
+            font-size: 3rem;
+            opacity: 0.5;
+            margin-bottom: var(--space-4);
+        }
+
+        .quote-author {
+            margin-top: var(--space-6);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border-dim);
+            padding: var(--space-12) 0;
+            margin-top: var(--space-20);
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .hamburger { display: block; }
-            .nav-links {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 60px;
-                left: 0;
-                width: 100%;
-                background: var(--glass-bg);
-                padding: 1rem;
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
             }
-            .nav-links.active { display: flex; }
-            h1 { font-size: 2.5rem; }
-            .contacts-title { font-size: 2rem; }
-            .contact-btn { padding: 1.2rem; font-size: 1rem; }
-            .values-grid { grid-template-columns: 1fr; }
-            .value-card { min-height: 220px; }
-            .timeline::after { left: 25px; }
-            .timeline-item {
-                width: 100%;
-                padding-left: 60px;
-                padding-right: 20px;
-            }
-            .timeline-item:nth-child(even), .timeline-item:nth-child(odd) { left: 0; }
-            .timeline-item::after { left: 12px; }
+            
+            .timeline::before { left: 30px; }
+            .timeline-item { flex-direction: column; align-items: flex-start; }
+            .timeline-year { width: auto; text-align: left; padding-right: 0; }
+            .timeline-content { width: 100%; margin-left: 0; }
+            
+            .nav-links { display: none; }
+            
+            .hero-stats-mini { flex-wrap: wrap; }
         }
 
-        @media (max-width: 576px) {
-            h1 { font-size: 2rem; }
-            .tagline { font-size: 1rem; }
-            .about-content { padding: 2rem 1rem; }
-            .contacts-title { font-size: 1.8rem; }
-            .contacts-grid { grid-template-columns: 1fr; }
-            .footer-logo { font-size: 1.8rem; }
-            .footer-quote { font-size: 1rem; }
-            .social-link { width: 40px; height: 40px; }
-            .social-link i { font-size: 1.2rem; }
-            .logo-circle { width: 140px; height: 140px; }
-            .logo-circle img { width: 90px; height: 90px; }
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
         }
     </style>
 </head>
 <body>
-    <div class="animated-bg"></div>
-    <div class="diamond-effect" id="diamond-effect"></div>
+    <div class="parallax-bg"></div>
+    <div class="grid-overlay"></div>
 
-    <nav class="navbar">
-        <div class="navbar-logo">DOROSfamd 🌟</div>
-        <ul class="nav-links">
-            <li><a href="#home">Главная</a></li>
-            <li><a href="#about">О проекте</a></li>
-            <li><a href="#values">Ценности</a></li>
-            <li><a href="#mission">Миссия</a></li>
-            <li><a href="#timeline">История</a></li>
-            <li><a href="#contacts">Контакты</a></li>
-        </ul>
-        <div class="hamburger">☰</div>
-    </nav>
-
-    <section id="home" class="header">
-        <div class="header-content">
-            <div class="logo-container">
-                <div class="logo-circle">
-                    <img src="gerb.png" alt="Логотип DOROSfamd" loading="lazy">
-                </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="https://dorosfamd.com" class="logo">
+                <div class="logo-icon"></div>
+                <span>DOROSfamd</span>
+            </a>
+            <div class="nav-links">
+                <a href="#about">О нас</a>
+                <a href="#ecosystem">Экосистема</a>
+                <a href="#history">История</a>
+                <a href="#contact">Контакты</a>
             </div>
-            <h1>DOROSfamd</h1>
-            <p class="tagline">Фронтенд-сайты с душой 💻</p>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h1>
+                Цифровая вселенная<br>
+                <span>одного разработчика</span>
+            </h1>
+            <p class="hero-sub">
+                100+ фронтенд-проектов. 6 лет кода. 18 апреля 2026 — 20 сайтов в Google.
+            </p>
+            <div class="hero-stats-mini">
+                <div><strong>100+</strong> <span>проектов</span></div>
+                <div><strong>6</strong> <span>лет развития</span></div>
+                <div><strong>2026</strong> <span>запуск 20 сайтов</span></div>
+            </div>
+            <div class="btn-group">
+                <a href="https://dorosfamd.com/#projects" class="btn btn-primary"><i class="fas fa-rocket"></i> Все проекты</a>
+                <a href="mailto:dorosfamd@gmail.com" class="btn btn-outline"><i class="fas fa-paper-plane"></i> Связаться</a>
+            </div>
         </div>
     </section>
 
-    <div class="container">
-        <section id="about" class="about-content">
-            <p><span class="glowing-text">DOROSfamd</span>, созданный Х. Дориушем, — это проект из 20 фронтенд-сайтов, начавшийся с «Словаря» в 2020 году. Каждый сайт, сделанный на HTML, CSS и JavaScript, показывает <span class="glowing-text">творчество</span> и <span class="glowing-text">усилие</span>. 🌟</p>
-            <p>Все сайты были запущены в Google 18 апреля 2025 года, вдохновляя на новые идеи в веб-разработке. 🚀</p>
-        </section>
-
-        <section id="contacts">
-            <h2 class="contacts-title">Свяжитесь с нами <i class="fas fa-envelope fa-beat"></i></h2>
-            <div class="contacts-grid">
-                <a href="tel:+992876619999" class="contact-btn">
-                    <i class="fas fa-phone"></i> Позвонить
-                </a>
-                <a href="https://wa.me/992406507575" target="_blank" class="contact-btn">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </a>
-                <a href="https://t.me/Dor1ush" target="_blank" class="contact-btn">
-                    <i class="fab fa-telegram-plane"></i> Telegram
-                </a>
-                <a href="https://www.instagram.com/dorosfamd" target="_blank" class="contact-btn">
-                    <i class="fab fa-instagram"></i> Instagram
-                </a>
-                <a href="mailto:dorosfamd@gmail.com" class="contact-btn">
-                    <i class="fas fa-envelope-open-text"></i> Написать
-                </a>
-            </div>
-        </section>
-
-        <section id="values" class="values-section">
-            <h2 class="values-title">Ценности <i class="fas fa-star fa-beat"></i></h2>
-            <div class="values-grid">
-                <div class="value-card">
-                    <i class="fas fa-lightbulb value-icon"></i>
-                    <h3 class="value-name">Творчество</h3>
-                    <p class="value-desc">Каждый сайт — новая идея, оживающая в коде. 🎨</p>
+    <!-- Кто мы -->
+    <section class="section" id="about">
+        <div class="container">
+            <h2 class="section-title">Кто мы</h2>
+            <p class="section-sub">
+                DOROSfamd — это не компания и не маркетплейс. Это личная цифровая экосистема, созданная одним разработчиком, Х. Дориушем.
+            </p>
+            <div class="grid-2" style="margin-top: var(--space-12);">
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-cubes"></i></div>
+                    <h3>Цифровая империя</h3>
+                    <p style="color: var(--text-dim);">Игры, инструменты, образование, финансы, творчество, соцсети, бизнес-платформы — всё в одной экосистеме.</p>
                 </div>
-                <div class="value-card">
-                    <i class="fas fa-code value-icon"></i>
-                    <h3 class="value-name">Умение</h3>
-                    <p class="value-desc">Чистый код создаёт удобный опыт. 💻</p>
-                </div>
-                <div class="value-card">
-                    <i class="fas fa-rocket value-icon"></i>
-                    <h3 class="value-name">Упорство</h3>
-                    <p class="value-desc">Ошибки — шаги к новым идеям. 🚀</p>
-                </div>
-                <div class="value-card">
-                    <i class="fas fa-heart value-icon"></i>
-                    <h3 class="value-name">Интерес</h3>
-                    <p class="value-desc">Любовь к делу движет проектами. ❤️</p>
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-code"></i></div>
+                    <h3>Чистый код</h3>
+                    <p style="color: var(--text-dim);">Каждый проект написан на HTML, CSS и JavaScript. Без фреймворков, без компромиссов.</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="mission" class="mission-section">
-            <h2 class="mission-title">Миссия <i class="fas fa-compass fa-beat"></i></h2>
-            <div class="mission-content">
-                <p>DOROSfamd создаёт фронтенд-сайты, которые радуют и вдохновляют. От «Словаря» в 2020 году до 20 сайтов в 2025 году, проект живёт <span class="glowing-text">интересом</span> к веб-разработке. 🌟</p>
-                <p>Каждый сайт — это попытка сделать что-то новое и полезное. Присоединяйтесь! 💡</p>
+    <!-- Масштаб экосистемы -->
+    <section class="section" id="ecosystem">
+        <div class="container">
+            <h2 class="section-title">Масштаб экосистемы</h2>
+            <p class="section-sub">Более 100 проектов в 7 направлениях</p>
+            
+            <div class="category-grid">
+                <div class="category-item">
+                    <i class="fas fa-gamepad"></i>
+                    <h3>Игры</h3>
+                    <p>2D-аркады, шахматы, песочницы, GTA2D, симуляторы</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-tools"></i>
+                    <h3>Инструменты</h3>
+                    <p>Редактор кода, облако, браузер, калькулятор, карты, QR</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3>Образование</h3>
+                    <p>ИИ-решатель, тесты, словари, курсы фронтенда</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-briefcase"></i>
+                    <h3>Бизнес</h3>
+                    <p>Онлайн-банк, маркетплейс, бухгалтерия, такси</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-paint-brush"></i>
+                    <h3>Творчество</h3>
+                    <p>Графические редакторы, музыка, генераторы рифм</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-globe"></i>
+                    <h3>Социальное</h3>
+                    <p>Чаты, звонки, видеоплатформа, вики</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-coins"></i>
+                    <h3>Финтех</h3>
+                    <p>Криптокошелек, биржевой монитор, конвертер валют</p>
+                </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="timeline" class="timeline-section">
-            <h2 class="timeline-title">История <i class="fas fa-history fa-beat"></i></h2>
+    <!-- Философия -->
+    <section class="section">
+        <div class="container">
+            <div class="quote-block">
+                <i class="fas fa-quote-left"></i>
+                <p>«Семь раз упасть — восемь раз подняться.»</p>
+                <div class="quote-author">— Дзигоро Кано</div>
+                <div style="margin-top: var(--space-8); color: var(--text-dim); font-size: 1.2rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+                    Творчество, упорство, самостоятельная разработка и постоянные обновления — код, который живёт и дышит.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- История (таймлайн) -->
+    <section class="section" id="history">
+        <div class="container">
+            <h2 class="section-title">История</h2>
             <div class="timeline">
                 <div class="timeline-item">
+                    <div class="timeline-year">2011</div>
                     <div class="timeline-content">
-                        <h3>2011 — Начало пути</h3>
-                        <p>Год, когда началась история создателя DOROSfamd. 👶</p>
+                        <h4>Начало пути</h4>
+                        <p>Первое знакомство с компьютерами, интерес к технологиям.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
+                    <div class="timeline-year">2017</div>
                     <div class="timeline-content">
-                        <h3>2017 — Первые шаги</h3>
-                        <p>Начало изучения программирования: Scratch, AppInventor. 📚</p>
+                        <h4>Первое программирование</h4>
+                        <p>Scratch, AppInventor — первые логические конструкции.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
+                    <div class="timeline-year">2020</div>
                     <div class="timeline-content">
-                        <h3>2020 — Рождение DOROSfamd</h3>
-                        <p>Создан первый сайт «Словарь», начало проекта. 🌱</p>
+                        <h4>Первый сайт «Словарь»</h4>
+                        <p>Запуск первого полноценного веб-проекта.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
+                    <div class="timeline-year">2024</div>
                     <div class="timeline-content">
-                        <h3>2024 — Новый «Словарь»</h3>
-                        <p>Обновление «Словаря» с новым дизайном. 🔧</p>
+                        <h4>Обновление «Словаря»</h4>
+                        <p>Редизайн и новый функционал спустя 4 года.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
+                    <div class="timeline-year">2025</div>
                     <div class="timeline-content">
-                        <h3>2025 — 20 сайтов</h3>
-                        <p>18 апреля 2025 года 20 сайтов запущены в Google. 🎉</p>
+                        <h4>Запуск 20 сайтов</h4>
+                        <p>18 апреля 2025 года — 20 новых проектов проиндексированы Google.</p>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
-
-    <footer>
-        <div class="footer-logo">DOROSfamd</div>
-        <p class="footer-quote">«Семь раз упасть — восемь раз подняться.»</p>
-        <div class="social-links">
-            <a href="https://wa.me/992406507575" target="_blank" class="social-link">
-                <i class="fab fa-whatsapp"></i>
-            </a>
-            <a href="https://t.me/Dor1ush" target="_blank" class="social-link">
-                <i class="fab fa-telegram-plane"></i>
-            </a>
-            <a href="https://www.instagram.com/dorosfamd" target="_blank" class="social-link">
-                <i class="fab fa-instagram"></i>
-            </a>
         </div>
-        <p style="font-size: 0.9rem; opacity: 0.7;"><span id="years">5</span> лет веб-разработки (2020–2025)</p>
+    </section>
+
+    <!-- Миссия -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Миссия</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <i class="fas fa-brain" style="font-size: 2.5rem; color: var(--primary); margin-bottom: var(--space-4);"></i>
+                    <h3>Развивать мышление</h3>
+                    <p style="color: var(--text-dim);">Проекты, которые заставляют думать, решать, творить.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-graduation-cap" style="font-size: 2.5rem; color: var(--primary); margin-bottom: var(--space-4);"></i>
+                    <h3>Помогать учиться</h3>
+                    <p style="color: var(--text-dim);">Образовательные инструменты для всех возрастов.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-lightbulb" style="font-size: 2.5rem; color: var(--primary); margin-bottom: var(--space-4);"></i>
+                    <h3>Вдохновлять</h3>
+                    <p style="color: var(--text-dim);">Показать, что один разработчик может создать целую вселенную.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Видение будущего -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Видение будущего</h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6);">
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; color: var(--primary);">100+</div>
+                    <p>проектов к концу года</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; color: var(--primary);">AI</div>
+                    <p>собственные нейросети</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; color: var(--primary);">1M+</div>
+                    <p>пользователей</p>
+                </div>
+            </div>
+            <p class="section-sub" style="margin-top: var(--space-12);">
+                Масштабирование экосистемы, новые технологии и миллионная аудитория.
+            </p>
+        </div>
+    </section>
+
+    <!-- Заключительный CTA -->
+    <section class="section" style="text-align: center; background: linear-gradient(135deg, rgba(99,102,241,0.1), transparent); border-radius: var(--radius-xl); margin: var(--space-20) 0;">
+        <div class="container">
+            <h2 style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: var(--space-6);">Стань частью вселенной</h2>
+            <p style="font-size: 1.3rem; color: var(--text-dim); max-width: 600px; margin: 0 auto var(--space-8);">
+                Присоединяйся к экосистеме, которая доказывает: один человек может создать цифровую империю.
+            </p>
+            <div class="btn-group">
+                <a href="https://dorosfamd.com/#projects" class="btn btn-primary"><i class="fas fa-rocket"></i> Исследовать проекты</a>
+                <a href="mailto:dorosfamd@gmail.com" class="btn btn-outline"><i class="fas fa-envelope"></i> Написать создателю</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
+                <div>
+                    <div class="logo" style="margin-bottom: var(--space-2);">
+                        <div class="logo-icon"></div>
+                        <span>DOROSfamd</span>
+                    </div>
+                    <p>© 2026 Х. Дориуш. Все права защищены.</p>
+                </div>
+                <div style="display: flex; gap: var(--space-4);">
+                    <a href="mailto:dorosfamd@gmail.com" style="color: var(--text-dim);"><i class="fas fa-envelope fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
     </footer>
 
-    <div class="back-to-top" onclick="scrollToTop()">↑</div>
-
     <script>
-        // Hamburger Menu
-        document.querySelector('.hamburger').addEventListener('click', () => {
-            document.querySelector('.nav-links').classList.toggle('active');
-        });
-
-        // Smooth Scroll
-        document.querySelectorAll('.nav-links a').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
+        // Плавный скролл
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
-                document.querySelector('.nav-links').classList.remove('active');
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
 
-        // Back to Top
-        window.onscroll = function() {
-            document.querySelector('.back-to-top').style.display = window.scrollY > 300 ? 'block' : 'none';
-        };
-
-        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
-        // Diamond Effect
-        const diamondEffect = document.getElementById('diamond-effect');
-        for (let i = 0; i < 15; i++) {
-            const diamond = document.createElement('div');
-            diamond.className = 'diamond';
-            diamond.style.left = Math.random() * 100 + 'vw';
-            diamond.style.animationDuration = Math.random() * 4 + 4 + 's';
-            diamond.style.animationDelay = Math.random() * 4 + 's';
-            diamondEffect.appendChild(diamond);
-        }
-
-        // Dynamic Years
-        const startYear = 2020;
-        const currentYear = new Date().getFullYear();
-        document.getElementById('years').textContent = currentYear - startYear;
+        // Параллакс эффект (легкое движение фона)
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            document.querySelector('.parallax-bg').style.transform = `translateY(${scrolled * 0.2}px)`;
+        });
     </script>
 </body>
-            </html>
+</html>
