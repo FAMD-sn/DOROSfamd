@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mentor Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 28px;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: #6b7280;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+
+        select, textarea {
+            width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 16px;
+            transition: all 0.2s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button:hover { background: var(--primary-hover); }
+        button:active { transform: scale(0.98); }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+
+        #res {
+            margin-top: 24px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 16px;
+            border: 1px solid #edf2f7;
+            text-align: left;
+            display: none;
+            font-size: 15px;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Анимация загрузки */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>AI Решатель 2.0</h1>
+    <p class="subtitle">Универсальный помощник: от школы до университета</p>
+
+    <div class="input-group">
+        <label>Уровень сложности</label>
+        <select id="level">
+            <option value="начальной школы (1-4 класс)">Младшие классы (1-4)</option>
+            <option value="средней школы (5-9 класс)" selected>Средние классы (5-9)</option>
+            <option value="старшей школы (10-11 класс)">Старшие классы (10-11)</option>
+            <option value="студента университета">Студент / ВУЗ</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>Текст задачи</label>
+        <textarea id="task" placeholder="Напиши условие задачи..."></textarea>
+    </div>
+
+    <button id="go" onclick="ask()">
+        <span class="spinner" id="loader"></span>
+        <span id="btnText">РЕШИТЬ ЗАДАЧУ</span>
+    </button>
+
+    <div id="res"></div>
+</div>
+
+<script>
+    async function ask() {
+        const task = document.getElementById('task').value;
+        const level = document.getElementById('level').value;
+        const resDiv = document.getElementById('res');
+        const btn = document.getElementById('go');
+        const loader = document.getElementById('loader');
+        const btnText = document.getElementById('btnText');
+
+        if (!task.trim()) {
+            alert("Пожалуйста, введи текст задачи!");
+            return;
+        }
+
+        // Состояние загрузки
+        btn.disabled = true;
+        loader.style.display = "block";
+        btnText.innerText = "АНАЛИЗИРУЮ...";
+        resDiv.style.display = "none";
+
+        // Формируем умный промпт
+        const prompt = `Ты — профессиональный репетитор. Реши задачу для уровня ${level}. 
+        Дай четкое, пошаговое решение и в конце напиши краткий ответ. 
+        Задача: ${task}`;
+
+        try {
+            const response = await fetch("https://text.pollinations.ai/" + encodeURIComponent(prompt));
+            if (!response.ok) throw new Error();
+            
+            const answer = await response.text();
+            
+            // Красивое отображение результата
+            resDiv.innerText = answer;
+            resDiv.style.display = "block";
+        } catch (e) {
+            alert("Произошла ошибка при подключении к ИИ. Попробуй позже.");
+        } finally {
+            btn.disabled = false;
+            loader.style.display = "none";
+            btnText.innerText = "РЕШИТЬ ЗАДАЧУ";
+        }
+    }
+</script>
+
+</body>
+</html>

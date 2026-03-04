@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Javoni участники</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        :root {
+            --primary-color: #2c5aa0;
+            --primary-dark: #1e3d6f;
+            --secondary-color: #4caf50;
+            --secondary-dark: #3d8b40;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --light-color: #f5f5f5;
+            --dark-color: #333;
+            --gray-color: #757575;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        header h1 i {
+            font-size: 2.8rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .date-display {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 20px 10px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tab:hover {
+            background-color: rgba(44, 90, 160, 0.05);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background-color: rgba(44, 90, 160, 0.1);
+        }
+
+        .tab i {
+            font-size: 1.4rem;
+        }
+
+        .panel {
+            display: none;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .panel.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            font-size: 2rem;
+        }
+
+        /* Панель 1: Добавление ученика */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(44, 90, 160, 0.3);
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #d32f2f;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #f57c00;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .btn-lg {
+            padding: 18px 35px;
+            font-size: 1.3rem;
+        }
+
+        .qr-result {
+            display: none;
+            margin-top: 40px;
+            text-align: center;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            background-color: #f9f9f9;
+            border: 2px dashed #ddd;
+        }
+
+        .qr-result.active {
+            display: block;
+        }
+
+        .qr-code-container {
+            display: inline-block;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        #qrCode {
+            width: 250px;
+            height: 250px;
+        }
+
+        .student-info {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        /* Панель 2: Список учеников */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            border: 2px solid #ddd;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .student-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 20px rgba(44, 90, 160, 0.15);
+        }
+
+        .student-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+
+        .student-class {
+            display: inline-block;
+            background-color: rgba(44, 90, 160, 0.1);
+            color: var(--primary-color);
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .student-id {
+            color: var(--gray-color);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 10px 15px;
+            font-size: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--gray-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .modal-qr-container {
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            margin: 25px 0;
+            display: inline-block;
+        }
+
+        #modalQrCode {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Панель 3: Сканирование и посещаемость */
+        .scan-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .scan-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scan-section {
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            padding: 25px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .attendance-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .attendance-list {
+            margin-top: 25px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .attendance-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .attendance-item:hover {
+            transform: translateX(5px);
+        }
+
+        .attendance-info h4 {
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .attendance-class {
+            display: inline-block;
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--secondary-color);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .attendance-time {
+            color: var(--gray-color);
+            font-weight: 500;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-color);
+            font-size: 1.2rem;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-left: 15px;
+        }
+
+        .status-active {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .status-inactive {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--danger-color);
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 20px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            max-width: 400px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification-success {
+            background-color: var(--secondary-color);
+            color: white;
+            border-left: 6px solid var(--secondary-dark);
+        }
+
+        .notification-warning {
+            background-color: var(--warning-color);
+            color: white;
+            border-left: 6px solid #e68900;
+        }
+
+        .notification-error {
+            background-color: var(--danger-color);
+            color: white;
+            border-left: 6px solid #d32f2f;
+        }
+
+        .notification-icon {
+            font-size: 1.8rem;
+        }
+
+        .notification-content h4 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray-color);
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .panel {
+                padding: 20px;
+            }
+            
+            .tab {
+                min-width: 150px;
+                padding: 15px 5px;
+                font-size: 1rem;
+            }
+            
+            .students-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .attendance-controls {
+                justify-content: center;
+            }
+            
+            .notification {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-user-graduate"></i> Javoni участники</h1>
+            <p>Система учета прибытия учеников по QR-кодам</p>
+            <div class="date-display" id="currentDate"></div>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="add-student">
+                <i class="fas fa-user-plus"></i> Добавить ученика
+            </div>
+            <div class="tab" data-tab="students-list">
+                <i class="fas fa-users"></i> Список учеников
+            </div>
+            <div class="tab" data-tab="scan-attendance">
+                <i class="fas fa-qrcode"></i> Сканирование
+            </div>
+        </div>
+        
+        <!-- Панель 1: Добавление ученика -->
+        <div class="panel active" id="add-student-panel">
+            <h2 class="panel-title"><i class="fas fa-user-plus"></i> Добавление нового ученика</h2>
+            
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="studentName">Имя ученика</label>
+                    <input type="text" id="studentName" class="form-control" placeholder="Введите полное имя ученика">
+                </div>
+                
+                <div class="form-group">
+                    <label for="studentClass">Класс</label>
+                    <input type="text" id="studentClass" class="form-control" placeholder="Например: 9Б">
+                </div>
+                
+                <button id="createQrBtn" class="btn btn-primary btn-lg">
+                    <i class="fas fa-qrcode"></i> Создать QR-код
+                </button>
+                
+                <div class="qr-result" id="qrResult">
+                    <div class="student-info">
+                        Ученик: <span id="qrStudentName"></span>, Класс: <span id="qrStudentClass"></span>
+                    </div>
+                    <div class="qr-code-container">
+                        <div id="qrCode"></div>
+                    </div>
+                    <p>QR-код содержит ID ученика. Распечатайте его для сканирования при входе.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Панель 2: Список учеников -->
+        <div class="panel" id="students-list-panel">
+            <h2 class="panel-title"><i class="fas fa-users"></i> Список всех учеников</h2>
+            
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="searchStudent" class="form-control" placeholder="Поиск по имени...">
+                </div>
+                
+                <div class="filter-group">
+                    <select id="filterClass" class="filter-select">
+                        <option value="">Все классы</option>
+                    </select>
+                    
+                    <button id="refreshStudents" class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i> Обновить
+                    </button>
+                </div>
+            </div>
+            
+            <div id="studentsContainer">
+                <div class="no-data">
+                    <i class="fas fa-users-slash"></i>
+                    <p>Пока нет добавленных учеников. Добавьте первого ученика на вкладке "Добавить ученика".</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Панель 3: Сканирование и посещаемость -->
+        <div class="panel" id="scan-attendance-panel">
+            <h2 class="panel-title"><i class="fas fa-qrcode"></i> Сканирование и посещаемость</h2>
+            
+            <div class="scan-container">
+                <div class="scan-section">
+                    <h3 class="section-title"><i class="fas fa-camera"></i> Сканирование QR-кода</h3>
+                    
+                    <div id="reader"></div>
+                    
+                    <div class="attendance-controls">
+                        <button id="startScanBtn" class="btn btn-success">
+                            <i class="fas fa-play-circle"></i> Начать сканирование
+                        </button>
+                        <button id="stopScanBtn" class="btn btn-danger">
+                            <i class="fas fa-stop-circle"></i> Остановить сканирование
+                        </button>
+                        <button id="endAttendanceBtn" class="btn btn-warning">
+                            <i class="fas fa-ban"></i> Закончить время прибытия
+                        </button>
+                    </div>
+                    
+                    <div class="status-info" style="margin-top: 20px; padding: 15px; background-color: #e8f4fd; border-radius: var(--border-radius);">
+                        <p><strong>Статус:</strong> <span id="scanStatus" class="status-badge status-inactive">Сканирование остановлено</span></p>
+                        <p style="margin-top: 10px; font-size: 0.9rem;">Отсканируйте QR-код ученика, чтобы отметить его прибытие.</p>
+                    </div>
+                </div>
+                
+                <div class="scan-section">
+                    <h3 class="section-title"><i class="fas fa-clipboard-list"></i> Сегодняшняя посещаемость</h3>
+                    
+                    <div class="attendance-controls">
+                        <button id="exportExcelBtn" class="btn btn-success">
+                            <i class="fas fa-file-excel"></i> Скачать Excel
+                        </button>
+                        <button id="clearTodayBtn" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Очистить сегодня
+                        </button>
+                    </div>
+                    
+                    <div id="attendanceList" class="attendance-list">
+                        <div class="no-data">
+                            <i class="fas fa-clipboard"></i>
+                            <p>Сегодня еще никто не отмечен. Начните сканирование QR-кодов.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Модальное окно для просмотра QR-кода -->
+        <div class="modal" id="qrModal">
+            <div class="modal-content">
+                <button class="modal-close" id="closeModal">&times;</button>
+                <h3 class="modal-title">QR-код ученика</h3>
+                <div class="modal-qr-container">
+                    <div id="modalQrCode"></div>
+                </div>
+                <div class="student-info">
+                    Ученик: <span id="modalStudentName"></span>, Класс: <span id="modalStudentClass"></span>
+                </div>
+                <p style="margin-top: 20px; color: var(--gray-color);">Предъявите этот QR-код для сканирования при входе в лицей.</p>
+            </div>
+        </div>
+        
+        <!-- Уведомления -->
+        <div class="notification" id="notification">
+            <div class="notification-icon">
+                <i id="notificationIcon"></i>
+            </div>
+            <div class="notification-content">
+                <h4 id="notificationTitle"></h4>
+                <p id="notificationMessage"></p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Javoni участники &copy; <span id="currentYear"></span> | Система для инновационного лицея</p>
+            <p>Все данные хранятся локально в вашем браузере</p>
+        </footer>
+    </div>
+
+    <!-- Аудио для звукового сигнала -->
+    <audio id="beepSound" preload="auto">
+        <!-- Если файл 1.mp3 находится в той же папке, можно использовать относительный путь -->
+        <source src="1.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио элемент.
+    </audio>
+
+    <!-- QR-код библиотека -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        // Глобальные переменные
+        let db;
+        let html5QrCode;
+        let isScanning = false;
+        let attendanceActive = true;
+        const DB_NAME = "JavoniDB";
+        const DB_VERSION = 1;
+        
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+        
+        // Основная функция инициализации
+        function initApp() {
+            // Установка текущей даты
+            const now = new Date();
+            document.getElementById('currentDate').textContent = formatDate(now);
+            document.getElementById('currentYear').textContent = now.getFullYear();
+            
+            // Инициализация IndexedDB
+            initDatabase();
+            
+            // Настройка навигации по вкладкам
+            setupTabs();
+            
+            // Настройка обработчиков событий
+            setupEventListeners();
+            
+            // Инициализация сканера QR-кодов
+            html5QrCode = new Html5Qrcode("reader");
+            
+            // Загрузка данных
+            setTimeout(() => {
+                loadStudents();
+                loadAttendance();
+                loadClassFilter();
+            }, 500);
+            
+            // Проверка наличия аудио файла
+            checkAudioFile();
+        }
+        
+        // Инициализация IndexedDB
+        function initDatabase() {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            
+            request.onerror = function(event) {
+                console.error("Ошибка IndexedDB:", event.target.error);
+                showNotification("Ошибка", "Не удалось открыть базу данных. Проверьте настройки браузера.", "error");
+            };
+            
+            request.onsuccess = function(event) {
+                db = event.target.result;
+                console.log("База данных успешно открыта");
+            };
+            
+            request.onupgradeneeded = function(event) {
+                const db = event.target.result;
+                
+                // Создание хранилища для учеников
+                if (!db.objectStoreNames.contains('students')) {
+                    const studentStore = db.createObjectStore('students', { keyPath: 'id' });
+                    studentStore.createIndex('class', 'class', { unique: false });
+                    studentStore.createIndex('name', 'name', { unique: false });
+                }
+                
+                // Создание хранилища для посещаемости
+                if (!db.objectStoreNames.contains('attendance_today')) {
+                    const attendanceStore = db.createObjectStore('attendance_today', { keyPath: 'id' });
+                    attendanceStore.createIndex('studentId', 'studentId', { unique: true });
+                    attendanceStore.createIndex('class', 'class', { unique: false });
+                    attendanceStore.createIndex('time', 'time', { unique: false });
+                }
+                
+                console.log("Структура базы данных создана");
+            };
+        }
+        
+        // Настройка навигации по вкладкам
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const panels = document.querySelectorAll('.panel');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Обновление активной вкладки
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Обновление активной панели
+                    panels.forEach(panel => panel.classList.remove('active'));
+                    document.getElementById(`${tabId}-panel`).classList.add('active');
+                    
+                    // Остановка сканирования при переключении с панели сканирования
+                    if (tabId !== 'scan-attendance' && isScanning) {
+                        stopScanner();
+                    }
+                    
+                    // Обновление данных при переключении на определенные вкладки
+                    if (tabId === 'students-list') {
+                        loadStudents();
+                    } else if (tabId === 'scan-attendance') {
+                        loadAttendance();
+                    }
+                });
+            });
+        }
+        
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Кнопка создания QR-кода
+            document.getElementById('createQrBtn').addEventListener('click', createStudent);
+            
+            // Поле ввода имени ученика (создание по Enter)
+            document.getElementById('studentName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    createStudent();
+                }
+            });
+            
+            // Поле ввода класса (создание по Enter)
+            document.getElementById('studentClass').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    createStudent();
+                }
+            });
+            
+            // Поиск учеников
+            document.getElementById('searchStudent').addEventListener('input', loadStudents);
+            
+            // Фильтр по классу
+            document.getElementById('filterClass').addEventListener('change', loadStudents);
+            
+            // Кнопка обновления списка учеников
+            document.getElementById('refreshStudents').addEventListener('click', loadStudents);
+            
+            // Кнопки сканирования
+            document.getElementById('startScanBtn').addEventListener('click', startScanner);
+            document.getElementById('stopScanBtn').addEventListener('click', stopScanner);
+            document.getElementById('endAttendanceBtn').addEventListener('click', endAttendance);
+            
+            // Кнопки управления посещаемостью
+            document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+            document.getElementById('clearTodayBtn').addEventListener('click', clearTodayAttendance);
+            
+            // Модальное окно
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            
+            // Закрытие модального окна при клике вне его
+            document.getElementById('qrModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+            
+            // Обновление данных при видимости вкладки
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    if (document.getElementById('students-list-panel').classList.contains('active')) {
+                        loadStudents();
+                    } else if (document.getElementById('scan-attendance-panel').classList.contains('active')) {
+                        loadAttendance();
+                    }
+                }
+            });
+        }
+        
+        // Создание нового ученика
+        function createStudent() {
+            const name = document.getElementById('studentName').value.trim();
+            const className = document.getElementById('studentClass').value.trim();
+            
+            if (!name || !className) {
+                showNotification("Внимание", "Пожалуйста, заполните все поля", "warning");
+                return;
+            }
+            
+            // Генерация уникального ID
+            const id = 'STU-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            
+            const student = {
+                id: id,
+                name: name,
+                class: className
+            };
+            
+            // Сохранение в IndexedDB
+            const transaction = db.transaction(['students'], 'readwrite');
+            const store = transaction.objectStore('students');
+            const request = store.add(student);
+            
+            request.onsuccess = function() {
+                // Очистка формы
+                document.getElementById('studentName').value = '';
+                document.getElementById('studentClass').value = '';
+                
+                // Отображение QR-кода
+                showQrCode(student);
+                
+                // Обновление списка классов в фильтре
+                loadClassFilter();
+                
+                showNotification("Успешно", "Ученик успешно добавлен", "success");
+            };
+            
+            request.onerror = function() {
+                showNotification("Ошибка", "Не удалось добавить ученика", "error");
+            };
+        }
+        
+        // Отображение QR-кода для ученика
+        function showQrCode(student) {
+            const qrResult = document.getElementById('qrResult');
+            const qrStudentName = document.getElementById('qrStudentName');
+            const qrStudentClass = document.getElementById('qrStudentClass');
+            const qrCodeDiv = document.getElementById('qrCode');
+            
+            // Установка информации об ученике
+            qrStudentName.textContent = student.name;
+            qrStudentClass.textContent = student.class;
+            
+            // Очистка предыдущего QR-кода
+            qrCodeDiv.innerHTML = '';
+            
+            // Генерация нового QR-кода (только ID ученика)
+            new QRCode(qrCodeDiv, {
+                text: student.id,
+                width: 250,
+                height: 250,
+                colorDark: "#2c5aa0",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            // Показать результат
+            qrResult.classList.add('active');
+        }
+        
+        // Загрузка списка учеников
+        function loadStudents() {
+            const searchTerm = document.getElementById('searchStudent').value.toLowerCase().trim();
+            const filterClass = document.getElementById('filterClass').value;
+            
+            const transaction = db.transaction(['students'], 'readonly');
+            const store = transaction.objectStore('students');
+            const request = store.getAll();
+            
+            request.onsuccess = function() {
+                const students = request.result;
+                const container = document.getElementById('studentsContainer');
+                
+                if (students.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-users-slash"></i>
+                            <p>Пока нет добавленных учеников. Добавьте первого ученика на вкладке "Добавить ученика".</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Фильтрация студентов
+                let filteredStudents = students;
+                
+                if (searchTerm) {
+                    filteredStudents = filteredStudents.filter(student => 
+                        student.name.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                if (filterClass) {
+                    filteredStudents = filteredStudents.filter(student => 
+                        student.class === filterClass
+                    );
+                }
+                
+                if (filteredStudents.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-search"></i>
+                            <p>Ученики по вашему запросу не найдены.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Отображение отфильтрованных студентов
+                let html = '<div class="students-grid">';
+                
+                filteredStudents.forEach(student => {
+                    html += `
+                        <div class="student-card" data-id="${student.id}">
+                            <h3 class="student-name">${student.name}</h3>
+                            <div class="student-class">${student.class}</div>
+                            <div class="student-id">ID: ${student.id}</div>
+                            <div class="student-actions">
+                                <button class="btn btn-primary btn-sm view-qr-btn" data-id="${student.id}">
+                                    <i class="fas fa-qrcode"></i> Показать QR
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                container.innerHTML = html;
+                
+                // Добавление обработчиков для кнопок просмотра QR-кода
+                document.querySelectorAll('.view-qr-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const studentId = this.getAttribute('data-id');
+                        showStudentQrModal(studentId);
+                    });
+                });
+                
+                // Добавление обработчиков для карточек учеников
+                document.querySelectorAll('.student-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        const studentId = this.getAttribute('data-id');
+                        showStudentQrModal(studentId);
+                    });
+                });
+            };
+        }
+        
+        // Загрузка фильтра классов
+        function loadClassFilter() {
+            const transaction = db.transaction(['students'], 'readonly');
+            const store = transaction.objectStore('students');
+            const classIndex = store.index('class');
+            const request = classIndex.getAll();
+            
+            request.onsuccess = function() {
+                const students = request.result;
+                const classes = [...new Set(students.map(student => student.class))].sort();
+                
+                const filterSelect = document.getElementById('filterClass');
+                const currentValue = filterSelect.value;
+                
+                // Очистка опций кроме первой
+                while (filterSelect.options.length > 1) {
+                    filterSelect.remove(1);
+                }
+                
+                // Добавление классов
+                classes.forEach(className => {
+                    const option = document.createElement('option');
+                    option.value = className;
+                    option.textContent = className;
+                    filterSelect.appendChild(option);
+                });
+                
+                // Восстановление выбранного значения
+                if (currentValue) {
+                    filterSelect.value = currentValue;
+                }
+            };
+        }
+        
+        // Показать QR-код ученика в модальном окне
+        function showStudentQrModal(studentId) {
+            const transaction = db.transaction(['students'], 'readonly');
+            const store = transaction.objectStore('students');
+            const request = store.get(studentId);
+            
+            request.onsuccess = function() {
+                const student = request.result;
+                
+                if (!student) {
+                    showNotification("Ошибка", "Ученик не найден", "error");
+                    return;
+                }
+                
+                // Заполнение информации в модальном окне
+                document.getElementById('modalStudentName').textContent = student.name;
+                document.getElementById('modalStudentClass').textContent = student.class;
+                
+                // Очистка и генерация QR-кода
+                const modalQrCodeDiv = document.getElementById('modalQrCode');
+                modalQrCodeDiv.innerHTML = '';
+                
+                new QRCode(modalQrCodeDiv, {
+                    text: student.id,
+                    width: 300,
+                    height: 300,
+                    colorDark: "#2c5aa0",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                // Показать модальное окно
+                document.getElementById('qrModal').classList.add('active');
+            };
+        }
+        
+        // Закрытие модального окна
+        function closeModal() {
+            document.getElementById('qrModal').classList.remove('active');
+        }
+        
+        // Запуск сканирования QR-кодов
+        function startScanner() {
+            if (isScanning) return;
+            
+            if (!attendanceActive) {
+                showNotification("Внимание", "Время прибытия завершено. Новые отметки не принимаются.", "warning");
+                return;
+            }
+            
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanError
+            ).then(() => {
+                isScanning = true;
+                updateScanStatus(true);
+                showNotification("Сканирование", "Сканирование QR-кодов запущено", "success");
+            }).catch(err => {
+                showNotification("Ошибка", "Не удалось запустить камеру: " + err, "error");
+            });
+        }
+        
+        // Остановка сканирования
+        function stopScanner() {
+            if (!isScanning) return;
+            
+            html5QrCode.stop().then(() => {
+                isScanning = false;
+                updateScanStatus(false);
+                showNotification("Сканирование", "Сканирование остановлено", "warning");
+            }).catch(err => {
+                console.error("Ошибка при остановке сканирования:", err);
+            });
+        }
+        
+        // Обработка успешного сканирования
+        function onScanSuccess(decodedText, decodedResult) {
+            // Проверка активности времени прибытия
+            if (!attendanceActive) {
+                showNotification("Внимание", "Время прибытия завершено", "warning");
+                return;
+            }
+            
+            // Поиск ученика по ID
+            const transaction = db.transaction(['students', 'attendance_today'], 'readonly');
+            const studentStore = transaction.objectStore('students');
+            const attendanceStore = transaction.objectStore('attendance_today');
+            
+            const getStudentRequest = studentStore.get(decodedText);
+            
+            getStudentRequest.onsuccess = function() {
+                const student = getStudentRequest.result;
+                
+                if (!student) {
+                    showNotification("Ошибка", "Ученик с таким ID не найден", "error");
+                    return;
+                }
+                
+                // Проверка, не отмечен ли ученик сегодня
+                const attendanceIndex = attendanceStore.index('studentId');
+                const checkAttendanceRequest = attendanceIndex.get(student.id);
+                
+                checkAttendanceRequest.onsuccess = function() {
+                    const existingAttendance = checkAttendanceRequest.result;
+                    
+                    if (existingAttendance) {
+                        showNotification("Повтор", `${student.name} уже отмечен сегодня в ${formatTime(existingAttendance.time)}`, "warning");
+                        return;
+                    }
+                    
+                    // Добавление отметки о посещаемости
+                    addAttendance(student);
+                };
+            };
+            
+            // Воспроизведение звукового сигнала
+            playBeepSound();
+        }
+        
+        // Обработка ошибок сканирования
+        function onScanError(error) {
+            // Игнорируем некоторые частые ошибки сканирования
+            if (!error.includes("NotFoundException") && !error.includes("NotAllowedError")) {
+                console.warn("Ошибка сканирования QR-кода:", error);
+            }
+        }
+        
+        // Добавление отметки о посещаемости
+        function addAttendance(student) {
+            const attendanceTime = new Date();
+            const attendanceId = 'ATT-' + Date.now();
+            
+            const attendanceRecord = {
+                id: attendanceId,
+                studentId: student.id,
+                name: student.name,
+                class: student.class,
+                time: attendanceTime.getTime()
+            };
+            
+            const transaction = db.transaction(['attendance_today'], 'readwrite');
+            const store = transaction.objectStore('attendance_today');
+            const request = store.add(attendanceRecord);
+            
+            request.onsuccess = function() {
+                showNotification("Успех", `${student.name} отмечен как прибывший`, "success");
+                loadAttendance();
+            };
+            
+            request.onerror = function() {
+                showNotification("Ошибка", "Не удалось сохранить отметку о посещаемости", "error");
+            };
+        }
+        
+        // Загрузка сегодняшней посещаемости
+        function loadAttendance() {
+            const transaction = db.transaction(['attendance_today'], 'readonly');
+            const store = transaction.objectStore('attendance_today');
+            const timeIndex = store.index('time');
+            const request = timeIndex.getAll();
+            
+            request.onsuccess = function() {
+                const attendanceRecords = request.result;
+                const container = document.getElementById('attendanceList');
+                
+                if (attendanceRecords.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-clipboard"></i>
+                            <p>Сегодня еще никто не отмечен. Начните сканирование QR-кодов.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Сортировка по времени (сначала последние)
+                attendanceRecords.sort((a, b) => b.time - a.time);
+                
+                // Группировка по классам
+                const classes = {};
+                attendanceRecords.forEach(record => {
+                    if (!classes[record.class]) {
+                        classes[record.class] = [];
+                    }
+                    classes[record.class].push(record);
+                });
+                
+                // Отображение посещаемости
+                let html = '';
+                
+                Object.keys(classes).sort().forEach(className => {
+                    html += `<h3 style="margin: 20px 0 10px 0; color: var(--primary-color);">Класс: ${className}</h3>`;
+                    
+                    classes[className].forEach(record => {
+                        html += `
+                            <div class="attendance-item">
+                                <div class="attendance-info">
+                                    <h4>${record.name}</h4>
+                                    <div class="attendance-class">${record.class}</div>
+                                </div>
+                                <div class="attendance-time">${formatTime(record.time)}</div>
+                            </div>
+                        `;
+                    });
+                });
+                
+                container.innerHTML = html;
+            };
+        }
+        
+        // Завершение времени прибытия
+        function endAttendance() {
+            if (!confirm("Вы уверены, что хотите завершить время прибытия? После этого новые отметки приниматься не будут.")) {
+                return;
+            }
+            
+            attendanceActive = false;
+            document.getElementById('scanStatus').textContent = "Время прибытия завершено";
+            document.getElementById('scanStatus').className = "status-badge status-inactive";
+            
+            // Остановка сканирования, если оно активно
+            if (isScanning) {
+                stopScanner();
+            }
+            
+            showNotification("Завершено", "Время прибытия завершено. Новые отметки не принимаются.", "warning");
+        }
+        
+        // Экспорт данных в Excel
+        function exportToExcel() {
+            const transaction = db.transaction(['attendance_today'], 'readonly');
+            const store = transaction.objectStore('attendance_today');
+            const request = store.getAll();
+            
+            request.onsuccess = function() {
+                const attendanceRecords = request.result;
+                
+                if (attendanceRecords.length === 0) {
+                    showNotification("Внимание", "Нет данных для экспорта", "warning");
+                    return;
+                }
+                
+                // Сортировка по классам и времени
+                attendanceRecords.sort((a, b) => {
+                    if (a.class === b.class) {
+                        return a.name.localeCompare(b.name);
+                    }
+                    return a.class.localeCompare(b.class);
+                });
+                
+                // Группировка по классам
+                const classes = {};
+                attendanceRecords.forEach(record => {
+                    if (!classes[record.class]) {
+                        classes[record.class] = [];
+                    }
+                    classes[record.class].push(record);
+                });
+                
+                // Создание книги Excel
+                const wb = XLSX.utils.book_new();
+                
+                // Создание листа для каждого класса
+                Object.keys(classes).sort().forEach(className => {
+                    const classData = classes[className];
+                    
+                    // Подготовка данных для листа
+                    const sheetData = [
+                        ["Имя ученика", "Класс", "Время прихода"],
+                        ...classData.map(record => [
+                            record.name,
+                            record.class,
+                            formatDateTime(record.time)
+                        ])
+                    ];
+                    
+                    // Создание листа
+                    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+                    
+                    // Настройка ширины столбцов
+                    const colWidths = [
+                        { wch: 30 }, // Имя ученика
+                        { wch: 10 }, // Класс
+                        { wch: 20 }  // Время прихода
+                    ];
+                    ws['!cols'] = colWidths;
+                    
+                    // Добавление листа в книгу
+                    XLSX.utils.book_append_sheet(wb, ws, className);
+                });
+                
+                // Генерация имени файла с текущей датой
+                const today = new Date();
+                const fileName = `Javoni_${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}.xlsx`;
+                
+                // Сохранение файла
+                XLSX.writeFile(wb, fileName);
+                
+                showNotification("Экспорт", `Файл ${fileName} успешно скачан`, "success");
+            };
+        }
+        
+        // Очистка сегодняшней посещаемости
+        function clearTodayAttendance() {
+            if (!confirm("Вы уверены, что хотите очистить сегодняшние данные о посещаемости? Это действие нельзя отменить.")) {
+                return;
+            }
+            
+            const transaction = db.transaction(['attendance_today'], 'readwrite');
+            const store = transaction.objectStore('attendance_today');
+            const request = store.clear();
+            
+            request.onsuccess = function() {
+                loadAttendance();
+                attendanceActive = true;
+                updateScanStatus(isScanning);
+                showNotification("Очистка", "Сегодняшние данные о посещаемости очищены", "success");
+            };
+            
+            request.onerror = function() {
+                showNotification("Ошибка", "Не удалось очистить данные о посещаемости", "error");
+            };
+        }
+        
+        // Обновление статуса сканирования
+        function updateScanStatus(scanning) {
+            const statusElement = document.getElementById('scanStatus');
+            
+            if (!attendanceActive) {
+                statusElement.textContent = "Время прибытия завершено";
+                statusElement.className = "status-badge status-inactive";
+                return;
+            }
+            
+            if (scanning) {
+                statusElement.textContent = "Сканирование активно";
+                statusElement.className = "status-badge status-active";
+            } else {
+                statusElement.textContent = "Сканирование остановлено";
+                statusElement.className = "status-badge status-inactive";
+            }
+        }
+        
+        // Воспроизведение звукового сигнала
+        function playBeepSound() {
+            const audio = document.getElementById('beepSound');
+            
+            // Сброс аудио на начало
+            audio.currentTime = 0;
+            
+            // Попытка воспроизведения
+            audio.play().catch(error => {
+                console.warn("Не удалось воспроизвести звук:", error);
+                // Альтернатива: использование Web Audio API для генерации звука
+                generateBeepSound();
+            });
+        }
+        
+        // Генерация звукового сигнала с помощью Web Audio API
+        function generateBeepSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (error) {
+                console.warn("Web Audio API не поддерживается:", error);
+            }
+        }
+        
+        // Проверка наличия аудио файла
+        function checkAudioFile() {
+            const audio = document.getElementById('beepSound');
+            audio.addEventListener('error', function() {
+                console.warn("Аудио файл не найден. Будет использована генерация звука через Web Audio API.");
+            });
+        }
+        
+        // Показать уведомление
+        function showNotification(title, message, type) {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const notificationTitle = document.getElementById('notificationTitle');
+            const notificationMessage = document.getElementById('notificationMessage');
+            
+            // Установка типа уведомления
+            notification.className = `notification ${type === 'success' ? 'notification-success' : 
+                                   type === 'warning' ? 'notification-warning' : 'notification-error'}`;
+            
+            // Установка иконки
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle';
+            } else if (type === 'warning') {
+                icon.className = 'fas fa-exclamation-triangle';
+            } else {
+                icon.className = 'fas fa-exclamation-circle';
+            }
+            
+            // Установка текста
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // Показать уведомление
+            notification.classList.add('show');
+            
+            // Автоматическое скрытие через 5 секунд
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Форматирование даты
+        function formatDate(date) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('ru-RU', options);
+        }
+        
+        // Форматирование времени
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Форматирование даты и времени
+        function formatDateTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString('ru-RU');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Змейка - Игра с настройками</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .game-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        #game-board {
+            border: 3px solid #2c3e50;
+            border-radius: 5px;
+            background-color: #1a1a2e;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-info {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .info-box {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .controls-section {
+            width: 300px;
+            padding: 20px;
+            background-color: #34495e;
+            color: white;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .section-title {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            color: #ecf0f1;
+        }
+        
+        .settings-group {
+            margin-bottom: 20px;
+        }
+        
+        .setting-item {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        select, input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: none;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .mobile-controls {
+            display: none;
+            margin-top: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 200px;
+        }
+        
+        .mobile-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .mobile-btn:active {
+            background-color: #2980b9;
+        }
+        
+        .up { grid-column: 2; grid-row: 1; }
+        .left { grid-column: 1; grid-row: 2; }
+        .right { grid-column: 3; grid-row: 2; }
+        .down { grid-column: 2; grid-row: 3; }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .controls-section {
+                width: 100%;
+                max-height: none;
+            }
+            
+            .mobile-controls {
+                display: grid;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            #game-board {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-section">
+            <h1 class="game-title">Змейка</h1>
+            <canvas id="game-board" width="500" height="500"></canvas>
+            
+            <div class="game-info">
+                <div class="info-box">
+                    <div>Счет:</div>
+                    <div id="score">0</div>
+                </div>
+                <div class="info-box">
+                    <div>Уровень:</div>
+                    <div id="level">1</div>
+                </div>
+                <div class="info-box">
+                    <div>Скорость:</div>
+                    <div id="speed">1</div>
+                </div>
+            </div>
+            
+            <div class="mobile-controls">
+                <button class="mobile-btn up">↑</button>
+                <button class="mobile-btn left">←</button>
+                <button class="mobile-btn right">→</button>
+                <button class="mobile-btn down">↓</button>
+            </div>
+        </div>
+        
+        <div class="controls-section">
+            <h2 class="section-title">Управление игрой</h2>
+            <div class="settings-group">
+                <button id="start-btn" class="btn btn-success">Начать игру</button>
+                <button id="pause-btn" class="btn btn-primary">Пауза</button>
+                <button id="reset-btn" class="btn btn-danger">Сброс</button>
+            </div>
+            
+            <h2 class="section-title">Настройки игры</h2>
+            <div class="settings-group">
+                <div class="setting-item">
+                    <label for="game-mode">Режим игры:</label>
+                    <select id="game-mode">
+                        <option value="classic">Классический</option>
+                        <option value="walls">Стены (проигрыш при столкновении)</option>
+                        <option value="portal">Порталы</option>
+                        <option value="accelerated">Ускорение со временем</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="difficulty">Сложность:</label>
+                    <select id="difficulty">
+                        <option value="easy">Легкая</option>
+                        <option value="medium" selected>Средняя</option>
+                        <option value="hard">Сложная</option>
+                        <option value="expert">Эксперт</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="grid-size">Размер сетки:</label>
+                    <select id="grid-size">
+                        <option value="20">20x20 (Маленькая)</option>
+                        <option value="25" selected>25x25 (Средняя)</option>
+                        <option value="30">30x30 (Большая)</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="initial-speed">Начальная скорость:</label>
+                    <input type="range" id="initial-speed" min="1" max="10" value="5">
+                    <div id="speed-value">Средняя</div>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="snake-color">Цвет змейки:</label>
+                    <select id="snake-color">
+                        <option value="#2ecc71">Зеленый</option>
+                        <option value="#3498db">Синий</option>
+                        <option value="#e74c3c">Красный</option>
+                        <option value="#f39c12">Оранжевый</option>
+                        <option value="#9b59b6">Фиолетовый</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="food-color">Цвет еды:</label>
+                    <select id="food-color">
+                        <option value="#e74c3c">Красный</option>
+                        <option value="#f1c40f">Желтый</option>
+                        <option value="#1abc9c">Бирюзовый</option>
+                        <option value="#e67e22">Морковный</option>
+                        <option value="#9b59b6">Фиолетовый</option>
+                    </select>
+                </div>
+            </div>
+            
+            <h2 class="section-title">Управление</h2>
+            <div class="settings-group">
+                <p>Используйте стрелки на клавиатуре для управления змейкой.</p>
+                <p>На мобильных устройствах используйте кнопки управления.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Получаем элементы DOM
+        const canvas = document.getElementById('game-board');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const speedElement = document.getElementById('speed');
+        
+        // Элементы управления
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        // Настройки
+        const gameModeSelect = document.getElementById('game-mode');
+        const difficultySelect = document.getElementById('difficulty');
+        const gridSizeSelect = document.getElementById('grid-size');
+        const initialSpeedSlider = document.getElementById('initial-speed');
+        const speedValue = document.getElementById('speed-value');
+        const snakeColorSelect = document.getElementById('snake-color');
+        const foodColorSelect = document.getElementById('food-color');
+        
+        // Мобильные кнопки управления
+        const upBtn = document.querySelector('.mobile-btn.up');
+        const leftBtn = document.querySelector('.mobile-btn.left');
+        const rightBtn = document.querySelector('.mobile-btn.right');
+        const downBtn = document.querySelector('.mobile-btn.down');
+        
+        // Переменные игры
+        let gridSize = 25;
+        let cellSize = canvas.width / gridSize;
+        let snake = [];
+        let food = {};
+        let direction = 'right';
+        let nextDirection = 'right';
+        let gameSpeed = 100;
+        let score = 0;
+        let level = 1;
+        let gameRunning = false;
+        let gamePaused = false;
+        let gameLoop;
+        
+        // Цвета
+        let snakeColor = '#2ecc71';
+        let foodColor = '#e74c3c';
+        let backgroundColor = '#1a1a2e';
+        let gridColor = '#16213e';
+        
+        // Инициализация игры
+        function initGame() {
+            // Сброс переменных
+            score = 0;
+            level = 1;
+            direction = 'right';
+            nextDirection = 'right';
+            
+            // Установка скорости в зависимости от сложности
+            updateGameSpeed();
+            
+            // Создание змейки
+            snake = [
+                {x: 5, y: Math.floor(gridSize / 2)},
+                {x: 4, y: Math.floor(gridSize / 2)},
+                {x: 3, y: Math.floor(gridSize / 2)}
+            ];
+            
+            // Создание еды
+            generateFood();
+            
+            // Обновление интерфейса
+            updateUI();
+            
+            // Отрисовка игрового поля
+            drawGame();
+        }
+        
+        // Генерация еды
+        function generateFood() {
+            let foodOnSnake;
+            
+            do {
+                foodOnSnake = false;
+                food = {
+                    x: Math.floor(Math.random() * gridSize),
+                    y: Math.floor(Math.random() * gridSize)
+                };
+                
+                // Проверяем, не находится ли еда на змейке
+                for (let segment of snake) {
+                    if (segment.x === food.x && segment.y === food.y) {
+                        foodOnSnake = true;
+                        break;
+                    }
+                }
+            } while (foodOnSnake);
+        }
+        
+        // Обновление скорости игры
+        function updateGameSpeed() {
+            const difficulty = difficultySelect.value;
+            const initialSpeed = parseInt(initialSpeedSlider.value);
+            
+            // Базовые скорости для разных уровней сложности
+            const baseSpeeds = {
+                easy: 150,
+                medium: 120,
+                hard: 90,
+                expert: 70
+            };
+            
+            // Корректировка скорости в зависимости от начальной настройки
+            const speedAdjustment = (10 - initialSpeed) * 5;
+            
+            gameSpeed = baseSpeeds[difficulty] - speedAdjustment;
+            
+            // Обновление отображения скорости
+            speedElement.textContent = level;
+            speedValue.textContent = 
+                initialSpeed <= 3 ? 'Медленная' : 
+                initialSpeed <= 7 ? 'Средняя' : 'Быстрая';
+        }
+        
+        // Обновление интерфейса
+        function updateUI() {
+            scoreElement.textContent = score;
+            levelElement.textContent = level;
+            speedElement.textContent = level;
+        }
+        
+        // Отрисовка игры
+        function drawGame() {
+            // Очистка холста
+            ctx.fillStyle = backgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Отрисовка сетки
+            drawGrid();
+            
+            // Отрисовка змейки
+            drawSnake();
+            
+            // Отрисовка еды
+            drawFood();
+        }
+        
+        // Отрисовка сетки
+        function drawGrid() {
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 0.5;
+            
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    ctx.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+            }
+        }
+        
+        // Отрисовка змейки
+        function drawSnake() {
+            // Отрисовка тела змейки
+            for (let i = 0; i < snake.length; i++) {
+                // Градиентный цвет для змейки
+                const colorIntensity = 1 - (i / snake.length) * 0.5;
+                const r = parseInt(snakeColor.slice(1, 3), 16) * colorIntensity;
+                const g = parseInt(snakeColor.slice(3, 5), 16) * colorIntensity;
+                const b = parseInt(snakeColor.slice(5, 7), 16) * colorIntensity;
+                
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                ctx.fillRect(snake[i].x * cellSize, snake[i].y * cellSize, cellSize, cellSize);
+                
+                // Обводка для сегментов
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(snake[i].x * cellSize, snake[i].y * cellSize, cellSize, cellSize);
+            }
+            
+            // Отрисовка головы змейки
+            const head = snake[0];
+            ctx.fillStyle = snakeColor;
+            ctx.fillRect(head.x * cellSize, head.y * cellSize, cellSize, cellSize);
+            
+            // Глаза змейки
+            ctx.fillStyle = '#fff';
+            const eyeSize = cellSize / 5;
+            const offset = cellSize / 3;
+            
+            // Определяем положение глаз в зависимости от направления
+            if (direction === 'right') {
+                ctx.fillRect(head.x * cellSize + cellSize - offset, head.y * cellSize + offset, eyeSize, eyeSize);
+                ctx.fillRect(head.x * cellSize + cellSize - offset, head.y * cellSize + cellSize - offset - eyeSize, eyeSize, eyeSize);
+            } else if (direction === 'left') {
+                ctx.fillRect(head.x * cellSize + offset - eyeSize, head.y * cellSize + offset, eyeSize, eyeSize);
+                ctx.fillRect(head.x * cellSize + offset - eyeSize, head.y * cellSize + cellSize - offset - eyeSize, eyeSize, eyeSize);
+            } else if (direction === 'up') {
+                ctx.fillRect(head.x * cellSize + offset, head.y * cellSize + offset - eyeSize, eyeSize, eyeSize);
+                ctx.fillRect(head.x * cellSize + cellSize - offset - eyeSize, head.y * cellSize + offset - eyeSize, eyeSize, eyeSize);
+            } else if (direction === 'down') {
+                ctx.fillRect(head.x * cellSize + offset, head.y * cellSize + cellSize - offset, eyeSize, eyeSize);
+                ctx.fillRect(head.x * cellSize + cellSize - offset - eyeSize, head.y * cellSize + cellSize - offset, eyeSize, eyeSize);
+            }
+        }
+        
+        // Отрисовка еды
+        function drawFood() {
+            ctx.fillStyle = foodColor;
+            ctx.beginPath();
+            const centerX = food.x * cellSize + cellSize / 2;
+            const centerY = food.y * cellSize + cellSize / 2;
+            const radius = cellSize / 2 - 2;
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Блики на еде
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(centerX - radius/3, centerY - radius/3, radius/4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Обновление игрового состояния
+        function updateGame() {
+            if (gamePaused || !gameRunning) return;
+            
+            // Обновляем направление
+            direction = nextDirection;
+            
+            // Создаем новую голову
+            const head = {...snake[0]};
+            
+            // Перемещаем голову в зависимости от направления
+            switch(direction) {
+                case 'up':
+                    head.y -= 1;
+                    break;
+                case 'down':
+                    head.y += 1;
+                    break;
+                case 'left':
+                    head.x -= 1;
+                    break;
+                case 'right':
+                    head.x += 1;
+                    break;
+            }
+            
+            // Проверяем столкновение со стенами в зависимости от режима
+            const gameMode = gameModeSelect.value;
+            if (gameMode === 'walls' || gameMode === 'accelerated') {
+                if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
+                    gameOver();
+                    return;
+                }
+            } else {
+                // Режим с прохождением через стены
+                if (head.x < 0) head.x = gridSize - 1;
+                if (head.x >= gridSize) head.x = 0;
+                if (head.y < 0) head.y = gridSize - 1;
+                if (head.y >= gridSize) head.y = 0;
+            }
+            
+            // Проверяем столкновение с собой
+            for (let i = 0; i < snake.length; i++) {
+                if (snake[i].x === head.x && snake[i].y === head.y) {
+                    gameOver();
+                    return;
+                }
+            }
+            
+            // Добавляем новую голову
+            snake.unshift(head);
+            
+            // Проверяем, съела ли змейка еду
+            if (head.x === food.x && head.y === food.y) {
+                // Увеличиваем счет
+                score += 10;
+                
+                // Проверяем повышение уровня
+                if (score % 50 === 0) {
+                    level++;
+                    // Увеличиваем скорость с каждым уровнем
+                    if (gameMode === 'accelerated') {
+                        gameSpeed = Math.max(50, gameSpeed - 10);
+                    }
+                }
+                
+                // Генерируем новую еду
+                generateFood();
+            } else {
+                // Удаляем хвост, если еда не съедена
+                snake.pop();
+            }
+            
+            // Обновляем интерфейс
+            updateUI();
+            
+            // Отрисовываем игру
+            drawGame();
+        }
+        
+        // Конец игры
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            
+            // Отображение сообщения о конце игры
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Игра окончена!', canvas.width / 2, canvas.height / 2 - 30);
+            
+            ctx.font = '20px Arial';
+            ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2 + 10);
+            
+            ctx.font = '16px Arial';
+            ctx.fillText('Нажмите "Начать игру" для повторной игры', canvas.width / 2, canvas.height / 2 + 40);
+        }
+        
+        // Обработка нажатий клавиш
+        function handleKeyDown(e) {
+            if (!gameRunning || gamePaused) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (direction !== 'down') nextDirection = 'up';
+                    break;
+                case 'ArrowDown':
+                    if (direction !== 'up') nextDirection = 'down';
+                    break;
+                case 'ArrowLeft':
+                    if (direction !== 'right') nextDirection = 'left';
+                    break;
+                case 'ArrowRight':
+                    if (direction !== 'left') nextDirection = 'right';
+                    break;
+            }
+        }
+        
+        // Обработчики событий для кнопок
+        startBtn.addEventListener('click', () => {
+            if (!gameRunning) {
+                initGame();
+                gameRunning = true;
+                gamePaused = false;
+                gameLoop = setInterval(updateGame, gameSpeed);
+            } else if (gamePaused) {
+                gamePaused = false;
+            }
+        });
+        
+        pauseBtn.addEventListener('click', () => {
+            if (gameRunning) {
+                gamePaused = !gamePaused;
+                pauseBtn.textContent = gamePaused ? 'Продолжить' : 'Пауза';
+            }
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            gameRunning = false;
+            gamePaused = false;
+            clearInterval(gameLoop);
+            initGame();
+            pauseBtn.textContent = 'Пауза';
+        });
+        
+        // Обработчики для мобильных кнопок управления
+        upBtn.addEventListener('click', () => {
+            if (direction !== 'down') nextDirection = 'up';
+        });
+        
+        downBtn.addEventListener('click', () => {
+            if (direction !== 'up') nextDirection = 'down';
+        });
+        
+        leftBtn.addEventListener('click', () => {
+            if (direction !== 'right') nextDirection = 'left';
+        });
+        
+        rightBtn.addEventListener('click', () => {
+            if (direction !== 'left') nextDirection = 'right';
+        });
+        
+        // Обработчики для настроек
+        gridSizeSelect.addEventListener('change', () => {
+            gridSize = parseInt(gridSizeSelect.value);
+            cellSize = canvas.width / gridSize;
+            if (!gameRunning) initGame();
+        });
+        
+        initialSpeedSlider.addEventListener('input', () => {
+            updateGameSpeed();
+            if (gameRunning && !gamePaused) {
+                clearInterval(gameLoop);
+                gameLoop = setInterval(updateGame, gameSpeed);
+            }
+        });
+        
+        difficultySelect.addEventListener('change', updateGameSpeed);
+        
+        snakeColorSelect.addEventListener('change', () => {
+            snakeColor = snakeColorSelect.value;
+            if (!gameRunning) drawGame();
+        });
+        
+        foodColorSelect.addEventListener('change', () => {
+            foodColor = foodColorSelect.value;
+            if (!gameRunning) drawGame();
+        });
+        
+        // Обработчик нажатий клавиш
+        document.addEventListener('keydown', handleKeyDown);
+        
+        // Инициализация игры при загрузке
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>

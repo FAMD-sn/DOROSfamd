@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Детектор телефонов на экране</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+        }
+
+        .settings-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setting-item label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .setting-item input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .setting-item input:focus {
+            outline: none;
+            border-color: #764ba2;
+        }
+
+        .setting-item input[type="number"] {
+            width: 100%;
+        }
+
+        .status-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .status-active {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-inactive {
+            background: #f44336;
+            color: white;
+        }
+
+        .status-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #764ba2;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #764ba2;
+            color: white;
+        }
+
+        .button:hover {
+            background: #5a3d7a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-danger {
+            background: #f44336;
+        }
+
+        .button-danger:hover {
+            background: #d32f2f;
+        }
+
+        .preview-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .preview-item {
+            text-align: center;
+        }
+
+        .preview-item h3 {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .preview-canvas {
+            width: 100%;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f5f5f5;
+        }
+
+        .detections-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .detections-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .detection-item {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detection-item:last-child {
+            border-bottom: none;
+        }
+
+        .detection-phone {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .detection-coords {
+            font-family: monospace;
+            color: #666;
+        }
+
+        .telegram-log {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-success {
+            color: #4caf50;
+        }
+
+        .log-error {
+            color: #f44336;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #764ba2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Детектор телефонов на экране</h1>
+            <p>Обнаружение телефонов с помощью COCO-SSD и отправка уведомлений в Telegram</p>
+        </div>
+
+        <div class="settings-panel">
+            <h2>⚙️ Настройки</h2>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <label>Telegram Bot Token</label>
+                    <input type="text" id="botToken" placeholder="Например: 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz" value="">
+                </div>
+                <div class="setting-item">
+                    <label>Telegram Chat ID</label>
+                    <input type="text" id="chatId" placeholder="Например: 123456789" value="">
+                </div>
+                <div class="setting-item">
+                    <label>Интервал скриншотов (сек)</label>
+                    <input type="number" id="interval" min="1" max="10" value="2">
+                </div>
+                <div class="setting-item">
+                    <label>Cooldown уведомлений (сек)</label>
+                    <input type="number" id="cooldown" min="5" max="60" value="10">
+                </div>
+                <div class="setting-item">
+                    <label>Порог уверенности (%)</label>
+                    <input type="number" id="confidence" min="10" max="100" value="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="status-panel">
+            <div class="status-info">
+                <div class="status-badge status-inactive" id="statusBadge">⏸ Остановлено</div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="phoneCount">0</div>
+                        <div class="stat-label">Телефонов найдено</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="detectionCount">0</div>
+                        <div class="stat-label">Всего детекций</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="cooldownTimer">0</div>
+                        <div class="stat-label">До след. уведомления</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button class="button" id="startBtn" onclick="startDetection()">▶ Запустить</button>
+                <button class="button button-danger" id="stopBtn" onclick="stopDetection()" disabled>⏹ Остановить</button>
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <h2>📸 Превью</h2>
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <h3>Захват экрана</h3>
+                    <video id="screenVideo" autoplay playsinline muted class="preview-canvas" style="display: none;"></video>
+                    <canvas id="screenCanvas" class="preview-canvas" style="display: none;"></canvas>
+                    <div id="noVideo" style="padding: 50px; text-align: center; background: #f5f5f5; border-radius: 8px;">
+                        🎥 Запустите детектор для отображения видео
+                    </div>
+                </div>
+                <div class="preview-item">
+                    <h3>Результат детекции</h3>
+                    <canvas id="detectionCanvas" class="preview-canvas" width="640" height="480"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="detections-panel">
+            <h2>🔍 Последние обнаружения</h2>
+            <div class="detections-list" id="detectionsList">
+                <div class="detection-item" style="justify-content: center; color: #999;">
+                    Нет обнаружений
+                </div>
+            </div>
+            
+            <h2 style="margin-top: 20px;">📱 Telegram лог</h2>
+            <div class="telegram-log" id="telegramLog">
+                <div class="log-entry" style="color: #999;">
+                    Ожидание отправки сообщений...
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Скрипт работает полностью в браузере с использованием TensorFlow.js</p>
+        </div>
+    </div>
+
+    <!-- Подключаем необходимые библиотеки -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+    <script>
+        // Глобальные переменные
+        let model = null;
+        let detectionInterval = null;
+        let isDetecting = false;
+        let lastNotificationTime = 0;
+        let phoneCount = 0;
+        let totalDetections = 0;
+        let cooldownInterval = null;
+        let stream = null;
+        
+        // Элементы DOM
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const statusBadge = document.getElementById('statusBadge');
+        const phoneCountEl = document.getElementById('phoneCount');
+        const detectionCountEl = document.getElementById('detectionCount');
+        const cooldownTimerEl = document.getElementById('cooldownTimer');
+        const screenVideo = document.getElementById('screenVideo');
+        const screenCanvas = document.getElementById('screenCanvas');
+        const detectionCanvas = document.getElementById('detectionCanvas');
+        const ctx = detectionCanvas.getContext('2d');
+        const noVideoDiv = document.getElementById('noVideo');
+        const detectionsList = document.getElementById('detectionsList');
+        const telegramLog = document.getElementById('telegramLog');
+
+        // Загрузка модели при старте
+        async function loadModel() {
+            try {
+                statusBadge.textContent = '🔄 Загрузка модели...';
+                statusBadge.className = 'status-badge status-warning';
+                
+                model = await cocoSsd.load();
+                
+                statusBadge.textContent = '✅ Модель загружена';
+                statusBadge.className = 'status-badge status-inactive';
+                
+                return true;
+            } catch (error) {
+                console.error('Ошибка загрузки модели:', error);
+                addTelegramLog('❌ Ошибка загрузки модели: ' + error.message, 'error');
+                statusBadge.textContent = '❌ Ошибка загрузки';
+                statusBadge.className = 'status-badge status-inactive';
+                return false;
+            }
+        }
+
+        // Запуск детекции
+        async function startDetection() {
+            if (isDetecting) return;
+            
+            // Проверяем настройки
+            const botToken = document.getElementById('botToken').value.trim();
+            const chatId = document.getElementById('chatId').value.trim();
+            
+            if (!botToken || !chatId) {
+                alert('⚠️ Пожалуйста, введите Telegram Bot Token и Chat ID');
+                return;
+            }
+            
+            try {
+                // Захват экрана
+                stream = await navigator.mediaDevices.getDisplayMedia({ 
+                    video: { 
+                        width: 640,
+                        height: 480,
+                        frameRate: 10
+                    } 
+                });
+                
+                screenVideo.srcObject = stream;
+                screenVideo.style.display = 'block';
+                screenCanvas.style.display = 'none';
+                noVideoDiv.style.display = 'none';
+                
+                // Загружаем модель если ещё не загружена
+                if (!model) {
+                    const loaded = await loadModel();
+                    if (!loaded) {
+                        stopDetection();
+                        return;
+                    }
+                }
+                
+                isDetecting = true;
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                statusBadge.textContent = '▶ Работает';
+                statusBadge.className = 'status-badge status-active';
+                
+                // Запускаем интервал детекции
+                const interval = parseInt(document.getElementById('interval').value) * 1000;
+                detectionInterval = setInterval(detectFrame, interval);
+                
+                // Запускаем обновление таймера cooldown
+                startCooldownTimer();
+                
+                addTelegramLog('🚀 Мониторинг запущен', 'success');
+                
+            } catch (error) {
+                console.error('Ошибка доступа к экрану:', error);
+                alert('❌ Не удалось получить доступ к экрану. Убедитесь, что вы разрешили захват экрана.');
+                stopDetection();
+            }
+        }
+
+        // Остановка детекции
+        function stopDetection() {
+            isDetecting = false;
+            
+            if (detectionInterval) {
+                clearInterval(detectionInterval);
+                detectionInterval = null;
+            }
+            
+            if (cooldownInterval) {
+                clearInterval(cooldownInterval);
+                cooldownInterval = null;
+            }
+            
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            screenVideo.style.display = 'none';
+            noVideoDiv.style.display = 'block';
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            statusBadge.textContent = '⏸ Остановлено';
+            statusBadge.className = 'status-badge status-inactive';
+            
+            // Очищаем канвас
+            ctx.clearRect(0, 0, detectionCanvas.width, detectionCanvas.height);
+            
+            addTelegramLog('⏹ Мониторинг остановлен', 'success');
+        }
+
+        // Детекция одного кадра
+        async function detectFrame() {
+            if (!isDetecting || !model) return;
+            
+            try {
+                // Рисуем текущий кадр видео на канвасе для обработки
+                screenCanvas.width = screenVideo.videoWidth;
+                screenCanvas.height = screenVideo.videoHeight;
+                const screenCtx = screenCanvas.getContext('2d');
+                screenCtx.drawImage(screenVideo, 0, 0, screenCanvas.width, screenCanvas.height);
+                
+                // Получаем изображение для детекции
+                const imageData = screenCtx.getImageData(0, 0, screenCanvas.width, screenCanvas.height);
+                
+                // Детекция объектов
+                const predictions = await model.detect(imageData);
+                
+                // Очищаем канвас для отрисовки
+                ctx.clearRect(0, 0, detectionCanvas.width, detectionCanvas.height);
+                
+                // Рисуем оригинальное изображение
+                ctx.drawImage(screenCanvas, 0, 0, detectionCanvas.width, detectionCanvas.height);
+                
+                // Фильтруем телефоны по порогу уверенности
+                const confidenceThreshold = parseInt(document.getElementById('confidence').value) / 100;
+                const phones = predictions.filter(p => 
+                    p.class === 'cell phone' && p.score >= confidenceThreshold
+                );
+                
+                if (phones.length > 0) {
+                    totalDetections++;
+                    detectionCountEl.textContent = totalDetections;
+                    
+                    // Отрисовываем bounding boxes для всех телефонов
+                    phones.forEach((phone, index) => {
+                        const [x, y, width, height] = phone.bbox;
+                        
+                        // Рисуем прямоугольник
+                        ctx.strokeStyle = '#ff9800';
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(x, y, width, height);
+                        
+                        // Рисуем метку
+                        ctx.fillStyle = '#ff9800';
+                        ctx.font = 'bold 16px Arial';
+                        ctx.fillText(`📱 Телефон ${Math.round(phone.score * 100)}%`, x, y - 5);
+                        
+                        // Добавляем в список обнаружений
+                        addDetectionToList(phone, index);
+                    });
+                    
+                    // Проверяем cooldown для отправки уведомления
+                    const now = Date.now();
+                    const cooldownSec = parseInt(document.getElementById('cooldown').value) * 1000;
+                    
+                    if (now - lastNotificationTime >= cooldownSec) {
+                        // Отправляем уведомление
+                        sendTelegramNotification(phones);
+                        lastNotificationTime = now;
+                        
+                        // Увеличиваем счетчик найденных телефонов
+                        phoneCount += phones.length;
+                        phoneCountEl.textContent = phoneCount;
+                        
+                        addTelegramLog(`📱 Обнаружено ${phones.length} телефонов. Уведомление отправлено`, 'success');
+                    } else {
+                        const secondsLeft = Math.ceil((cooldownSec - (now - lastNotificationTime)) / 1000);
+                        addTelegramLog(`📱 Обнаружен телефон, но cooldown ещё ${secondsLeft}с`, 'info');
+                    }
+                }
+                
+                // Обновляем список обнаружений
+                updateDetectionsList(phones);
+                
+            } catch (error) {
+                console.error('Ошибка детекции:', error);
+            }
+        }
+
+        // Отправка уведомления в Telegram
+        async function sendTelegramNotification(phones) {
+            const botToken = document.getElementById('botToken').value.trim();
+            const chatId = document.getElementById('chatId').value.trim();
+            
+            if (!botToken || !chatId) return;
+            
+            try {
+                // Формируем сообщение
+                let message = `🔍 <b>Обнаружен телефон на экране!</b>\n\n`;
+                message += `📱 Найдено телефонов: ${phones.length}\n\n`;
+                
+                phones.forEach((phone, index) => {
+                    const [x, y, width, height] = phone.bbox;
+                    message += `<b>Телефон #${index + 1}:</b>\n`;
+                    message += `   • Уверенность: ${Math.round(phone.score * 100)}%\n`;
+                    message += `   • Координаты: x=${Math.round(x)}, y=${Math.round(y)}\n`;
+                    message += `   • Размер: ${Math.round(width)}x${Math.round(height)}px\n\n`;
+                });
+                
+                message += `🕐 Время: ${new Date().toLocaleTimeString()}`;
+                
+                // Отправляем запрос
+                const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.ok) {
+                    addTelegramLog('✅ Уведомление успешно отправлено', 'success');
+                } else {
+                    addTelegramLog('❌ Ошибка отправки: ' + data.description, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка отправки в Telegram:', error);
+                addTelegramLog('❌ Ошибка сети при отправке', 'error');
+            }
+        }
+
+        // Добавление записи в Telegram лог
+        function addTelegramLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const time = new Date().toLocaleTimeString();
+            
+            if (type === 'success') {
+                entry.innerHTML = `✅ [${time}] ${message}`;
+                entry.style.color = '#4caf50';
+            } else if (type === 'error') {
+                entry.innerHTML = `❌ [${time}] ${message}`;
+                entry.style.color = '#f44336';
+            } else {
+                entry.innerHTML = `ℹ️ [${time}] ${message}`;
+                entry.style.color = '#666';
+            }
+            
+            telegramLog.insertBefore(entry, telegramLog.firstChild);
+            
+            // Ограничиваем количество записей
+            while (telegramLog.children.length > 10) {
+                telegramLog.removeChild(telegramLog.lastChild);
+            }
+        }
+
+        // Добавление обнаружения в список
+        function addDetectionToList(phone, index) {
+            const [x, y, width, height] = phone.bbox;
+            const time = new Date().toLocaleTimeString();
+            
+            const item = document.createElement('div');
+            item.className = 'detection-item detection-phone';
+            item.innerHTML = `
+                <div>
+                    <strong>📱 Телефон #${index + 1}</strong><br>
+                    <small>${time}</small>
+                </div>
+                <div class="detection-coords">
+                    Уверенность: ${Math.round(phone.score * 100)}%<br>
+                    X:${Math.round(x)} Y:${Math.round(y)}<br>
+                    ${Math.round(width)}x${Math.round(height)}px
+                </div>
+            `;
+            
+            detectionsList.insertBefore(item, detectionsList.firstChild);
+            
+            // Ограничиваем количество записей
+            while (detectionsList.children.length > 10) {
+                detectionsList.removeChild(detectionsList.lastChild);
+            }
+        }
+
+        // Обновление списка обнаружений
+        function updateDetectionsList(phones) {
+            if (phones.length === 0) {
+                if (detectionsList.children.length === 0) {
+                    detectionsList.innerHTML = '<div class="detection-item" style="justify-content: center; color: #999;">Нет обнаружений</div>';
+                }
+                return;
+            }
+            
+            // Удаляем сообщение "Нет обнаружений" если оно есть
+            if (detectionsList.children.length === 1 && detectionsList.children[0].textContent.includes('Нет обнаружений')) {
+                detectionsList.innerHTML = '';
+            }
+        }
+
+        // Запуск таймера cooldown
+        function startCooldownTimer() {
+            cooldownInterval = setInterval(() => {
+                if (!isDetecting) return;
+                
+                const now = Date.now();
+                const cooldownSec = parseInt(document.getElementById('cooldown').value) * 1000;
+                const timeLeft = Math.max(0, cooldownSec - (now - lastNotificationTime));
+                
+                if (timeLeft > 0) {
+                    cooldownTimerEl.textContent = Math.ceil(timeLeft / 1000);
+                } else {
+                    cooldownTimerEl.textContent = '0';
+                }
+            }, 100);
+        }
+
+        // Загружаем модель при загрузке страницы
+        window.addEventListener('load', () => {
+            loadModel();
+            
+            // Добавляем примеры значений для демонстрации
+            document.getElementById('botToken').value = '8437603107:AAFkL9YQVt0_2Owt8t749cNANQgs-l0Vfqc';
+            document.getElementById('chatId').value = '6379225282';
+        });
+
+        // Обработка закрытия страницы
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>

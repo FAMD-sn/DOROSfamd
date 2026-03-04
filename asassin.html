@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Школа: Кровавая Перемена (V10 - Ultimate)</title>
+    <style>
+        /* === ОСНОВНОЙ СТИЛЬ === */
+        body {
+            margin: 0; overflow: hidden; background-color: #0a0a0a;
+            font-family: 'Courier New', Courier, monospace;
+            touch-action: none; user-select: none; -webkit-user-select: none;
+            color: white;
+        }
+        canvas { display: block; }
+
+        /* === UI СЛОИ === */
+        #ui-layer, #menu-layer, #shop-layer, #inventory-layer, #quiz-layer, #vignette {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        
+        #vignette {
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
+            z-index: 5;
+        }
+
+        #menu-layer, #shop-layer, #inventory-layer, #quiz-layer { pointer-events: auto; display: none; z-index: 50; }
+        
+        /* HUD */
+        .hud-text {
+            position: absolute; text-shadow: 2px 2px 0 #000; font-weight: bold; z-index: 10;
+        }
+        #score-box { top: 15px; left: 15px; font-size: 20px; color: #ffd700; background: rgba(0,0,0,0.5); padding: 5px 10px; border: 1px solid #555; }
+        #wave-box { top: 15px; left: 50%; transform: translateX(-50%); font-size: 24px; color: #fff; background: rgba(0,0,0,0.5); padding: 5px 15px; border: 1px solid #fff; }
+        
+        #combo-box { 
+            top: 80px; right: 20px; font-size: 40px; color: #e74c3c; 
+            font-weight: 900; font-style: italic; display: none;
+            text-shadow: 3px 3px 0 #500;
+        }
+
+        #debuff-indicator {
+            position: absolute; top: 100px; left: 15px; 
+            color: #e74c3c; font-weight: bold; font-size: 18px; display: none;
+            background: rgba(0,0,0,0.7); padding: 5px; border: 1px solid red;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        #skip-btn {
+            position: absolute; top: 130px; left: 50%; transform: translateX(-50%);
+            background: #f39c12; color: #fff; border: 2px solid #fff; padding: 8px 20px;
+            font-size: 18px; font-weight: bold; border-radius: 4px; cursor: pointer; pointer-events: auto;
+            display: none; z-index: 40;
+        }
+
+        #hp-container {
+            position: absolute; top: 15px; right: 15px; width: 200px; height: 20px;
+            background: #222; border: 2px solid #fff; transform: skewX(-15deg);
+            overflow: hidden; z-index: 10;
+        }
+        #hp-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); transition: width 0.1s; }
+
+        /* УПРАВЛЕНИЕ */
+        .control-zone {
+            position: absolute; pointer-events: auto; z-index: 20;
+            display: flex; justify-content: center; align-items: center;
+            color: white; user-select: none;
+        }
+        #joystick-zone { 
+            bottom: 30px; left: 30px; width: 120px; height: 120px;
+            background: rgba(255, 255, 255, 0.05); border-radius: 50%; 
+            border: 2px dashed rgba(255,255,255,0.2); 
+        }
+        #stick {
+            position: absolute; top: 50%; left: 50%; width: 50px; height: 50px;
+            background: rgba(255, 255, 255, 0.3); border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none;
+        }
+
+        .btn-circle {
+            width: 70px; height: 70px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex; justify-content: center; align-items: center; font-size: 28px;
+            background: rgba(0,0,0,0.6); box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .btn-circle:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
+
+        #attack-btn { bottom: 30px; right: 30px; background: rgba(192, 57, 43, 0.8); width: 80px; height: 80px; font-size: 35px; border-color: #c0392b; }
+        #dash-btn { bottom: 130px; right: 30px; background: rgba(41, 128, 185, 0.8); width: 60px; height: 60px; font-size: 24px; border-color: #2980b9; }
+        #inv-btn { top: 60px; left: 15px; background: rgba(127, 140, 141, 0.8); width: 45px; height: 45px; font-size: 20px; border-radius: 8px; }
+        
+        /* SUPER BUTTON */
+        #super-btn { 
+            bottom: 30px; right: 130px; 
+            background: rgba(142, 68, 173, 0.4); 
+            width: 60px; height: 60px; font-size: 24px; border-color: #8e44ad; 
+            transition: all 0.3s;
+        }
+        #super-btn.ready { background: rgba(142, 68, 173, 1); box-shadow: 0 0 15px #9b59b6; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* МЕНЮ - ПЕРЕРАБОТАНО ДЛЯ ГОРИЗОНТАЛИ */
+        .overlay {
+            background: rgba(10, 10, 10, 0.95);
+            flex-direction: column; justify-content: center; align-items: center;
+            color: white; text-align: center;
+        }
+        
+        .menu-title {
+            font-size: 40px; color: #e74c3c; 
+            text-transform: uppercase; margin-bottom: 15px;
+            border: 3px solid white; padding: 10px 20px;
+            background: #111; transform: skewX(-10deg);
+        }
+
+        .menu-container {
+            display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 15px;
+            width: 80%;
+        }
+
+        .menu-btn {
+            background: #222; color: white; border: 1px solid #555; padding: 12px 20px;
+            font-size: 18px; width: 160px;
+            font-family: inherit; font-weight: bold; text-transform: uppercase;
+            cursor: pointer; border-radius: 4px;
+        }
+        .menu-btn:active { transform: scale(0.95); }
+
+        /* QUIZ MODAL */
+        #quiz-modal {
+            background: #2c3e50; border: 4px solid #f1c40f; padding: 20px;
+            width: 300px; border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+        .quiz-option {
+            display: block; width: 100%; margin: 10px 0; padding: 10px;
+            font-size: 20px; background: #34495e; color: white; border: none; cursor: pointer;
+        }
+        #quiz-timer-bar { width: 100%; height: 10px; background: #c0392b; margin-top: 10px; transition: width 1s linear; }
+
+        /* ОКНА */
+        #shop-content, #inv-content {
+            background: #1a1a1a; border: 2px solid #fff; padding: 15px; 
+            width: 85%; max-width: 500px; max-height: 85%; overflow-y: auto;
+        }
+        .shop-item {
+            background: #252525; margin: 8px 0; padding: 10px; 
+            display: flex; justify-content: space-between; align-items: center;
+            border-left: 4px solid #555;
+        }
+        .shop-btn { background: #27ae60; border: none; color: white; padding: 6px 12px; font-weight: bold; cursor: pointer; }
+
+        .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 15px; }
+        .inv-slot { background: #333; padding: 8px; border: 1px solid #444; text-align: center; font-size: 12px; }
+
+        /* ГОРИЗОНТАЛЬНЫЙ РЕЖИМ */
+        #rotate-msg {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; color: white;
+        }
+        #rotate-icon { font-size: 60px; margin-bottom: 20px; animation: rotAnim 2s infinite; }
+        @keyframes rotAnim { 0% { transform: rotate(0deg); } 25% { transform: rotate(-90deg); } 75% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
+
+        @media (orientation: portrait) {
+            #rotate-msg { display: flex; }
+        }
+
+        /* ПК КОНТРОЛЫ ИНФО */
+        #pc-controls {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 10px;
+            font-size: 14px; color: #aaa; display: none; text-align: center;
+            border: 1px solid #555; z-index: 10;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            /* Скрываем сенсорные элементы на ПК */
+            #joystick-zone, #attack-btn, #dash-btn, #super-btn, #inv-btn { 
+                display: none !important; 
+            }
+            #pc-controls { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="rotate-msg">
+    <div id="rotate-icon">📱</div>
+    <h1>ПОВЕРНИ ТЕЛЕФОН</h1>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+<div id="vignette"></div>
+
+<div id="ui-layer">
+    <div id="score-box">💰 <span id="score">0</span></div>
+    <div id="wave-box">УРОК <span id="wave-num">1</span></div>
+    <div id="hp-container"><div id="hp-fill"></div></div>
+    <div id="combo-box">x<span id="combo-val">0</span></div>
+    <div id="debuff-indicator">⚠️ ТЯЖЕЛЫЙ ПОРТФЕЛЬ (-50% СКОРОСТЬ)</div>
+    
+    <div id="wave-timer" class="hud-text" style="top: 90px; width: 100%; text-align: center; font-size: 24px; color: #2ecc71; display: none; text-shadow: 0 0 10px black;">
+        ПЕРЕМЕНА: <span id="timer-val">30</span>
+    </div>
+    <button id="skip-btn" onclick="skipBreak()">⏩ НА УРОК</button>
+</div>
+
+<!-- Сенсорные элементы (скрываются на ПК) -->
+<div id="joystick-zone" class="control-zone"><div id="stick"></div></div>
+<div id="attack-btn" class="control-zone btn-circle">⚔️</div>
+<div id="dash-btn" class="control-zone btn-circle">👟</div>
+<div id="super-btn" class="control-zone btn-circle">🔔</div>
+<div id="inv-btn" class="control-zone btn-circle">🎒</div>
+
+<!-- Инфо об управлении на ПК -->
+<div id="pc-controls">
+    WASD/Стрелки - Движение | ЛКМ - Атака | ПРОБЕЛ - Рывок | R - Супер | I - Инвентарь
+</div>
+
+<div id="menu-layer" class="overlay" style="display: flex;">
+    <div class="menu-title">КРОВАВАЯ ПЕРЕМЕНА<br><span style="font-size:20px; color:#fff;">V10 ULTIMATE</span></div>
+    <div class="menu-container">
+        <button class="menu-btn" onclick="startGame('easy')" style="border-left: 5px solid #27ae60;">🟢 ЛЕГКО</button>
+        <button class="menu-btn" onclick="startGame('normal')" style="border-left: 5px solid #f39c12;">🟠 НОРМА</button>
+        <button class="menu-btn" onclick="startGame('hard')" style="border-left: 5px solid #c0392b;">🔴 ХАРД</button>
+    </div>
+</div>
+
+<div id="quiz-layer" class="overlay">
+    <div id="quiz-modal">
+        <h2 style="color:#f1c40f; margin:0 0 10px 0;">ВНЕЗАПНАЯ КОНТРОЛЬНАЯ!</h2>
+        <p style="font-size: 30px; font-weight:bold; margin: 10px 0;" id="quiz-problem">2 + 2 = ?</p>
+        <div id="quiz-options"></div>
+        <div id="quiz-timer-bar"></div>
+    </div>
+</div>
+
+<div id="shop-layer" class="overlay">
+    <div id="shop-content">
+        <h2 style="color:#f1c40f; border-bottom: 1px solid #555; padding-bottom:10px;">ФИЗРУК (МАГАЗИН)</h2>
+        <p>Очки: <span id="shop-score" style="color:gold;">0</span></p>
+        <div id="shop-items"></div>
+        <button class="menu-btn" onclick="closeShop()" style="width:100%; margin-top:20px;">УЙТИ</button>
+    </div>
+</div>
+
+<div id="inventory-layer" class="overlay">
+    <div id="inv-content">
+        <h2 style="border-bottom: 1px solid #555; padding-bottom:10px;">РЮКЗАК</h2>
+        <p>В руках: <span id="current-weapon" style="color: yellow;">Швабра</span></p>
+        <div class="inv-grid" id="inv-items"></div>
+        <button class="menu-btn" onclick="toggleInventory()" style="width:100%; margin-top:20px;">ЗАКРЫТЬ</button>
+    </div>
+</div>
+
+<script>
+// === CONFIG ===
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const TILE_SIZE = 80;
+
+// Map Layout
+const MAP_LAYOUT = [
+    "WWWWWWWWWWWWWWWWWWWWWW",
+    "WCCCCCCWFFFFFFWCCCCCCW",
+    "WCCCCCCDFFFFFFDCCCCCCW",
+    "WCCCCCCWFFFFFFWCCCCCCW",
+    "WWWWWWWWWWDDWWWWWWWWWW",
+    "WFFFFFFFFFFFFFFFFFFFFW",
+    "WFFFFFFFFFFFFFFFFFFFFW",
+    "WFFFFFFFFFFFFFFFFFFFFW",
+    "WWWWWWWWWWDDWWWWWWWWWW",
+    "WCCCCCCWFFFFFFWCCCCCCW",
+    "WCCCCCCDFFFFFFDCCCCCCW",
+    "WCCCCCCWFFFFFFWCCCCCCW",
+    "WWWWWWWWWWWWWWWWWWWWWW"
+];
+
+let grid = [];
+let obstacles = [];
+
+// Game Vars
+let gameState = 'MENU'; 
+let difficulty = 'normal';
+let frames = 0;
+let score = 0;
+let wave = 1;
+let waveState = 'fighting'; 
+let breakTimer = 0;
+let zombiesRemaining = 0;
+let combo = 0;
+let comboTimer = 0;
+let freezeFrame = 0;
+let bossActive = false;
+
+// Debuff System
+let debuffTimer = 0; // if > 0, player is slowed
+
+// Quiz System
+let quizTimer = 0;
+let quizCallback = null;
+
+// Camera
+const camera = { x: 0, y: 0, shake: 0 };
+const mapW = MAP_LAYOUT[0].length * TILE_SIZE;
+const mapH = MAP_LAYOUT.length * TILE_SIZE;
+
+// Weapons
+const WEAPONS = [
+    { id: 0, name: 'Швабра', damage: 25, range: 110, cooldown: 25, price: 0, color: '#8d6e63', knock: 15 },
+    { id: 1, name: 'Линейка', damage: 15, range: 90, cooldown: 12, price: 500, color: '#f1c40f', knock: 5 },
+    { id: 2, name: 'Бита', damage: 60, range: 100, cooldown: 40, price: 1500, color: '#95a5a6', knock: 35 },
+    { id: 3, name: 'Катана', damage: 50, range: 130, cooldown: 20, price: 3000, color: '#fff', knock: 20 },
+    { id: 4, name: 'Топор', damage: 100, range: 90, cooldown: 50, price: 5000, color: '#c0392b', knock: 45 }
+];
+
+// Player
+const player = {
+    x: mapW/2, y: mapH/2, vx: 0, vy: 0, r: 25, speed: 6, 
+    maxHp: 100, hp: 100, angle: 0, 
+    weaponIdx: 0, attackCD: 0, isAttacking: false, dashCD: 0,
+    walkAnim: 0, inventory: { gum: 0, pizza: 0, soda: 0 }, unlockedWeapons: [0],
+    superCharge: 0, superMax: 100
+};
+
+// ПК Управление
+const keys = {};
+let mouseX = 0, mouseY = 0;
+let mousePressed = false;
+
+let zombies = [];
+let blood = [];
+let particles = []; 
+let texts = [];
+let merchant = { x: -1000, y: -1000, active: false, cooldown: 0 };
+
+const joyZone = document.getElementById('joystick-zone');
+const stick = document.getElementById('stick');
+let joyData = { active: false, dx: 0, dy: 0 };
+
+// === ИНИЦИАЛИЗАЦИЯ ===
+function initMap() {
+    grid = []; obstacles = [];
+    for(let y=0; y<MAP_LAYOUT.length; y++) {
+        let row = [];
+        for(let x=0; x<MAP_LAYOUT[0].length; x++) {
+            const char = MAP_LAYOUT[y][x];
+            row.push(char === 'W' ? 1 : (char === 'C' ? 2 : (char === 'D' ? 3 : 0)));
+            if (char === 'C' && Math.random() > 0.4) {
+                obstacles.push({ x: x*TILE_SIZE+15, y: y*TILE_SIZE+15, w: TILE_SIZE-30, h: TILE_SIZE-30 });
+            }
+        }
+        grid.push(row);
+    }
+}
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize);
+resize();
+initMap();
+
+// === ОБРАБОТКА ВВОДА ПК ===
+// Обработка клавиатуры
+document.addEventListener('keydown', (e) => {
+    if (gameState === 'MENU' || gameState === 'QUIZ' || gameState === 'SHOP') return;
+    keys[e.code] = true;
+    
+    // Открытие инвентаря по I
+    if (e.code === 'KeyI') {
+        toggleInventory();
+    }
+    
+    // Активация супер способности по R
+    if (e.code === 'KeyR' && player.superCharge >= player.superMax) {
+        activateSuper();
+    }
+    
+    // Рывок по пробелу
+    if (e.code === 'Space' && player.dashCD <= 0) {
+        performDash();
+        e.preventDefault();
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    keys[e.code] = false;
+});
+
+// Обработка мыши
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left + camera.x;
+    mouseY = e.clientY - rect.top + camera.y;
+    
+    // Обновляем угол поворота игрока в сторону мыши
+    if (gameState === 'PLAYING') {
+        player.angle = Math.atan2(mouseY - player.y, mouseX - player.x);
+    }
+});
+
+canvas.addEventListener('mousedown', (e) => {
+    if (gameState === 'PLAYING' && e.button === 0) { // ЛКМ
+        mousePressed = true;
+        if (player.attackCD <= 0) {
+            performAttack();
+        }
+    }
+});
+
+canvas.addEventListener('mouseup', (e) => {
+    if (e.button === 0) mousePressed = false;
+});
+
+// === ИГРОВАЯ ЛОГИКА ===
+function startGame(diff) {
+    difficulty = diff;
+    gameState = 'PLAYING';
+    document.getElementById('menu-layer').style.display = 'none';
+    player.hp = player.maxHp; score = 0; wave = 1;
+    player.x = mapW/2; player.y = mapH/2; player.vx = 0; player.vy = 0;
+    player.inventory = { gum: 1, pizza: 0, soda: 0 };
+    player.unlockedWeapons = [0]; player.weaponIdx = 0;
+    player.superCharge = 0;
+    debuffTimer = 0;
+    zombies = []; blood = [];
+    startWave();
+}
+
+function startWave() {
+    waveState = 'fighting';
+    document.getElementById('wave-num').innerText = wave;
+    document.getElementById('wave-timer').style.display = 'none';
+    document.getElementById('skip-btn').style.display = 'none';
+    merchant.active = false;
+    bossActive = false;
+
+    if (wave % 5 === 0) {
+        showMessage("!!! ЭКЗАМЕН !!!");
+        setTimeout(() => showMessage("ДИРЕКТОР ТУТ!"), 2000);
+        zombiesRemaining = 5; 
+        spawnBoss();
+        bossActive = true;
+    } else {
+        zombiesRemaining = 5 + Math.floor(wave * 3);
+        showMessage(`УРОК ${wave}`);
+    }
+}
+
+function endWave() {
+    waveState = 'break';
+    breakTimer = 30 * 60;
+    showMessage("ПЕРЕМЕНА!");
+    merchant.x = player.x; merchant.y = player.y - 150;
+    if (merchant.y < 50) merchant.y = player.y + 150;
+    merchant.active = true; merchant.cooldown = 60;
+    document.getElementById('wave-timer').style.display = 'block';
+    document.getElementById('skip-btn').style.display = 'block';
+}
+
+window.skipBreak = function() { if (waveState === 'break') breakTimer = 0; }
+
+function startQuiz() {
+    gameState = 'QUIZ';
+    joyData.active = false; // Stop movement
+    const num1 = Math.floor(Math.random() * 20) + 10;
+    const num2 = Math.floor(Math.random() * 20) + 10;
+    const correct = num1 + num2;
+    
+    // Generate wrong answers
+    let w1 = correct + Math.floor(Math.random() * 10) + 1;
+    let w2 = correct - Math.floor(Math.random() * 10) - 1;
+    let opts = [correct, w1, w2].sort(() => Math.random() - 0.5);
+    
+    document.getElementById('quiz-problem').innerText = `${num1} + ${num2} = ?`;
+    const optsDiv = document.getElementById('quiz-options');
+    optsDiv.innerHTML = '';
+    opts.forEach(opt => {
+        optsDiv.innerHTML += `<button class="quiz-option" onclick="answerQuiz(${opt === correct})">${opt}</button>`;
+    });
+    
+    document.getElementById('quiz-layer').style.display = 'flex';
+    quizTimer = 100; // Percent
+    
+    // Countdown loop for quiz
+    const qLoop = setInterval(() => {
+        if (gameState !== 'QUIZ') { clearInterval(qLoop); return; }
+        quizTimer -= 0.5; // Speed of timer
+        document.getElementById('quiz-timer-bar').style.width = quizTimer + '%';
+        if (quizTimer <= 0) {
+            answerQuiz(false);
+            clearInterval(qLoop);
+        }
+    }, 20);
+}
+
+window.answerQuiz = function(isCorrect) {
+    document.getElementById('quiz-layer').style.display = 'none';
+    gameState = 'PLAYING';
+    if (isCorrect) {
+        showMessage("ПРАВИЛЬНО!");
+        player.hp = Math.min(player.hp + 20, player.maxHp);
+        texts.push({ x: player.x, y: player.y, text: "HP +20", color: 'lime', scale: 20, life: 1 });
+    } else {
+        showMessage("ОШИБКА! ДЕБАФФ!");
+        debuffTimer = 120 * 60; // 2 minutes
+    }
+}
+
+function update() {
+    if (gameState !== 'PLAYING') return;
+    if (freezeFrame > 0) { freezeFrame--; camera.shake *= 0.9; return; }
+
+    frames++;
+    if (combo > 0) {
+        comboTimer--;
+        if (comboTimer <= 0) { combo = 0; document.getElementById('combo-box').style.display = 'none'; }
+        document.getElementById('combo-box').style.transform = `scale(${1 + Math.sin(frames*0.2)*0.05})`;
+    }
+
+    // Random Quiz Event (Small chance every second)
+    if (waveState === 'fighting' && !bossActive && frames % 60 === 0 && Math.random() < 0.005) { // ~Every 3 mins avg
+        startQuiz();
+    }
+
+    // Debuff Logic
+    if (debuffTimer > 0) {
+        debuffTimer--;
+        document.getElementById('debuff-indicator').style.display = 'block';
+    } else {
+        document.getElementById('debuff-indicator').style.display = 'none';
+    }
+
+    if (waveState === 'fighting') {
+        let spawnRate = bossActive ? 180 : 60;
+        if (frames % spawnRate === 0 && zombies.length < 25 && zombiesRemaining > 0) { spawnZombie(); zombiesRemaining--; }
+        if (zombiesRemaining === 0 && zombies.filter(z => !z.dead).length === 0) endWave();
+    } else {
+        breakTimer--;
+        document.getElementById('timer-val').innerText = Math.ceil(breakTimer/60);
+        if (breakTimer <= 0) { wave++; startWave(); }
+        if (merchant.cooldown > 0) merchant.cooldown--;
+        if (merchant.active && merchant.cooldown <= 0 && Math.hypot(player.x - merchant.x, player.y - merchant.y) < 80) openShop();
+    }
+
+    handlePlayer();
+    handleZombies();
+    handleParticles();
+    
+    blood.forEach(b => b.life--);
+    blood = blood.filter(b => b.life > 0);
+
+    if (Math.abs(camera.shake) > 0.5) camera.shake *= 0.9; else camera.shake = 0;
+
+    // HUD Updates
+    document.getElementById('score').innerText = score;
+    const hpPct = (player.hp / player.maxHp) * 100;
+    document.getElementById('hp-fill').style.width = hpPct + '%';
+    document.getElementById('hp-fill').style.background = hpPct < 30 ? '#e74c3c' : '#2ecc71';
+    
+    // Super Btn Style
+    const sBtn = document.getElementById('super-btn');
+    if (player.superCharge >= player.superMax) sBtn.classList.add('ready'); else sBtn.classList.remove('ready');
+    sBtn.style.opacity = player.superCharge >= player.superMax ? 1 : 0.4;
+}
+
+function handlePlayer() {
+    if (player.dashCD > 0) player.dashCD--;
+    
+    // Управление с клавиатуры (ПК)
+    let inputX = 0, inputY = 0;
+    if (keys['KeyW'] || keys['ArrowUp']) inputY -= 1;
+    if (keys['KeyS'] || keys['ArrowDown']) inputY += 1;
+    if (keys['KeyA'] || keys['ArrowLeft']) inputX -= 1;
+    if (keys['KeyD'] || keys['ArrowRight']) inputX += 1;
+    
+    // Нормализуем вектор движения по диагонали
+    if (inputX !== 0 || inputY !== 0) {
+        const length = Math.sqrt(inputX * inputX + inputY * inputY);
+        inputX /= length;
+        inputY /= length;
+        
+        // Обновляем анимацию ходьбы
+        player.walkAnim += 0.2;
+        
+        // Обновляем угол только если не атакуем
+        if (!player.isAttacking && !mousePressed) {
+            player.angle = Math.atan2(inputY, inputX);
+        }
+    } else {
+        player.walkAnim = 0;
+    }
+    
+    // Сенсорное управление (мобильное)
+    if (joyData.active) {
+        inputX += joyData.dx;
+        inputY += joyData.dy;
+        if (!player.isAttacking && !mousePressed) player.angle = Math.atan2(joyData.dy, joyData.dx);
+        player.walkAnim += 0.2;
+    }
+    
+    // Debuff Speed Multiplier
+    let spdMult = debuffTimer > 0 ? 0.5 : 1.0;
+    let acc = player.speed * spdMult * 0.15;
+
+    // Применяем движение
+    if (inputX !== 0 || inputY !== 0) {
+        player.vx += inputX * acc;
+        player.vy += inputY * acc;
+    }
+    
+    player.vx *= 0.85; player.vy *= 0.85;
+    let nextX = player.x + player.vx, nextY = player.y + player.vy;
+    if (!checkCollision(nextX, player.y)) player.x = nextX; else player.vx = 0;
+    if (!checkCollision(player.x, nextY)) player.y = nextY; else player.vy = 0;
+
+    if (player.attackCD > 0) player.attackCD--;
+    if (player.isAttacking) {
+        if (player.attackCD > WEAPONS[player.weaponIdx].cooldown - 5) {
+            player.vx += Math.cos(player.angle) * 2; player.vy += Math.sin(player.angle) * 2;
+        }
+        if (player.attackCD < WEAPONS[player.weaponIdx].cooldown - 10) player.isAttacking = false;
+    }
+
+    let shakeX = (Math.random() - 0.5) * camera.shake, shakeY = (Math.random() - 0.5) * camera.shake;
+    camera.x = player.x - canvas.width/2 + shakeX; camera.y = player.y - canvas.height/2 + shakeY;
+    camera.x = Math.max(0, Math.min(camera.x, mapW - canvas.width)); camera.y = Math.max(0, Math.min(camera.y, mapH - canvas.height));
+}
+
+// Атака для ПК (по клику мыши)
+function performPcAttack() {
+    if (player.attackCD <= 0) {
+        performAttack();
+    }
+}
+
+// Функция рывка для ПК
+function performDash() {
+    if (player.dashCD <= 0) {
+        player.dashCD = 60;
+        let force = 25; player.vx = Math.cos(player.angle) * force; player.vy = Math.sin(player.angle) * force;
+        createDust(player.x, player.y);
+    }
+}
+
+// Супер способность для ПК
+function activateSuper() {
+    if (player.superCharge >= player.superMax) {
+        player.superCharge = 0;
+        // Effect: Stun all enemies
+        camera.shake = 30;
+        showMessage("ЗВОНОК НА ПЕРЕМЕНУ!");
+        document.body.style.backgroundColor = "white";
+        setTimeout(() => document.body.style.backgroundColor = "#050505", 100);
+        
+        zombies.forEach(z => {
+            if (!z.dead) {
+                z.stunTimer = 300; // 5 seconds (60fps * 5)
+                texts.push({x: z.x, y: z.y-40, text: "STUN", color: 'cyan', scale: 20, life: 2});
+            }
+        });
+    }
+}
+
+// Обработчики для сенсорного управления (сохраняем старые)
+document.getElementById('attack-btn').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (player.attackCD <= 0) {
+        let nearest = null, minDst = 300;
+        zombies.forEach(z => { if(z.dead) return; let d = Math.hypot(z.x - player.x, z.y - player.y); if (d < minDst) { minDst = d; nearest = z; } });
+        if (nearest) player.angle = Math.atan2(nearest.y - player.y, nearest.x - player.x);
+        performAttack();
+    }
+});
+
+document.getElementById('dash-btn').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (player.dashCD <= 0) {
+        player.dashCD = 60;
+        let force = 25; player.vx = Math.cos(player.angle) * force; player.vy = Math.sin(player.angle) * force;
+        createDust(player.x, player.y);
+    }
+});
+
+// SUPER ABILITY (сенсорная)
+document.getElementById('super-btn').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (player.superCharge >= player.superMax) {
+        activateSuper();
+    }
+});
+
+function performAttack() {
+    player.isAttacking = true;
+    const weapon = WEAPONS[player.weaponIdx];
+    player.attackCD = weapon.cooldown;
+    zombies.forEach(z => {
+        if(z.dead) return;
+        let dist = Math.hypot(z.x - player.x, z.y - player.y);
+        let hitRange = weapon.range + (z.type === 'boss' ? 30 : 0);
+        if (dist < hitRange) {
+            let angleToZ = Math.atan2(z.y - player.y, z.x - player.x);
+            let diff = Math.abs(angleToZ - player.angle);
+            if (diff > Math.PI) diff = 2*Math.PI - diff;
+            if (diff < 1.2) { 
+                let dmg = weapon.damage * (difficulty === 'easy' ? 1.5 : (difficulty === 'hard' ? 0.8 : 1));
+                if (Math.random() < 0.2) dmg *= 2;
+                z.hp -= dmg;
+                let force = weapon.knock * (z.type === 'boss' ? 0.2 : 0.5); 
+                z.vx += Math.cos(player.angle) * force; z.vy += Math.sin(player.angle) * force;
+                createBlood(z.x, z.y, 5);
+                showDamage(z.x, z.y, Math.floor(dmg));
+                freezeFrame = 2; camera.shake = 4; 
+                if (z.hp <= 0) killZombie(z);
+            }
+        }
+    });
+}
+
+function killZombie(z) {
+    z.dead = true; z.slideTimer = 40;
+    let deathAngle = Math.atan2(z.y - player.y, z.x - player.x);
+    let deathForce = 20; z.vx = Math.cos(deathAngle) * deathForce; z.vy = Math.sin(deathAngle) * deathForce;
+    createBlood(z.x, z.y, z.type === 'boss' ? 50 : 20);
+    
+    combo++; comboTimer = 120;
+    let mult = 1 + Math.floor(combo/5)*0.5; score += Math.floor(z.score * mult);
+    document.getElementById('combo-val').innerText = combo;
+    document.getElementById('combo-box').style.display = 'block';
+    
+    // Fill Super
+    player.superCharge = Math.min(player.superCharge + (z.type === 'boss' ? 50 : 10), player.superMax);
+    
+    if (Math.random() < 0.15 || z.type === 'boss') { 
+        const drops = ['gum', 'soda', 'pizza']; 
+        player.inventory[drops[Math.floor(Math.random()*3)]]++; 
+    }
+    
+    if (z.type === 'boss') {
+        showMessage("ДИРЕКТОР ПОВЕРЖЕН!");
+        score += 1000; 
+    }
+}
+
+// === COLLISION & SPAWNING FIX ===
+function checkCollision(x, y, radius = 0) {
+    // Bounds
+    if (x < 20 || x > mapW-20 || y < 20 || y > mapH-20) return true;
+    
+    // Grid & Obstacles
+    // Check center point
+    let c = Math.floor(x / TILE_SIZE), r = Math.floor(y / TILE_SIZE);
+    if (grid[r] && grid[r][c] === 1) return true;
+    for(let o of obstacles) if (x > o.x && x < o.x + o.w && y > o.y && y < o.y + o.h) return true;
+
+    // If radius provided (for boss), check 4 points around
+    if (radius > 0) {
+        if (checkCollision(x + radius, y)) return true;
+        if (checkCollision(x - radius, y)) return true;
+        if (checkCollision(x, y + radius)) return true;
+        if (checkCollision(x, y - radius)) return true;
+    }
+    return false;
+}
+
+function findSafeSpawn(radius) {
+    for(let i=0; i<100; i++) {
+        let angle = Math.random() * Math.PI * 2;
+        let dist = 500 + Math.random() * 200;
+        let zx = player.x + Math.cos(angle) * dist;
+        let zy = player.y + Math.sin(angle) * dist;
+        
+        // Check if this spot AND surroundings are clear
+        if (!checkCollision(zx, zy, radius)) {
+            return { x: zx, y: zy };
+        }
+    }
+    return null; // Fail safe
+}
+
+function spawnBoss() {
+    const pos = findSafeSpawn(50); // 50 is boss safe radius
+    if (!pos) return; // Couldn't find spot
+    
+    let boss = { 
+        type: 'boss', x: pos.x, y: pos.y, 
+        maxHp: 500 + (wave * 50), hp: 500 + (wave * 50), 
+        speed: 0.25, color: '#000000', score: 500, r: 45, 
+        vx: 0, vy: 0, dead: false, slideTimer: 0, rotation: 0, rotSpeed: 0, stunTimer: 0
+    };
+    zombies.push(boss);
+}
+
+function spawnZombie() {
+    const pos = findSafeSpawn(10);
+    if (!pos) return;
+    
+    const types = [
+        { type: 'std', hp: 40, speed: 0.2, color: '#556b2f', score: 10, r: 25 },
+        { type: 'fast', hp: 25, speed: 0.35, color: '#c0392b', score: 20, r: 20 },
+        { type: 'tank', hp: 120, speed: 0.15, color: '#2c3e50', score: 40, r: 35 }
+    ];
+    let tIdx = 0; if (wave > 2 && Math.random() > 0.7) tIdx = 1; if (wave > 4 && Math.random() > 0.8) tIdx = 2;
+    
+    let z = { ...types[tIdx], x: pos.x, y: pos.y, maxHp: types[tIdx].hp, vx: 0, vy: 0, dead: false, slideTimer: 0, rotation: 0, rotSpeed: 0, stunTimer: 0 };
+    if (difficulty === 'hard') { z.hp *= 1.5; z.speed *= 1.2; } z.hp += wave * 5;
+    zombies.push(z);
+}
+
+function handleZombies() {
+    zombies.forEach(z => {
+        // Handle Stun
+        if (z.stunTimer > 0) {
+            z.stunTimer--;
+            // Draw stun effect
+            if (frames % 10 === 0) texts.push({x: z.x, y: z.y - 30, text: "💫", color: 'yellow', scale: 15, life: 0.5});
+            return; // Skip movement logic if stunned
+        }
+
+        if (z.dead) {
+            let nextX = z.x + z.vx; let nextY = z.y + z.vy;
+            if (checkCollision(nextX, z.y, z.r)) z.vx *= -0.6; else z.x += z.vx;
+            if (checkCollision(z.x, nextY, z.r)) z.vy *= -0.6; else z.y += z.vy;
+            z.vx *= 0.9; z.vy *= 0.9; z.rotation += z.rotSpeed; z.rotSpeed *= 0.95; z.slideTimer--;
+            return; 
+        }
+        let ax = 0, ay = 0;
+        let dirAngle = Math.atan2(player.y - z.y, player.x - z.x);
+        ax += Math.cos(dirAngle) * z.speed; ay += Math.sin(dirAngle) * z.speed;
+        
+        let avoidance = z.type === 'boss' ? 20 : 60;
+        let lookAheadX = z.x + Math.cos(dirAngle) * avoidance; let lookAheadY = z.y + Math.sin(dirAngle) * avoidance;
+        
+        // Pass radius to checkCollision for better wall avoidance
+        if (checkCollision(lookAheadX, lookAheadY, z.r)) { ax += -Math.sin(dirAngle) * z.speed * 2; ay += Math.cos(dirAngle) * z.speed * 2; }
+        
+        zombies.forEach(other => {
+            if (z !== other && !other.dead) {
+                let dx = z.x - other.x, dy = z.y - other.y; let dist = Math.hypot(dx, dy);
+                if (dist < z.r + other.r) { let force = (z.r + other.r - dist) / dist; ax += (dx / dist) * force * 0.5; ay += (dy / dist) * force * 0.5; }
+            }
+        });
+        z.vx += ax; z.vy += ay;
+        let vel = Math.hypot(z.vx, z.vy); let maxSpd = z.speed * 15;
+        if (vel > maxSpd) { z.vx = (z.vx/vel)*maxSpd; z.vy = (z.vy/vel)*maxSpd; }
+        
+        if (!checkCollision(z.x + z.vx, z.y, z.r)) z.x += z.vx; else z.vx *= -0.5;
+        if (!checkCollision(z.x, z.y + z.vy, z.r)) z.y += z.vy; else z.vy *= -0.5;
+        z.vx *= 0.9; z.vy *= 0.9;
+        
+        if (Math.hypot(player.x - z.x, player.y - z.y) < player.r + z.r) {
+            if (frames % 30 === 0) {
+                let dmg = 5; 
+                if (z.type === 'boss') dmg = 20; 
+                if (difficulty === 'hard') dmg *= 1.5;
+                if (debuffTimer > 0) dmg *= 1.5; // Take more damage if debuffed
+                
+                player.hp -= dmg; document.body.classList.add('red-screen'); setTimeout(()=>document.body.classList.remove('red-screen'), 200); camera.shake = 5;
+                if (player.hp <= 0) { alert("ВАС ОТЧИСЛИЛИ! (Игра окончена)"); location.reload(); }
+            }
+        }
+    });
+    zombies = zombies.filter(z => !z.dead || z.slideTimer > 0);
+}
+
+// === ВИЗУАЛЫ ===
+function createBlood(x, y, amt) {
+    if (blood.length < 200 && amt > 3) {
+        if (!checkCollision(x, y)) blood.push({ x: x, y: y, r: Math.random()*20+10, life: 7200 });
+    }
+    for(let i=0; i<amt; i++) {
+        particles.push({ x: x, y: y, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, life: 1, color: '#800', size: Math.random()*4+2 });
+    }
+}
+
+function createDust(x, y) {
+    for(let i=0; i<10; i++) { particles.push({ x:x, y:y, vx:(Math.random()-0.5)*5, vy:(Math.random()-0.5)*5, life:0.5, color:'#fff', size:3 }); }
+}
+function showDamage(x, y, val) { texts.push({ x:x, y:y-20, text:val, color: '#fff', scale: 22, life:1 }); }
+function showMessage(msg) { texts.push({ x: player.x, y: player.y-100, text:msg, color:'#f1c40f', scale:40, life:2 }); }
+function handleParticles() {
+    particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.life-=0.05; });
+    particles = particles.filter(p => p.life>0);
+    texts.forEach(t => { t.y-=1; t.life-=0.02; });
+    texts = texts.filter(t => t.life>0);
+}
+
+function drawShadow(x, y, r) {
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath(); ctx.ellipse(x, y + 5, r, r * 0.4, 0, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawWeapon(ctx, wp) {
+    // Same weapon drawing logic as before
+    if (wp.name === 'Швабра') { ctx.fillStyle = '#8d6e63'; ctx.fillRect(0, -3, 60, 6); ctx.fillStyle = '#bdc3c7'; ctx.beginPath(); for(let i=0; i<5; i++) { ctx.rect(55, -15 + i*6, 20, 4); } ctx.fill(); }
+    else if (wp.name === 'Линейка') { ctx.fillStyle = '#f1c40f'; ctx.fillRect(0, -3, 50, 6); ctx.fillStyle = '#000'; for(let i=0; i<10; i++) ctx.fillRect(5+i*4, -3, 1, 3); }
+    else if (wp.name === 'Бита') { ctx.fillStyle = '#95a5a6'; ctx.beginPath(); ctx.moveTo(0, -2); ctx.lineTo(60, -6); ctx.lineTo(60, 6); ctx.lineTo(0, 2); ctx.fill(); ctx.fillStyle = '#7f8c8d'; ctx.fillRect(10, -3, 5, 6); }
+    else if (wp.name === 'Катана') { ctx.fillStyle = '#000'; ctx.fillRect(0, -2, 15, 4); ctx.fillStyle = '#ccc'; ctx.beginPath(); ctx.moveTo(15, -2); ctx.quadraticCurveTo(40, -5, 70, 0); ctx.lineTo(15, 2); ctx.fill(); }
+    else if (wp.name === 'Топор') { ctx.fillStyle = '#c0392b'; ctx.fillRect(0, -3, 50, 6); ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.moveTo(40, -3); ctx.lineTo(40, -15); ctx.quadraticCurveTo(55, -5, 40, 15); ctx.lineTo(40, 3); ctx.fill(); }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(-camera.x, -camera.y);
+
+    let startCol = Math.floor(camera.x / TILE_SIZE);
+    let endCol = startCol + Math.ceil(canvas.width / TILE_SIZE) + 1;
+    let startRow = Math.floor(camera.y / TILE_SIZE);
+    let endRow = startRow + Math.ceil(canvas.height / TILE_SIZE) + 1;
+
+    for(let y=Math.max(0, startRow); y<Math.min(grid.length, endRow); y++) {
+        for(let x=Math.max(0, startCol); x<Math.min(grid[0].length, endCol); x++) {
+            let type = grid[y][x], px = x*TILE_SIZE, py = y*TILE_SIZE;
+            if (type === 1) { ctx.fillStyle = '#444'; ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE); ctx.fillStyle = '#222'; ctx.fillRect(px, py+TILE_SIZE-10, TILE_SIZE, 10); }
+            else if (type === 2) { ctx.fillStyle = '#5d4037'; ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE); ctx.strokeStyle = '#3e2723'; ctx.lineWidth=2; ctx.strokeRect(px,py,TILE_SIZE,TILE_SIZE); }
+            else if (type === 3) { ctx.fillStyle = '#3e2723'; ctx.fillRect(px+10, py+30, TILE_SIZE-20, 20); ctx.fillStyle = '#7f8c8d'; ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE); }
+            else { ctx.fillStyle = (x+y)%2==0 ? '#95a5a6' : '#7f8c8d'; ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE); }
+        }
+    }
+
+    blood.forEach(b => { 
+        ctx.globalAlpha = Math.min(1, b.life / 100); 
+        ctx.fillStyle = '#700'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill(); 
+        ctx.globalAlpha = 1;
+    });
+
+    obstacles.forEach(o => { ctx.fillStyle = '#6d4c41'; ctx.fillRect(o.x, o.y, o.w, o.h); ctx.fillStyle = '#8d6e63'; ctx.fillRect(o.x+5, o.y+5, o.w-10, o.h-10); });
+
+    if (merchant.active) {
+        drawShadow(merchant.x, merchant.y, 30);
+        ctx.fillStyle = '#27ae60'; ctx.beginPath(); ctx.arc(merchant.x, merchant.y, 30, 0, Math.PI*2); ctx.fill();
+    }
+
+    // Player
+    drawShadow(player.x, player.y, player.r);
+    ctx.save(); ctx.translate(player.x, player.y); ctx.rotate(player.angle);
+    let footOffset = Math.sin(player.walkAnim) * 10;
+    ctx.fillStyle = '#2c3e50';
+    ctx.beginPath(); ctx.arc(10, 10 + footOffset, 9, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(10, -10 - footOffset, 9, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#3498db'; ctx.beginPath(); ctx.arc(0, 0, player.r, 0, Math.PI*2); ctx.fill();
+    
+    let weaponOffset = player.isAttacking ? 35 : 20;
+    let weaponRot = player.isAttacking ? -0.5 : 0;
+    ctx.save(); ctx.translate(weaponOffset, 10); ctx.rotate(weaponRot);
+    drawWeapon(ctx, WEAPONS[player.weaponIdx]);
+    ctx.restore(); ctx.restore();
+
+    // Zombies
+    zombies.forEach(z => {
+        drawShadow(z.x, z.y, z.r);
+        ctx.save(); ctx.translate(z.x, z.y);
+        if (z.dead) { ctx.rotate(z.rotation); ctx.globalAlpha = z.slideTimer/40; }
+        
+        ctx.fillStyle = z.color; 
+        ctx.beginPath(); ctx.arc(0, 0, z.r, 0, Math.PI*2); ctx.fill();
+        
+        if (z.type === 'boss') {
+            ctx.fillStyle = 'white'; ctx.beginPath(); ctx.moveTo(-10,0); ctx.lineTo(10,0); ctx.lineTo(0,20); ctx.fill();
+            ctx.fillStyle = 'red'; ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(3,0); ctx.lineTo(0,25); ctx.fill();
+        }
+
+        if (!z.dead && z.hp < z.maxHp) { 
+            ctx.fillStyle = 'red'; ctx.fillRect(-z.r, -z.r - 15, z.r*2, 5); 
+            ctx.fillStyle = '#2ecc71'; ctx.fillRect(-z.r, -z.r - 15, (z.r*2) * (z.hp/z.maxHp), 5); 
+        }
+        ctx.restore();
+    });
+
+    particles.forEach(p => { ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1; });
+    texts.forEach(t => { ctx.globalAlpha = Math.min(1, t.life); ctx.fillStyle = t.color; ctx.font = `bold ${t.scale}px Courier New`; ctx.fillText(t.text, t.x, t.y); ctx.globalAlpha = 1; });
+
+    ctx.restore();
+}
+
+function loop() { 
+    update(); 
+    draw(); 
+    
+    // Авто-атака при зажатой ЛКМ (для ПК)
+    if (mousePressed && player.attackCD <= 0 && gameState === 'PLAYING') {
+        performAttack();
+    }
+    
+    requestAnimationFrame(loop); 
+}
+
+// === UI INPUT ===
+// Сенсорное управление (оставляем для мобильных)
+joyZone.addEventListener('touchstart', (e) => { e.preventDefault(); updateJoy(e.touches[0]); }, {passive: false});
+joyZone.addEventListener('touchmove', (e) => { e.preventDefault(); updateJoy(e.touches[0]); }, {passive: false});
+joyZone.addEventListener('touchend', (e) => { e.preventDefault(); joyData.active = false; stick.style.transform = `translate(-50%, -50%)`; joyData.dx = 0; joyData.dy = 0; }, {passive: false});
+function updateJoy(touch) {
+    const rect = joyZone.getBoundingClientRect();
+    const dx = touch.clientX - (rect.left + rect.width/2), dy = touch.clientY - (rect.top + rect.height/2);
+    const dist = Math.min(Math.hypot(dx, dy), rect.width/2);
+    const angle = Math.atan2(dy, dx);
+    stick.style.transform = `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px))`;
+    joyData.active = true; joyData.dx = (Math.cos(angle)*dist) / (rect.width/2); joyData.dy = (Math.sin(angle)*dist) / (rect.width/2);
+}
+function openShop() {
+    gameState = 'SHOP'; 
+    joyData.active = false; joyData.dx = 0; joyData.dy = 0; stick.style.transform = `translate(-50%, -50%)`;
+    document.getElementById('shop-layer').style.display = 'flex'; document.getElementById('shop-score').innerText = score;
+    const container = document.getElementById('shop-items'); container.innerHTML = '';
+    WEAPONS.forEach(w => {
+        if (w.id === 0) return;
+        const owned = player.unlockedWeapons.includes(w.id);
+        container.innerHTML += `<div class="shop-item"><div><b style="color:${w.color}">${w.name}</b><br><span style="font-size:12px">Урон: ${w.damage}</span></div><div>${owned ? '<span style="color:lime">КУПЛЕНО</span>' : `<button class="shop-btn" onclick="buyWeapon(${w.id})" ${score < w.price ? 'disabled' : ''}>${w.price}</button>`}</div></div>`;
+    });
+}
+window.buyWeapon = function(id) { const w = WEAPONS.find(x => x.id === id); if (score >= w.price) { score -= w.price; player.unlockedWeapons.push(id); document.getElementById('shop-score').innerText = score; openShop(); } };
+window.closeShop = function() { document.getElementById('shop-layer').style.display = 'none'; gameState = 'PLAYING'; merchant.cooldown = 120; };
+document.getElementById('inv-btn').addEventListener('touchstart', toggleInventory);
+function toggleInventory() {
+    const layer = document.getElementById('inventory-layer');
+    if (layer.style.display === 'flex') { layer.style.display = 'none'; if(gameState !== 'SHOP') gameState = 'PLAYING'; }
+    else { gameState = 'PAUSE'; layer.style.display = 'flex'; updateInvUI(); }
+}
+function updateInvUI() {
+    const curW = WEAPONS[player.weaponIdx];
+    document.getElementById('current-weapon').innerText = curW.name; document.getElementById('current-weapon').style.color = curW.color;
+    const container = document.getElementById('inv-items'); container.innerHTML = '';
+    player.unlockedWeapons.forEach(id => {
+        const w = WEAPONS.find(x => x.id === id);
+        container.innerHTML += `<div class="inv-slot" style="border: 1px solid ${w.color}"><div style="font-size:20px">🗡️</div><div style="font-size:10px">${w.name}</div>${player.weaponIdx === id ? '<small>РУКИ</small>' : `<button class="use-btn" onclick="equip(${id})">ВЗЯТЬ</button>`}</div>`;
+    });
+    if (player.inventory.gum > 0) container.innerHTML += `<div class="inv-slot"><div>🍬 ${player.inventory.gum}</div><button class="use-btn" onclick="eat('gum')">ЕСТЬ</button></div>`;
+    if (player.inventory.soda > 0) container.innerHTML += `<div class="inv-slot"><div>🥤 ${player.inventory.soda}</div><button class="use-btn" onclick="eat('soda')">ПИТЬ</button></div>`;
+    if (player.inventory.pizza > 0) container.innerHTML += `<div class="inv-slot"><div>🍕 ${player.inventory.pizza}</div><button class="use-btn" onclick="eat('pizza')">ЕСТЬ</button></div>`;
+}
+window.equip = function(id) { player.weaponIdx = id; updateInvUI(); };
+window.eat = function(type) { if (player.hp >= player.maxHp) return; if (player.inventory[type] > 0) { player.inventory[type]--; let heal = type==='gum'?5:(type==='soda'?15:50); player.hp = Math.min(player.hp + heal, player.maxHp); updateInvUI(); } };
+loop();
+</script>
+</body>
+</html>

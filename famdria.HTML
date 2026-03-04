@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>FAMDria 1.3 - Виправлена Динаміка</title>
+    <style>
+        /* Стилі з FAMDria 1.2 */
+        body { margin: 0; overflow: hidden; background-color: #000; }
+        canvas { display: block; image-rendering: pixelated; }
+        
+        #hotbar, #fullInventory, #mainMenu, #characterMenu, #craftingMenu {
+            font-family: 'Press Start 2P', cursive, Arial, sans-serif; 
+            color: white;
+            user-select: none;
+        }
+
+        /* Hotbar */
+        #hotbar {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; background: rgba(0, 0, 0, 0.85); padding: 5px; border-radius: 10px;
+            pointer-events: auto; z-index: 900;
+        }
+        .slot {
+            width: 40px; height: 40px; line-height: 40px; text-align: center;
+            margin: 0 2px; border: 3px solid #555; cursor: pointer;
+            background-color: #333; transition: all 0.1s;
+            font-size: 10px; 
+            position: relative;
+        }
+        .slot.selected {
+            border-color: #FFD700; 
+            background-color: #555;
+        }
+        .slot-count {
+            position: absolute; bottom: 0; right: 2px; font-size: 10px; text-shadow: 1px 1px #000;
+        }
+        .slot-icon {
+            display: flex; align-items: center; justify-content: center; height: 100%; font-size: 20px;
+        }
+
+        /* Інвентар та Крафт Загальне */
+        #fullInventory, #craftingMenu {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 500px; 
+            background: rgba(40, 40, 40, 0.95);
+            border: 4px solid #888;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+            z-index: 1000;
+            text-align: center;
+        }
+
+        /* Крафт */
+        #craftingMenu {
+            width: 700px;
+            display: none;
+            flex-direction: column;
+        }
+        #craftingGrid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .recipe-item {
+            background: rgba(60, 60, 60, 0.9);
+            border: 2px solid #555;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.1s;
+        }
+        .recipe-item:hover {
+            background: rgba(80, 80, 80, 0.9);
+        }
+        .recipe-item.can-craft {
+             border-color: #00FF00;
+             box-shadow: 0 0 8px #00FF0080;
+        }
+        .recipe-item h4 { margin: 0 0 5px 0; font-size: 14px; color: #FFD700; }
+        .recipe-item p { margin: 2px 0; font-size: 10px; color: #aaa; }
+        .resource-needed { color: #fff; margin-left: 5px; }
+
+        /* Інвентар */
+        #inventoryGrid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr); 
+            gap: 5px;
+            margin-top: 15px;
+        }
+        .inv-slot {
+            width: 40px; height: 40px; 
+            background-color: #555;
+            border: 2px solid #333;
+            text-align: right;
+            padding: 2px;
+            box-sizing: border-box;
+            font-size: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        /* Меню */
+        #mainMenu, #characterMenu {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 2000;
+        }
+        #mainMenu h1 {
+            font-size: 60px; color: #FFD700; text-shadow: 4px 4px #000; margin-bottom: 50px;
+        }
+        .menu-button {
+            background: #007bff; color: white; border: 3px solid #0056b3;
+            padding: 15px 30px; margin: 10px; cursor: pointer;
+            font-size: 20px; border-radius: 8px; transition: background 0.2s, transform 0.1s;
+        }
+        .menu-button:hover { background: #0056b3; transform: scale(1.05); }
+
+        /* Меню Персонажа */
+        #characterMenu h2 {
+            font-size: 30px; margin-bottom: 30px; color: #FFD700;
+        }
+        #colorPicker {
+            display: flex; gap: 15px; margin-top: 20px;
+        }
+        .color-option {
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            border: 4px solid transparent; transition: border 0.2s;
+        }
+        .color-option.selected {
+            border-color: #FFD700;
+            box-shadow: 0 0 15px #FFD700;
+        }
+        #charPreview {
+            width: 80px; height: 160px; background-color: #333; border: 2px solid #FFF; margin-bottom: 20px;
+            position: relative;
+        }
+        #previewHead { position: absolute; top: 0; left: 0; width: 80px; height: 80px; }
+        #previewShirt { position: absolute; top: 80px; left: 0; width: 80px; height: 40px; }
+        #previewPants { position: absolute; top: 120px; left: 0; width: 80px; height: 40px; }
+
+
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="hotbar"></div>
+
+    <div id="fullInventory" style="display: none;">
+        <h2>Інвентар</h2>
+        <div id="inventoryGrid"></div>
+        <p style="margin-top: 15px; font-size: 12px; color: #aaa;">ESC для закриття</p>
+    </div>
+
+    <div id="craftingMenu" style="display: none;">
+        <h2>Майстерня</h2>
+        <p style="font-size: 12px; color: #FFD700;">Натисніть на рецепт, щоб створити предмет.</p>
+        <div id="craftingGrid"></div>
+        <p style="margin-top: 15px; font-size: 12px; color: #aaa;">"C" або ESC для закриття</p>
+    </div>
+
+    <div id="mainMenu">
+        <h1>FAMDria 1.3</h1>
+        <button class="menu-button" id="playButton">ГРАТИ</button>
+        <button class="menu-button" id="selectCharButton">ВИБРАТИ ПЕРСОНАЖА</button>
+    </div>
+    
+    <div id="characterMenu" style="display: none;">
+        <h2>Налаштування Персонажа</h2>
+        <div id="charPreview">
+            <div id="previewHead"></div>
+            <div id="previewShirt"></div>
+            <div id="previewPants"></div>
+        </div>
+        
+        <h3>Колір Сорочки:</h3>
+        <div id="colorPicker">
+        </div>
+        
+        <button class="menu-button" id="confirmCharButton" style="margin-top: 40px;">ГОТОВО</button>
+    </div>
+
+
+    <script>
+        // =================================================================
+        // 🛠️ КОНСТАНТИ ТА ІНІЦІАЛІЗАЦІЯ
+        // =================================================================
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const TILE_SIZE = 32; 
+        const WORLD_WIDTH = 2500; 
+        const WORLD_HEIGHT = 400; 
+        const SURFACE_LEVEL = WORLD_HEIGHT - 350; 
+        
+        const PLAYER_TILE_HEIGHT = 2;
+        const PLAYER_WIDTH = TILE_SIZE;
+        const PLAYER_HEIGHT = TILE_SIZE * PLAYER_TILE_HEIGHT; 
+        const GRAVITY = 0.5;
+        const JUMP_POWER = 12;
+        const MOVE_SPEED = 6;
+        const ITEM_SIZE = TILE_SIZE / 2;
+        const HOTBAR_SIZE = 10; 
+        const INVENTORY_SIZE = 50; 
+        const FLUID_PASSES_PER_FRAME = 3; 
+        const MINING_RANGE = 6 * TILE_SIZE; 
+
+        let world = [];
+        let itemsOnGround = []; 
+        let player = {
+            x: WORLD_WIDTH * TILE_SIZE / 2, y: 0,
+            vx: 0, vy: 0, onGround: false,
+            width: PLAYER_WIDTH, height: PLAYER_HEIGHT,
+            facingRight: true,
+            colors: { head: '#FFC0CB', shirt: '#0000FF', pants: '#800080' }
+        };
+        let keys = {};
+        let camera = { x: 0, y: 0 };
+        let mining = { active: false, x: 0, y: 0, progress: 0, required: 0 };
+        let lastTime = performance.now();
+        let inventoryOpen = false; 
+        let craftingOpen = false; 
+        let gameRunning = false; 
+
+        // --- Типи Блоків ---
+        const TILE_AIR = 0;
+        const TILE_GRASS = 101;
+        const TILE_DIRT = 102;
+        const TILE_STONE = 103;
+        const TILE_WOOD = 104;
+        const TILE_LEAVES = 105;
+        const TILE_COPPER = 106;
+        const TILE_IRON = 107;
+        const TILE_GOLD = 108;
+        const TILE_SILVER = 109;
+        const TILE_PLATINUM = 110;
+        const TILE_SAND = 111;
+        const TILE_WATER = 112; 
+        const TILE_LAVA = 113;
+        const TILE_GEM = 114;
+        const TILE_CLAY = 115;
+        
+        // --- Візуальне представлення ---
+        const tileColors = {
+            [TILE_GRASS]: '#008000', [TILE_DIRT]: '#8B4513', [TILE_STONE]: '#808080', 
+            [TILE_WOOD]: '#654321', [TILE_LEAVES]: '#006400', [TILE_COPPER]: '#B87333', 
+            [TILE_IRON]: '#C0C0C0', [TILE_GOLD]: '#FFD700', [TILE_SILVER]: '#A9A9A9',
+            [TILE_PLATINUM]: '#E5E4E2', [TILE_SAND]: '#FAD5A5', [TILE_WATER]: '#4682B490', 
+            [TILE_LAVA]: '#FF4500B0', 
+            [TILE_GEM]: '#DDA0DD', [TILE_CLAY]: '#CC8899',
+            1: '#8B4513', // Робочий Стіл (як дерево)
+            2: '#B87333', // Мідна Кирка (як мідь)
+            3: '#FFA500' // Смолоскип
+        };
+        
+        const tileNames = {
+            [TILE_GRASS]: 'Трава', [TILE_DIRT]: 'Земля', [TILE_STONE]: 'Камінь', 
+            [TILE_WOOD]: 'Дерево', [TILE_LEAVES]: 'Листя', [TILE_COPPER]: 'Мідь', 
+            [TILE_IRON]: 'Залізо', [TILE_GOLD]: 'Золото', [TILE_SILVER]: 'Срібло',
+            [TILE_PLATINUM]: 'Платина', [TILE_SAND]: 'Пісок', [TILE_WATER]: 'Вода',
+            [TILE_LAVA]: 'Лава', [TILE_GEM]: 'Самоцвіт', [TILE_CLAY]: 'Глина',
+            0: 'Кирка', // Інструмент за замовчуванням
+            1: 'Робочий Стіл',
+            2: 'Мідна Кирка',
+            3: 'Смолоскип'
+        };
+
+        const tileMiningTime = {
+            [TILE_GRASS]: 100, [TILE_DIRT]: 150, [TILE_WOOD]: 150, [TILE_LEAVES]: 50,
+            [TILE_STONE]: 300, [TILE_CLAY]: 300, [TILE_COPPER]: 400, [TILE_IRON]: 600,
+            [TILE_SILVER]: 800, [TILE_GOLD]: 1000, [TILE_PLATINUM]: 1200, [TILE_GEM]: 1500,
+            1: 200, 
+            2: 500, 
+            3: 100
+        };
+        
+        const SHIRT_COLORS = {
+            'blue': '#0000FF', 'red': '#FF0000', 'green': '#00FF00', 
+            'yellow': '#FFFF00', 'black': '#000000', 'cyan': '#00FFFF'
+        };
+
+        const CRAFTING_RECIPES = [
+            { 
+                output: { id: 1, type: 'placeable', count: 1, label: 'Робочий Стіл' }, 
+                required: [{ id: TILE_WOOD, count: 10, label: tileNames[TILE_WOOD] }],
+                craftingStation: null
+            },
+            { 
+                output: { id: 2, type: 'tool', count: 1, label: 'Мідна Кирка' }, 
+                required: [
+                    { id: TILE_WOOD, count: 5, label: tileNames[TILE_WOOD] },
+                    { id: TILE_COPPER, count: 15, label: tileNames[TILE_COPPER] }
+                ],
+                craftingStation: 1 
+            },
+            { 
+                output: { id: 3, type: 'placeable', count: 5, label: 'Смолоскип' }, 
+                required: [
+                    { id: TILE_WOOD, count: 1, label: tileNames[TILE_WOOD] },
+                    { id: TILE_DIRT, count: 1, label: tileNames[TILE_DIRT] } 
+                ],
+                craftingStation: null
+            },
+            {
+                output: { id: TILE_STONE, type: 'block', count: 1, label: tileNames[TILE_STONE] }, 
+                required: [{ id: TILE_DIRT, count: 1, label: tileNames[TILE_DIRT] }],
+                craftingStation: null
+            }
+        ];
+
+        let inventory = {
+            selectedSlot: 0,
+            slots: Array(INVENTORY_SIZE).fill(null).map((_, i) => {
+                if (i === 0) return { id: 0, type: 'tool', count: 1, label: '⛏️' };
+                if (i === 1) return { id: TILE_GRASS, type: 'block', count: 99, label: tileNames[TILE_GRASS] };
+                if (i === 2) return { id: TILE_STONE, type: 'block', count: 50, label: tileNames[TILE_STONE] };
+                if (i === 3) return { id: TILE_WOOD, type: 'block', count: 20, label: tileNames[TILE_WOOD] };
+                if (i === 4) return { id: TILE_COPPER, type: 'block', count: 5, label: tileNames[TILE_COPPER] };
+                return null;
+            })
+        };
+
+        // =================================================================
+        // 🗺️ ГЕНЕРАЦІЯ СВІТУ (БЕЗ ЗМІН)
+        // =================================================================
+        
+        function pseudoNoise(x, y, scale, seed) { 
+            const val = Math.sin(x * scale + seed) * Math.cos(y * scale + seed / 2);
+            return (val + 1) / 2;
+        }
+        
+        function getSurfaceHeight(x) { 
+             const baseLevel = SURFACE_LEVEL;
+             const wave = pseudoNoise(x, 0, 0.05, 10) * 8; 
+             return Math.floor(baseLevel + wave);
+        }
+
+        function generateWorld() {
+            const caveSeed = 500;
+            const caveDensity = 0.50; 
+            const waterSeed = 300; 
+            const blobSeed = 700; 
+            
+            for (let y = 0; y < WORLD_HEIGHT; y++) {
+                world[y] = [];
+                for (let x = 0; x < WORLD_WIDTH; x++) {
+                    const surfaceLevel = getSurfaceHeight(x);
+
+                    if (y < surfaceLevel) {
+                        world[y][x] = TILE_AIR;
+                    } else if (y === surfaceLevel) {
+                        world[y][x] = TILE_GRASS;
+                    } else if (y > surfaceLevel && y < surfaceLevel + 5) {
+                        world[y][x] = TILE_DIRT;
+                    } else {
+                        const caveNoise = pseudoNoise(x, y, 0.1, caveSeed);
+                        const blobNoise = pseudoNoise(x, y, 0.05, blobSeed); 
+                        let blockId = TILE_STONE;
+                        const depth = y - surfaceLevel; 
+
+                        if (blobNoise < 0.2) { 
+                            blockId = TILE_AIR;
+                        } else if (caveNoise < caveDensity) {
+                             blockId = TILE_AIR;
+                             
+                             const liquidNoise = pseudoNoise(x, y, 0.2, waterSeed);
+                             if (blockId === TILE_AIR) {
+                                  if (depth > WORLD_HEIGHT * 0.7 - SURFACE_LEVEL && liquidNoise < 0.015) { 
+                                     blockId = TILE_LAVA; 
+                                 } else if (liquidNoise < 0.03) {
+                                     blockId = TILE_WATER; 
+                                 }
+                             }
+                        } else {
+                            const depthNoise = pseudoNoise(x, y, 0.5, 99);
+                            
+                            if (depth < 50) { 
+                                if (depthNoise < 0.08) blockId = TILE_COPPER;
+                                else if (depthNoise < 0.1) blockId = TILE_CLAY;
+                                else blockId = TILE_STONE;
+                            } else if (depth < 150) { 
+                                if (depthNoise < 0.06) blockId = TILE_IRON;
+                                else if (depthNoise < 0.1) blockId = TILE_SILVER;
+                                else blockId = TILE_STONE;
+                            } else { 
+                                if (depthNoise < 0.05) blockId = TILE_GOLD;
+                                else if (depthNoise < 0.08) blockId = TILE_PLATINUM;
+                                else if (depthNoise < 0.1) blockId = TILE_GEM;
+                                else blockId = TILE_STONE;
+                            }
+                        }
+                        world[y][x] = blockId;
+                    }
+                }
+            }
+
+            for (let x = 0; x < WORLD_WIDTH; x++) {
+                 if (Math.random() < 0.02) {
+                     const surfaceY = getSurfaceHeight(x);
+                     for(let y = 0; y < 3; y++) {
+                         if (surfaceY + y < WORLD_HEIGHT) {
+                             world[surfaceY + y][x] = TILE_SAND;
+                         }
+                     }
+                 }
+            }
+
+            for (let x = 10; x < WORLD_WIDTH - 10; x++) {
+                if (Math.random() < 0.05) {
+                    const surfaceY = getSurfaceHeight(x);
+                    if (world[surfaceY] && world[surfaceY][x] === TILE_GRASS) {
+                        const treeHeight = 5 + Math.floor(Math.random() * 3);
+                        for (let h = 0; h < treeHeight; h++) {
+                            if (surfaceY - h >= 0) world[surfaceY - h][x] = TILE_WOOD;
+                        }
+                        for (let dx = -2; dx <= 2; dx++) {
+                            for (let dy = -2; dy <= 1; dy++) {
+                                const leafX = x + dx;
+                                const leafY = surfaceY - treeHeight + dy - 1;
+                                if (leafY >= 0 && leafY < WORLD_HEIGHT && world[leafY][leafX] === TILE_AIR) {
+                                     world[leafY][leafX] = TILE_LEAVES;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            player.x = WORLD_WIDTH * TILE_SIZE / 2;
+            player.y = (getSurfaceHeight(Math.floor(player.x / TILE_SIZE)) - PLAYER_TILE_HEIGHT - 1) * TILE_SIZE;
+        }
+
+        function setTile(x, y, id) {
+            if (x < 0 || x >= WORLD_WIDTH || y < 0 || y >= WORLD_HEIGHT) {
+                return false; 
+            }
+            world[y][x] = id;
+            return true;
+        }
+
+        // =================================================================
+        // 🌊 ДИНАМІКА РІДИН
+        // =================================================================
+
+        function isLiquid(tileId) {
+            return tileId === TILE_WATER || tileId === TILE_LAVA;
+        }
+        
+        function updateFluids() {
+            const startX = Math.max(0, Math.floor(camera.x / TILE_SIZE));
+            const endX = Math.min(WORLD_WIDTH, startX + Math.ceil(canvas.width / TILE_SIZE) + 1);
+            const startY = Math.max(0, Math.floor(camera.y / TILE_SIZE));
+            const endY = Math.min(WORLD_HEIGHT, startY + Math.ceil(canvas.height / TILE_SIZE) + 1);
+
+            let changes = []; 
+
+            for (let pass = 0; pass < FLUID_PASSES_PER_FRAME; pass++) {
+                 changes = [];
+                for (let y = endY - 1; y >= startY; y--) { 
+                    for (let x = startX; x < endX; x++) {
+                        const id = world[y][x];
+
+                        if (isLiquid(id)) {
+                            // 1. Потік Вниз
+                            if (y + 1 < WORLD_HEIGHT && world[y + 1][x] === TILE_AIR) {
+                                changes.push({ x: x, y: y, newY: y + 1, id: id });
+                            } 
+                            // 2. Потік вбік
+                            else if (y + 1 < WORLD_HEIGHT && isSolid(world[y + 1][x])) {
+                                const left = (x - 1 >= 0 && world[y][x - 1] === TILE_AIR);
+                                const right = (x + 1 < WORLD_WIDTH && world[y][x + 1] === TILE_AIR);
+
+                                if (left && right) {
+                                    if (Math.random() < 0.5) changes.push({ x: x, y: y, newX: x - 1, id: id });
+                                    else changes.push({ x: x, y: y, newX: x + 1, id: id });
+                                } else if (left) {
+                                    changes.push({ x: x, y: y, newX: x - 1, id: id });
+                                } else if (right) {
+                                    changes.push({ x: x, y: y, newX: x + 1, id: id });
+                                }
+                            }
+
+                            // 3. Реакція Рідин (Лава + Вода = Камінь)
+                            if (id === TILE_LAVA) {
+                                const neighbors = [{dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}];
+                                neighbors.forEach(n => {
+                                    const nx = x + n.dx;
+                                    const ny = y + n.dy;
+                                    if (ny >= 0 && ny < WORLD_HEIGHT && world[ny][nx] === TILE_WATER) {
+                                        world[y][x] = TILE_STONE;
+                                        world[ny][nx] = TILE_STONE; 
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+
+                changes.forEach(change => {
+                    if (change.newY !== undefined) {
+                        if (world[change.newY][change.x] === TILE_AIR) {
+                            world[change.newY][change.x] = change.id;
+                            world[change.y][change.x] = TILE_AIR;
+                        }
+                    } 
+                    else if (change.newX !== undefined) {
+                        if (world[change.y][change.newX] === TILE_AIR) {
+                             world[change.y][change.newX] = change.id;
+                             world[change.y][change.x] = TILE_AIR;
+                        }
+                    }
+                });
+            }
+        }
+
+
+        // =================================================================
+        // 📦 ФУНКЦІЇ ІНВЕНТАРЮ ТА КРАФТУ (ПОЛАГОДЖЕНІ)
+        // =================================================================
+        
+        function addItemToInventory(id, count = 1) {
+            const itemType = (id >= 101) ? 'block' : (id === 0 || id === 2) ? 'tool' : 'placeable';
+            
+            // Спроба об'єднати
+            let targetSlot = inventory.slots.find(slot => 
+                slot && slot.id === id && slot.type === itemType && (itemType === 'block' || itemType === 'placeable')
+            );
+            
+            // Якщо не знайшли слот для об'єднання або це інструмент, шукаємо пустий
+            if (!targetSlot) {
+                const targetSlotIndex = inventory.slots.findIndex(slot => slot === null);
+                if (targetSlotIndex !== -1) {
+                    inventory.slots[targetSlotIndex] = { 
+                        id: id, 
+                        type: itemType, 
+                        count: 0, 
+                        label: tileNames[id] || 'Предмет' 
+                    };
+                    targetSlot = inventory.slots[targetSlotIndex];
+                } else {
+                    console.warn('Інвентар повний! Предмет дропається на землю.');
+                    return; 
+                }
+            }
+            
+            targetSlot.count += count;
+            updateHotbarDisplay();
+            updateFullInventoryDisplay();
+        }
+
+        function useItemFromInventory(slotIndex) {
+            const item = inventory.slots[slotIndex];
+            if (!item || item.type === 'tool') return false; 
+
+            item.count--;
+            if (item.count <= 0) {
+                inventory.slots[slotIndex] = null;
+                if (inventory.selectedSlot === slotIndex) {
+                    // Після використання блоку, вибираємо кирку (якщо вона є)
+                    inventory.selectedSlot = inventory.slots.findIndex(s => s && s.type === 'tool') || 0;
+                }
+            }
+            updateHotbarDisplay();
+            updateFullInventoryDisplay();
+            return true;
+        }
+
+        function getInventoryCount(id) {
+            return inventory.slots.filter(item => item && item.id === id).reduce((sum, item) => sum + item.count, 0);
+        }
+
+        function canCraft(recipe) {
+            return recipe.required.every(req => getInventoryCount(req.id) >= req.count);
+        }
+
+        function craftItem(recipe) {
+            if (!canCraft(recipe)) {
+                console.warn('Неможливо створити: Не вистачає ресурсів.');
+                return;
+            }
+
+            recipe.required.forEach(req => {
+                let remaining = req.count;
+                for (let i = 0; i < INVENTORY_SIZE && remaining > 0; i++) {
+                    let slot = inventory.slots[i];
+                    if (slot && slot.id === req.id && (slot.type === 'block' || slot.type === 'placeable')) {
+                        const amountToTake = Math.min(remaining, slot.count);
+                        slot.count -= amountToTake;
+                        remaining -= amountToTake;
+                        if (slot.count <= 0) {
+                            inventory.slots[i] = null;
+                        }
+                    }
+                }
+            });
+
+            addItemToInventory(recipe.output.id, recipe.output.count);
+            updateCraftingMenuDisplay();
+            updateHotbarDisplay();
+        }
+
+        function toggleCrafting() {
+            if (inventoryOpen) toggleInventory();
+            
+            craftingOpen = !craftingOpen;
+            const menu = document.getElementById('craftingMenu');
+            menu.style.display = craftingOpen ? 'flex' : 'none';
+            
+            if (craftingOpen) {
+                updateCraftingMenuDisplay();
+                keys = {}; 
+                mining.active = false; 
+            }
+        }
+        
+        function updateCraftingMenuDisplay() {
+            const grid = document.getElementById('craftingGrid');
+            grid.innerHTML = ''; 
+            
+            const playerHasWorkbench = getInventoryCount(1) > 0;
+
+            CRAFTING_RECIPES.forEach(recipe => {
+                if (recipe.craftingStation === 1 && !playerHasWorkbench) return;
+
+                const canMake = canCraft(recipe);
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'recipe-item';
+                if (canMake) itemDiv.classList.add('can-craft');
+                
+                itemDiv.innerHTML = `
+                    <h4>${recipe.output.label} (x${recipe.output.count})</h4>
+                    ${recipe.required.map(req => {
+                        const currentCount = getInventoryCount(req.id);
+                        const color = currentCount >= req.count ? '#00FF00' : '#FF0000';
+                        return `<p style="color: ${color};">Потрібно: ${req.label} <span class="resource-needed">(${currentCount}/${req.count})</span></p>`;
+                    }).join('')}
+                    ${recipe.craftingStation ? '<p style="font-size: 10px; color: #FFD700;">Потрібен Робочий Стіл</p>' : ''}
+                `;
+                
+                itemDiv.addEventListener('click', () => {
+                    craftItem(recipe);
+                });
+                
+                grid.appendChild(itemDiv);
+            });
+        }
+
+
+        // =================================================================
+        // 💻 ОНОВЛЕННЯ ІНТЕРФЕЙСУ (ПОЛАГОДЖЕНО)
+        // =================================================================
+        
+        function selectSlot(index) {
+            if (index >= 0 && index < HOTBAR_SIZE) {
+                inventory.selectedSlot = index;
+                updateHotbarDisplay();
+            }
+        }
+
+        function toggleInventory() {
+            if (craftingOpen) toggleCrafting();
+
+            inventoryOpen = !inventoryOpen;
+            const inv = document.getElementById('fullInventory');
+            inv.style.display = inventoryOpen ? 'block' : 'none';
+            
+            if (inventoryOpen) {
+                updateFullInventoryDisplay();
+                keys = {}; 
+                mining.active = false; 
+            }
+        }
+
+        function updateHotbarDisplay() {
+            const hotbarDiv = document.getElementById('hotbar');
+            // Перевірка та створення слотів (якщо необхідно)
+            while (hotbarDiv.children.length < HOTBAR_SIZE) {
+                const newSlot = document.createElement('div');
+                newSlot.className = 'slot';
+                newSlot.setAttribute('data-slot-id', hotbarDiv.children.length);
+                newSlot.addEventListener('mousedown', (e) => {
+                    selectSlot(parseInt(e.currentTarget.getAttribute('data-slot-id')));
+                    e.stopPropagation(); 
+                });
+                hotbarDiv.appendChild(newSlot);
+            }
+
+            const slots = document.querySelectorAll('#hotbar .slot');
+            slots.forEach((slot, index) => {
+                const item = inventory.slots[index];
+                slot.classList.toggle('selected', index === inventory.selectedSlot);
+                slot.innerHTML = ''; 
+
+                if (item) {
+                    const iconDiv = document.createElement('div');
+                    iconDiv.className = 'slot-icon';
+                    iconDiv.setAttribute('title', item.label); 
+                    
+                    if (item.type === 'tool') {
+                        iconDiv.textContent = item.label;
+                        iconDiv.style.color = 'white';
+                        iconDiv.style.backgroundColor = '#333';
+                    } else {
+                        iconDiv.style.backgroundColor = tileColors[item.id] || '#555';
+                        iconDiv.style.borderRadius = '5px';
+                    }
+                    slot.appendChild(iconDiv);
+                    
+                    if (item.count > 1) {
+                         const countDiv = document.createElement('div');
+                         countDiv.className = 'slot-count';
+                         countDiv.textContent = item.count;
+                         slot.appendChild(countDiv);
+                    }
+                }
+            });
+        }
+        
+        function updateFullInventoryDisplay() {
+            const grid = document.getElementById('inventoryGrid');
+            grid.innerHTML = ''; 
+            
+            document.getElementById('inventoryGrid').style.gridTemplateColumns = `repeat(${HOTBAR_SIZE}, 1fr)`;
+            
+            inventory.slots.forEach((item, index) => {
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'inv-slot';
+                slotDiv.setAttribute('data-slot-id', index);
+
+                if (index < HOTBAR_SIZE) {
+                    slotDiv.style.border = '2px solid #FFD700'; 
+                    slotDiv.style.boxShadow = '0 0 5px rgba(255, 215, 0, 0.7)';
+                }
+
+                if (item) {
+                    slotDiv.setAttribute('title', item.label);
+                    
+                    if (item.type === 'block' || item.type === 'placeable') {
+                        slotDiv.style.backgroundColor = tileColors[item.id] || '#555';
+                        slotDiv.textContent = item.count; 
+                        slotDiv.style.color = 'white';
+                        slotDiv.style.fontSize = '10px';
+                        slotDiv.style.textAlign = 'right';
+                    } else if (item.type === 'tool') {
+                        const iconDiv = document.createElement('div');
+                        iconDiv.className = 'inv-slot-icon';
+                        iconDiv.textContent = item.label;
+                        slotDiv.appendChild(iconDiv);
+                        slotDiv.style.textAlign = 'center';
+                        slotDiv.style.backgroundColor = '#555'; 
+                    }
+                }
+                
+                grid.appendChild(slotDiv);
+            });
+        }
+
+
+        // =================================================================
+        // 🏃 ФІЗИКА ТА РУХ (БЕЗ ЗМІН)
+        // =================================================================
+
+        function getTile(x, y) {
+            const tileX = Math.floor(x / TILE_SIZE);
+            const tileY = Math.floor(y / TILE_SIZE);
+
+            if (tileX < 0 || tileX >= WORLD_WIDTH || tileY < 0 || tileY >= WORLD_HEIGHT) {
+                return TILE_STONE; 
+            }
+            if (!world[tileY] || !world[tileY][tileX]) return TILE_AIR; 
+            return world[tileY][tileX];
+        }
+
+        function isSolid(tileId) {
+            return tileId !== TILE_AIR && tileId !== TILE_LEAVES && tileId !== TILE_WATER && tileId !== TILE_LAVA; 
+        }
+
+        function checkCollision(x, y, w, h) {
+            const tx1 = Math.floor(x / TILE_SIZE);
+            const ty1 = Math.floor(y / TILE_SIZE);
+            const tx2 = Math.floor((x + w - 1) / TILE_SIZE);
+            const ty2 = Math.floor((y + h - 1) / TILE_SIZE);
+
+            for (let ty = ty1; ty <= ty2; ty++) {
+                for (let tx = tx1; tx <= tx2; tx++) {
+                    if (isSolid(getTile(tx * TILE_SIZE, ty * TILE_SIZE))) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function updatePhysics() {
+            // ... (Рух по X)
+            const newX = player.x + player.vx;
+            if (checkCollision(newX, player.y, player.width, player.height)) {
+                if (player.vx > 0) {
+                    player.x = Math.floor((newX + player.width) / TILE_SIZE) * TILE_SIZE - player.width;
+                } else {
+                    player.x = Math.floor(newX / TILE_SIZE) * TILE_SIZE + TILE_SIZE;
+                }
+                player.vx = 0;
+            } else {
+                 player.x = newX;
+            }
+
+            // ... (Рух по Y та Гравітація)
+            player.vy += GRAVITY;
+            const newY = player.y + player.vy;
+            player.onGround = false;
+
+            if (checkCollision(player.x, newY, player.width, player.height)) {
+                if (player.vy > 0) {
+                    player.y = Math.floor((newY + player.height) / TILE_SIZE) * TILE_SIZE - player.height;
+                    player.onGround = true; 
+                    player.vy = 0;
+                } else if (player.vy < 0) {
+                    player.y = Math.floor(newY / TILE_SIZE) * TILE_SIZE + TILE_SIZE; 
+                    player.vy = 0;
+                }
+            } else {
+                 player.y = newY;
+            }
+
+            // ... (Фізика Дропу)
+            itemsOnGround = itemsOnGround.filter(item => {
+                item.vy += GRAVITY * 2;
+                item.x += item.vx;
+                item.y += item.vy;
+
+                const tx1 = Math.floor(item.x / TILE_SIZE);
+                const ty1 = Math.floor(item.y / TILE_SIZE);
+                const tx2 = Math.floor((item.x + ITEM_SIZE - 1) / TILE_SIZE);
+                const ty2 = Math.floor((item.y + ITEM_SIZE - 1) / TILE_SIZE);
+
+                let hit = false;
+                for (let ty = ty1; ty <= ty2; ty++) {
+                    for (let tx = tx1; tx <= tx2; tx++) {
+                        if (isSolid(getTile(tx * TILE_SIZE, ty * TILE_SIZE))) {
+                             hit = true;
+                             break;
+                        }
+                    }
+                }
+
+                if (hit) {
+                    item.vy = 0;
+                    item.vx = 0;
+                    item.y = Math.floor((item.y + ITEM_SIZE) / TILE_SIZE) * TILE_SIZE - ITEM_SIZE; 
+                }
+
+                const pickupRadius = TILE_SIZE * 1.5;
+                const distX = player.x + player.width / 2 - item.x - ITEM_SIZE / 2;
+                const distY = player.y + player.height / 2 - item.y - ITEM_SIZE / 2;
+                const distance = Math.sqrt(distX * distX + distY * distY);
+
+                if (distance < pickupRadius) {
+                    addItemToInventory(item.id);
+                    return false;
+                }
+                return true;
+            });
+        }
+        
+        function handleInput() {
+            player.vx = 0;
+            if (keys['KeyA']) {
+                player.vx = -MOVE_SPEED;
+                player.facingRight = false;
+            }
+            if (keys['KeyD']) {
+                player.vx = MOVE_SPEED;
+                player.facingRight = true;
+            }
+            if (keys['Space'] && player.onGround) {
+                player.vy = -JUMP_POWER;
+            }
+        }
+        
+        function isWithinRange(tileX, tileY) {
+            const playerCenterX = player.x + player.width / 2;
+            const playerCenterY = player.y + player.height / 2;
+            const tileCenterX = tileX * TILE_SIZE + TILE_SIZE / 2;
+            const tileCenterY = tileY * TILE_SIZE + TILE_SIZE / 2;
+
+            const distX = playerCenterX - tileCenterX;
+            const distY = playerCenterY - tileCenterY;
+            const distance = Math.sqrt(distX * distX + distY * distY);
+
+            return distance <= MINING_RANGE;
+        }
+
+        function updateMining(deltaTime) {
+            if (!mining.active || mining.required === 0) return;
+            
+            const tileUnderMining = getTile(mining.x * TILE_SIZE, mining.y * TILE_SIZE);
+            const selectedItem = inventory.slots[inventory.selectedSlot];
+
+            if (!selectedItem || selectedItem.type !== 'tool' || isLiquid(tileUnderMining) || !isWithinRange(mining.x, mining.y)) {
+                mining.active = false;
+                return;
+            }
+
+            mining.progress += deltaTime * 1000; 
+            
+            if (mining.progress >= mining.required) {
+                const minedTileId = world[mining.y][mining.x];
+                
+                // Дропаємо тільки блоки та розміщені предмети
+                if (minedTileId >= 101 || minedTileId === 1 || minedTileId === 3) { 
+                    addItemToInventory(minedTileId); 
+                }
+                
+                setTile(mining.x, mining.y, TILE_AIR);
+                mining.active = false;
+            }
+        }
+
+
+        // =================================================================
+        // 🖼️ РЕНДЕРИНГ (БЕЗ ЗМІН)
+        // =================================================================
+        
+        function drawSkyGradient() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB'); 
+            gradient.addColorStop(0.5, '#4682B4'); 
+            gradient.addColorStop(1, '#1A3350'); 
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawCharacter() {
+            const selectedItem = inventory.slots[inventory.selectedSlot];
+            
+            ctx.save();
+            ctx.translate(player.x - camera.x, player.y - camera.y);
+            
+            if (!player.facingRight) {
+                ctx.scale(-1, 1);
+                ctx.translate(-player.width, 0); 
+            }
+            
+            ctx.fillStyle = player.colors.head; 
+            ctx.fillRect(0, 0, player.width, player.width);
+            ctx.fillStyle = player.colors.shirt; 
+            ctx.fillRect(0, player.width, player.width, TILE_SIZE * 0.5);
+            ctx.fillStyle = player.colors.pants; 
+            ctx.fillRect(0, player.width + TILE_SIZE * 0.5, player.width, TILE_SIZE * 0.5);
+
+            if (selectedItem) {
+                const color = selectedItem.type === 'tool' ? 'grey' : tileColors[selectedItem.id] || 'black'; 
+                ctx.fillStyle = color;
+                ctx.fillRect(player.width - 8, player.width * 1.2, 12, 12);
+                
+                if (selectedItem.type === 'tool') {
+                    ctx.fillStyle = 'white';
+                    ctx.font = '10px Arial';
+                    ctx.fillText(selectedItem.label, player.width - 7, player.width * 1.2 + 10);
+                }
+            }
+
+            ctx.restore();
+        }
+
+        function drawItemsOnGround() {
+            itemsOnGround.forEach(item => {
+                ctx.fillStyle = tileColors[item.id] || 'purple'; 
+                ctx.fillRect(
+                    item.x - camera.x,
+                    item.y - camera.y,
+                    ITEM_SIZE,
+                    ITEM_SIZE
+                );
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(
+                    item.x - camera.x,
+                    item.y - camera.y,
+                    ITEM_SIZE,
+                    ITEM_SIZE
+                );
+            });
+        }
+        
+        function draw() {
+            drawSkyGradient(); 
+
+            camera.x = player.x - canvas.width / 2;
+            camera.y = player.y - canvas.height / 2;
+            
+            camera.x = Math.max(0, Math.min(camera.x, WORLD_WIDTH * TILE_SIZE - canvas.width));
+            camera.y = Math.max(0, Math.min(camera.y, WORLD_HEIGHT * TILE_SIZE - canvas.height));
+            
+            const startX = Math.max(0, Math.floor(camera.x / TILE_SIZE)); 
+            const endX = Math.min(WORLD_WIDTH, startX + Math.ceil(canvas.width / TILE_SIZE) + 1); 
+            const startY = Math.max(0, Math.floor(camera.y / TILE_SIZE)); 
+            const endY = Math.min(WORLD_HEIGHT, startY + Math.ceil(canvas.height / TILE_SIZE) + 1); 
+
+            for (let y = startY; y < endY; y++) {
+                for (let x = startX; x < endX; x++) {
+                    const tileId = getTile(x * TILE_SIZE, y * TILE_SIZE); 
+                    if (tileId !== TILE_AIR) {
+                        ctx.fillStyle = tileColors[tileId];
+                        ctx.fillRect(
+                            x * TILE_SIZE - camera.x,
+                            y * TILE_SIZE - camera.y,
+                            TILE_SIZE + 1, 
+                            TILE_SIZE + 1
+                        );
+                        if (tileId === TILE_WATER || tileId === TILE_LAVA) {
+                            ctx.strokeStyle = '#00000040';
+                            ctx.lineWidth = 1;
+                            ctx.strokeRect(
+                                x * TILE_SIZE - camera.x,
+                                y * TILE_SIZE - camera.y,
+                                TILE_SIZE,
+                                TILE_SIZE
+                            );
+                        }
+                    }
+                }
+            }
+            
+            drawItemsOnGround(); 
+            drawCharacter();     
+
+            if (mining.active && mining.required > 0) {
+                const progressRatio = mining.progress / mining.required;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(
+                    mining.x * TILE_SIZE - camera.x + TILE_SIZE / 2,
+                    mining.y * TILE_SIZE - camera.y + TILE_SIZE / 2,
+                    TILE_SIZE / 2 - 4,
+                    -Math.PI / 2,
+                    -Math.PI / 2 + 2 * Math.PI * progressRatio
+                );
+                ctx.stroke();
+            }
+        }
+
+
+        // =================================================================
+        // ⌨️ ОБРОБКА ВВОДУ ТА КЛІКІВ
+        // =================================================================
+
+        function getMouseTileCoords(e) {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const tileX = Math.floor((mouseX + camera.x) / TILE_SIZE);
+            const tileY = Math.floor((mouseY + camera.y) / TILE_SIZE);
+            return { tileX, tileY };
+        }
+
+        function handleMouseClick(e) {
+            e.preventDefault(); 
+            if (inventoryOpen || craftingOpen || !gameRunning) return;
+
+            const { tileX, tileY } = getMouseTileCoords(e);
+            if (!isWithinRange(tileX, tileY)) { mining.active = false; return; }
+
+            const currentTileId = getTile(tileX * TILE_SIZE, tileY * TILE_SIZE);
+            const selectedItem = inventory.slots[inventory.selectedSlot];
+
+            // --- ЛКМ: Ламання Блоків ---
+            if (e.button === 0) { 
+                if (currentTileId !== TILE_AIR && !isLiquid(currentTileId)) { 
+                    if (selectedItem && selectedItem.type === 'tool') {
+                        if (mining.active && mining.x === tileX && mining.y === tileY) return; 
+                        
+                        mining.active = true;
+                        mining.x = tileX;
+                        mining.y = tileY;
+                        mining.progress = 0;
+                        mining.required = tileMiningTime[currentTileId] || 500; 
+                    }
+                } else {
+                    mining.active = false; 
+                }
+            } 
+            
+            // --- ПКМ: Встановлення Блоків/Предметів ---
+            else if (e.button === 2) { 
+                if (!selectedItem || selectedItem.count <= 0 || selectedItem.type === 'tool') return; 
+                
+                const isPlaceable = selectedItem.type === 'block' || selectedItem.type === 'placeable'; 
+
+                if (isPlaceable && (currentTileId === TILE_AIR || currentTileId === TILE_LEAVES || isLiquid(currentTileId))) {
+                    const isOverlappingPlayer = 
+                        tileX * TILE_SIZE < player.x + player.width && 
+                        tileX * TILE_SIZE + TILE_SIZE > player.x && 
+                        tileY * TILE_SIZE < player.y + player.height &&
+                        tileY * TILE_SIZE + TILE_SIZE > player.y;
+
+                    if (!isOverlappingPlayer) {
+                        if (useItemFromInventory(inventory.selectedSlot)) {
+                            setTile(tileX, tileY, selectedItem.id); 
+                        }
+                    }
+                }
+            }
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Escape') {
+                if (craftingOpen) toggleCrafting();
+                else toggleInventory();
+                e.preventDefault(); 
+                return;
+            }
+            if (e.code === 'KeyC') { 
+                if (!inventoryOpen) toggleCrafting();
+                e.preventDefault();
+                return;
+            }
+            
+            if (inventoryOpen || craftingOpen || !gameRunning) return;
+
+            let slotIndex = -1;
+            if (e.code.startsWith('Digit') && e.code.length === 6) {
+                const digit = parseInt(e.code.charAt(5));
+                slotIndex = (digit === 0) ? 9 : digit - 1; 
+            }
+            if (slotIndex >= 0 && slotIndex < HOTBAR_SIZE) selectSlot(slotIndex);
+
+            
+            if (e.code === 'KeyA' || e.code === 'KeyD' || e.code === 'Space') {
+                 keys[e.code] = true;
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyA' || e.code === 'KeyD' || e.code === 'Space') {
+                 keys[e.code] = false;
+            }
+        });
+        
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+        canvas.addEventListener('mousedown', handleMouseClick);
+        canvas.addEventListener('mouseup', () => {
+             if (mining.active) mining.active = false;
+        });
+
+        // =================================================================
+        // 🧑‍🎨 ФУНКЦІЇ ВИБОРУ ПЕРСОНАЖА (БЕЗ ЗМІН)
+        // =================================================================
+
+        function openCharacterMenu() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('characterMenu').style.display = 'flex';
+            renderCharacterPreview(player.colors.shirt);
+            setupColorPicker();
+        }
+
+        function renderCharacterPreview(shirtColor) {
+            document.getElementById('previewHead').style.backgroundColor = player.colors.head;
+            document.getElementById('previewShirt').style.backgroundColor = shirtColor;
+            document.getElementById('previewPants').style.backgroundColor = player.colors.pants;
+            document.getElementById('characterMenu').setAttribute('data-selected-color', shirtColor); 
+            
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.getAttribute('data-color') === shirtColor) { 
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        function setupColorPicker() {
+            const picker = document.getElementById('colorPicker');
+            picker.innerHTML = ''; 
+            
+            for (const key in SHIRT_COLORS) {
+                const color = SHIRT_COLORS[key];
+                const option = document.createElement('div');
+                option.className = 'color-option';
+                option.style.backgroundColor = color;
+                option.setAttribute('data-color', color); 
+                
+                if (color === player.colors.shirt) {
+                    option.classList.add('selected');
+                    document.getElementById('characterMenu').setAttribute('data-selected-color', color);
+                }
+
+                option.addEventListener('click', () => {
+                    renderCharacterPreview(color); 
+                });
+                picker.appendChild(option);
+            }
+        }
+
+        function confirmCharacterSelection() {
+            const selectedColor = document.getElementById('characterMenu').getAttribute('data-selected-color');
+            player.colors.shirt = selectedColor;
+            startGame();
+        }
+
+
+        // =================================================================
+        // 🚀 ЦИКЛ ЗАПУСКУ ТА МЕНЮ
+        // =================================================================
+        
+        function gameLoop(currentTime) {
+            let deltaTime = (currentTime - lastTime) / 1000;
+            if (deltaTime > 0.1) deltaTime = 0.1; 
+            lastTime = currentTime;
+
+            if (gameRunning && !inventoryOpen && !craftingOpen) {
+                handleInput();
+                updatePhysics();
+                updateMining(deltaTime);
+                updateFluids(); 
+            }
+            
+            if (gameRunning) {
+                draw();
+            } else {
+                 ctx.fillStyle = '#000';
+                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('characterMenu').style.display = 'none';
+            document.getElementById('hotbar').style.display = 'flex';
+            generateWorld();
+            
+            // Забезпечуємо наявність кирок у слоті 0
+            if (!inventory.slots[0] || inventory.slots[0].id !== 0) {
+                 inventory.slots[0] = { id: 0, type: 'tool', count: 1, label: '⛏️' };
+            }
+
+            updateHotbarDisplay();
+            gameRunning = true;
+        }
+
+        function onResize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', onResize);
+        document.getElementById('playButton').addEventListener('click', startGame);
+        document.getElementById('selectCharButton').addEventListener('click', openCharacterMenu);
+        document.getElementById('confirmCharButton').addEventListener('click', confirmCharacterSelection);
+        
+        onResize();
+        gameLoop(performance.now()); 
+        document.getElementById('hotbar').style.display = 'none';
+    </script>
+</body>
+</html>
