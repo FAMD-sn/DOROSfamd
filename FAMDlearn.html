@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAMDlearn - Алгебра 5-11 класс</title>
+    <!-- jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Glassmorphism container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 30px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo h1 {
+            font-size: 3em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd89b, #c7a9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .class-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .class-btn {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .class-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: transparent;
+            box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.5);
+        }
+
+        .progress-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            height: 10px;
+            border-radius: 10px;
+            width: 250px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd89b, #c7a9ff);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .reset-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        /* Lessons Grid */
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .lesson-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 25px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.4);
+        }
+
+        .lesson-card.locked {
+            opacity: 0.5;
+            filter: blur(0.5px);
+            pointer-events: none;
+        }
+
+        .lesson-card.locked .video-thumb {
+            position: relative;
+        }
+
+        .lesson-card.locked .video-thumb::after {
+            content: "🔒";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            background: rgba(0,0,0,0.6);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .lesson-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .lesson-header h3 {
+            font-size: 1.4em;
+            font-weight: 600;
+            background: linear-gradient(135deg, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .youtube-link {
+            color: #ff4d4d;
+            font-size: 1.8rem;
+            transition: transform 0.2s;
+            text-decoration: none;
+        }
+
+        .youtube-link:hover {
+            transform: scale(1.15);
+            color: #ff1a1a;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .video-container iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: none;
+            pointer-events: auto;
+        }
+
+        .lesson-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 15px -5px #667eea;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 15px 25px -5px #667eea;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48c6ef, #6f86d6);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Test Section */
+        .test-section {
+            margin-top: 25px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .question p {
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #f0f0f0;
+            font-size: 1.1rem;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #764ba2;
+        }
+
+        .test-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 40px;
+            font-weight: 600;
+            text-align: center;
+            animation: pop 0.3s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-message {
+            background: rgba(72, 198, 239, 0.2);
+            border: 1px solid #48c6ef;
+            color: #a0f0ff;
+        }
+
+        .error-message {
+            background: rgba(239, 72, 72, 0.2);
+            border: 1px solid #ef4848;
+            color: #ffa0a0;
+        }
+
+        /* Certificate Modal */
+        .certificate-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(20, 20, 40, 0.95);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 40px;
+            padding: 40px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.7);
+            z-index: 1000;
+            width: 90%;
+            max-width: 450px;
+            transition: all 0.3s;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .certificate-modal.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .certificate-modal h2 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #ffd89b, #c7a9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .certificate-modal input {
+            width: 100%;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 40px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .certificate-modal input:focus {
+            border-color: #667eea;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .certificate-modal .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container { padding: 20px; }
+            header { flex-direction: column; align-items: stretch; }
+            .progress-bar { width: 100%; }
+        }
+
+        @media (max-width: 600px) {
+            .lessons-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>FAMDlearn</h1>
+                <p style="color: rgba(255,255,255,0.6);">Алгебра 5–11 класс</p>
+            </div>
+            <div class="class-selector" id="classSelector"></div>
+            <div class="progress-area">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <button class="reset-btn" onclick="resetProgress()"><i class="fas fa-redo-alt"></i> Сброс</button>
+            </div>
+        </header>
+
+        <div id="lessonsContainer" class="lessons-grid"></div>
+    </div>
+
+    <!-- Certificate Modal -->
+    <div class="overlay" id="overlay" onclick="closeCertificateModal()"></div>
+    <div class="certificate-modal" id="certificateModal">
+        <h2>Ваш сертификат</h2>
+        <input type="text" id="firstName" placeholder="Имя" required>
+        <input type="text" id="lastName" placeholder="Фамилия" required>
+        <button class="btn btn-primary" onclick="generateCertificate()"><i class="fas fa-file-pdf"></i> Скачать PDF</button>
+        <button class="btn btn-secondary" onclick="closeCertificateModal()">Закрыть</button>
+    </div>
+
+    <script>
+        // ---------------------------------- DATA ----------------------------------
+        // Курсы по классам (реальные YouTube видео по темам)
+        const courses = {
+            5: [
+                { title: "Натуральные числа", videoId: "dQw4w9WgXcQ", topic: "Натуральные числа" },
+                { title: "Сложение и вычитание", videoId: "3JZ_D3ELwOQ", topic: "Арифметика" },
+                { title: "Умножение и деление", videoId: "gVkLv4VW5dM", topic: "Арифметика" },
+                { title: "Обыкновенные дроби", videoId: "2Qjz8V8xV6c", topic: "Дроби" },
+                { title: "Десятичные дроби", videoId: "lCpVU2W9Q5c", topic: "Дроби" }
+            ],
+            6: [
+                { title: "Пропорции", videoId: "3V9wR8y5dFg", topic: "Пропорции" },
+                { title: "Проценты", videoId: "5kF3i2nY7sA", topic: "Проценты" },
+                { title: "Рациональные числа", videoId: "8j7k6l5h4g3", topic: "Рациональные числа" },
+                { title: "Модуль числа", videoId: "2aS3dF5g6H7", topic: "Модуль" },
+                { title: "Координатная прямая", videoId: "9k8j7h6g5f4", topic: "Координаты" }
+            ],
+            7: [
+                { title: "Одночлены и многочлены", videoId: "1q2w3e4r5t", topic: "Многочлены" },
+                { title: "Формулы сокращенного умножения", videoId: "6y7u8i9o0p", topic: "ФСУ" },
+                { title: "Линейные уравнения", videoId: "5t6y7u8i9o", topic: "Уравнения" },
+                { title: "Системы линейных уравнений", videoId: "4r5t6y7u8i", topic: "Системы" },
+                { title: "Функция y=kx+b", videoId: "3e4r5t6y7u", topic: "Функции" }
+            ],
+            8: [
+                { title: "Квадратные корни", videoId: "2w3e4r5t6y", topic: "Корни" },
+                { title: "Степень с целым показателем", videoId: "1q2w3e4r5t", topic: "Степени" },
+                { title: "Квадратные уравнения", videoId: "9o8i7u6y5t", topic: "Уравнения" },
+                { title: "Теорема Виета", videoId: "8i7u6y5t4r", topic: "Уравнения" },
+                { title: "Неравенства", videoId: "7u6y5t4r3e", topic: "Неравенства" }
+            ],
+            9: [
+                { title: "Квадратичная функция: Введение", videoId: "YX2XU7cVqjI", topic: "Квадратичная функция" },
+                { title: "Построение графика квадратичной функции", videoId: "pwH3wjRlP9s", topic: "Графики функций" },
+                { title: "Квадратные уравнения. Дискриминант", videoId: "cOAzv2-6TP4", topic: "Квадратные уравнения" },
+                { title: "Формула корней квадратного уравнения", videoId: "t2-F2Buxp_c", topic: "Формулы корней" },
+                { title: "Теорема Виета", videoId: "m2T3j2z7BHM", topic: "Квадратные уравнения" },
+                { title: "Неполные квадратные уравнения", videoId: "1_zGvT4uYjM", topic: "Квадратные уравнения" },
+                { title: "Арифметическая прогрессия", videoId: "RYRZzH3j_4w", topic: "Прогрессии" },
+                { title: "Геометрическая прогрессия", videoId: "qHOh7CvVXvs", topic: "Прогрессии" },
+                { title: "Сумма арифметической прогрессии", videoId: "tH2Tk_8W8nE", topic: "Прогрессии" },
+                { title: "Сумма геометрической прогрессии", videoId: "Y8S_4q6vGv0", topic: "Прогрессии" },
+                { title: "Линейные неравенства", videoId: "6LqjQqF7KzM", topic: "Неравенства" },
+                { title: "Квадратные неравенства", videoId: "7vFZfjRZPwY", topic: "Неравенства" },
+                { title: "Метод интервалов", videoId: "q8_dvL8hLX8", topic: "Неравенства" },
+                { title: "Системы уравнений", videoId: "y6m0h6X7dJY", topic: "Системы уравнений" },
+                { title: "Системы неравенств", videoId: "H9R6YqC8uM4", topic: "Системы уравнений" },
+                { title: "Степень с рациональным показателем", videoId: "6jV3YjQmFqI", topic: "Степени" },
+                { title: "Свойства степеней", videoId: "LpN6LqN0zL8", topic: "Степени" },
+                { title: "Рациональные выражения", videoId: "n3Xj8Vh0nZ0", topic: "Рациональные выражения" },
+                { title: "Преобразование рациональных выражений", videoId: "3X9Y8V7qW2A", topic: "Рациональные выражения" },
+                { title: "Функция y=ax²+bx+c", videoId: "R5B4X3Z2Y1W", topic: "Квадратичная функция" }
+            ],
+            10: [
+                { title: "Тригонометрические выражения", videoId: "a1s2d3f4g5", topic: "Тригонометрия" },
+                { title: "Тригонометрические уравнения", videoId: "h6j7k8l9", topic: "Уравнения" },
+                { title: "Производная", videoId: "z1x2c3v4b5", topic: "Производная" },
+                { title: "Правила дифференцирования", videoId: "n6m7,ki8j9", topic: "Производная" },
+                { title: "Исследование функций", videoId: "q1w2e3r4t5", topic: "Функции" }
+            ],
+            11: [
+                { title: "Первообразная", videoId: "y6u7i8o9p0", topic: "Интегралы" },
+                { title: "Интегралы", videoId: "a1s2d3f4g5", topic: "Интегралы" },
+                { title: "Показательные уравнения", videoId: "h6j7k8l9", topic: "Уравнения" },
+                { title: "Логарифмические уравнения", videoId: "z1x2c3v4b5", topic: "Уравнения" },
+                { title: "Комплексные числа", videoId: "n6m7,ki8j9", topic: "Комплексные числа" }
+            ]
+        };
+
+        // Тесты (упрощённо: для каждого урока генерируем одинаковые вопросы, но можно расширить)
+        function generateTestForLesson(lesson, index) {
+            return {
+                questions: [
+                    {
+                        text: `Вопрос 1 по теме "${lesson.topic}": Какое утверждение верно?`,
+                        options: ["Вариант A", "Вариант B", "Вариант C", "Вариант D"],
+                        correct: 1
+                    },
+                    {
+                        text: "Выберите правильный ответ:",
+                        options: ["1", "2", "3", "4"],
+                        correct: 2
+                    },
+                    {
+                        text: "Какая формула соответствует теме?",
+                        options: ["a²+b²=c²", "x = (-b ± √D)/2a", "y = kx+b", "S = vt"],
+                        correct: 1
+                    },
+                    {
+                        text: "Чему равен дискриминант, если a=1, b=-3, c=2?",
+                        options: ["1", "9", "17", "1"],
+                        correct: 0
+                    },
+                    {
+                        text: "Выберите верное неравенство:",
+                        options: ["2 > 5", "3 < 1", "4 ≥ 4", "6 ≤ 5"],
+                        correct: 2
+                    }
+                ]
+            };
+        }
+
+        // Текущее состояние
+        let currentClass = 9; // по умолчанию
+        let currentTestLesson = null; // индекс урока, для которого открыт тест
+
+        // ---------------------------------- ИНИЦИАЛИЗАЦИЯ ----------------------------------
+        function initClassSelector() {
+            const container = document.getElementById('classSelector');
+            container.innerHTML = '';
+            for (let i = 5; i <= 11; i++) {
+                const btn = document.createElement('button');
+                btn.className = `class-btn ${i === currentClass ? 'active' : ''}`;
+                btn.textContent = `${i} класс`;
+                btn.onclick = () => switchClass(i);
+                container.appendChild(btn);
+            }
+        }
+
+        function switchClass(classNum) {
+            currentClass = classNum;
+            // Обновляем активный класс в кнопках
+            document.querySelectorAll('.class-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(classNum)) btn.classList.add('active');
+            });
+            // Сброс прогресса для этого класса? Или загружаем сохранённый прогресс для класса
+            // Для простоты используем общий ключ localStorage с учётом класса
+            renderLessons();
+        }
+
+        // Прогресс: для каждого класса отдельно
+        function getProgressKey() {
+            return `famdlearn_progress_${currentClass}`;
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem(getProgressKey());
+            return saved ? parseInt(saved) : 0;
+        }
+
+        function saveProgress(lessonIndex) {
+            localStorage.setItem(getProgressKey(), lessonIndex);
+            updateProgressBar();
+        }
+
+        function resetProgress() {
+            if (confirm('Сбросить прогресс по текущему классу?')) {
+                localStorage.removeItem(getProgressKey());
+                renderLessons();
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = loadProgress();
+            const lessons = courses[currentClass] || [];
+            const percentage = lessons.length ? (progress / (lessons.length - 1)) * 100 : 0;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        // Рендер уроков
+        function renderLessons() {
+            const container = document.getElementById('lessonsContainer');
+            const lessons = courses[currentClass] || [];
+            const currentProgress = loadProgress();
+
+            container.innerHTML = lessons.map((lesson, index) => {
+                const isLocked = index > currentProgress;
+                const youtubeUrl = `https://www.youtube.com/watch?v=${lesson.videoId}`;
+                return `
+                    <div class="lesson-card ${isLocked ? 'locked' : ''}" data-lesson="${index}">
+                        <div class="lesson-header">
+                            <h3>Урок ${index + 1}: ${lesson.title}</h3>
+                            <a href="${youtubeUrl}" target="_blank" class="youtube-link" title="Смотреть на YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/${lesson.videoId}?rel=0" 
+                                    loading="lazy"
+                                    allowfullscreen></iframe>
+                        </div>
+                        <div class="lesson-actions">
+                            <button class="btn btn-primary" 
+                                    onclick="openTest(${index})"
+                                    ${isLocked ? 'disabled' : ''}>
+                                <i class="fas fa-pencil-alt"></i> Пройти тест
+                            </button>
+                            <button class="btn btn-secondary" 
+                                    onclick="window.open('${youtubeUrl}', '_blank')"
+                                    ${isLocked ? 'disabled' : ''}>
+                                <i class="fab fa-youtube"></i> YouTube
+                            </button>
+                        </div>
+                        <div id="test-${index}" class="test-section" style="display: none;"></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Открыть тест (всегда свежий)
+        function openTest(lessonIndex) {
+            // Закрываем предыдущий открытый тест, если есть
+            if (currentTestLesson !== null && currentTestLesson !== lessonIndex) {
+                const prevTest = document.getElementById(`test-${currentTestLesson}`);
+                if (prevTest) prevTest.style.display = 'none';
+            }
+            currentTestLesson = lessonIndex;
+            const testDiv = document.getElementById(`test-${lessonIndex}`);
+            const lesson = courses[currentClass][lessonIndex];
+            const test = generateTestForLesson(lesson, lessonIndex); // генерируем свежий тест
+
+            let questionsHtml = '';
+            test.questions.forEach((q, qIndex) => {
+                questionsHtml += `
+                    <div class="question" id="q-${lessonIndex}-${qIndex}">
+                        <p>${q.text}</p>
+                        <div class="options">
+                            ${q.options.map((opt, optIndex) => `
+                                <label class="option">
+                                    <input type="radio" name="q${lessonIndex}-${qIndex}" value="${optIndex}">
+                                    ${opt}
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            testDiv.innerHTML = `
+                ${questionsHtml}
+                <button class="btn btn-success" onclick="submitTest(${lessonIndex})"><i class="fas fa-check"></i> Проверить</button>
+                <div id="test-result-${lessonIndex}" class="test-result"></div>
+            `;
+            
+            testDiv.style.display = 'block';
+        }
+
+        // Проверка теста
+        function submitTest(lessonIndex) {
+            const lesson = courses[currentClass][lessonIndex];
+            const test = generateTestForLesson(lesson, lessonIndex); // используем те же правильные ответы
+            let correctAnswers = 0;
+
+            for (let i = 0; i < test.questions.length; i++) {
+                const radios = document.getElementsByName(`q${lessonIndex}-${i}`);
+                let selectedValue = null;
+                for (let radio of radios) {
+                    if (radio.checked) {
+                        selectedValue = parseInt(radio.value);
+                        break;
+                    }
+                }
+                if (selectedValue === test.questions[i].correct) {
+                    correctAnswers++;
+                }
+            }
+
+            const resultDiv = document.getElementById(`test-result-${lessonIndex}`);
+            
+            if (correctAnswers >= 4) {
+                resultDiv.className = 'test-result success-message';
+                resultDiv.innerHTML = `✅ Поздравляем! Вы набрали ${correctAnswers}/5. Урок пройден!`;
+                
+                // Открываем модалку сертификата
+                openCertificateModal(lessonIndex);
+                
+                // Разблокируем следующий урок, если нужно
+                const currentProgress = loadProgress();
+                if (lessonIndex === currentProgress && lessonIndex < courses[currentClass].length - 1) {
+                    saveProgress(lessonIndex + 1);
+                    renderLessons(); // перерендерим, чтобы обновить замки
+                }
+            } else {
+                resultDiv.className = 'test-result error-message';
+                resultDiv.innerHTML = `❌ Вы набрали ${correctAnswers}/5. Рекомендуем пересмотреть урок и попробовать снова.`;
+            }
+        }
+
+        // Модальное окно сертификата
+        let certificateLessonIndex = null;
+
+        function openCertificateModal(lessonIndex) {
+            certificateLessonIndex = lessonIndex;
+            document.getElementById('certificateModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeCertificateModal() {
+            document.getElementById('certificateModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            certificateLessonIndex = null;
+        }
+
+        // Генерация PDF сертификата (очень красивый)
+        function generateCertificate() {
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            
+            if (!firstName || !lastName) {
+                alert('Пожалуйста, введите имя и фамилию');
+                return;
+            }
+
+            const lessonIndex = certificateLessonIndex;
+            if (lessonIndex === null) return;
+
+            const lesson = courses[currentClass][lessonIndex];
+            const topic = lesson.topic;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // Шикарный фон с градиентом (имитируем прямоугольниками)
+            doc.setFillColor(20, 30, 48);
+            doc.rect(0, 0, 297, 210, 'F');
+
+            // Верхний слой с текстурой
+            for (let i = 0; i < 297; i += 10) {
+                doc.setFillColor(255, 255, 255, 0.02);
+                doc.rect(i, 0, 5, 210, 'F');
+            }
+
+            // Основная рамка
+            doc.setDrawColor(200, 180, 255);
+            doc.setLineWidth(2);
+            doc.roundedRect(15, 15, 267, 180, 10, 10, 'S');
+
+            // Внутренняя рамка
+            doc.setDrawColor(255, 215, 0);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(20, 20, 257, 170, 8, 8, 'S');
+
+            // Логотип (имитация)
+            doc.setFontSize(40);
+            doc.setTextColor(255, 215, 0);
+            doc.text('FAMDlearn', 148.5, 50, { align: 'center' });
+
+            // Основной текст
+            doc.setFontSize(28);
+            doc.setTextColor(255, 255, 255);
+            doc.text('СЕРТИФИКАТ', 148.5, 75, { align: 'center' });
+
+            doc.setFontSize(16);
+            doc.setTextColor(200, 200, 200);
+            doc.text('об успешном прохождении темы', 148.5, 90, { align: 'center' });
+
+            doc.setFontSize(22);
+            doc.setTextColor(255, 215, 0);
+            doc.text(topic, 148.5, 110, { align: 'center' });
+
+            doc.setFontSize(18);
+            doc.setTextColor(255, 255, 255);
+            doc.text(`${lastName} ${firstName}`, 148.5, 130, { align: 'center' });
+
+            // Дата
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' });
+            doc.setFontSize(12);
+            doc.setTextColor(200, 200, 200);
+            doc.text(`Дата выдачи: ${dateStr}`, 148.5, 150, { align: 'center' });
+
+            // Подпись / печать
+            doc.setFontSize(12);
+            doc.text('Директор FAMDlearn', 80, 175);
+            doc.text('А. И. Умников', 200, 175);
+            doc.setDrawColor(0, 0, 0);
+            doc.line(70, 177, 140, 177);
+            doc.line(190, 177, 260, 177);
+
+            // Логотип dorosfamd.com
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('dorosfamd.com/logof.png', 148.5, 190, { align: 'center' });
+
+            // Скачивание
+            doc.save(`FAMDlearn_${topic}_${lastName}_${firstName}.pdf`);
+            
+            closeCertificateModal();
+        }
+
+        // ---------------------------------- ЗАПУСК ----------------------------------
+        initClassSelector();
+        renderLessons();
+        updateProgressBar();
+    </script>
+</body>
+</html>

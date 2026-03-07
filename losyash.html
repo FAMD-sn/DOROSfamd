@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAMD — библиотека лосяша</title>
+    <style>
+        /* ===== ОСНОВНЫЕ СБРОСЫ И ПЕРЕМЕННЫЕ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        :root {
+            --primary-dark: #0a2f44;
+            --primary: #1e4a6f;
+            --primary-light: #2e6a95;
+            --accent: #f9b81b;
+            --accent-dark: #e5a10b;
+            --bg-gradient-start: #0b2b3f;
+            --bg-gradient-end: #1a4b6d;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --text-dark: #1e2a36;
+            --text-light: #f0f4f8;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            background: linear-gradient(145deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== КАСТОМНЫЙ СКРОЛЛБАР ===== */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-dark);
+        }
+
+        /* ===== ШАПКА ===== */
+        .site-header {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 4px solid var(--accent);
+            transition: var(--transition);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 75px;
+            width: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            transition: var(--transition);
+        }
+
+        .logo img:hover {
+            transform: scale(1.08) rotate(1deg);
+        }
+
+        .site-name {
+            font-size: 2.1rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.15);
+            letter-spacing: -0.5px;
+        }
+
+        /* ===== ПОИСК ===== */
+        .search-section {
+            flex: 1;
+            max-width: 550px;
+            margin: 0 15px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            background: #ffffff;
+            border-radius: 60px;
+            padding: 6px 6px 6px 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .search-container:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 12px 28px rgba(249, 184, 27, 0.3);
+            transform: scale(1.01);
+        }
+
+        #wikiSearch {
+            flex: 1;
+            padding: 14px 5px;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.05rem;
+            outline: none;
+            background: transparent;
+            color: #333;
+        }
+
+        #wikiSearch::placeholder {
+            color: #888;
+            font-style: italic;
+        }
+
+        #searchBtn {
+            padding: 14px 35px;
+            background: linear-gradient(145deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: var(--transition);
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        #searchBtn:hover {
+            background: linear-gradient(145deg, var(--primary-light), var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(30, 74, 111, 0.4);
+        }
+
+        #searchBtn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
+        .main-container {
+            max-width: 1400px;
+            margin: 35px auto;
+            padding: 0 30px;
+        }
+
+        .page {
+            background: var(--card-bg);
+            border-radius: 40px 40px 20px 20px;
+            padding: 35px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(4px);
+        }
+
+        /* ===== ЗАГОЛОВОК СТРАНИЦЫ ===== */
+        .page-header {
+            margin-bottom: 35px;
+            border-bottom: 4px solid var(--accent);
+            padding-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .page-header__title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, var(--primary-dark), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .stats-badge {
+            background: var(--primary);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .stats-badge span {
+            color: var(--accent);
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-right: 5px;
+        }
+
+        /* ===== ОБЩИЕ БЛОКИ ===== */
+        .mainpage-block {
+            background: white;
+            border-radius: 30px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            transition: var(--transition);
+        }
+
+        .mainpage-block:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            transform: translateY(-6px);
+        }
+
+        .mainpage-header {
+            background: linear-gradient(105deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px 30px;
+            font-size: 1.9rem;
+            font-weight: 700;
+            position: relative;
+            letter-spacing: -0.3px;
+        }
+
+        .mainpage-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15));
+            clip-path: polygon(20% 0, 100% 0, 80% 100%, 0% 100%);
+        }
+
+        .mainpage-content {
+            padding: 30px;
+        }
+
+        /* ===== СЕТКА ПЕРСОНАЖЕЙ ===== */
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 25px;
+        }
+
+        .character-card {
+            position: relative;
+            cursor: pointer;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: var(--transition);
+            background: #fff;
+            border: 2px solid transparent;
+        }
+
+        .character-card:hover {
+            transform: scale(1.03) translateY(-12px);
+            box-shadow: 0 25px 35px rgba(30, 74, 111, 0.4);
+            border-color: var(--accent);
+        }
+
+        .character-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s ease;
+        }
+
+        .character-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .character-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,20,30,0.95), transparent);
+            color: white;
+            padding: 70px 20px 20px;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+            backdrop-filter: blur(3px);
+        }
+
+        .character-card:hover .character-info {
+            transform: translateY(0);
+        }
+
+        .character-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--accent);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .character-desc {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+
+        /* ===== МОДАЛЬНОЕ ОКНО ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 40px;
+            max-width: 850px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 35px 40px;
+            position: relative;
+            animation: modalSlideUp 0.4s ease;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(70px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 2.5rem;
+            cursor: pointer;
+            color: #777;
+            transition: var(--transition);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.05);
+        }
+
+        .modal-close:hover {
+            color: var(--accent);
+            background: rgba(249, 184, 27, 0.15);
+            transform: rotate(90deg);
+        }
+
+        #modalTitle {
+            font-size: 2.4rem;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            padding-right: 50px;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+
+        #modalBody {
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        #modalBody img {
+            max-width: 250px;
+            height: auto;
+            border-radius: 20px;
+            margin: 10px 25px 15px 0;
+            float: left;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .wiki-link {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 30px;
+            background: linear-gradient(145deg, var(--primary), var(--primary-light));
+            color: white;
+            border-radius: 60px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .wiki-link:hover {
+            background: linear-gradient(145deg, var(--primary-light), var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(30, 74, 111, 0.5);
+        }
+
+        /* ===== ВИДЕОГАЛЕРЕЯ ===== */
+        .video-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .video-card {
+            background: #f5f7fa;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .video-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.25);
+            border-color: var(--accent);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            overflow: hidden;
+            height: 170px;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .video-card:hover .video-thumbnail img {
+            transform: scale(1.1);
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 65px;
+            height: 65px;
+            background: rgba(249, 184, 27, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            transition: var(--transition);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .video-card:hover .play-button {
+            transform: translate(-50%, -50%) scale(1.15);
+            background: var(--accent);
+            box-shadow: 0 0 30px var(--accent);
+        }
+
+        .video-title {
+            padding: 18px 15px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 1.15rem;
+            background: white;
+        }
+
+        /* ===== ФАКТЫ ===== */
+        .facts-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+        }
+
+        .facts-list li {
+            padding: 18px 20px;
+            background: #f0f4fa;
+            border-radius: 20px;
+            border-left: 6px solid var(--accent);
+            transition: var(--transition);
+            font-size: 1.05rem;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.05);
+        }
+
+        .facts-list li:hover {
+            transform: translateX(10px);
+            background: #e4ecf5;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        /* ===== РЕЗУЛЬТАТЫ ПОИСКА ===== */
+        #searchResults {
+            margin-top: 30px;
+        }
+
+        .search-result {
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid #e0e7ef;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .search-result:hover {
+            transform: translateX(15px) scale(1.01);
+            border-color: var(--accent);
+            box-shadow: 0 15px 30px rgba(30, 74, 111, 0.2);
+        }
+
+        .search-result h3 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+        }
+
+        .search-result p {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        /* ===== НИЖНИЙ КОЛОНТИТУЛ ===== */
+        .site-footer {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(8px);
+            padding: 40px 0 30px;
+            margin-top: 60px;
+            border-top: 5px solid var(--accent);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            text-align: center;
+            color: var(--primary-dark);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border-bottom: 2px solid transparent;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* ===== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ ===== */
+        @media (max-width: 800px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .site-name {
+                font-size: 1.8rem;
+            }
+            .page-header__title {
+                font-size: 2rem;
+            }
+            .stats-badge {
+                margin-top: 15px;
+            }
+            .characters-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+        }
+        @media (max-width: 500px) {
+            .main-container {
+                padding: 0 15px;
+            }
+            .page {
+                padding: 20px;
+            }
+            .search-container {
+                flex-wrap: wrap;
+                background: none;
+                box-shadow: none;
+                padding: 0;
+            }
+            #wikiSearch {
+                background: white;
+                border-radius: 60px;
+                padding: 12px 20px;
+            }
+            #searchBtn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ШАПКА -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="https://static.wikia.nocookie.net/smesharikiarhives/images/e/e6/Site-logo.png/revision/latest?cb=20250906165844&path-prefix=ru" alt="Логотип FAMD">
+                <span class="site-name">FAMD · библиотека лосяша</span>
+            </div>
+            <div class="search-section">
+                <div class="search-container">
+                    <input type="text" id="wikiSearch" placeholder="Найти в Википедии...">
+                    <button id="searchBtn">Найти</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <div class="main-container">
+        <div class="page">
+            <div class="page-header">
+                <h1 class="page-header__title">Добро пожаловать в библиотеку</h1>
+                <div class="stats-badge"><span>1905</span> статей</div>
+            </div>
+
+            <!-- СЮДА БУДУТ ВЫВОДИТЬСЯ РЕЗУЛЬТАТЫ ПОИСКА -->
+            <div id="searchResults"></div>
+
+            <!-- БЛОК ПЕРСОНАЖЕЙ -->
+            <div class="mainpage-block">
+                <div class="mainpage-header">✨ Главные герои</div>
+                <div class="mainpage-content">
+                    <div class="characters-grid" id="charactersGrid"></div>
+                </div>
+            </div>
+
+            <!-- БЛОК КАТЕГОРИЙ -->
+            <div class="mainpage-block">
+                <div class="mainpage-header">📚 Категории</div>
+                <div class="mainpage-content">
+                    <div class="characters-grid" id="categoriesGrid"></div>
+                </div>
+            </div>
+
+            <!-- БЛОК ВИДЕО -->
+            <div class="mainpage-block">
+                <div class="mainpage-header">🎬 Свежие видео</div>
+                <div class="mainpage-content">
+                    <div class="video-gallery" id="videoGallery"></div>
+                </div>
+            </div>
+
+            <!-- БЛОК ФАКТОВ -->
+            <div class="mainpage-block">
+                <div class="mainpage-header">🔍 Знаете ли вы?</div>
+                <div class="mainpage-content">
+                    <ul class="facts-list" id="factsList"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПОДВАЛ -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#">О проекте</a>
+                <a href="#">Все статьи</a>
+                <a href="#">Помощь</a>
+                <a href="#">Контакты</a>
+            </div>
+            <p>© 2025 FAMD — библиотека лосяша. Материалы сообщества доступны по лицензии CC-BY-SA.</p>
+            <p style="margin-top: 15px; font-size: 0.9rem;">Данные предоставлены Википедией и сообществом. Версия 3.0</p>
+        </div>
+    </footer>
+
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div class="modal" id="wikiModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div id="modalBody"></div>
+            <a href="#" id="modalWikiLink" target="_blank" class="wiki-link">Читать в Википедии</a>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ==================== ОГРОМНАЯ БАЗА ДАННЫХ ====================
+            // Персонажи (подробные)
+            const characters = [
+                {
+                    name: 'Крош',
+                    wiki: 'Крош (Смешарики)',
+                    shortDesc: 'Энергичный кролик-непоседа, вечный двигатель.',
+                    fullDesc: `Крош — один из главных персонажей, кролик голубого цвета. Родился 29 декабря. 
+                    Характер: весёлый, непоседливый, оптимистичный. Обожает приключения, спорт (особенно футбол и хоккей). 
+                    Любит морковку и коллекционирует её. Лучший друг — Ёжик, которого часто втягивает в авантюры. 
+                    Имеет привычку говорить «Ёлки-иголки!» и «Оба-на!». Боится грозы и зубных врачей, но ради друзей готов на всё. 
+                    В прошлом был членом команды супергероев Люсьена. Живёт в своём домике, где всегда беспорядок.`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/0/0c/%D0%A8%D0%B0%D0%BF%D0%BA%D0%B0-%D1%83%D1%88%D0%B0%D0%BD%D0%BA%D0%B0_%D0%BA%D1%80%D0%BE%D1%88%D0%B0.jpg/revision/latest/scale-to-width-down/200?cb=20130203134355&path-prefix=ru'
+                },
+                {
+                    name: 'Ёжик',
+                    wiki: 'Ёжик (Смешарики)',
+                    shortDesc: 'Скромный, рассудительный ёж, коллекционер.',
+                    fullDesc: `Ёжик — лучший друг Кроша. Родился 14 февраля. Очень застенчивый, воспитанный и ответственный. 
+                    Увлекается коллекционированием кактусов и фантиков. Любит порядок, читает книги, играет в гольф. 
+                    Носит очки, зимой — жёлтую шапку. Часто сомневается, но в критической ситуации проявляет решительность. 
+                    Страдает ипохондрией — вечно ищет у себя болезни. Боится клоунов и замкнутых пространств. 
+                    Озвучен Владимиром Постниковым.`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/1/1c/%D0%81%D0%B6%D0%B8%D0%BA_%D0%B8_%D0%BB%D0%B5%D0%B3%D0%B5%D0%BD%D0%B4%D0%B0%D1%80%D0%BD%D0%B0%D1%8F_%D0%BA%D0%BD%D0%B8%D0%B6%D0%B5%D1%87%D0%BA%D0%B0.png/revision/latest/scale-to-width-down/200?cb=20200423205857&path-prefix=ru'
+                },
+                {
+                    name: 'Нюша',
+                    wiki: 'Нюша (Смешарики)',
+                    shortDesc: 'Модница-свинка, мечтает о принце.',
+                    fullDesc: `Нюша — единственная девочка среди главных смешариков. Родилась 13 июля. 
+                    Очень любит моду, косметику, зеркала. Мечтает о прекрасном принце. Капризная, но добрая. 
+                    Увлекается поэзией, иногда пишет стихи. Обожает сладости. Имеет любимую куклу Тузю. 
+                    Хорошо играет в футбол (вратарь). Умеет шить и плести макраме. Полное имя — Анна. 
+                    В серии «Дар» обладала электрическими способностями.`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/3/30/%D0%9D%D1%8E%D1%88%D0%B0%2C_%D0%B3%D0%BE%D1%80%D1%8B_%D0%B8_%D1%86%D0%B2%D0%B5%D1%82%D1%8B.png/revision/latest/scale-to-width-down/200?cb=20200423212318&path-prefix=ru'
+                },
+                {
+                    name: 'Бараш',
+                    wiki: 'Бараш (Смешарики)',
+                    shortDesc: 'Поэт-романтик, влюблён в Нюшу.',
+                    fullDesc: `Бараш — меланхоличный баран, поэт. Родился 29 апреля. Пишет грустные стихи о любви и одиночестве. 
+                    Очень ранимый, сентиментальный, легко впадает в депрессию. Любит горы, но боится высоты. 
+                    Влюблён в Нюшу, ради неё готов на подвиги. Носит синий шарф. Имеет привычку говорить «Ценок». 
+                    В серии «Забыть всё» под гипнозом стал гением. Любит творог.`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/7/75/%D0%91%D0%B0%D1%80%D0%B0%D1%88_%D0%BF%D0%B8%D1%88%D0%B5%D1%82_%D1%88%D0%B5%D0%B4%D0%B5%D0%B2%D1%80.png/revision/latest/scale-to-width-down/200?cb=20200424213724&path-prefix=ru'
+                },
+                {
+                    name: 'Лосяш',
+                    wiki: 'Лосяш (Смешарики)',
+                    shortDesc: 'Учёный-эрудит, мечтает о Нобелевке.',
+                    fullDesc: `Лосяш — умный лось, учёный. Родился 25 мая. Увлекается астрономией, химией, физикой. 
+                    Рассеянный, но добрый. Пишет научные труды. Часто спорит с Копатычем. 
+                    Изобрёл много приборов. Любит порядок в знаниях, но в быту небрежен. 
+                    Носит очки. Верит в инопланетян.`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/9/9f/%D0%9A%D0%BE%D0%B3%D0%B4%D0%B0_%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%8B%D0%BC_%D0%B8_%D0%BD%D0%B5%D0%B6%D0%BD%D1%8B%D0%BC_%D0%B2%D0%B7%D0%BE%D1%80%D0%BE%D0%BC%E2%80%A6.png/revision/latest/scale-to-width-down/200?cb=20200423095914&path-prefix=ru'
+                },
+                {
+                    name: 'Копатыч',
+                    wiki: 'Копатыч (Смешарики)',
+                    shortDesc: 'Добрый медведь-огородник, любит мёд.',
+                    fullDesc: `Копатыч — медведь, заботливый хозяин. Родился 8 октября. Выращивает овощи и фрукты для всех. 
+                    Обожает мёд и покой. Очень сильный, но миролюбивый. В прошлом — актёр и танцор диско. 
+                    Зимой впадает в спячку, но просыпается на Новый год. Говорит: «Укуси меня, пчела!».`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/c/ce/%D0%9A%D0%BE%D0%BF%D0%B0%D1%82%D1%8B%D1%87_%D0%BF%D1%8C%D1%91%D1%82_%D1%87%D0%B0%D0%B9.png/revision/latest/scale-to-width-down/200?cb=20200424223545&path-prefix=ru'
+                },
+                {
+                    name: 'Кар-Карыч',
+                    wiki: 'Кар-Карыч (Смешарики)',
+                    shortDesc: 'Мудрый ворон-путешественник, артист.',
+                    fullDesc: `Кар-Карыч — старый ворон, бывалый путешественник. Родился 3 марта. 
+                    Играет на рояле, знает много историй, иногда приукрашивает. Любит уют. 
+                    В молодости объездил весь мир. Хороший психолог. Носит цилиндр.`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/e/ef/%D0%AD%D1%82%D0%BE_%D0%9A%D0%B0%D1%80%D1%8B%D1%87_%D0%BF%D1%80%D1%8B%D0%B3%D0%B0%D0%BB_%D0%BF%D0%BE_%D0%BB%D1%83%D0%B6%D0%B0%D0%BC.png/revision/latest/scale-to-width-down/200?cb=20200424214555&path-prefix=ru'
+                },
+                {
+                    name: 'Совунья',
+                    wiki: 'Совунья (Смешарики)',
+                    shortDesc: 'Сова-врач и спортсменка, следит за здоровьем.',
+                    fullDesc: `Совунья — заботливая сова, врач и повар. Родилась 15 сентября. 
+                    Сторонница здорового образа жизни, любит лыжи. Очень ответственная. 
+                    В молодости была спортсменкой. Любит вязать и печь пироги.`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/a/ab/%D0%98_%D0%BF%D0%B5%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8....png/revision/latest/scale-to-width-down/200?cb=20200423210015&path-prefix=ru'
+                },
+                {
+                    name: 'Пин',
+                    wiki: 'Пин (Смешарики)',
+                    shortDesc: 'Пингвин-изобретатель с немецким акцентом.',
+                    fullDesc: `Пин — талантливый изобретатель, пингвин. Родился 9 августа. 
+                    Говорит с немецким акцентом. Создал Биби, Шаролёт и много других механизмов. 
+                    Любит порядок в мастерской, но его изобретения часто выходят из-под контроля.`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/e/e2/%D0%A1%D1%83%D0%BF%D0%B5%D1%80%D0%9F%D0%B8%D0%BD.png/revision/latest/scale-to-width-down/200?cb=20200423215053&path-prefix=ru'
+                },
+                {
+                    name: 'Биби',
+                    wiki: 'Биби (Смешарики)',
+                    shortDesc: 'Робот, сын Пина, путешествует по космосу.',
+                    fullDesc: `Биби — маленький робот, созданный Пином. Очень умный, добрый. 
+                    Улетел на Луну, но периодически возвращается. Дружит со всеми смешариками. 
+                    Общается звуками, но понимает речь. Любит учиться.`,
+                    image: 'https://static.wikia.nocookie.net/smesharikiarhives/images/c/c2/%D0%91%D0%B8%D0%B1%D0%B8_%D1%83%D0%BF%D0%BB%D1%8B%D0%BB%2C_%D0%BD%D0%BE_%D0%BE%D0%B1%D0%B5%D1%89%D0%B0%D0%BB_%D0%B2%D0%B5%D1%80%D0%BD%D1%83%D1%82%D1%8C%D1%81%D1%8F.png/revision/latest/scale-to-width-down/200?cb=20200423213658&path-prefix=ru'
+                }
+            ];
+
+            // Категории
+            const categories = [
+                { name: 'Серии', wiki: 'Список серий мультсериала «Смешарики»', desc: 'Более 200 эпизодов', img: 'https://static.wikia.nocookie.net/smesharikiarhives/images/0/03/%D0%9D%D1%8E%D1%88%D0%B0_%D1%81%D0%BD%D0%B8%D0%BC%D0%B0%D0%B5%D1%82.png/revision/latest/scale-to-width-down/200?cb=20200515214302&path-prefix=ru' },
+                { name: 'Места', wiki: 'Страна смешариков', desc: 'Долина, дома, горы', img: 'https://static.wikia.nocookie.net/smesharikiarhives/images/f/f7/%D0%9B%D0%BE%D1%81%D1%8F%D1%88_%D1%80%D0%B8%D1%81%D1%83%D0%B5%D1%82_%D0%BA%D0%B0%D1%80%D1%82%D1%83_%281%29.png/revision/latest/scale-to-width-down/200?cb=20200515215159&path-prefix=ru' },
+                { name: 'Вещи', wiki: 'Изобретения Пина', desc: 'Предметы и механизмы', img: 'https://static.wikia.nocookie.net/smesharikiarhives/images/a/a2/%D0%A0%D0%B0%D0%B4%D0%B8%D0%BE_%D0%9A%D0%BE%D0%BF%D0%B0%D1%82%D1%8B%D1%87%D0%B0.png/revision/latest/scale-to-width-down/200?cb=20200515215827&path-prefix=ru' },
+                { name: 'Песни', wiki: 'Песни из Смешариков', desc: 'Музыка и клипы', img: 'https://static.wikia.nocookie.net/smesharikiarhives/images/5/55/%D0%9A%D0%B0%D1%80%D1%8B%D1%87_%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%D1%81%D1%8F_%D1%81%D1%82%D0%B0%D0%BB%D0%BE_%D0%BB%D0%B8_%D0%9B%D0%BE%D1%81%D1%8F%D1%88%D1%83_%D0%BB%D1%83%D1%87%D1%88%D0%B5.png/revision/latest/scale-to-width-down/200?cb=20200510091534&path-prefix=ru' }
+            ];
+
+            // Видео (YouTube ID)
+            const videos = [
+                { title: 'Пин-Код 2.0 — трейлер', id: 'dQw4w9WgXcQ', thumb: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg' },
+                { title: 'Смешарики снимают кино', id: 'dQw4w9WgXcQ', thumb: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg' },
+                { title: 'Азбука благотворительности', id: 'dQw4w9WgXcQ', thumb: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg' },
+                { title: 'Новый сезон — тизер', id: 'dQw4w9WgXcQ', thumb: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg' },
+                { title: 'Смешарики. Спорт', id: 'dQw4w9WgXcQ', thumb: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg' },
+                { title: 'Пин-Код: Перемотка', id: 'dQw4w9WgXcQ', thumb: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg' }
+            ];
+
+            // Факты (расширенные)
+            const facts = [
+                'Крош называет племя Караваев «Чебуреками»',
+                'Слово «Кузинатра» впервые появилось в романах Роджера Желязны, а не в «Смешариках»',
+                'ПИН-код Пина — 9757',
+                'Серия «Вальс Кабанюши» основана на реальной истории Энтони Хопкинса',
+                'Часть эпизода «Футбол» была переснята в 3D',
+                'Пин — католик (крестится слева направо)',
+                'В серии «Скамейка» Бараш впервые написал стихи нормальным почерком',
+                'Нюша — единственная из основной девятки с реальным именем (Анна)',
+                'Рост Ёжика — 48 см',
+                'Копатыч был танцором диско в Мегаполисе',
+                'У Кар-Карыча есть зубы',
+                'Совунья — член Солнечного ордена (из «Пин-Кода»)',
+                'Биби говорит на языке Fortran',
+                'Лосяш — лауреат Нобелевской премии (по его словам)'
+            ];
+
+            // ==================== ФУНКЦИИ ====================
+            async function fetchFromWikipedia(title) {
+                try {
+                    const response = await fetch(`https://ru.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+                    if (!response.ok) return null;
+                    return await response.json();
+                } catch {
+                    return null;
+                }
+            }
+
+            window.openModal = async function(name, wikiQuery, localDesc) {
+                const modal = document.getElementById('wikiModal');
+                const titleEl = document.getElementById('modalTitle');
+                const bodyEl = document.getElementById('modalBody');
+                const linkEl = document.getElementById('modalWikiLink');
+
+                titleEl.textContent = 'Загрузка...';
+                bodyEl.innerHTML = '<div style="text-align:center;padding:40px;"><span style="font-size:2rem;">⏳</span><br>Ищем информацию...</div>';
+                linkEl.style.display = 'none';
+
+                let wikiData = null;
+                if (wikiQuery) wikiData = await fetchFromWikipedia(wikiQuery);
+
+                if (wikiData && wikiData.extract) {
+                    titleEl.textContent = wikiData.title;
+                    bodyEl.innerHTML = `
+                        ${wikiData.thumbnail ? `<img src="${wikiData.thumbnail.source}" alt="${wikiData.title}">` : ''}
+                        <p>${wikiData.description ? `<strong>${wikiData.description}</strong><br><br>` : ''}</p>
+                        <p>${wikiData.extract}</p>
+                    `;
+                    linkEl.href = wikiData.content_urls.desktop.page;
+                    linkEl.style.display = 'inline-block';
+                } else {
+                    titleEl.textContent = name;
+                    bodyEl.innerHTML = `<p>${localDesc}</p><p><i>Данные из Википедии не найдены, показано локальное описание.</i></p>`;
+                }
+                modal.classList.add('active');
+            };
+
+            window.closeModal = function() {
+                document.getElementById('wikiModal').classList.remove('active');
+            };
+
+            document.getElementById('wikiModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+
+            async function searchWikipedia(query) {
+                const resultsDiv = document.getElementById('searchResults');
+                resultsDiv.innerHTML = '<div style="text-align:center;padding:25px;">🔎 Ищем...</div>';
+                try {
+                    const res = await fetch(`https://ru.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`);
+                    const data = await res.json();
+                    if (!data.query.search.length) {
+                        resultsDiv.innerHTML = '<div class="search-result">Ничего не найдено.</div>';
+                        return;
+                    }
+                    let html = '<h2 style="margin:20px 0;">Результаты поиска:</h2>';
+                    for (let item of data.query.search.slice(0, 6)) {
+                        const summ = await fetchFromWikipedia(item.title);
+                        html += `
+                            <div class="search-result" onclick="window.open('https://ru.wikipedia.org/wiki/${encodeURIComponent(item.title)}', '_blank')">
+                                <h3>${item.title}</h3>
+                                <p>${summ?.description || ''}</p>
+                                <p>${item.snippet.replace(/<[^>]*>/g, '')}...</p>
+                                <span class="wiki-link">Перейти в Википедию</span>
+                            </div>
+                        `;
+                    }
+                    resultsDiv.innerHTML = html;
+                } catch {
+                    resultsDiv.innerHTML = '<div class="search-result">Ошибка при запросе.</div>';
+                }
+            }
+
+            document.getElementById('searchBtn').addEventListener('click', () => {
+                const q = document.getElementById('wikiSearch').value.trim();
+                if (q) searchWikipedia(q);
+            });
+            document.getElementById('wikiSearch').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const q = e.target.value.trim();
+                    if (q) searchWikipedia(q);
+                }
+            });
+
+            window.openVideo = (id) => window.open(`https://youtube.com/watch?v=${id}`, '_blank');
+
+            function render() {
+                // Персонажи
+                const charsGrid = document.getElementById('charactersGrid');
+                charsGrid.innerHTML = characters.map(c => `
+                    <div class="character-card" onclick="openModal('${c.name}', '${c.wiki}', \`${c.fullDesc}\`)">
+                        <img src="${c.image}" alt="${c.name}" loading="lazy">
+                        <div class="character-info">
+                            <div class="character-name">${c.name}</div>
+                            <div class="character-desc">${c.shortDesc}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Категории
+                const catGrid = document.getElementById('categoriesGrid');
+                catGrid.innerHTML = categories.map(c => `
+                    <div class="character-card" onclick="openModal('${c.name}', '${c.wiki}', 'Категория: ${c.desc}')">
+                        <img src="${c.img}" alt="${c.name}" loading="lazy">
+                        <div class="character-info">
+                            <div class="character-name">${c.name}</div>
+                            <div class="character-desc">${c.desc}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Видео
+                const videoGallery = document.getElementById('videoGallery');
+                videoGallery.innerHTML = videos.map(v => `
+                    <div class="video-card" onclick="openVideo('${v.id}')">
+                        <div class="video-thumbnail">
+                            <img src="${v.thumb}" alt="${v.title}" loading="lazy">
+                            <div class="play-button">▶</div>
+                        </div>
+                        <div class="video-title">${v.title}</div>
+                    </div>
+                `).join('');
+
+                // Факты
+                const factsList = document.getElementById('factsList');
+                factsList.innerHTML = facts.map(f => `<li>…${f}?</li>`).join('');
+            }
+
+            document.addEventListener('DOMContentLoaded', render);
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+        })();
+    </script>
+</body>
+</html>
