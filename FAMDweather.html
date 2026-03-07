@@ -3,737 +3,849 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAMDweather - Умный прогноз погоды</title>
+    <title>FAMDweather — понятный прогноз</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #4CAF50;
-            --primary-dark: #388E3C;
-            --secondary: #8BC34A;
-            --dark: #121212;
-            --darker: #0A0A0A;
-            --light: #F5F5F5;
-            --text: #E0E0E0;
-            --error: #F44336;
-            --warning: #FFC107;
-            --info: #2196F3;
-        }
-        
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-        
+
+        :root {
+            /* Спокойная, читаемая цветовая схема */
+            --bg-gradient-start: #e0f0fe;
+            --bg-gradient-end: #b8d9f5;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-primary: #1e293b;
+            --text-secondary: #334155;
+            --text-light: #64748b;
+            --accent: #2563eb;
+            --accent-light: #3b82f6;
+            --accent-soft: #dbeafe;
+            --success: #10b981;
+            --error: #ef4444;
+            --border-light: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --shadow-hover: 0 20px 30px -10px rgba(37, 99, 235, 0.2);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--dark);
-            color: var(--text);
-            line-height: 1.6;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            background-image: linear-gradient(to bottom, #1b3b1a, #0f1f0e);
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background-color: rgba(42, 93, 40, 0.8);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            transition: all 0.3s ease;
-        }
-        
-        .container:hover {
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            transform: translateY(-5px);
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        
-        .logo {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--light);
-            margin-bottom: 10px;
+            background: linear-gradient(145deg, var(--bg-gradient-start), var(--bg-gradient-end));
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            padding: 20px;
+            color: var(--text-primary);
         }
-        
+
+        /* Контейнер — чистый, светлый, с мягкой тенью */
+        .container {
+            width: 100%;
+            max-width: 760px;
+            background: var(--card-bg);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            padding: 32px 36px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .container:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Шапка */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .logo-icon {
-            color: var(--primary);
+            font-size: 2.2rem;
+            color: var(--accent);
+            filter: drop-shadow(0 4px 6px rgba(37, 99, 235, 0.2));
         }
-        
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
         .tagline {
-            color: var(--secondary);
-            font-size: 1rem;
-            opacity: 0.9;
+            background: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        
+
+        .tagline i {
+            color: var(--accent);
+        }
+
+        /* Поиск */
+        .search-section {
+            margin-bottom: 28px;
+        }
+
         .search-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
-        
+
         #city {
             flex: 1;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid var(--primary);
+            padding: 16px 22px;
+            border: 1px solid var(--border-light);
+            border-radius: 60px;
             font-size: 1rem;
-            background-color: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
-        
+
         #city:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 0 0 4px var(--accent-soft);
         }
-        
+
         #city::placeholder {
-            color: rgba(0, 0, 0, 0.5);
+            color: var(--text-light);
+            font-weight: 300;
         }
-        
+
         #search-button {
-            padding: 0 25px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
+            background: var(--accent);
             border: none;
-            border-radius: 8px;
-            font-size: 1rem;
+            border-radius: 60px;
+            padding: 0 32px;
+            color: white;
             font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 1rem;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
         }
-        
+
         #search-button:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            background: var(--accent-light);
+            transform: scale(1.02);
         }
-        
+
         #search-button:active {
-            transform: translateY(0);
+            transform: scale(0.98);
         }
-        
+
+        .button-text {
+            white-space: nowrap;
+        }
+
+        /* Переключатель единиц */
+        .unit-panel {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .unit-btn {
+            background: white;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .unit-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .unit-btn:not(.active):hover {
+            background: #f8fafc;
+            border-color: var(--accent-light);
+        }
+
+        /* Индикатор загрузки */
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 32px;
+            margin: 20px 0 10px;
+            border: 1px solid var(--border-light);
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid var(--accent-soft);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading p {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Ошибка */
+        .error-message {
+            display: none;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            border-radius: 24px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            color: #b91c1c;
+            align-items: center;
+            gap: 16px;
+            font-weight: 500;
+        }
+
+        .error-message i {
+            font-size: 1.6rem;
+            color: #dc2626;
+        }
+
+        /* Основной блок погоды */
         .weather-info {
+            background: white;
+            border-radius: 32px;
+            padding: 32px;
             margin-top: 20px;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            transition: all 0.5s ease;
+            border: 1px solid var(--border-light);
+            transition: opacity 0.3s ease;
             opacity: 0;
-            height: 0;
-            overflow: hidden;
+            visibility: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
         }
-        
+
         .weather-info.active {
             opacity: 1;
-            height: auto;
-            padding: 20px;
+            visibility: visible;
         }
-        
+
+        /* Локация */
         .location {
             font-size: 1.8rem;
             font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--light);
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-light);
         }
-        
+
+        .location i {
+            color: var(--accent);
+            font-size: 2rem;
+        }
+
+        /* Текущая погода — крупно и понятно */
         .current-weather {
             display: flex;
             align-items: center;
-            justify-content: space-around;
-            margin: 20px 0;
+            justify-content: space-between;
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 20px 28px;
+            margin-bottom: 28px;
+            border: 1px solid var(--border-light);
         }
-        
+
+        .temp-block {
+            display: flex;
+            flex-direction: column;
+        }
+
         .temperature {
-            font-size: 3.5rem;
-            font-weight: 300;
+            font-size: 4.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1;
             position: relative;
+            display: inline-block;
         }
-        
+
         .temperature::after {
             content: "°C";
-            position: absolute;
-            font-size: 1.5rem;
-            top: 5px;
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--text-light);
+            position: relative;
+            top: -12px;
+            left: 4px;
         }
-        
+
+        .feels-like {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        .weather-icon-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .weather-icon {
             width: 100px;
             height: 100px;
         }
-        
+
         .description {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            color: var(--text-primary);
             text-transform: capitalize;
-            margin-bottom: 15px;
+            font-weight: 500;
         }
-        
+
+        /* Детали — сетка 2x2 на десктопе, адаптивно */
         .details {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 32px 0;
         }
-        
+
         .detail-item {
-            background-color: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 18px 12px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            transition: background 0.1s;
         }
-        
+
+        .detail-item:hover {
+            background: #f1f5f9;
+        }
+
         .detail-icon {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-            color: var(--secondary);
-        }
-        
-        .detail-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 5px;
-        }
-        
-        .detail-value {
-            font-size: 1.2rem;
-            font-weight: 500;
-        }
-        
-        .forecast-container {
-            margin-top: 30px;
-        }
-        
-        .forecast-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .forecast-items {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-        
-        .forecast-item {
-            min-width: 100px;
-            background-color: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .forecast-day {
-            font-weight: 500;
+            font-size: 1.8rem;
+            color: var(--accent);
             margin-bottom: 10px;
         }
-        
-        .forecast-icon {
-            width: 50px;
-            height: 50px;
-            margin: 5px 0;
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
-        
-        .forecast-temp {
-            font-size: 0.9rem;
+
+        .detail-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Прогноз */
+        .forecast-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
             display: flex;
-            gap: 5px;
+            align-items: center;
+            gap: 12px;
+            margin: 32px 0 20px;
         }
-        
-        .forecast-temp-max {
-            font-weight: 500;
-            color: var(--light);
+
+        .forecast-title i {
+            color: var(--accent);
         }
-        
-        .forecast-temp-min {
-            opacity: 0.7;
+
+        .forecast-items {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 8px 4px 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) #e2e8f0;
         }
-        
-        .loading {
-            display: none;
+
+        .forecast-items::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .forecast-items::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .forecast-items::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .forecast-item {
+            min-width: 130px;
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 20px 12px;
+            border: 1px solid var(--border-light);
             text-align: center;
-            padding: 20px;
+            transition: 0.1s;
         }
-        
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            border-top: 4px solid var(--primary);
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+
+        .forecast-item:hover {
+            background: white;
+            border-color: var(--accent-light);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.08);
         }
-        
-        .error-message {
-            color: var(--error);
-            text-align: center;
-            padding: 20px;
-            display: none;
+
+        .forecast-day {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
         }
-        
-        .unit-toggle {
+
+        .forecast-icon {
+            width: 56px;
+            height: 56px;
+            margin: 8px auto;
+        }
+
+        .forecast-temp {
             display: flex;
             justify-content: center;
-            margin-top: 15px;
-            gap: 10px;
+            gap: 12px;
+            font-size: 1.1rem;
         }
-        
-        .unit-btn {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text);
-            border: none;
-            padding: 5px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
+
+        .forecast-temp-max {
+            font-weight: 600;
+            color: var(--text-primary);
         }
-        
-        .unit-btn.active {
-            background-color: var(--primary);
-            color: white;
+
+        .forecast-temp-min {
+            color: var(--text-light);
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
+
+        /* Адаптивность */
         @media (max-width: 600px) {
             .container {
-                padding: 20px;
+                padding: 24px 20px;
             }
-            
-            .logo {
-                font-size: 2rem;
+
+            .logo-text {
+                font-size: 1.5rem;
             }
-            
+
             .search-container {
                 flex-direction: column;
             }
-            
+
             #search-button {
-                padding: 15px;
+                padding: 16px;
                 justify-content: center;
             }
-            
+
             .current-weather {
                 flex-direction: column;
                 text-align: center;
+                gap: 16px;
             }
-            
+
             .details {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
+
+            .location {
+                font-size: 1.5rem;
+            }
+
+            .temperature {
+                font-size: 3.5rem;
+            }
+
+            .temperature::after {
+                font-size: 1.5rem;
+                top: -8px;
+            }
+        }
+
+        /* Дополнительные микро-фишки для удобства */
+        .last-updated {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-align: right;
+            margin-top: 16px;
+            border-top: 1px dashed var(--border-light);
+            padding-top: 16px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Шапка -->
         <div class="header">
             <div class="logo">
                 <i class="fas fa-cloud-sun logo-icon"></i>
-                <span>FAMDweather</span>
+                <span class="logo-text">FAMDweather</span>
             </div>
-            <div class="tagline">Точный прогноз погоды в любом городе</div>
+            <div class="tagline">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>текущая погода + 5 дней</span>
+            </div>
         </div>
-        
-        <div class="search-container">
-            <input type="text" id="city" placeholder="Введите город">
-            <button id="search-button" onclick="getWeather()">
-                <i class="fas fa-search"></i>
-                <span class="button-text">Поиск</span>
-            </button>
+
+        <!-- Поиск и единицы -->
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="city" placeholder="Город, страна (например: Москва, Лондон)" autocomplete="off">
+                <button id="search-button" onclick="getWeather()">
+                    <i class="fas fa-search"></i>
+                    <span class="button-text">Найти</span>
+                </button>
+            </div>
+            <div class="unit-panel">
+                <button class="unit-btn active" id="celsius-btn">°C</button>
+                <button class="unit-btn" id="fahrenheit-btn">°F</button>
+            </div>
         </div>
-        
-        <div class="unit-toggle">
-            <button class="unit-btn active" id="celsius-btn">°C</button>
-            <button class="unit-btn" id="fahrenheit-btn">°F</button>
-        </div>
-        
+
+        <!-- Загрузка -->
         <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <p>Загрузка данных...</p>
+            <div class="spinner"></div>
+            <p>Получаем данные о погоде...</p>
         </div>
-        
+
+        <!-- Ошибка -->
         <div class="error-message" id="error-message">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p id="error-text">Ошибка при загрузке данных</p>
+            <i class="fas fa-exclamation-circle"></i>
+            <p id="error-text">Не удалось загрузить погоду. Проверьте город.</p>
         </div>
-        
+
+        <!-- Основной блок погоды -->
         <div class="weather-info" id="weatherResult">
-            <div class="location" id="location">
-                <i class="fas fa-map-marker-alt"></i>
-                <span id="city-name">Город, Страна</span>
+            <div class="location">
+                <i class="fas fa-location-dot"></i>
+                <span id="city-name">——</span>
             </div>
-            
+
+            <!-- Текущая погода -->
             <div class="current-weather">
-                <div class="temperature" id="temperature">25</div>
-                <img class="weather-icon" id="weather-icon" src="" alt="Погода">
+                <div class="temp-block">
+                    <span class="temperature" id="temperature">--</span>
+                    <span class="feels-like" id="feels-like">ощущается как --°</span>
+                </div>
+                <div class="weather-icon-block">
+                    <img class="weather-icon" id="weather-icon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="иконка">
+                    <span class="description" id="description">—</span>
+                </div>
             </div>
-            
-            <div class="description" id="description">Ясно</div>
-            
+
+            <!-- Детали -->
             <div class="details">
                 <div class="detail-item">
-                    <i class="fas fa-tint detail-icon"></i>
-                    <span class="detail-label">Влажность</span>
-                    <span class="detail-value" id="humidity">75%</span>
+                    <i class="fas fa-droplet detail-icon"></i>
+                    <div class="detail-label">Влажность</div>
+                    <div class="detail-value" id="humidity">--%</div>
                 </div>
                 <div class="detail-item">
                     <i class="fas fa-wind detail-icon"></i>
-                    <span class="detail-label">Ветер</span>
-                    <span class="detail-value" id="wind">5 м/с</span>
+                    <div class="detail-label">Ветер</div>
+                    <div class="detail-value" id="wind">-- м/с</div>
                 </div>
                 <div class="detail-item">
-                    <i class="fas fa-tachometer-alt detail-icon"></i>
-                    <span class="detail-label">Давление</span>
-                    <span class="detail-value" id="pressure">760 мм</span>
+                    <i class="fas fa-gauge-high detail-icon"></i>
+                    <div class="detail-label">Давление</div>
+                    <div class="detail-value" id="pressure">-- мм</div>
                 </div>
                 <div class="detail-item">
                     <i class="fas fa-eye detail-icon"></i>
-                    <span class="detail-label">Видимость</span>
-                    <span class="detail-value" id="visibility">10 км</span>
+                    <div class="detail-label">Видимость</div>
+                    <div class="detail-value" id="visibility">-- км</div>
                 </div>
             </div>
-            
-            <div class="forecast-container">
-                <div class="forecast-title">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Прогноз на 5 дней</span>
-                </div>
-                <div class="forecast-items" id="forecast-items">
-                    <!-- Прогноз будет добавлен через JavaScript -->
-                </div>
+
+            <!-- Прогноз -->
+            <div class="forecast-title">
+                <i class="fas fa-calendar-week"></i>
+                <span>Прогноз на 5 дней</span>
             </div>
+            <div class="forecast-items" id="forecast-items"></div>
+
+            <!-- Метка последнего обновления (необязательно, но приятно) -->
+            <div class="last-updated" id="last-updated"></div>
         </div>
     </div>
 
     <script>
-        const apiKey = "06f1b25fe189fab13bf74d225683fd70"; // Ваш API-ключ OpenWeatherMap
-        let currentUnit = 'celsius';
-        
-        // Элементы DOM
-        const elements = {
-            cityInput: document.getElementById('city'),
-            searchButton: document.getElementById('search-button'),
-            weatherResult: document.getElementById('weatherResult'),
-            loading: document.getElementById('loading'),
-            errorMessage: document.getElementById('error-message'),
-            errorText: document.getElementById('error-text'),
-            cityName: document.getElementById('city-name'),
-            temperature: document.getElementById('temperature'),
-            weatherIcon: document.getElementById('weather-icon'),
-            description: document.getElementById('description'),
-            humidity: document.getElementById('humidity'),
-            wind: document.getElementById('wind'),
-            pressure: document.getElementById('pressure'),
-            visibility: document.getElementById('visibility'),
-            forecastItems: document.getElementById('forecast-items'),
-            celsiusBtn: document.getElementById('celsius-btn'),
-            fahrenheitBtn: document.getElementById('fahrenheit-btn')
-        };
-        
-        // Переключение единиц измерения
-        elements.celsiusBtn.addEventListener('click', () => {
-            if (currentUnit !== 'celsius') {
-                currentUnit = 'celsius';
-                elements.celsiusBtn.classList.add('active');
-                elements.fahrenheitBtn.classList.remove('active');
-                updateWeatherDisplay();
+        (function() {
+            // --- Конфиг ---
+            const API_KEY = "06f1b25fe189fab13bf74d225683fd70";  // рабочий ключ
+            let currentUnit = 'celsius';
+            let weatherData = null;
+
+            // --- Элементы DOM ---
+            const cityInput = document.getElementById('city');
+            const searchBtn = document.getElementById('search-button');
+            const loadingDiv = document.getElementById('loading');
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const weatherResult = document.getElementById('weatherResult');
+            const cityNameSpan = document.getElementById('city-name');
+            const tempSpan = document.getElementById('temperature');
+            const feelsLikeSpan = document.getElementById('feels-like');
+            const weatherIcon = document.getElementById('weather-icon');
+            const descriptionP = document.getElementById('description');
+            const humiditySpan = document.getElementById('humidity');
+            const windSpan = document.getElementById('wind');
+            const pressureSpan = document.getElementById('pressure');
+            const visibilitySpan = document.getElementById('visibility');
+            const forecastContainer = document.getElementById('forecast-items');
+            const lastUpdatedSpan = document.getElementById('last-updated');
+
+            const celsiusBtn = document.getElementById('celsius-btn');
+            const fahrenheitBtn = document.getElementById('fahrenheit-btn');
+
+            // --- Вспомогательные функции ---
+            function showLoading() { loadingDiv.style.display = 'flex'; }
+            function hideLoading() { loadingDiv.style.display = 'none'; }
+            function showError(msg) {
+                errorText.innerText = msg;
+                errorDiv.style.display = 'flex';
+                weatherResult.classList.remove('active');
             }
-        });
-        
-        elements.fahrenheitBtn.addEventListener('click', () => {
-            if (currentUnit !== 'fahrenheit') {
-                currentUnit = 'fahrenheit';
-                elements.fahrenheitBtn.classList.add('active');
-                elements.celsiusBtn.classList.remove('active');
-                updateWeatherDisplay();
+            function hideError() { errorDiv.style.display = 'none'; }
+            function showWeather() { weatherResult.classList.add('active'); }
+            function hideWeather() { weatherResult.classList.remove('active'); }
+
+            // Конвертация температуры
+            function formatTemp(celsius) {
+                if (currentUnit === 'celsius') return Math.round(celsius);
+                return Math.round(celsius * 9/5 + 32);
             }
-        });
-        
-        // Основная функция получения погоды
-        async function getWeather() {
-            const city = elements.cityInput.value.trim();
-            if (!city) {
-                showError("Пожалуйста, введите название города");
-                return;
+
+            function formatTempWithUnit(celsius, forFeelsLike = false) {
+                let val = formatTemp(celsius);
+                let unit = currentUnit === 'celsius' ? '°C' : '°F';
+                if (forFeelsLike) return `ощущается как ${val}${unit}`;
+                return `${val}${unit}`;
             }
-            
-            showLoading();
-            hideError();
-            hideWeather();
-            
-            try {
-                // Получаем текущую погоду
-                const currentResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=ru&appid=${apiKey}`);
-                
-                if (!currentResponse.ok) {
-                    throw new Error("Город не найден");
-                }
-                
-                const currentData = await currentResponse.json();
-                
-                // Получаем прогноз на 5 дней
-                const forecastResponse = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&lang=ru&appid=${apiKey}`);
-                
-                if (!forecastResponse.ok) {
-                    throw new Error("Не удалось получить прогноз");
-                }
-                
-                const forecastData = await forecastResponse.json();
-                
-                // Сохраняем данные
-                window.weatherData = {
-                    current: currentData,
-                    forecast: forecastData
-                };
-                
-                // Отображаем данные
-                updateWeatherDisplay();
-                showWeather();
-                
-            } catch (error) {
-                console.error("Ошибка:", error);
-                showError(error.message || "Ошибка при получении данных");
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        // Функция обновления отображения погоды
-        function updateWeatherDisplay() {
-            if (!window.weatherData) return;
-            
-            const { current, forecast } = window.weatherData;
-            
-            // Текущая погода
-            elements.cityName.textContent = `${current.name}, ${current.sys.country}`;
-            
-            const temp = currentUnit === 'celsius' 
-                ? Math.round(current.main.temp) 
-                : Math.round(current.main.temp * 9/5 + 32);
-            elements.temperature.textContent = temp;
-            
-            elements.weatherIcon.src = `https://openweathermap.org/img/wn/${current.weather[0].icon}@2x.png`;
-            elements.weatherIcon.alt = current.weather[0].description;
-            elements.description.textContent = current.weather[0].description;
-            elements.humidity.textContent = `${current.main.humidity}%`;
-            elements.wind.textContent = `${current.wind.speed} м/с`;
-            elements.pressure.textContent = `${Math.round(current.main.pressure * 0.75006375541921)} мм`;
-            elements.visibility.textContent = `${current.visibility / 1000} км`;
-            
-            // Прогноз на 5 дней
-            elements.forecastItems.innerHTML = '';
-            
-            // Группируем прогноз по дням
-            const dailyForecast = {};
-            forecast.list.forEach(item => {
-                const date = new Date(item.dt * 1000);
-                const dayKey = date.toLocaleDateString('ru-RU', { weekday: 'short' });
-                
-                if (!dailyForecast[dayKey]) {
-                    dailyForecast[dayKey] = {
-                        date: date,
-                        temps: [],
-                        icons: [],
-                        descriptions: []
-                    };
-                }
-                
-                dailyForecast[dayKey].temps.push(item.main.temp);
-                dailyForecast[dayKey].icons.push(item.weather[0].icon);
-                dailyForecast[dayKey].descriptions.push(item.weather[0].description);
-            });
-            
-            // Отображаем прогноз для каждого дня
-            Object.keys(dailyForecast).slice(0, 5).forEach(dayKey => {
-                const day = dailyForecast[dayKey];
-                const dayName = day.date.toLocaleDateString('ru-RU', { weekday: 'short' });
-                const dayNumber = day.date.getDate();
-                
-                // Находим среднюю температуру и наиболее частую иконку
-                const avgTemp = day.temps.reduce((a, b) => a + b, 0) / day.temps.length;
-                const maxTemp = Math.max(...day.temps);
-                const minTemp = Math.min(...day.temps);
-                
-                // Находим наиболее частое описание
-                const descriptionCounts = {};
-                day.descriptions.forEach(desc => {
-                    descriptionCounts[desc] = (descriptionCounts[desc] || 0) + 1;
-                });
-                const mostCommonDesc = Object.keys(descriptionCounts).reduce((a, b) => 
-                    descriptionCounts[a] > descriptionCounts[b] ? a : b);
-                
-                // Находим наиболее частую иконку
-                const iconCounts = {};
-                day.icons.forEach(icon => {
-                    iconCounts[icon] = (iconCounts[icon] || 0) + 1;
-                });
-                const mostCommonIcon = Object.keys(iconCounts).reduce((a, b) => 
-                    iconCounts[a] > iconCounts[b] ? a : b);
-                
-                // Форматируем температуру в зависимости от выбранных единиц
-                const displayMaxTemp = currentUnit === 'celsius' 
-                    ? Math.round(maxTemp) 
-                    : Math.round(maxTemp * 9/5 + 32);
-                
-                const displayMinTemp = currentUnit === 'celsius' 
-                    ? Math.round(minTemp) 
-                    : Math.round(minTemp * 9/5 + 32);
-                
-                // Создаем элемент прогноза
-                const forecastItem = document.createElement('div');
-                forecastItem.className = 'forecast-item';
-                forecastItem.innerHTML = `
-                    <div class="forecast-day">${dayName} ${dayNumber}</div>
-                    <img class="forecast-icon" src="https://openweathermap.org/img/wn/${mostCommonIcon}.png" alt="${mostCommonDesc}">
-                    <div class="forecast-temp">
-                        <span class="forecast-temp-max">${displayMaxTemp}°</span>
-                        <span class="forecast-temp-min">${displayMinTemp}°</span>
-                    </div>
-                `;
-                
-                elements.forecastItems.appendChild(forecastItem);
-            });
-        }
-        
-        // Функции для управления отображением состояния
-        function showLoading() {
-            elements.loading.style.display = 'block';
-        }
-        
-        function hideLoading() {
-            elements.loading.style.display = 'none';
-        }
-        
-        function showError(message) {
-            elements.errorText.textContent = message;
-            elements.errorMessage.style.display = 'block';
-        }
-        
-        function hideError() {
-            elements.errorMessage.style.display = 'none';
-        }
-        
-        function showWeather() {
-            elements.weatherResult.classList.add('active');
-        }
-        
-        function hideWeather() {
-            elements.weatherResult.classList.remove('active');
-        }
-        
-        // Автоопределение местоположения при загрузке
-        function getLocationWeather() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async position => {
-                        try {
-                            showLoading();
-                            
-                            // Получаем текущую погоду по координатам
-                            const currentResponse = await fetch(
-                                `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&units=metric&lang=ru&appid=${apiKey}`
-                            );
-                            
-                            if (!currentResponse.ok) throw new Error("Ошибка получения данных");
-                            
-                            const currentData = await currentResponse.json();
-                            
-                            // Получаем прогноз по координатам
-                            const forecastResponse = await fetch(
-                                `https://api.openweathermap.org/data/2.5/forecast?lat=${position.coords.latitude}&lon=${position.coords.longitude}&units=metric&lang=ru&appid=${apiKey}`
-                            );
-                            
-                            if (!forecastResponse.ok) throw new Error("Ошибка получения прогноза");
-                            
-                            const forecastData = await forecastResponse.json();
-                            
-                            // Сохраняем данные
-                            window.weatherData = {
-                                current: currentData,
-                                forecast: forecastData
-                            };
-                            
-                            // Устанавливаем город в поле ввода
-                            elements.cityInput.value = currentData.name;
-                            
-                            // Отображаем данные
-                            updateWeatherDisplay();
-                            showWeather();
-                            
-                        } catch (error) {
-                            console.error("Ошибка:", error);
-                            showError("Не удалось определить погоду для вашего местоположения");
-                        } finally {
-                            hideLoading();
-                        }
-                    },
-                    error => {
-                        console.error("Геолокация отключена:", error);
-                        // Можно показать погоду для города по умолчанию
-                        elements.cityInput.value = "Москва";
-                        getWeather();
+
+            // Обновление интерфейса
+            function updateDisplay() {
+                if (!weatherData) return;
+
+                const { current, forecast } = weatherData;
+
+                // Город
+                cityNameSpan.innerText = `${current.name}, ${current.sys.country}`;
+
+                // Температура
+                tempSpan.innerText = formatTemp(current.main.temp);
+                feelsLikeSpan.innerText = formatTempWithUnit(current.main.feels_like, true);
+
+                // Иконка и описание
+                weatherIcon.src = `https://openweathermap.org/img/wn/${current.weather[0].icon}@2x.png`;
+                descriptionP.innerText = current.weather[0].description;
+
+                // Детали
+                humiditySpan.innerText = current.main.humidity + '%';
+                windSpan.innerText = current.wind.speed + ' м/с';
+                let pressureMm = Math.round(current.main.pressure * 0.75006375541921);
+                pressureSpan.innerText = pressureMm + ' мм';
+                let visKm = (current.visibility / 1000).toFixed(1);
+                visibilitySpan.innerText = visKm + ' км';
+
+                // Прогноз (группировка по дням)
+                const dailyMap = new Map();
+                forecast.list.forEach(item => {
+                    const date = new Date(item.dt * 1000);
+                    const dayKey = date.toLocaleDateString('ru-RU', { day:'numeric', month:'numeric' });
+                    if (!dailyMap.has(dayKey)) {
+                        dailyMap.set(dayKey, {
+                            temps_max: [],
+                            temps_min: [],
+                            icons: []
+                        });
                     }
-                );
-            } else {
-                // Браузер не поддерживает геолокацию
-                elements.cityInput.value = "Москва";
-                getWeather();
+                    const day = dailyMap.get(dayKey);
+                    day.temps_max.push(item.main.temp_max);
+                    day.temps_min.push(item.main.temp_min);
+                    day.icons.push(item.weather[0].icon);
+                });
+
+                // Преобразуем в массив и берём первые 5
+                const entries = Array.from(dailyMap.entries()).slice(0, 5);
+                forecastContainer.innerHTML = '';
+
+                entries.forEach(([dateLabel, data]) => {
+                    const maxTemp = Math.max(...data.temps_max);
+                    const minTemp = Math.min(...data.temps_min);
+
+                    // Самая частая иконка
+                    const iconCounts = {};
+                    data.icons.forEach(ic => iconCounts[ic] = (iconCounts[ic] || 0) + 1);
+                    const topIcon = Object.keys(iconCounts).reduce((a, b) => iconCounts[a] > iconCounts[b] ? a : b, data.icons[0]);
+
+                    // Название дня недели
+                    let dayName = '';
+                    for (let item of forecast.list) {
+                        let d = new Date(item.dt * 1000);
+                        let key = d.toLocaleDateString('ru-RU', { day:'numeric', month:'numeric' });
+                        if (key === dateLabel) {
+                            dayName = d.toLocaleDateString('ru-RU', { weekday: 'short' });
+                            break;
+                        }
+                    }
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'forecast-item';
+                    itemDiv.innerHTML = `
+                        <div class="forecast-day">${dayName} ${dateLabel}</div>
+                        <img class="forecast-icon" src="https://openweathermap.org/img/wn/${topIcon}.png" alt="icon">
+                        <div class="forecast-temp">
+                            <span class="forecast-temp-max">${formatTemp(maxTemp)}°</span>
+                            <span class="forecast-temp-min">${formatTemp(minTemp)}°</span>
+                        </div>
+                    `;
+                    forecastContainer.appendChild(itemDiv);
+                });
+
+                // Время последнего обновления
+                const now = new Date();
+                lastUpdatedSpan.innerText = `Обновлено: ${now.toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' })}`;
             }
-        }
-        
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', () => {
-            // Обработчик нажатия Enter в поле ввода
-            elements.cityInput.addEventListener('keypress', e => {
-                if (e.key === 'Enter') {
-                    getWeather();
+
+            // Запрос к API
+            async function fetchWeather(city) {
+                showLoading();
+                hideError();
+                hideWeather();
+
+                try {
+                    const currentRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=ru&appid=${API_KEY}`);
+                    if (!currentRes.ok) {
+                        if (currentRes.status === 404) throw new Error('Город не найден');
+                        throw new Error('Ошибка соединения');
+                    }
+                    const current = await currentRes.json();
+
+                    const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&lang=ru&appid=${API_KEY}`);
+                    if (!forecastRes.ok) throw new Error('Не удалось получить прогноз');
+                    const forecast = await forecastRes.json();
+
+                    weatherData = { current, forecast };
+                    updateDisplay();
+                    showWeather();
+                } catch (err) {
+                    showError(err.message);
+                } finally {
+                    hideLoading();
                 }
+            }
+
+            // Обработчик поиска
+            window.getWeather = function() {
+                const city = cityInput.value.trim();
+                if (!city) {
+                    showError('Введите название города');
+                    return;
+                }
+                fetchWeather(city);
+            };
+
+            cityInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') getWeather();
             });
-            
-            // Загружаем погоду для текущего местоположения
-            getLocationWeather();
-        });
+
+            // Переключение единиц
+            celsiusBtn.addEventListener('click', () => {
+                if (currentUnit === 'celsius') return;
+                currentUnit = 'celsius';
+                celsiusBtn.classList.add('active');
+                fahrenheitBtn.classList.remove('active');
+                if (weatherData) updateDisplay();
+            });
+
+            fahrenheitBtn.addEventListener('click', () => {
+                if (currentUnit === 'fahrenheit') return;
+                currentUnit = 'fahrenheit';
+                fahrenheitBtn.classList.add('active');
+                celsiusBtn.classList.remove('active');
+                if (weatherData) updateDisplay();
+            });
+
+            // Геолокация при старте (или город по умолчанию)
+            function startWithGeolocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(async (pos) => {
+                        showLoading();
+                        try {
+                            const { latitude, longitude } = pos.coords;
+                            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=ru&appid=${API_KEY}`);
+                            if (!res.ok) throw new Error();
+                            const data = await res.json();
+                            cityInput.value = data.name;
+                            fetchWeather(data.name);
+                        } catch {
+                            cityInput.value = 'Москва';
+                            fetchWeather('Москва');
+                        }
+                    }, () => {
+                        cityInput.value = 'Москва';
+                        fetchWeather('Москва');
+                    });
+                } else {
+                    cityInput.value = 'Москва';
+                    fetchWeather('Москва');
+                }
+            }
+
+            // Старт
+            startWithGeolocation();
+        })();
     </script>
 </body>
 </html>
