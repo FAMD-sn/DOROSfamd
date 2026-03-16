@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DOROS Транслятор</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #1a1a2e;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            color: #fff;
+        }
+        h1 {
+            text-align: center;
+            color: #a78bfa;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 10px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .panel {
+            flex: 1;
+            background: #16213e;
+            border-radius: 10px;
+            border: 1px solid #0f3460;
+        }
+        .header {
+            background: #0f3460;
+            padding: 10px 15px;
+            border-radius: 10px 10px 0 0;
+            font-weight: bold;
+            color: #a78bfa;
+        }
+        textarea {
+            width: 100%;
+            height: 500px;
+            background: #1a1a2e;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+        }
+        .buttons {
+            padding: 10px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            border-top: 1px solid #0f3460;
+        }
+        button {
+            background: #0f3460;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        button:hover {
+            background: #1a4a8a;
+        }
+        .center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+        }
+        .big-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            background: #a78bfa;
+        }
+        .info {
+            text-align: center;
+            margin-top: 10px;
+            color: #a78bfa;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔮 DOROS ТРАНСЛЯТОР</h1>
+    <div class="container">
+        <!-- ЛЕВОЕ ПОЛЕ (ОБЫЧНЫЙ КОД) -->
+        <div class="panel">
+            <div class="header">📄 ОБЫЧНЫЙ КОД</div>
+            <textarea id="normal" placeholder="Вставьте обычный код..."></textarea>
+            <div class="buttons">
+                <button id="loadBtn">📋 ЗАГРУЗИТЬ ВАШ САЙТ</button>
+                <button id="clearNormalBtn">🗑 ОЧИСТИТЬ</button>
+            </div>
+        </div>
+
+        <!-- КНОПКИ ПО СЕРЕДИНЕ -->
+        <div class="center">
+            <button class="big-btn" id="toDoros">→</button>
+            <button class="big-btn" id="toNormal">←</button>
+        </div>
+
+        <!-- ПРАВОЕ ПОЛЕ (DOROS КОД) -->
+        <div class="panel">
+            <div class="header">🔐 DOROS КОД</div>
+            <textarea id="doros" placeholder="Здесь будет DOROS код..."></textarea>
+            <div class="buttons">
+                <button id="encodeBtn">🔒 В DOROS</button>
+                <button id="decodeBtn">🔓 В HTML</button>
+                <button id="copyBtn">📋 КОПИРОВАТЬ</button>
+            </div>
+        </div>
+    </div>
+    <div class="info">
+        A=1 B=4 C=8 D=5 E=2 F=6 G=7 H=9 I=14 J=88 K=52 L=67 M=69 N=11 O=44 P=55 Q=22 R=66 S=77 T=99 U=15 V=26 W=47 X=58 Y=79 Z=96
+    </div>
+
+    <script>
+        // ==================== СЛОВАРЬ ====================
+        const charToNum = {
+            'A':'1','B':'4','C':'8','D':'5','E':'2','F':'6','G':'7','H':'9',
+            'I':'14','J':'88','K':'52','L':'67','M':'69','N':'11','O':'44','P':'55',
+            'Q':'22','R':'66','S':'77','T':'99','U':'15','V':'26','W':'47','X':'58',
+            'Y':'79','Z':'96','a':'1','b':'4','c':'8','d':'5','e':'2','f':'6',
+            'g':'7','h':'9','i':'14','j':'88','k':'52','l':'67','m':'69','n':'11',
+            'o':'44','p':'55','q':'22','r':'66','s':'77','t':'99','u':'15','v':'26',
+            'w':'47','x':'58','y':'79','z':'96'
+        };
+
+        // Обратный словарь
+        const numToChar = {};
+        for(let c in charToNum) numToChar[charToNum[c]] = c.toUpperCase();
+
+        // ==================== ФУНКЦИИ ====================
+        function encode(text) {
+            let result = '';
+            for(let i = 0; i < text.length; i++) {
+                let num = charToNum[text[i]];
+                result += num ? num + ',' : text[i];
+            }
+            return result;
+        }
+
+        function decode(text) {
+            let result = '';
+            let i = 0;
+            while(i < text.length) {
+                if(text[i] >= '0' && text[i] <= '9') {
+                    let num = '';
+                    while(i < text.length && text[i] >= '0' && text[i] <= '9') {
+                        num += text[i];
+                        i++;
+                    }
+                    if(text[i] === ',') i++;
+                    result += numToChar[num] || num;
+                } else {
+                    result += text[i];
+                    i++;
+                }
+            }
+            return result;
+        }
+
+        // ==================== ВАШ САЙТ ====================
+        const yourSite = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Словарь FAMD</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #0f1e13, #1c3d2b);
+            color: #d4c9a3;
+            text-align: center;
+        }
+        h1 {
+            font-size: 46px;
+            color: #e5d6b9;
+            padding: 20px;
+            background: linear-gradient(90deg, #2a4f39, #21392a);
+            border-radius: 10px;
+            border: 3px solid #4f7d5a;
+            display: inline-block;
+        }
+        #search-bar {
+            margin: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        #search-input {
+            width: 60%;
+            padding: 14px;
+            font-size: 18px;
+            border: 2px solid #8abf7a;
+            border-radius: 8px;
+            background: #1a3023;
+            color: #e5d6b9;
+        }
+        #search-button {
+            padding: 14px 28px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #b5a36c, #8f7c55);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #result {
+            padding: 30px;
+            background: rgba(32, 50, 40, 0.9);
+            border: 2px solid #8abf7a;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+        footer {
+            background: linear-gradient(90deg, #1a3023, #21392a);
+            color: #b4a892;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Словарь FAMD</h1>
+    <div id="search-bar">
+        <input id="search-input" placeholder="Введите слово...">
+        <button id="search-button">Искать</button>
+    </div>
+    <div id="result">Введите слово и нажмите "Искать"</div>
+    <script>
+        document.getElementById('search-button').onclick = () => {
+            const q = document.getElementById('search-input').value;
+            document.getElementById('result').innerHTML = '<h2>' + q + '</h2><p>Поиск: ' + q + '</p>';
+        }
+    <\/script>
+    <footer>© 2025 Famd Music | Все права защищены</footer>
+</body>
+</html>`;
+
+        // ==================== ПОЛУЧАЕМ ЭЛЕМЕНТЫ ====================
+        const normal = document.getElementById('normal');
+        const doros = document.getElementById('doros');
+
+        // ==================== КНОПКИ ====================
+        document.getElementById('loadBtn').onclick = () => {
+            normal.value = yourSite;
+        };
+
+        document.getElementById('clearNormalBtn').onclick = () => {
+            normal.value = '';
+        };
+
+        document.getElementById('encodeBtn').onclick = () => {
+            doros.value = encode(normal.value);
+        };
+
+        document.getElementById('decodeBtn').onclick = () => {
+            normal.value = decode(doros.value);
+        };
+
+        document.getElementById('toDoros').onclick = () => {
+            doros.value = encode(normal.value);
+        };
+
+        document.getElementById('toNormal').onclick = () => {
+            normal.value = decode(doros.value);
+        };
+
+        document.getElementById('copyBtn').onclick = () => {
+            doros.select();
+            document.execCommand('copy');
+            alert('✅ Скопировано!');
+        };
+
+        // ==================== ЗАГРУЗКА ====================
+        window.onload = () => {
+            normal.value = yourSite;
+            doros.value = encode(yourSite);
+        };
+    </script>
+</body>
+</html>
