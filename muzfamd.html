@@ -1,0 +1,717 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О нас — DOROSfamd: цифровая вселенная разработчика</title>
+    <meta name="description" content="100+ фронтенд-проектов, созданных одним разработчиком. Игры, инструменты, образование, бизнес, финтех, творчество. 6 лет развития.">
+    <meta name="keywords" content="DOROSfamd, экосистема, фронтенд, разработчик, Х. Дориуш, проекты, игры, инструменты">
+    <meta name="author" content="Х. Дориуш">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://dorosfamd.com/logof.png" type="image/png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #111116;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --text-light: #f0f0f0;
+            --text-dim: #a0a0b0;
+            --border-dim: #22222a;
+            --gradient-1: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --gradient-2: linear-gradient(135deg, #3b82f6, #2dd4bf);
+            --font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            
+            --space-2: 8px;
+            --space-4: 16px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-12: 48px;
+            --space-16: 64px;
+            --space-20: 80px;
+            
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 30px;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: var(--font-family);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Плавный параллакс-фон */
+        .parallax-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(139,92,246,0.12) 0%, transparent 50%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-4);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 15, 0.7);
+            border-bottom: 1px solid var(--border-dim);
+            z-index: 100;
+            padding: var(--space-4) 0;
+        }
+
+        .header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: url('https://dorosfamd.com/logof.png') center/cover no-repeat, var(--gradient-1);
+            border-radius: var(--radius-md);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-6);
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-4);
+            background: linear-gradient(135deg, #fff, #c0c0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h1 span {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .hero-sub {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: var(--text-dim);
+            margin-bottom: var(--space-6);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stats-mini {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-8);
+            margin-bottom: var(--space-8);
+            font-size: 1.1rem;
+        }
+
+        .hero-stats-mini div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-stats-mini strong {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: var(--space-4) var(--space-8);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 10px 20px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px var(--primary-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: rgba(99,102,241,0.1);
+            border-color: var(--primary);
+        }
+
+        /* Sections */
+        .section {
+            padding: var(--space-20) 0;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: var(--space-12);
+            text-align: center;
+            background: linear-gradient(135deg, #fff, #a0a0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: var(--text-dim);
+            max-width: 800px;
+            margin: 0 auto var(--space-12);
+            font-size: 1.2rem;
+        }
+
+        /* Cards */
+        .grid-2, .grid-3, .grid-4 {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 30px rgba(99,102,241,0.2);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .category-item {
+            background: rgba(99,102,241,0.05);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-md);
+            padding: var(--space-6);
+            transition: all 0.3s;
+        }
+
+        .category-item:hover {
+            background: rgba(99,102,241,0.1);
+            border-color: var(--primary);
+        }
+
+        .category-item i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .category-item h3 {
+            font-size: 1.3rem;
+            margin-bottom: var(--space-2);
+        }
+
+        .category-item p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--primary), transparent);
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+            position: relative;
+        }
+
+        .timeline-year {
+            width: 120px;
+            text-align: right;
+            padding-right: var(--space-6);
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .timeline-content {
+            width: calc(50% - 60px);
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-md);
+            padding: var(--space-6);
+            margin-left: var(--space-6);
+        }
+
+        .timeline-content h4 {
+            font-size: 1.3rem;
+            margin-bottom: var(--space-2);
+        }
+
+        /* Quote */
+        .quote-block {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 500;
+            line-height: 1.4;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--space-12);
+            background: rgba(99,102,241,0.05);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-dim);
+            position: relative;
+        }
+
+        .quote-block i {
+            color: var(--primary);
+            font-size: 3rem;
+            opacity: 0.5;
+            margin-bottom: var(--space-4);
+        }
+
+        .quote-author {
+            margin-top: var(--space-6);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border-dim);
+            padding: var(--space-12) 0;
+            margin-top: var(--space-20);
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline::before { left: 30px; }
+            .timeline-item { flex-direction: column; align-items: flex-start; }
+            .timeline-year { width: auto; text-align: left; padding-right: 0; }
+            .timeline-content { width: 100%; margin-left: 0; }
+            
+            .nav-links { display: none; }
+            
+            .hero-stats-mini { flex-wrap: wrap; }
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="parallax-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="https://dorosfamd.com" class="logo">
+                <div class="logo-icon"></div>
+                <span>DOROSfamd</span>
+            </a>
+            <div class="nav-links">
+                <a href="#about">О нас</a>
+                <a href="#ecosystem">Экосистема</a>
+                <a href="#history">История</a>
+                <a href="#contact">Контакты</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h1>
+                Цифровая вселенная<br>
+                <span>одного разработчика</span>
+            </h1>
+            <p class="hero-sub">
+                100+ фронтенд-проектов. 6 лет кода. 18 апреля 2026 — 20 сайтов в Google.
+            </p>
+            <div class="hero-stats-mini">
+                <div><strong>100+</strong> <span>проектов</span></div>
+                <div><strong>6</strong> <span>лет развития</span></div>
+                <div><strong>2026</strong> <span>запуск 20 сайтов</span></div>
+            </div>
+            <div class="btn-group">
+                <a href="https://dorosfamd.com/#projects" class="btn btn-primary"><i class="fas fa-rocket"></i> Все проекты</a>
+                <a href="mailto:dorosfamd@gmail.com" class="btn btn-outline"><i class="fas fa-paper-plane"></i> Связаться</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Кто мы -->
+    <section class="section" id="about">
+        <div class="container">
+            <h2 class="section-title">Кто мы</h2>
+            <p class="section-sub">
+                DOROSfamd — это не компания и не маркетплейс. Это личная цифровая экосистема, созданная одним разработчиком, Х. Дориушем.
+            </p>
+            <div class="grid-2" style="margin-top: var(--space-12);">
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-cubes"></i></div>
+                    <h3>Цифровая империя</h3>
+                    <p style="color: var(--text-dim);">Игры, инструменты, образование, финансы, творчество, соцсети, бизнес-платформы — всё в одной экосистеме.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-code"></i></div>
+                    <h3>Чистый код</h3>
+                    <p style="color: var(--text-dim);">Каждый проект написан на HTML, CSS и JavaScript. Без фреймворков, без компромиссов.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Масштаб экосистемы -->
+    <section class="section" id="ecosystem">
+        <div class="container">
+            <h2 class="section-title">Масштаб экосистемы</h2>
+            <p class="section-sub">Более 100 проектов в 7 направлениях</p>
+            
+            <div class="category-grid">
+                <div class="category-item">
+                    <i class="fas fa-gamepad"></i>
+                    <h3>Игры</h3>
+                    <p>2D-аркады, шахматы, песочницы, GTA2D, симуляторы</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-tools"></i>
+                    <h3>Инструменты</h3>
+                    <p>Редактор кода, облако, браузер, калькулятор, карты, QR</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3>Образование</h3>
+                    <p>ИИ-решатель, тесты, словари, курсы фронтенда</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-briefcase"></i>
+                    <h3>Бизнес</h3>
+                    <p>Онлайн-банк, маркетплейс, бухгалтерия, такси</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-paint-brush"></i>
+                    <h3>Творчество</h3>
+                    <p>Графические редакторы, музыка, генераторы рифм</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-globe"></i>
+                    <h3>Социальное</h3>
+                    <p>Чаты, звонки, видеоплатформа, вики</p>
+                </div>
+                <div class="category-item">
+                    <i class="fas fa-coins"></i>
+                    <h3>Финтех</h3>
+                    <p>Криптокошелек, биржевой монитор, конвертер валют</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Философия -->
+    <section class="section">
+        <div class="container">
+            <div class="quote-block">
+                <i class="fas fa-quote-left"></i>
+                <p>«Семь раз упасть — восемь раз подняться.»</p>
+                <div class="quote-author">— Дзигоро Кано</div>
+                <div style="margin-top: var(--space-8); color: var(--text-dim); font-size: 1.2rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+                    Творчество, упорство, самостоятельная разработка и постоянные обновления — код, который живёт и дышит.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- История (таймлайн) -->
+    <section class="section" id="history">
+        <div class="container">
+            <h2 class="section-title">История</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">2011</div>
+                    <div class="timeline-content">
+                        <h4>Начало пути</h4>
+                        <p>Первое знакомство с компьютерами, интерес к технологиям.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2017</div>
+                    <div class="timeline-content">
+                        <h4>Первое программирование</h4>
+                        <p>Scratch, AppInventor — первые логические конструкции.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2020</div>
+                    <div class="timeline-content">
+                        <h4>Первый сайт «Словарь»</h4>
+                        <p>Запуск первого полноценного веб-проекта.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2024</div>
+                    <div class="timeline-content">
+                        <h4>Обновление «Словаря»</h4>
+                        <p>Редизайн и новый функционал спустя 4 года.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2025</div>
+                    <div class="timeline-content">
+                        <h4>Запуск 20 сайтов</h4>
+                        <p>18 апреля 2025 года — 20 новых проектов проиндексированы Google.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Миссия -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Миссия</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <i class="fas fa-brain" style="font-size: 2.5rem; color: var(--primary); margin-bottom: var(--space-4);"></i>
+                    <h3>Развивать мышление</h3>
+                    <p style="color: var(--text-dim);">Проекты, которые заставляют думать, решать, творить.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-graduation-cap" style="font-size: 2.5rem; color: var(--primary); margin-bottom: var(--space-4);"></i>
+                    <h3>Помогать учиться</h3>
+                    <p style="color: var(--text-dim);">Образовательные инструменты для всех возрастов.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-lightbulb" style="font-size: 2.5rem; color: var(--primary); margin-bottom: var(--space-4);"></i>
+                    <h3>Вдохновлять</h3>
+                    <p style="color: var(--text-dim);">Показать, что один разработчик может создать целую вселенную.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Видение будущего -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Видение будущего</h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6);">
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; color: var(--primary);">100+</div>
+                    <p>проектов к концу года</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; color: var(--primary);">AI</div>
+                    <p>собственные нейросети</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; color: var(--primary);">1M+</div>
+                    <p>пользователей</p>
+                </div>
+            </div>
+            <p class="section-sub" style="margin-top: var(--space-12);">
+                Масштабирование экосистемы, новые технологии и миллионная аудитория.
+            </p>
+        </div>
+    </section>
+
+    <!-- Заключительный CTA -->
+    <section class="section" style="text-align: center; background: linear-gradient(135deg, rgba(99,102,241,0.1), transparent); border-radius: var(--radius-xl); margin: var(--space-20) 0;">
+        <div class="container">
+            <h2 style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: var(--space-6);">Стань частью вселенной</h2>
+            <p style="font-size: 1.3rem; color: var(--text-dim); max-width: 600px; margin: 0 auto var(--space-8);">
+                Присоединяйся к экосистеме, которая доказывает: один человек может создать цифровую империю.
+            </p>
+            <div class="btn-group">
+                <a href="https://dorosfamd.com/#projects" class="btn btn-primary"><i class="fas fa-rocket"></i> Исследовать проекты</a>
+                <a href="mailto:dorosfamd@gmail.com" class="btn btn-outline"><i class="fas fa-envelope"></i> Написать создателю</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
+                <div>
+                    <div class="logo" style="margin-bottom: var(--space-2);">
+                        <div class="logo-icon"></div>
+                        <span>DOROSfamd</span>
+                    </div>
+                    <p>© 2026 Х. Дориуш. Все права защищены.</p>
+                </div>
+                <div style="display: flex; gap: var(--space-4);">
+                    <a href="mailto:dorosfamd@gmail.com" style="color: var(--text-dim);"><i class="fas fa-envelope fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Плавный скролл
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Параллакс эффект (легкое движение фона)
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            document.querySelector('.parallax-bg').style.transform = `translateY(${scrolled * 0.2}px)`;
+        });
+    </script>
+</body>
+</html>
