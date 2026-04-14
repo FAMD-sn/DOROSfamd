@@ -372,13 +372,13 @@
 <script>
   // ======================= FIREBASE CONFIG (совместимость с существующим проектом) ===================
   const firebaseConfig = {
-    apiKey: "AIzaSyB_9kumEubg6w3flpP8_iWy_9btubcCa38",
-    authDomain: "doroshop-cfb16.firebaseapp.com",
-    databaseURL: "https://doroshop-cfb16-default-rtdb.firebaseio.com",
-    projectId: "doroshop-cfb16",
-    storageBucket: "doroshop-cfb16.appspot.com",
-    messagingSenderId: "343457643268",
-    appId: "1:343457643268:web:0687d0ea1137124dafae51"
+    apiKey: "",
+    authDomain: "",
+    databaseURL: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
   };
   
   // Инициализация Firebase (если не была инициализирована ранее)
@@ -503,38 +503,6 @@
       timestamp: Date.now()
     }));
     localStorage.setItem(SPAM_KEY, Date.now().toString());
-  }
-
-  // Функция создания пользователя в Firebase Auth + сохранения данных
-  async function registerFirebaseUser(email, password, phone, fullname) {
-    // Сначала пытаемся создать пользователя в Firebase Auth
-    try {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-      const user = userCredential.user;
-      // Обновляем профиль (отображаемое имя)
-      await user.updateProfile({ displayName: fullname });
-      // Дополнительно можно сохранить телефон в custom claims или БД, но для базовой регистрации достаточно
-      console.log('Firebase user created:', user.uid);
-      return { success: true, uid: user.uid };
-    } catch (firebaseError) {
-      console.error('Firebase auth error:', firebaseError);
-      let errorMsg = 'Ошибка регистрации: ';
-      switch (firebaseError.code) {
-        case 'auth/email-already-in-use':
-          errorMsg += 'Этот email уже используется. Пожалуйста, войдите или используйте другой email.';
-          break;
-        case 'auth/invalid-email':
-          errorMsg += 'Некорректный email.';
-          break;
-        case 'auth/weak-password':
-          errorMsg += 'Слишком простой пароль. Используйте минимум 6 символов.';
-          break;
-        default:
-          errorMsg += firebaseError.message;
-      }
-      showMessage(errorMsg, 'error');
-      return { success: false, error: errorMsg };
-    }
   }
 
   // Главный обработчик формы: интеграция firebase + telegram + DC оплата
