@@ -502,6 +502,7 @@ header {
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-functions-compat.js"></script>
 <script>
 // ==================== FIREBASE CONFIG ====================
 const firebaseConfig = {
@@ -689,34 +690,35 @@ async function createSeller() {
   const password = document.getElementById('new-password').value;
   const username = document.getElementById('new-username').value.trim();
   const phone = document.getElementById('new-phone').value.trim();
+  
   if (!email || !password || !username) { showToast('Заполните обязательные поля', 'error'); return; }
   if (password.length < 6) { showToast('Пароль минимум 6 символов', 'error'); return; }
 
   const btn = document.getElementById('create-btn');
-  btn.innerHTML = '<span class="loader"></span> Создание...';
+  btn.innerHTML = '<span class="loader"></span> Создание в облаке...';
   btn.disabled = true;
 
   try {
-    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
-    const uid = cred.user.uid;
-
-    await db.ref(`users/${uid}`).set({
-      email, username, phone: phone || '',
-      productCount: 0,
-      frozen: false,
-      createdAt: firebase.database.ServerValue.TIMESTAMP
+    // ВЫЗЫВАЕМ ОБЛАЧНУЮ ФУНКЦИЮ ВО ФРАНКФУРТЕ ВМЕСТО ЛОКАЛЬНОЙ РЕГИСТРАЦИИ
+    const createSellerFn = firebase.app().functions('europe-west3').httpsCallable('createVerifiedSeller');
+    
+    await createSellerFn({
+      email: email,
+      password: password,
+      username: username,
+      phone: phone,
+      city: '' // город можно оставить пустым или добавить поле
     });
-
-    await secondaryAuth.signOut();
 
     document.getElementById('new-email').value = '';
     document.getElementById('new-password').value = '';
     document.getElementById('new-username').value = '';
     document.getElementById('new-phone').value = '';
-    showToast('Продавец создан: ' + email, 'success');
+    showToast('Продавец успешно создан!', 'success');
+    
     await loadData();
   } catch(e) {
-    showToast('Ошибка: ' + e.message, 'error');
+    showToast('Ошибка функции: ' + e.message, 'error');
   } finally {
     btn.innerHTML = '<i class="fas fa-user-plus"></i> Создать аккаунт продавца';
     btn.disabled = false;
