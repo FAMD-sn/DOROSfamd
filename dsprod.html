@@ -24,10 +24,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-
 <style>
   * {
     margin: 0;
@@ -370,23 +366,6 @@
 </div>
 
 <script>
-  // ======================= FIREBASE CONFIG (совместимость с существующим проектом) ===================
-  const firebaseConfig = {
-    apiKey: "",
-    authDomain: "",
-    databaseURL: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
-  };
-  
-  // Инициализация Firebase (если не была инициализирована ранее)
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  const auth = firebase.auth();
-
   // ======================= КОНСТАНТЫ ДЛЯ ЗАЩИТЫ ОТ СПАМА =================================
   const SPAM_KEY = 'doroshop_seller_reg_last';
   const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 часа
@@ -505,7 +484,7 @@
     localStorage.setItem(SPAM_KEY, Date.now().toString());
   }
 
-  // Главный обработчик формы: интеграция firebase + telegram + DC оплата
+  // Главный обработчик формы: отправка в Telegram и редирект на оплату
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideMessage();
@@ -526,14 +505,7 @@
     
     setLoading(true);
     
-    // 1) Регистрация в Firebase (создаем аккаунт продавца)
-    const firebaseResult = await registerFirebaseUser(email, password, phone, fullname);
-    if (!firebaseResult.success) {
-      setLoading(false);
-      return;
-    }
-    
-    // 2) Подготовка данных для Telegram и локального сохранения
+    // Подготовка данных для Telegram и локального сохранения
     const sellerInfo = {
       fullname,
       phone,
@@ -541,23 +513,24 @@
       email,
       city: city || '',
       business: business || '',
-      password: password,     // важно для админов, но передается в телеграм (как в оригинале)
-      firebaseUid: firebaseResult.uid
+      password: password
     };
     
-    // 3) Отправка в Telegram-канал администраторам
+    // Отправка в Telegram-канал администраторам
     const telegramSent = await sendToTelegram(sellerInfo);
     if (!telegramSent) {
-      console.warn('Telegram уведомление не отправлено, но данные сохранены.');
-      showMessage('⚠️ Заявка отправлена, но уведомление администратора не доставлено. Свяжитесь с поддержкой.', 'info');
-    } else {
-      showMessage('✅ Данные продавца зарегистрированы! Перенаправление на оплату...', 'success');
+      setLoading(false);
+      showMessage('❌ Ошибка при отправке заявки. Пожалуйста, свяжитесь с поддержкой.', 'error');
+      return;
     }
     
-    // 4) Сохраняем информацию локально + спам-защита
+    // Показываем сообщение об успехе
+    showMessage('✅ Заявка успешно отправлена! Перенаправление на оплату...', 'success');
+    
+    // Сохраняем информацию локально + спам-защита
     saveRegistrationLocally(sellerInfo);
     
-    // 5) Перенаправление на платёжный шлюз DC с комментарием (телефон + имя + email)
+    // Формируем комментарий для платежа
     const commentForPayment = `${phone}, ${fullname}, ${email}`;
     const dcLink = `http://pay.dc.tj/?a=992876619999&s=150&c=${encodeURIComponent(commentForPayment)}&f1=124`;
     
@@ -565,11 +538,6 @@
     setTimeout(() => {
       window.location.href = dcLink;
     }, 1800);
-    
-    // Не сбрасываем loading, т.к. произойдет редирект. Но на случай если блокировка:
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
   });
   
   // Автодополнение: сброс сообщений при вводе в поля
@@ -580,11 +548,7 @@
     });
   });
   
-  // Также проверка на наличие уже зарегистрированного пользователя (не блокируем, но покажем напоминание)
-  window.addEventListener('load', () => {
-    // Дополнительный фикс: если кто-то уже оставлял черновик - не мешаем
-    console.log('DOROShop Seller Registration — modern & secure');
-  });
+  console.log('DOROShop Seller Registration — Firebase полностью удален, данные идут только в Telegram');
 </script>
 </body>
 </html>
