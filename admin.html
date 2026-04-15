@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOROShop — Панель Администратора</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+:root {
+  --primary: #5A67D8;
+  --primary-light: #7F8AE6;
+  --primary-dark: #434B87;
+  --danger: #EF4444;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+  --background: #0F1117;
+  --surface: #1A1D2E;
+  --surface-2: #242840;
+  --border: #2D3154;
+  --text: #F0F2FF;
+  --text-muted: #8892B0;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Rubik', sans-serif;
+  background: var(--background);
+  color: var(--text);
+  min-height: 100vh;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+/* AUTH SCREEN */
+#auth-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 50% 0%, rgba(90,103,216,0.15) 0%, transparent 60%);
+}
+.auth-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 90%; max-width: 420px;
+  animation: fadeIn 0.4s ease;
+}
+.auth-logo {
+  text-align: center; margin-bottom: 2rem;
+  font-size: 1.75rem; font-weight: 700;
+  color: var(--primary-light);
+}
+.auth-logo span { color: var(--text-muted); font-weight: 400; font-size: 0.85rem; display: block; margin-top: 0.25rem; }
+
+/* MAIN LAYOUT */
+#admin-screen { display: none; }
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-size: 1.25rem; font-weight: 700; color: var(--primary-light); display: flex; align-items: center; gap: 0.5rem; }
+.admin-badge {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white; padding: 0.25rem 0.75rem;
+  border-radius: 2rem; font-size: 0.75rem; font-weight: 600;
+}
+.main { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem; }
+
+/* CARDS */
+.cards-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem; margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem;
+  animation: fadeIn 0.4s ease;
+  transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); border-color: var(--primary-light); }
+.stat-card .val { font-size: 2rem; font-weight: 700; color: var(--primary-light); }
+.stat-card .lbl { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
+.stat-card.warning .val { color: var(--warning); }
+.stat-card.danger .val { color: var(--danger); }
+
+/* SECTIONS */
+.section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem;
+  animation: fadeIn 0.4s ease;
+}
+.section-title {
+  font-size: 1.1rem; font-weight: 600; margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  color: var(--primary-light);
+}
+.section-title i { color: var(--primary); }
+
+/* FORMS */
+.form-group { margin-bottom: 1rem; }
+.form-label { display: block; margin-bottom: 0.4rem; font-size: 0.875rem; color: var(--text-muted); }
+.form-control {
+  width: 100%; padding: 0.65rem 0.9rem;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 0.95rem;
+  font-family: 'Rubik', sans-serif;
+  transition: border-color 0.2s;
+}
+.form-control:focus { outline: none; border-color: var(--primary); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media(max-width:600px) { .form-row { grid-template-columns: 1fr; } }
+
+/* BUTTONS */
+.btn {
+  padding: 0.65rem 1.25rem; border: none; border-radius: var(--radius-sm);
+  font-weight: 600; font-size: 0.9rem; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  transition: all 0.2s; font-family: 'Rubik', sans-serif;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: #dc2626; }
+.btn-warning { background: var(--warning); color: #1a1a1a; }
+.btn-warning:hover { background: #d97706; }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #059669; }
+.btn-info { background: var(--info); color: white; }
+.btn-info:hover { background: #2563EB; }
+.btn-outline {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary-light); }
+.btn-full { width: 100%; justify-content: center; padding: 0.85rem; }
+.btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+
+/* LOADER */
+.loader {
+  width: 24px; height: 24px; border: 3px solid var(--border);
+  border-top-color: var(--primary); border-radius: 50%;
+  animation: spin 0.8s linear infinite; display: inline-block;
+}
+.loader-sm { width: 16px; height: 16px; border-width: 2px; }
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+  background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--text); padding: 0.75rem 1.5rem;
+  border-radius: 2rem; font-size: 0.9rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  z-index: 9999; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+#toast.show { opacity: 1; }
+#toast.success { border-color: var(--success); color: var(--success); }
+#toast.error { border-color: var(--danger); color: var(--danger); }
+#toast.warning { border-color: var(--warning); color: var(--warning); }
+
+/* SELLERS TABLE */
+.sellers-table { width: 100%; border-collapse: collapse; }
+.sellers-table th, .sellers-table td {
+  padding: 0.75rem 1rem; text-align: left;
+  border-bottom: 1px solid var(--border); font-size: 0.875rem;
+}
+.sellers-table th { color: var(--text-muted); font-weight: 500; }
+.sellers-table tr:last-child td { border-bottom: none; }
+.sellers-table tr:hover td { background: rgba(255,255,255,0.02); }
+.badge-frozen {
+  background: rgba(239,68,68,0.15); color: var(--danger);
+  padding: 0.2rem 0.6rem; border-radius: 2rem; font-size: 0.75rem;
+}
+.badge-active {
+  background: rgba(16,185,129,0.15); color: var(--success);
+  padding: 0.2rem 0.6rem; border-radius: 2rem; font-size: 0.75rem;
+}
+.tbl-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* TABS */
+.tabs {
+  display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.tab {
+  padding: 0.65rem 1rem; cursor: pointer; font-weight: 500;
+  color: var(--text-muted); border-bottom: 2px solid transparent;
+  transition: all 0.2s; font-size: 0.9rem;
+}
+.tab:hover { color: var(--primary-light); }
+.tab.active { color: var(--primary-light); border-bottom-color: var(--primary); }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+/* PRODUCTS LIST */
+.products-admin-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+.product-admin-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); overflow: hidden;
+  transition: transform 0.2s;
+}
+.product-admin-card:hover { transform: translateY(-2px); border-color: var(--primary-light); }
+.product-admin-card img {
+  width: 100%; height: 120px; object-fit: cover;
+  display: block;
+}
+.product-admin-card .pinfo { padding: 0.75rem; }
+.product-admin-card .pname { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; }
+.product-admin-card .pmeta { font-size: 0.75rem; color: var(--text-muted); }
+.product-admin-card .pactions { margin-top: 0.5rem; display: flex; gap: 0.5rem; }
+
+/* QUICK CLEANUP BUTTON */
+.quick-cleanup-card {
+  background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.05));
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.quick-cleanup-btn {
+  background: linear-gradient(135deg, var(--danger), #dc2626);
+  width: 100%;
+  justify-content: center;
+  padding: 1rem;
+  font-size: 1rem;
+}
+.quick-cleanup-btn:disabled { opacity: 0.6; transform: none; cursor: not-allowed; }
+.cleanup-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.cleanup-stat { display: flex; align-items: center; gap: 0.5rem; }
+
+/* CONFIRM MODAL */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+.confirm-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.confirm-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 90%;
+  animation: fadeIn 0.3s ease;
+}
+.confirm-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--danger);
+}
+.confirm-message {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+.confirm-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+/* SEARCH */
+.search-box {
+  margin-bottom: 1rem;
+  position: relative;
+}
+.search-box input {
+  width: 100%;
+  padding: 0.65rem 0.9rem 0.65rem 2.5rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+}
+.search-box i {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <i class="fas fa-shield-alt"></i> DOROShop Admin
+      <span>Только для doro@shop.com</span>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-control" id="auth-email" placeholder="doro@shop.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input type="password" class="form-control" id="auth-password" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="adminLogin()">
+      <i class="fas fa-sign-in-alt"></i> Войти в панель
+    </button>
+    <div id="auth-error" style="color:var(--danger);font-size:0.85rem;margin-top:0.75rem;text-align:center;"></div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-screen">
+  <header>
+    <div class="logo"><i class="fas fa-store"></i> DOROShop Admin</div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="admin-badge"><i class="fas fa-crown"></i> ADMIN</span>
+      <button class="btn btn-outline btn-sm" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <!-- STATS CARDS -->
+    <div class="cards-grid" id="stats-cards">
+      <div class="stat-card">
+        <div class="val" id="stat-products">—</div>
+        <div class="lbl"><i class="fas fa-box"></i> Всего товаров</div>
+      </div>
+      <div class="stat-card">
+        <div class="val" id="stat-sellers">—</div>
+        <div class="lbl"><i class="fas fa-users"></i> Продавцов</div>
+      </div>
+      <div class="stat-card" id="stat-old-card">
+        <div class="val" id="stat-old">—</div>
+        <div class="lbl"><i class="fas fa-clock"></i> Старше 90 дней</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('sellers')"><i class="fas fa-users"></i> Продавцы</div>
+      <div class="tab" onclick="switchTab('create')"><i class="fas fa-user-plus"></i> Создать</div>
+      <div class="tab" onclick="switchTab('delete')"><i class="fas fa-user-minus"></i> Удалить</div>
+      <div class="tab" onclick="switchTab('cleanup')"><i class="fas fa-broom"></i> Очистка</div>
+      <div class="tab" onclick="switchTab('products')"><i class="fas fa-box-open"></i> Все товары</div>
+    </div>
+
+    <!-- TAB: SELLERS LIST -->
+    <div class="tab-content active" id="tab-sellers">
+      <div class="section">
+        <div class="section-title"><i class="fas fa-users"></i> Список продавцов</div>
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="seller-search" placeholder="Поиск по имени или email...">
+        </div>
+        <div id="sellers-list-wrap">
+          <div class="loader"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CREATE SELLER -->
+    <div class="tab-content" id="tab-create">
+      <div class="section">
+        <div class="section-title"><i class="fas fa-user-plus"></i> Создать нового продавца</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-control" id="new-email" placeholder="seller@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Пароль *</label>
+            <input type="password" class="form-control" id="new-password" placeholder="Минимум 6 символов">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Имя продавца *</label>
+            <input type="text" class="form-control" id="new-username" placeholder="Имя для отображения">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Телефон</label>
+            <input type="tel" class="form-control" id="new-phone" placeholder="992XXXXXXXXX">
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="createSeller()" id="create-btn">
+          <i class="fas fa-user-plus"></i> Создать аккаунт продавца
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB: DELETE SELLER -->
+    <div class="tab-content" id="tab-delete">
+      <div class="section">
+        <div class="section-title"><i class="fas fa-user-minus"></i> Удалить продавца</div>
+        <p style="color:var(--text-muted);margin-bottom:1rem;font-size:0.9rem;">
+          Введите Email продавца. Будут удалены его профиль и все товары. Возврат квот произойдёт автоматически.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Email продавца для удаления</label>
+          <input type="email" class="form-control" id="del-email" placeholder="seller@example.com">
+        </div>
+        <button class="btn btn-danger" onclick="deleteSeller()" id="delete-btn">
+          <i class="fas fa-trash"></i> Удалить продавца и все его товары
+        </button>
+        <div id="del-result" style="margin-top:1rem;font-size:0.9rem;"></div>
+      </div>
+    </div>
+
+    <!-- TAB: CLEANUP (УЛУЧШЕННАЯ) -->
+    <div class="tab-content" id="tab-cleanup">
+      <div class="section">
+        <div class="section-title"><i class="fas fa-broom"></i> Очистка устаревших товаров</div>
+        
+        <!-- БЫСТРАЯ КНОПКА ОЧИСТКИ -->
+        <div class="quick-cleanup-card">
+          <button class="btn btn-danger quick-cleanup-btn" onclick="quickCleanup()" id="quick-cleanup-btn">
+            <i class="fas fa-trash-alt"></i> 🗑️ БЫСТРАЯ ОЧИСТКА — удалить все товары старше 90 дней
+          </button>
+          <div class="cleanup-stats">
+            <div class="cleanup-stat"><i class="fas fa-box"></i> <span id="cleanup-total">—</span> товаров всего</div>
+            <div class="cleanup-stat"><i class="fas fa-clock"></i> <span id="cleanup-old-count">—</span> старше 90 дней</div>
+            <div class="cleanup-stat"><i class="fas fa-chart-line"></i> Освободится квот: <span id="cleanup-quota-release">—</span></div>
+          </div>
+        </div>
+
+        <hr style="border-color: var(--border); margin: 1rem 0;">
+        
+        <div id="cleanup-preview" style="margin-bottom:1rem;"></div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <button class="btn btn-warning" onclick="previewOldProducts()">
+            <i class="fas fa-search"></i> Найти устаревшие товары
+          </button>
+          <button class="btn btn-danger" onclick="cleanupOldProducts()" id="cleanup-btn" style="display:none;">
+            <i class="fas fa-broom"></i> Удалить все найденные
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ALL PRODUCTS -->
+    <div class="tab-content" id="tab-products">
+      <div class="section">
+        <div class="section-title"><i class="fas fa-box-open"></i> Все товары в базе</div>
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="product-search" placeholder="Поиск по названию или продавцу...">
+        </div>
+        <div id="all-products-wrap"><div class="loader"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Custom Confirm Modal -->
+<div id="confirmOverlay" class="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle">Подтверждение</div>
+    <div class="confirm-message" id="confirmMessage">Вы уверены?</div>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" onclick="confirmReject()">Отмена</button>
+      <button class="btn btn-danger" id="confirmAcceptBtn">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script>
+// ==================== FIREBASE CONFIG ====================
+const firebaseConfig = {
+  apiKey: "AIzaSyB_9kumEubg6w3flpP8_iWy_9btubcCa38",
+  authDomain: "doroshop-cfb16.firebaseapp.com",
+  databaseURL: "https://doroshop-cfb16-default-rtdb.firebaseio.com",
+  projectId: "doroshop-cfb16",
+  storageBucket: "doroshop-cfb16.firebasestorage.app",
+  messagingSenderId: "343457643268",
+  appId: "1:343457643268:web:0687d0ea1137124dafae51"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+
+const secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary');
+const secondaryAuth = secondaryApp.auth();
+
+const ADMIN_EMAIL = 'doro@shop.com';
+const NINETY_DAYS = 90 * 24 * 60 * 60 * 1000;
+
+let allProducts = [];
+let allUsers = {};
+let oldProducts = [];
+let currentConfirmCallback = null;
+
+// ==================== XSS PROTECTION ====================
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ==================== AUTH ====================
+auth.onAuthStateChanged(user => {
+  if (user && user.email === ADMIN_EMAIL) {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+    loadData();
+    setupSearchListeners();
+  } else if (user) {
+    auth.signOut();
+    showToast('Доступ запрещён', 'error');
+    setTimeout(() => location.href = '/DOROShop', 2000);
+  }
+});
+
+async function adminLogin() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const errEl = document.getElementById('auth-error');
+  errEl.textContent = '';
+  if (email !== ADMIN_EMAIL) { errEl.textContent = 'Доступ только для doro@shop.com'; return; }
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch(e) {
+    errEl.textContent = 'Ошибка: ' + e.message;
+  }
+}
+
+function adminLogout() {
+  auth.signOut().then(() => location.reload());
+}
+
+// ==================== LOAD DATA ====================
+async function loadData() {
+  const [snapProducts, snapUsers] = await Promise.all([
+    db.ref('products').once('value'),
+    db.ref('users').once('value')
+  ]);
+  allProducts = [];
+  allUsers = snapUsers.exists() ? snapUsers.val() : {};
+  if (snapProducts.exists()) {
+    snapProducts.forEach(child => {
+      allProducts.push({ id: child.key, ...child.val() });
+    });
+  }
+  updateStats();
+  renderSellers();
+  renderAllProducts();
+  updateCleanupStats();
+}
+
+function updateStats() {
+  const now = Date.now();
+  const oldCount = allProducts.filter(p => p.timestamp && (now - p.timestamp) > NINETY_DAYS).length;
+  document.getElementById('stat-products').textContent = allProducts.length;
+  document.getElementById('stat-sellers').textContent = Object.keys(allUsers).length;
+  document.getElementById('stat-old').textContent = oldCount;
+  
+  const oldCard = document.getElementById('stat-old-card');
+  if (oldCount > 100) oldCard.classList.add('danger');
+  else if (oldCount > 20) oldCard.classList.add('warning');
+  else oldCard.classList.remove('danger', 'warning');
+}
+
+function updateCleanupStats() {
+  const now = Date.now();
+  const oldCount = allProducts.filter(p => p.timestamp && (now - p.timestamp) > NINETY_DAYS).length;
+  document.getElementById('cleanup-total').textContent = allProducts.length;
+  document.getElementById('cleanup-old-count').textContent = oldCount;
+  
+  // Calculate how many quotas will be freed
+  const decrements = {};
+  allProducts.forEach(p => {
+    if (p.timestamp && (now - p.timestamp) > NINETY_DAYS) {
+      decrements[p.userId] = (decrements[p.userId] || 0) + 1;
+    }
+  });
+  const quotaRelease = Object.values(decrements).reduce((a, b) => a + b, 0);
+  document.getElementById('cleanup-quota-release').textContent = quotaRelease;
+}
+
+// ==================== TABS ====================
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const names = ['sellers', 'create', 'delete', 'cleanup', 'products'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'cleanup') updateCleanupStats();
+}
+
+// ==================== SELLERS TABLE ====================
+function renderSellers(filter = '') {
+  const wrap = document.getElementById('sellers-list-wrap');
+  const sellers = Object.entries(allUsers).filter(([_, u]) => {
+    if (!filter) return true;
+    const search = filter.toLowerCase();
+    return (u.username || '').toLowerCase().includes(search) || 
+           (u.email || '').toLowerCase().includes(search);
+  });
+  
+  if (!sellers.length) { 
+    wrap.innerHTML = '<p style="color:var(--text-muted)">Нет продавцов</p>'; 
+    return; 
+  }
+  
+  let html = `<div style="overflow-x:auto"><table class="sellers-table">
+    <thead><tr><th>Имя</th><th>Email</th><th>Телефон</th><th>Товаров</th><th>Статус</th><th>Действия</th></tr></thead><tbody>`;
+  
+  sellers.forEach(([uid, u]) => {
+    const pCount = allProducts.filter(p => p.userId === uid).length;
+    const frozen = u.frozen === true;
+    html += `<tr>
+      <td>${escapeHtml(u.username) || '—'}</td>
+      <td>${escapeHtml(u.email) || '—'}</td>
+      <td>${escapeHtml(u.phone) || '—'}</td>
+      <td>${pCount} / 50</td>
+      <td><span class="${frozen ? 'badge-frozen' : 'badge-active'}">${frozen ? 'Заморожен' : 'Активен'}</span></td>
+      <td><div class="tbl-actions">
+        <button class="btn btn-warning btn-sm" onclick="toggleFreeze('${uid}', ${frozen})">
+          <i class="fas fa-${frozen ? 'unlock' : 'lock'}"></i> ${frozen ? 'Разморозить' : 'Заморозить'}
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="deleteSellerByUid('${uid}', '${escapeHtml(u.email || '')}')">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div></td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  wrap.innerHTML = html;
+}
+
+function setupSearchListeners() {
+  const sellerSearch = document.getElementById('seller-search');
+  if (sellerSearch) {
+    sellerSearch.addEventListener('input', (e) => renderSellers(e.target.value));
+  }
+  const productSearch = document.getElementById('product-search');
+  if (productSearch) {
+    productSearch.addEventListener('input', (e) => renderAllProducts(e.target.value));
+  }
+}
+
+// ==================== CREATE SELLER ====================
+async function createSeller() {
+  const email = document.getElementById('new-email').value.trim();
+  const password = document.getElementById('new-password').value;
+  const username = document.getElementById('new-username').value.trim();
+  const phone = document.getElementById('new-phone').value.trim();
+  if (!email || !password || !username) { showToast('Заполните обязательные поля', 'error'); return; }
+  if (password.length < 6) { showToast('Пароль минимум 6 символов', 'error'); return; }
+
+  const btn = document.getElementById('create-btn');
+  btn.innerHTML = '<span class="loader"></span> Создание...';
+  btn.disabled = true;
+
+  try {
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+    const uid = cred.user.uid;
+
+    await db.ref(`users/${uid}`).set({
+      email, username, phone: phone || '',
+      productCount: 0,
+      frozen: false,
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+
+    await secondaryAuth.signOut();
+
+    document.getElementById('new-email').value = '';
+    document.getElementById('new-password').value = '';
+    document.getElementById('new-username').value = '';
+    document.getElementById('new-phone').value = '';
+    showToast('Продавец создан: ' + email, 'success');
+    await loadData();
+  } catch(e) {
+    showToast('Ошибка: ' + e.message, 'error');
+  } finally {
+    btn.innerHTML = '<i class="fas fa-user-plus"></i> Создать аккаунт продавца';
+    btn.disabled = false;
+  }
+}
+
+// ==================== DELETE SELLER ====================
+async function deleteSeller() {
+  const email = document.getElementById('del-email').value.trim();
+  if (!email) { showToast('Введите email', 'error'); return; }
+
+  const uid = Object.keys(allUsers).find(k => allUsers[k].email === email);
+  if (!uid) { 
+    document.getElementById('del-result').innerHTML = '<span style="color:var(--danger)">❌ Продавец не найден</span>'; 
+    return; 
+  }
+
+  showConfirm(
+    'Удаление продавца',
+    `Вы действительно хотите удалить продавца "${escapeHtml(email)}" и ВСЕ его товары? Это действие НЕОБРАТИМО.`,
+    () => deleteSellerByUid(uid, email)
+  );
+  document.getElementById('del-email').value = '';
+}
+
+async function deleteSellerByUid(uid, email) {
+  showToast('Удаление продавца...', 'warning');
+  
+  try {
+    const updates = {};
+    allProducts.filter(p => p.userId === uid).forEach(p => {
+      updates[`products/${p.id}`] = null;
+    });
+    updates[`users/${uid}`] = null;
+    updates[`userRatings/${uid}`] = null;
+
+    await db.ref().update(updates);
+    showToast(`✅ Продавец ${email} удалён`, 'success');
+    await loadData();
+  } catch(e) {
+    showToast('Ошибка: ' + e.message, 'error');
+  }
+}
+
+// ==================== FREEZE ====================
+async function toggleFreeze(uid, currentlyFrozen) {
+  await db.ref(`users/${uid}/frozen`).set(!currentlyFrozen);
+  allUsers[uid].frozen = !currentlyFrozen;
+  renderSellers(document.getElementById('seller-search')?.value || '');
+  showToast(currentlyFrozen ? 'Продавец разморожен' : 'Продавец заморожен', 'success');
+}
+
+// ==================== QUICK CLEANUP (ОДНА КНОПКА) ====================
+async function quickCleanup() {
+  const now = Date.now();
+  const oldProducts_local = allProducts.filter(p => p.timestamp && (now - p.timestamp) > NINETY_DAYS);
+  
+  if (oldProducts_local.length === 0) {
+    showToast('✨ Нет устаревших товаров для удаления', 'success');
+    return;
+  }
+  
+  showConfirm(
+    'Быстрая очистка',
+    `Найдено ${oldProducts_local.length} товаров старше 90 дней.\n\nПосле удаления они будут полностью удалены из базы данных и освободят квоты продавцов.\n\n⚠️ Это действие НЕОБРАТИМО!`,
+    async () => {
+      const btn = document.getElementById('quick-cleanup-btn');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loader"></span> Удаление ' + oldProducts_local.length + ' товаров...';
+      
+      try {
+        const updates = {};
+        const decrements = {};
+        
+        oldProducts_local.forEach(p => {
+          updates[`products/${p.id}`] = null;
+          decrements[p.userId] = (decrements[p.userId] || 0) + 1;
+        });
+        
+        Object.entries(decrements).forEach(([uid, cnt]) => {
+          const current = allUsers[uid]?.productCount || 0;
+          updates[`users/${uid}/productCount`] = Math.max(0, current - cnt);
+        });
+        
+        await db.ref().update(updates);
+        showToast(`✅ Удалено ${oldProducts_local.length} устаревших товаров`, 'success');
+        await loadData();
+        document.getElementById('cleanup-preview').innerHTML = '';
+        document.getElementById('cleanup-btn').style.display = 'none';
+      } catch(e) {
+        showToast('Ошибка: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+  );
+}
+
+// ==================== CLEANUP OLD PRODUCTS (PREVIEW) ====================
+async function previewOldProducts() {
+  const now = Date.now();
+  oldProducts = allProducts.filter(p => p.timestamp && (now - p.timestamp) > NINETY_DAYS);
+  const wrap = document.getElementById('cleanup-preview');
+  if (!oldProducts.length) {
+    wrap.innerHTML = '<p style="color:var(--success)"><i class="fas fa-check-circle"></i> Устаревших товаров нет</p>';
+    document.getElementById('cleanup-btn').style.display = 'none';
+    return;
+  }
+  wrap.innerHTML = `<p style="color:var(--warning)"><i class="fas fa-exclamation-triangle"></i> Найдено устаревших товаров: <strong>${oldProducts.length}</strong></p>
+    <div class="products-admin-grid" style="margin-top:1rem">` +
+    oldProducts.slice(0,6).map(p => `
+      <div class="product-admin-card">
+        <img src="${escapeHtml(p.image) || 'https://via.placeholder.com/200x120?text=No+Image'}" onerror="this.src='https://via.placeholder.com/200x120'">
+        <div class="pinfo">
+          <div class="pname">${escapeHtml(p.name) || '—'}</div>
+          <div class="pmeta">${new Date(p.timestamp).toLocaleDateString('ru')} · ${escapeHtml(p.userId?.slice(0,6))}...</div>
+        </div>
+      </div>`).join('') +
+    (oldProducts.length > 6 ? `<div class="stat-card" style="display:flex;align-items:center;justify-content:center;"><div class="val">+${oldProducts.length-6}</div></div>` : '') +
+    '</div>';
+  document.getElementById('cleanup-btn').style.display = 'flex';
+}
+
+async function cleanupOldProducts() {
+  if (!oldProducts.length) { showToast('Нет товаров для удаления', 'error'); return; }
+  
+  showConfirm(
+    'Удаление устаревших товаров',
+    `Удалить ${oldProducts.length} устаревших товаров? Это действие НЕОБРАТИМО.`,
+    async () => {
+      const btn = document.getElementById('cleanup-btn');
+      btn.disabled = true; 
+      btn.innerHTML = '<span class="loader"></span> Удаление...';
+
+      try {
+        const updates = {};
+        const decrements = {};
+
+        oldProducts.forEach(p => {
+          updates[`products/${p.id}`] = null;
+          decrements[p.userId] = (decrements[p.userId] || 0) + 1;
+        });
+
+        Object.entries(decrements).forEach(([uid, cnt]) => {
+          const current = allUsers[uid]?.productCount || 0;
+          updates[`users/${uid}/productCount`] = Math.max(0, current - cnt);
+        });
+
+        await db.ref().update(updates);
+        showToast(`✅ Удалено ${oldProducts.length} товаров`, 'success');
+        oldProducts = [];
+        document.getElementById('cleanup-preview').innerHTML = '';
+        btn.style.display = 'none';
+        await loadData();
+      } catch(e) {
+        showToast('Ошибка: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-broom"></i> Удалить все найденные';
+      }
+    }
+  );
+}
+
+// ==================== ALL PRODUCTS ====================
+function renderAllProducts(filter = '') {
+  const wrap = document.getElementById('all-products-wrap');
+  let filtered = allProducts;
+  if (filter) {
+    const search = filter.toLowerCase();
+    filtered = allProducts.filter(p => 
+      (p.name || '').toLowerCase().includes(search) ||
+      (allUsers[p.userId]?.username || '').toLowerCase().includes(search)
+    );
+  }
+  
+  if (!filtered.length) { 
+    wrap.innerHTML = '<p style="color:var(--text-muted)">Товаров не найдено</p>'; 
+    return; 
+  }
+  
+  const now = Date.now();
+  wrap.innerHTML = `<div class="products-admin-grid">` +
+    filtered.map(p => {
+      const isOld = p.timestamp && (now - p.timestamp) > NINETY_DAYS;
+      const seller = allUsers[p.userId];
+      return `<div class="product-admin-card">
+        <img src="${escapeHtml(p.image) || 'https://via.placeholder.com/200x120'}" onerror="this.src='https://via.placeholder.com/200x120'">
+        <div class="pinfo">
+          <div class="pname">${escapeHtml(p.name) || '—'}</div>
+          <div class="pmeta">${escapeHtml(seller?.username) || p.userId?.slice(0,8)} · ${p.price} сом</div>
+          ${isOld ? '<div style="color:var(--danger);font-size:0.75rem;margin-top:0.25rem"><i class="fas fa-clock"></i> Устарел</div>' : ''}
+          <div class="pactions">
+            <button class="btn btn-danger btn-sm" onclick="adminDeleteProduct('${p.id}', '${p.userId}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>`;
+    }).join('') +
+    '</div>';
+}
+
+async function adminDeleteProduct(productId, userId) {
+  showConfirm(
+    'Удаление товара',
+    'Вы действительно хотите удалить этот товар?',
+    async () => {
+      try {
+        const updates = {};
+        updates[`products/${productId}`] = null;
+        const current = allUsers[userId]?.productCount || 0;
+        if (current > 0) updates[`users/${userId}/productCount`] = current - 1;
+        await db.ref().update(updates);
+        showToast('Товар удалён', 'success');
+        await loadData();
+      } catch(e) {
+        showToast('Ошибка: ' + e.message, 'error');
+      }
+    }
+  );
+}
+
+// ==================== CONFIRM MODAL ====================
+function showConfirm(title, message, onAccept) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').innerHTML = message.replace(/\n/g, '<br>');
+  currentConfirmCallback = onAccept;
+  document.getElementById('confirmOverlay').classList.add('active');
+}
+
+function confirmReject() {
+  document.getElementById('confirmOverlay').classList.remove('active');
+  currentConfirmCallback = null;
+}
+
+document.getElementById('confirmAcceptBtn').addEventListener('click', () => {
+  if (currentConfirmCallback) {
+    currentConfirmCallback();
+  }
+  confirmReject();
+});
+
+// ==================== TOAST ====================
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3000);
+}
+
+// Close confirm on escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('confirmOverlay').classList.contains('active')) {
+    confirmReject();
+  }
+});
+</script>
+</body>
+</html>
