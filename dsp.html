@@ -7,51 +7,65 @@
 <meta name="description" content="Управляйте своими товарами на DOROShop">
 <meta name="robots" content="noindex">
 <link rel="icon" href="https://dorosfamd.com/doroshop.png" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="manifest" href="/manifest_dsp.json">
 <style>
 :root {
   --accent: #00BFA5;
-  --accent-glow: rgba(0,191,165,0.18);
+  --accent2: #26D0BD;
+  --accent-glow: rgba(0,191,165,0.22);
   --accent-dark: #007A6C;
   --danger: #FF5C72;
   --warning: #F5A623;
   --gold: #F5A623;
   --green: #2ECC71;
   --r-sm: 8px;
-  --r-md: 12px;
+  --r-md: 14px;
   --r-lg: 20px;
   --r-xl: 28px;
   --ease: cubic-bezier(0.4,0,0.2,1);
   --spring: cubic-bezier(0.34,1.56,0.64,1);
   --font: 'Sora', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
   --trans: all 0.25s var(--ease);
-  --header-h: 58px;
+  --header-h: 62px;
 }
 
-/* LIGHT */
 body {
-  --bg: #F4F6FA;
-  --surface: #FFFFFF;
-  --surface-2: #F0F2F7;
-  --border: #E4E8F0;
+  --bg: #F0F4FA;
+  --surface: rgba(255,255,255,0.75);
+  --surface-solid: #FFFFFF;
+  --surface-2: rgba(240,244,250,0.8);
+  --glass-border: rgba(255,255,255,0.6);
+  --border: rgba(0,0,0,0.07);
   --text: #1A1E2E;
   --text-2: #60708A;
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.14);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.08),0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.12),0 4px 12px rgba(0,0,0,0.06);
+  --shadow-glass: 0 8px 32px rgba(0,191,165,0.1),0 2px 8px rgba(0,0,0,0.06);
+  --mesh1: #e0f7f4;
+  --mesh2: #f0f8ff;
+  --mesh3: #fdf4e7;
 }
-/* DARK */
+
 body.dark {
-  --bg: #0D1117;
-  --surface: #161B27;
-  --surface-2: #1E2636;
-  --border: rgba(255,255,255,0.07);
+  --bg: #0A0F1A;
+  --surface: rgba(20,28,46,0.8);
+  --surface-solid: #141c2e;
+  --surface-2: rgba(26,36,56,0.8);
+  --glass-border: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.06);
   --text: #E8EDF8;
   --text-2: #8899B8;
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.4);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.4),0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.5),0 2px 6px rgba(0,0,0,0.35);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.7),0 4px 12px rgba(0,0,0,0.45);
+  --shadow-glass: 0 8px 32px rgba(0,191,165,0.08),0 2px 8px rgba(0,0,0,0.4);
+  --mesh1: #0a1a18;
+  --mesh2: #0a0f1a;
+  --mesh3: #120f08;
 }
 
 .hidden{display:none!important}
@@ -63,8 +77,20 @@ body{
   color:var(--text);
   line-height:1.5;
   min-height:100vh;
-  transition:background 0.35s,color 0.35s;
+  transition:background 0.4s,color 0.4s;
+  overflow-x:hidden;
 }
+
+body::before {
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, var(--mesh1), transparent),
+    radial-gradient(ellipse 50% 35% at 80% 90%, var(--mesh2), transparent),
+    radial-gradient(ellipse 40% 30% at 60% 50%, var(--mesh3), transparent);
+  pointer-events:none;z-index:0;
+}
+body > * { position:relative;z-index:1; }
 
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -75,12 +101,15 @@ body{
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 
 /* ====== HEADER ====== */
 .header{
   background:var(--surface);
-  border-bottom:1px solid var(--border);
-  padding:0 1.25rem;
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid var(--glass-border);
+  padding:0 1rem;
   height:var(--header-h);
   position:sticky;top:0;z-index:100;
   box-shadow:var(--shadow-sm);
@@ -89,205 +118,693 @@ body{
 .header-inner{
   max-width:1280px;margin:0 auto;
   display:flex;align-items:center;justify-content:space-between;
-  height:100%;gap:1rem;
+  height:100%;gap:0.75rem;
 }
-.logo{display:flex;align-items:center;gap:0.5rem;font-size:1rem;font-weight:700;color:var(--accent);text-decoration:none}
-.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-radius:9px;display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;flex-shrink:0}
-.header-actions{display:flex;align-items:center;gap:0.5rem}
-.hbtn{display:flex;align-items:center;gap:0.4rem;padding:0.45rem 0.875rem;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface-2);color:var(--text-2);font-size:0.78rem;font-weight:600;font-family:var(--font);cursor:pointer;transition:var(--trans)}
-.hbtn:hover{background:var(--border);color:var(--text)}
-.hbtn.accent{background:var(--accent);border-color:var(--accent);color:white}
+.logo{
+  display:flex;align-items:center;gap:0.6rem;
+  text-decoration:none;
+  transition:var(--trans);
+  flex-shrink:0;
+}
+.logo:hover{opacity:0.85}
+.logo img{
+  height:32px;width:auto;
+  border-radius:8px;
+  box-shadow:0 2px 10px var(--accent-glow);
+}
+.logo-text{
+  font-size:0.95rem;font-weight:700;
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.logo-sub{
+  font-size:0.6rem;font-weight:400;
+  color:var(--text-2);
+  -webkit-text-fill-color:var(--text-2);
+  opacity:0.8;
+}
+.header-actions{display:flex;align-items:center;gap:0.4rem;flex-shrink:0}
+.hbtn{
+  display:flex;align-items:center;gap:0.35rem;
+  padding:0.4rem 0.75rem;
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  background:var(--surface-2);
+  backdrop-filter:blur(10px);
+  color:var(--text-2);
+  font-size:0.75rem;font-weight:600;font-family:var(--font);
+  cursor:pointer;transition:var(--trans);
+  white-space:nowrap;
+}
+.hbtn:hover{background:var(--border);color:var(--text);border-color:var(--accent)}
+.hbtn.accent{background:var(--accent);border-color:var(--accent);color:white;box-shadow:0 4px 14px var(--accent-glow)}
 .hbtn.danger{background:var(--danger);border-color:var(--danger);color:white}
-.user-chip{display:flex;align-items:center;gap:0.4rem;padding:0.4rem 0.75rem;background:var(--surface-2);border:1px solid var(--border);border-radius:50px;font-size:0.8rem;font-weight:500;cursor:pointer;transition:var(--trans)}
-.user-chip:hover{border-color:var(--accent)}
-.user-ava{width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:white}
+/* Hide text labels on tiny screens */
+@media(max-width:480px){
+  .hbtn-label{display:none}
+  .hbtn{padding:0.4rem 0.6rem}
+}
+.user-chip{
+  display:flex;align-items:center;gap:0.4rem;
+  padding:0.35rem 0.7rem;
+  background:var(--surface);
+  backdrop-filter:blur(10px);
+  border:1px solid var(--glass-border);
+  border-radius:50px;
+  font-size:0.78rem;font-weight:500;
+  cursor:pointer;transition:var(--trans);
+  box-shadow:var(--shadow-sm);
+  max-width:140px;
+  overflow:hidden;
+}
+.user-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-chip:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.user-ava{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.65rem;font-weight:700;color:white;
+  box-shadow:0 2px 8px var(--accent-glow);
+}
 .lang-dd{position:relative}
-.lang-panel{position:absolute;top:calc(100%+6px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-lg);min-width:140px;z-index:300;display:none;animation:scaleIn 0.2s var(--spring)}
-.lang-item{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;cursor:pointer;font-size:0.85rem;transition:background 0.15s}
-.lang-item:hover{background:var(--surface-2)}
+.lang-panel{
+  position:absolute;top:calc(100%+8px);right:0;
+  background:var(--surface-solid);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r-md);
+  box-shadow:var(--shadow-lg);
+  min-width:155px;z-index:300;display:none;
+  animation:scaleIn 0.2s var(--spring);
+  overflow:hidden;
+}
+.lang-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;cursor:pointer;font-size:0.85rem;transition:background 0.15s}
+.lang-item:hover{background:var(--surface-2);color:var(--accent)}
+.lang-item.active-lang{color:var(--accent);font-weight:600}
 
 /* ====== AUTH ====== */
-.auth-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - var(--header-h));padding:2rem 1rem}
-.auth-card{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--shadow-lg);padding:2.5rem 2rem;width:100%;max-width:400px;animation:scaleIn 0.4s var(--spring)}
+.auth-wrap{
+  display:flex;align-items:center;justify-content:center;
+  min-height:calc(100vh - var(--header-h));
+  padding:2rem 1rem;
+}
+.auth-card{
+  background:var(--surface);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border-radius:var(--r-xl);
+  border:1px solid var(--glass-border);
+  box-shadow:var(--shadow-glass);
+  padding:2.5rem 1.5rem;
+  width:100%;max-width:420px;
+  animation:scaleIn 0.4s var(--spring);
+}
 .auth-head{text-align:center;margin-bottom:2rem}
-.auth-icon{font-size:2.5rem;margin-bottom:0.5rem}
+.auth-logo{
+  width:64px;height:64px;
+  margin:0 auto 1rem;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 8px 24px var(--accent-glow);
+}
+.auth-logo img{width:100%;height:100%;object-fit:cover}
 .auth-title{font-size:1.3rem;font-weight:700;color:var(--accent)}
 .auth-sub{font-size:0.82rem;color:var(--text-2);margin-top:0.25rem}
 .form-group{margin-bottom:1rem}
-.form-label{display:block;font-size:0.78rem;font-weight:600;color:var(--text-2);margin-bottom:0.375rem;letter-spacing:0.3px}
-.form-control{width:100%;padding:0.7rem 0.875rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);font-size:0.875rem;font-family:var(--font);transition:var(--trans);outline:none}
-.form-control:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-.form-control::placeholder{color:var(--text-2);opacity:0.6}
-textarea.form-control{resize:vertical;min-height:80px}
-.btn-block{width:100%;padding:0.85rem;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:white;border:none;border-radius:var(--r-md);font-size:0.95rem;font-weight:700;font-family:var(--font);cursor:pointer;transition:var(--trans);box-shadow:0 6px 20px var(--accent-glow);letter-spacing:0.3px}
+.form-label{
+  display:block;font-size:0.78rem;font-weight:600;
+  color:var(--text-2);margin-bottom:0.4rem;letter-spacing:0.3px;
+}
+.form-hint{
+  font-size:0.7rem;color:var(--text-2);margin-top:0.3rem;
+  font-family:var(--font-body);opacity:0.75;line-height:1.4;
+}
+.form-control{
+  width:100%;padding:0.8rem 1rem;
+  background:var(--surface-2);
+  backdrop-filter:blur(8px);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  color:var(--text);
+  font-size:0.9rem;font-family:var(--font);
+  transition:var(--trans);outline:none;
+  -webkit-appearance:none;appearance:none;
+  /* Larger tap target on mobile */
+  min-height:48px;
+}
+.form-control:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow);
+  background:var(--surface);
+}
+.form-control::placeholder{color:var(--text-2);opacity:0.45}
+textarea.form-control{resize:vertical;min-height:90px}
+select.form-control{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2360708A' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 0.875rem center;
+  background-size:16px;
+  padding-right:2.5rem;
+  cursor:pointer;
+}
+select.form-control:disabled{opacity:0.45;cursor:not-allowed}
+.btn-block{
+  width:100%;padding:0.95rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+  color:white;border:none;
+  border-radius:var(--r-md);
+  font-size:0.95rem;font-weight:700;font-family:var(--font);
+  cursor:pointer;transition:var(--trans);
+  box-shadow:0 6px 20px var(--accent-glow);
+  letter-spacing:0.3px;
+  position:relative;overflow:hidden;
+  min-height:52px;
+}
+.btn-block::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+}
+.btn-block:hover{transform:translateY(-1px);box-shadow:0 10px 30px var(--accent-glow)}
 .btn-block:active{transform:scale(0.98)}
 .auth-links{text-align:center;margin-top:1.25rem;font-size:0.82rem;color:var(--text-2)}
 .auth-links a{color:var(--accent);text-decoration:none;font-weight:500}
 .auth-error{font-size:0.82rem;color:var(--danger);margin-top:0.75rem;text-align:center;min-height:1.2em}
 
+/* ====== QUOTA BAR ====== */
+.quota-bar{
+  background:var(--surface);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--glass-border);
+  padding:0.625rem 1rem;
+}
+.quota-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:0.875rem;flex-wrap:wrap}
+.quota-label{font-size:0.75rem;color:var(--text-2);display:flex;align-items:center;gap:0.4rem;white-space:nowrap}
+.quota-track{flex:1;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;min-width:60px;border:1px solid var(--border)}
+.quota-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 0.5s var(--ease)}
+.quota-fill.warn{background:linear-gradient(90deg,var(--warning),#E8A000)}
+.quota-fill.crit{background:linear-gradient(90deg,var(--danger),#D0004A)}
+.quota-num{font-size:0.82rem;font-weight:700;color:var(--accent);white-space:nowrap}
+
 /* ====== DASHBOARD ====== */
-.quota-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0.625rem 1rem}
-.quota-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
-.quota-label{font-size:0.78rem;color:var(--text-2);display:flex;align-items:center;gap:0.4rem;white-space:nowrap}
-.quota-track{flex:1;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;min-width:80px}
-.quota-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.4s var(--ease)}
-.quota-fill.warn{background:var(--warning)}
-.quota-fill.crit{background:var(--danger)}
-.quota-num{font-size:0.82rem;font-weight:700;color:var(--accent)}
+.dashboard{max-width:1280px;margin:0 auto;padding:0 0.875rem 6rem;animation:fadeUp 0.4s var(--ease)}
 
-.dashboard{max-width:1280px;margin:0 auto;padding:0 1rem 6rem;animation:fadeUp 0.4s var(--ease)}
-
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.875rem;margin:1.25rem 0 1rem}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem 0.875rem;text-align:center;box-shadow:var(--shadow-sm);transition:var(--trans)}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.625rem;margin:1rem 0}
+.stat-card{
+  background:var(--surface);
+  backdrop-filter:blur(16px) saturate(160%);
+  -webkit-backdrop-filter:blur(16px) saturate(160%);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r-lg);
+  padding:1rem 0.75rem;
+  text-align:center;
+  box-shadow:var(--shadow-sm);
+  transition:var(--trans);
+  position:relative;overflow:hidden;
+}
+.stat-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent);
+  pointer-events:none;
+}
 .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.stat-val{font-size:1.5rem;font-weight:800;color:var(--accent)}
-.stat-label{font-size:0.7rem;color:var(--text-2);margin-top:0.2rem}
+.stat-val{font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1}
+.stat-label{font-size:0.68rem;color:var(--text-2);margin-top:0.3rem;font-family:var(--font-body);line-height:1.2}
 
 /* Notepad */
-.notepad-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;margin:0 0 1.25rem;box-shadow:var(--shadow-sm)}
+.notepad-card{
+  background:var(--surface);
+  backdrop-filter:blur(16px) saturate(160%);
+  -webkit-backdrop-filter:blur(16px) saturate(160%);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r-lg);
+  padding:1.125rem;
+  margin:0 0 1rem;
+  box-shadow:var(--shadow-sm);
+}
 .notepad-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
 .notepad-title{font-size:0.85rem;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:0.4rem}
 .notepad-title i{color:var(--warning)}
-.notepad-area{width:100%;min-height:80px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:0.85rem;font-family:var(--font);padding:0.625rem;resize:vertical;outline:none;transition:var(--trans)}
-.notepad-area:focus{border-color:var(--accent)}
-.notepad-hint{font-size:0.7rem;color:var(--text-2);margin-top:0.375rem;opacity:0.6}
+.notepad-area{
+  width:100%;min-height:80px;
+  background:rgba(255,255,255,0.35);
+  backdrop-filter:blur(4px);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  color:var(--text);font-size:0.875rem;font-family:var(--font-body);
+  padding:0.75rem;resize:vertical;outline:none;transition:var(--trans);
+}
+body.dark .notepad-area{background:rgba(255,255,255,0.04)}
+.notepad-area:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.notepad-hint{font-size:0.7rem;color:var(--text-2);margin-top:0.375rem;opacity:0.6;font-family:var(--font-body)}
 
-/* Financial Goal Tracker */
-.goal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;margin:0 0 1.25rem;box-shadow:var(--shadow-sm)}
+/* Financial Goal */
+.goal-card{
+  background:var(--surface);
+  backdrop-filter:blur(16px) saturate(160%);
+  -webkit-backdrop-filter:blur(16px) saturate(160%);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r-lg);
+  padding:1.125rem;margin:0 0 1rem;
+  box-shadow:var(--shadow-sm);
+}
 .goal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
 .goal-title{font-size:0.85rem;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:0.4rem}
 .goal-title i{color:var(--gold)}
 .goal-progress-wrap{margin:0.875rem 0}
-.goal-track{height:10px;background:var(--surface-2);border-radius:5px;overflow:hidden}
+.goal-track{height:10px;background:var(--surface-2);border-radius:5px;overflow:hidden;border:1px solid var(--border)}
 .goal-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:5px;transition:width 0.5s var(--ease)}
-.goal-labels{display:flex;justify-content:space-between;margin-top:0.375rem;font-size:0.72rem;color:var(--text-2)}
-.goal-inputs{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem}
+.goal-labels{display:flex;justify-content:space-between;margin-top:0.375rem;font-size:0.7rem;color:var(--text-2);font-family:var(--font-body)}
+.goal-inputs{display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;margin-top:0.75rem}
 
 /* Toolbar */
-.toolbar{display:flex;align-items:center;gap:0.625rem;margin-bottom:1rem;flex-wrap:wrap}
-.search-box{flex:1;position:relative;min-width:160px}
-.search-box i{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-2);font-size:0.85rem}
-.search-input{width:100%;padding:0.6rem 0.875rem 0.6rem 2.25rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);color:var(--text);font-size:0.85rem;font-family:var(--font);outline:none;transition:var(--trans)}
+.toolbar{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.875rem;flex-wrap:nowrap}
+.search-box{flex:1;position:relative;min-width:0}
+.search-box i{position:absolute;left:0.875rem;top:50%;transform:translateY(-50%);color:var(--text-2);font-size:0.82rem}
+.search-input{
+  width:100%;padding:0.65rem 1rem 0.65rem 2.4rem;
+  background:var(--surface);
+  backdrop-filter:blur(10px);
+  border:1px solid var(--glass-border);
+  border-radius:50px;
+  color:var(--text);font-size:0.85rem;font-family:var(--font);
+  outline:none;transition:var(--trans);
+  box-shadow:var(--shadow-sm);
+  min-height:42px;
+}
 .search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
 .search-input::placeholder{color:var(--text-2);opacity:0.6}
-.view-toggle{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden}
-.view-btn{padding:0.5rem 0.75rem;border:none;background:none;color:var(--text-2);cursor:pointer;transition:var(--trans);font-size:0.9rem}
+
+.view-toggle{
+  display:flex;
+  background:var(--surface);
+  backdrop-filter:blur(10px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r-md);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  flex-shrink:0;
+}
+.view-btn{padding:0.5rem 0.75rem;border:none;background:none;color:var(--text-2);cursor:pointer;transition:var(--trans);font-size:0.85rem;min-height:42px;min-width:42px}
 .view-btn.active{background:var(--accent);color:white}
 
-.cat-strip{display:flex;gap:0.4rem;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin-bottom:0.875rem}
+.cat-strip{display:flex;gap:0.375rem;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin-bottom:0.875rem;-webkit-overflow-scrolling:touch}
 .cat-strip::-webkit-scrollbar{display:none}
-.cat-chip{display:inline-flex;align-items:center;padding:0.4rem 0.875rem;border:1px solid var(--border);border-radius:50px;font-size:0.75rem;font-weight:500;color:var(--text-2);white-space:nowrap;cursor:pointer;transition:var(--trans);flex-shrink:0;background:var(--surface)}
-.cat-chip.active{background:var(--accent);border-color:var(--accent);color:white}
+.cat-chip{
+  display:inline-flex;align-items:center;
+  padding:0.4rem 0.875rem;
+  border:1px solid var(--glass-border);
+  border-radius:50px;
+  font-size:0.72rem;font-weight:500;
+  color:var(--text-2);white-space:nowrap;cursor:pointer;
+  transition:var(--trans);flex-shrink:0;
+  background:var(--surface);
+  backdrop-filter:blur(8px);
+  box-shadow:var(--shadow-sm);
+  min-height:34px;
+}
+.cat-chip.active{background:var(--accent);border-color:var(--accent);color:white;box-shadow:0 4px 12px var(--accent-glow)}
 
 /* Products Grid */
-.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));
+  gap:0.875rem;
+}
 .products-grid.list{grid-template-columns:1fr}
 
-.product-card{background:var(--surface);border-radius:var(--r-md);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);transition:var(--trans);animation:fadeUp 0.35s var(--ease) both;display:flex;flex-direction:column}
-.product-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.product-card{
+  background:var(--surface);
+  backdrop-filter:blur(16px) saturate(160%);
+  -webkit-backdrop-filter:blur(16px) saturate(160%);
+  border-radius:var(--r-lg);
+  border:1px solid var(--glass-border);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  transition:var(--trans);
+  animation:fadeUp 0.35s var(--ease) both;
+  display:flex;flex-direction:column;
+  position:relative;
+}
+.product-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.06),transparent 50%);
+  pointer-events:none;
+}
+.product-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:rgba(0,191,165,0.35)}
 .products-grid.list .product-card{flex-direction:row}
 
-.product-img{width:100%;height:185px;object-fit:cover;display:block;flex-shrink:0;background:var(--surface-2)}
-.products-grid.list .product-img{width:120px;height:120px}
+/* Product image — object-fit: contain with bg */
+.product-img-wrap{
+  width:100%;height:185px;
+  background:var(--surface-2);
+  flex-shrink:0;
+  overflow:hidden;
+  position:relative;
+}
+.products-grid.list .product-img-wrap{width:110px;height:110px;flex-shrink:0}
+.product-img{
+  width:100%;height:100%;
+  object-fit:contain;
+  display:block;
+  padding:6px;
+}
 
-.product-body{padding:0.875rem;flex:1}
-.product-name{font-size:0.9rem;font-weight:600;margin-bottom:0.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.product-price{font-size:1.05rem;font-weight:700;color:var(--accent);margin:0.375rem 0}
-.product-loc{font-size:0.75rem;color:var(--text-2);display:flex;align-items:center;gap:3px;margin-bottom:0.5rem}
-.product-actions{display:flex;gap:0.5rem;margin-top:0.625rem;flex-wrap:wrap}
+.product-body{padding:0.875rem;flex:1;display:flex;flex-direction:column}
+.product-name{font-size:0.875rem;font-weight:600;margin-bottom:0.2rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.35}
+.product-price{font-size:1rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-family:var(--font-body)}
+.product-loc{font-size:0.72rem;color:var(--text-2);display:flex;align-items:center;gap:3px;margin-bottom:0.5rem;font-family:var(--font-body)}
+.product-actions{display:flex;gap:0.375rem;margin-top:auto;flex-wrap:wrap}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.45rem 0.75rem;border-radius:var(--r-sm);border:none;font-size:0.78rem;font-weight:600;font-family:var(--font);cursor:pointer;transition:var(--trans)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.3rem;padding:0.5rem 0.875rem;border-radius:var(--r-sm);border:none;font-size:0.78rem;font-weight:600;font-family:var(--font);cursor:pointer;transition:var(--trans);min-height:38px}
 .btn:active{transform:scale(0.95)}
-.btn-primary{background:var(--accent);color:white}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:white;box-shadow:0 4px 12px var(--accent-glow)}
 .btn-outline{background:var(--surface-2);border:1px solid var(--border);color:var(--text)}
 .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
-.btn-danger{background:rgba(255,92,114,0.12);color:var(--danger);border:1px solid rgba(255,92,114,0.2)}
-.btn-danger:hover{background:var(--danger);color:white}
+.btn-danger{background:rgba(255,92,114,0.1);color:var(--danger);border:1px solid rgba(255,92,114,0.2)}
+.btn-danger:hover{background:var(--danger);color:white;border-color:var(--danger)}
+.btn-preview{background:rgba(0,191,165,0.1);color:var(--accent);border:1px solid rgba(0,191,165,0.25)}
+.btn-preview:hover{background:var(--accent);color:white}
 
 /* FAB */
 .fab{
-  position:fixed;bottom:1.5rem;right:1.5rem;
+  position:fixed;bottom:1.5rem;right:1.25rem;
   width:56px;height:56px;
   background:linear-gradient(135deg,var(--accent),var(--accent-dark));
   border:none;border-radius:50%;
   color:white;font-size:1.3rem;cursor:pointer;
-  box-shadow:0 8px 24px var(--accent-glow);
+  box-shadow:0 8px 24px var(--accent-glow),0 0 0 0 var(--accent-glow);
   transition:var(--trans);z-index:90;
-  align-items:center;justify-content:center;
+  display:none;align-items:center;justify-content:center;
 }
-.fab:hover{transform:scale(1.08)}
+.fab:hover{transform:scale(1.1);box-shadow:0 12px 32px var(--accent-glow)}
 .fab:active{transform:scale(0.94)}
 
 /* Modal */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all 0.3s;padding:0}
+.modal-bg{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  z-index:1000;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;visibility:hidden;
+  transition:all 0.3s;padding:0;
+}
 .modal-bg.on{opacity:1;visibility:visible}
 @media(min-width:640px){.modal-bg{align-items:center;padding:1rem}}
 
-.modal-box{background:var(--surface);border-radius:var(--r-xl) var(--r-xl) 0 0;border:1px solid var(--border);width:100%;max-width:540px;max-height:92vh;overflow-y:auto;transform:translateY(40px) scale(0.97);transition:transform 0.35s var(--spring);box-shadow:var(--shadow-lg)}
-@media(min-width:640px){.modal-box{border-radius:var(--r-lg)}}
+.modal-box{
+  background:var(--surface-solid);
+  border-radius:var(--r-xl) var(--r-xl) 0 0;
+  border:1px solid var(--glass-border);
+  width:100%;max-width:580px;max-height:92vh;overflow-y:auto;
+  transform:translateY(40px) scale(0.97);
+  transition:transform 0.35s var(--spring);
+  box-shadow:var(--shadow-lg);
+  -webkit-overflow-scrolling:touch;
+}
+@media(min-width:640px){.modal-box{border-radius:var(--r-xl);max-height:90vh}}
 .modal-bg.on .modal-box{transform:translateY(0) scale(1)}
 
 .modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0.75rem auto 0}
-.modal-head{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--surface);z-index:2}
-.modal-title{font-size:1rem;font-weight:700}
-.modal-close{width:30px;height:30px;border-radius:50%;background:var(--surface-2);border:none;color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.8rem;transition:var(--trans)}
-.modal-close:hover{background:var(--danger);color:white}
-.modal-body{padding:1.25rem}
-.modal-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:0.625rem;justify-content:flex-end}
+.modal-head{
+  padding:0.875rem 1.125rem;
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;
+  background:var(--surface-solid);
+  backdrop-filter:blur(20px);
+  z-index:2;
+}
+.modal-title{font-size:0.95rem;font-weight:700}
+.modal-close{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--surface-2);border:1px solid var(--border);
+  color:var(--text-2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.8rem;transition:var(--trans);
+  flex-shrink:0;
+}
+.modal-close:hover{background:var(--danger);border-color:var(--danger);color:white}
+.modal-body{padding:1.125rem}
+.modal-footer{
+  padding:0.875rem 1.125rem;
+  border-top:1px solid var(--border);
+  display:flex;gap:0.5rem;justify-content:flex-end;
+  background:var(--surface-solid);
+  position:sticky;bottom:0;z-index:2;
+}
 
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
-@media(max-width:480px){.form-row{grid-template-columns:1fr}}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.625rem}
+@media(max-width:440px){.form-row{grid-template-columns:1fr}}
 
-/* Image upload */
-.img-upload-area{border:2px dashed var(--border);border-radius:var(--r-md);padding:1.5rem;cursor:pointer;transition:var(--trans);text-align:center;position:relative;overflow:hidden}
-.img-upload-area:hover{border-color:var(--accent);background:rgba(0,191,165,0.04)}
-.img-upload-area i{font-size:2rem;color:var(--text-2);display:block;margin-bottom:0.5rem;pointer-events:none}
-.img-upload-area p{font-size:0.82rem;color:var(--text-2);pointer-events:none}
+/* ====== IMAGE UPLOAD (Mobile Optimized) ====== */
+.img-upload-section{
+  margin-bottom:1.125rem;
+}
+.img-upload-label-big{
+  display:block;
+  font-size:0.8rem;font-weight:700;
+  color:var(--text-2);margin-bottom:0.5rem;
+  letter-spacing:0.3px;
+  display:flex;align-items:center;gap:0.4rem;
+}
+.img-upload-label-big i{color:var(--accent)}
+.img-upload-area{
+  border:2px dashed var(--accent);
+  border-radius:var(--r-lg);
+  padding:1.5rem 1rem;
+  cursor:pointer;transition:var(--trans);text-align:center;
+  position:relative;overflow:hidden;
+  background:rgba(0,191,165,0.03);
+  min-height:120px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0.5rem;
+}
+.img-upload-area:hover{border-color:var(--accent2);background:rgba(0,191,165,0.07)}
+.img-upload-area:active{transform:scale(0.98)}
+.img-upload-area i{font-size:2rem;color:var(--accent);pointer-events:none}
+.img-upload-area p{font-size:0.82rem;color:var(--text-2);pointer-events:none;font-family:var(--font-body)}
+.img-upload-sub{font-size:0.7rem;color:var(--text-2);opacity:0.6;pointer-events:none;font-family:var(--font-body)}
 .img-upload-area .progress-ring{display:none;margin:0 auto;width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
 .img-preview-wrap{position:relative;margin-top:0.75rem;display:none}
-.img-preview{width:100%;max-height:200px;object-fit:cover;border-radius:var(--r-md)}
-.img-remove{position:absolute;top:0.375rem;right:0.375rem;width:26px;height:26px;background:var(--danger);border:none;border-radius:50%;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.65rem}
+.img-preview{
+  width:100%;max-height:240px;
+  object-fit:contain;
+  border-radius:var(--r-md);
+  border:1px solid var(--border);
+  background:var(--surface-2);
+  padding:8px;
+}
+.img-remove{position:absolute;top:0.5rem;right:0.5rem;width:30px;height:30px;background:var(--danger);border:none;border-radius:50%;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.65rem;box-shadow:0 2px 8px rgba(255,92,114,0.4);transition:var(--trans)}
+.img-remove:hover{transform:scale(1.1)}
 
-/* Draft */
-.draft-badge{display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.625rem;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.3);border-radius:50px;font-size:0.72rem;font-weight:600;color:var(--warning)}
+/* Draft badge */
+.draft-badge{
+  display:inline-flex;align-items:center;gap:0.35rem;
+  padding:0.25rem 0.625rem;
+  background:rgba(245,166,35,0.12);
+  border:1px solid rgba(245,166,35,0.3);
+  border-radius:50px;
+  font-size:0.68rem;font-weight:600;
+  color:var(--warning);
+}
 .draft-badge i{font-size:0.65rem;animation:spin 2s linear infinite}
 
-/* Settings */
-.settings-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;margin:0 0 1.25rem;box-shadow:var(--shadow-sm)}
+/* ====== SETTINGS ====== */
+.settings-panel{
+  background:var(--surface);
+  backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r-lg);
+  padding:1.125rem;margin:0 0 1rem;
+  box-shadow:var(--shadow-sm);
+}
 .settings-title{font-size:0.85rem;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:0.4rem;margin-bottom:0.875rem}
 .settings-title i{color:var(--accent)}
-.setting-row{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border)}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:0.625rem 0;border-bottom:1px solid var(--border)}
 .setting-row:last-child{border-bottom:none}
-.setting-label{font-size:0.82rem;color:var(--text)}
-.setting-desc{font-size:0.72rem;color:var(--text-2);margin-top:1px}
-.toggle{width:40px;height:22px;background:var(--border);border-radius:11px;position:relative;cursor:pointer;transition:background 0.25s;flex-shrink:0}
+.setting-label{font-size:0.85rem;color:var(--text);font-weight:500}
+.setting-desc{font-size:0.7rem;color:var(--text-2);margin-top:1px;font-family:var(--font-body)}
+.toggle{width:42px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:background 0.25s;flex-shrink:0;min-width:42px}
 .toggle.on{background:var(--accent)}
-.toggle::after{content:'';width:16px;height:16px;background:white;border-radius:50%;position:absolute;top:3px;left:3px;transition:left 0.25s var(--spring);box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+.toggle::after{content:'';width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:3px;left:3px;transition:left 0.25s var(--spring);box-shadow:0 1px 4px rgba(0,0,0,0.25)}
 .toggle.on::after{left:21px}
 
-.skeleton{background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);background-size:400px 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-md)}
+/* Lang selector row in settings */
+.lang-selector-row{
+  display:flex;gap:0.375rem;flex-wrap:wrap;
+}
+.lang-opt-btn{
+  padding:0.4rem 0.875rem;
+  border:1px solid var(--border);
+  border-radius:50px;
+  background:var(--surface-2);
+  font-size:0.78rem;font-weight:600;font-family:var(--font);
+  color:var(--text-2);cursor:pointer;transition:var(--trans);
+  min-height:36px;
+}
+.lang-opt-btn.active{background:var(--accent);border-color:var(--accent);color:white;box-shadow:0 3px 10px var(--accent-glow)}
 
-.empty-state{text-align:center;padding:3rem 2rem;color:var(--text-2);grid-column:1/-1}
+/* ====== SKELETON ====== */
+.skeleton{
+  background:linear-gradient(90deg,var(--surface-2) 25%,rgba(255,255,255,0.15) 50%,var(--surface-2) 75%);
+  background-size:400px 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:var(--r-md);
+}
+body.dark .skeleton{
+  background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);
+  background-size:400px 100%;
+  animation:shimmer 1.5s infinite;
+}
+
+.empty-state{text-align:center;padding:3rem 1.5rem;color:var(--text-2);grid-column:1/-1}
 .empty-icon{font-size:2.5rem;display:block;margin-bottom:0.875rem}
 .empty-title{font-size:0.95rem;font-weight:600;color:var(--text);margin-bottom:0.375rem}
-.empty-sub{font-size:0.82rem}
+.empty-sub{font-size:0.82rem;font-family:var(--font-body)}
 
-.loader{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:2rem auto}
+.loader{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:2.5rem auto}
 
-.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:0.6rem 1.25rem;font-size:0.82rem;z-index:9999;opacity:0;transition:all 0.3s var(--spring);white-space:nowrap;box-shadow:var(--shadow-md);pointer-events:none}
+/* Toast */
+.toast{
+  position:fixed;top:72px;left:50%;
+  transform:translateX(-50%) translateY(-20px);
+  background:var(--surface-solid);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);
+  border-radius:50px;
+  padding:0.6rem 1.25rem;
+  font-size:0.82rem;font-weight:600;
+  z-index:9999;opacity:0;
+  transition:all 0.35s var(--spring);
+  white-space:nowrap;
+  box-shadow:var(--shadow-md),0 0 0 1px rgba(0,191,165,0.1);
+  pointer-events:none;
+  display:flex;align-items:center;gap:0.5rem;
+  max-width:90vw;
+  text-overflow:ellipsis;overflow:hidden;
+}
+.toast::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;flex-shrink:0}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error::before{background:var(--danger)}
 
 /* Upload progress */
 .upload-progress{margin-top:0.75rem;display:none}
-.upload-progress-bar-wrap{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
-.upload-progress-bar{height:100%;background:var(--accent);border-radius:3px;transition:width 0.2s}
-.upload-progress-label{font-size:0.72rem;color:var(--text-2);margin-top:4px}
+.upload-progress-bar-wrap{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;border:1px solid var(--border)}
+.upload-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 0.2s}
+.upload-progress-label{font-size:0.7rem;color:var(--text-2);margin-top:4px;font-family:var(--font-body)}
 
-@media(max-width:768px){
-  .dashboard{padding:0 0.75rem 6rem}
-  .stats-row{gap:0.5rem}
-  .stat-val{font-size:1.2rem}
+/* Section divider in modal */
+.form-section-title{
+  font-size:0.72rem;font-weight:700;letter-spacing:0.5px;
+  color:var(--text-2);text-transform:uppercase;
+  margin:1.25rem 0 0.75rem;
+  display:flex;align-items:center;gap:0.5rem;
+  padding-bottom:0.5rem;
+  border-bottom:1px solid var(--border);
 }
+.form-section-title i{color:var(--accent);font-size:0.8rem}
+
+/* Contact input with icon */
+.contact-input-wrap{
+  position:relative;
+}
+.contact-input-wrap .contact-icon{
+  position:absolute;left:0.875rem;top:50%;transform:translateY(-50%);
+  font-size:0.85rem;color:var(--text-2);pointer-events:none;
+}
+.contact-input-wrap input{
+  padding-left:2.4rem;
+}
+
+/* ====== PRODUCT PREVIEW MODAL ====== */
+.preview-sheet{
+  background:var(--surface-solid);
+  border:1px solid var(--glass-border);
+}
+.preview-card-wrap{
+  background:var(--surface-2);
+  border-radius:var(--r-lg);
+  padding:1.125rem;
+  margin-bottom:1rem;
+}
+.preview-label{
+  font-size:0.72rem;font-weight:600;
+  color:var(--text-2);
+  text-transform:uppercase;letter-spacing:0.5px;
+  margin-bottom:0.75rem;
+  display:flex;align-items:center;gap:0.4rem;
+}
+.preview-label i{color:var(--accent)}
+
+/* Mini product card preview */
+.mini-pcard{
+  background:#0C1120;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.06);
+  overflow:hidden;
+  width:180px;
+  flex-shrink:0;
+}
+.mini-pcard-img-wrap{
+  width:100%;
+  padding-top:100%;
+  position:relative;
+  background:#111827;
+}
+.mini-pcard-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:contain;
+  padding:6px;
+}
+.mini-pcard-price{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(to top,rgba(6,10,19,0.9) 0%,transparent);
+  padding:1.2rem 0.6rem 0.5rem;
+  font-size:0.9rem;font-weight:800;color:white;
+  font-family:'Sora',sans-serif;
+}
+.mini-pcard-body{
+  padding:0.5rem 0.625rem 0.625rem;
+  background:#0C1120;
+}
+.mini-pcard-name{
+  font-size:0.75rem;font-weight:600;color:#EEF2FF;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-family:'DM Sans',sans-serif;
+}
+.mini-pcard-city{font-size:0.6rem;color:#7A8EAA;margin-top:2px;font-family:'DM Sans',sans-serif}
+
+/* ====== RESPONSIVE TWEAKS ====== */
+@media(max-width:480px){
+  .dashboard{padding:0 0.75rem 5.5rem}
+  .stats-row{gap:0.5rem}
+  .stat-val{font-size:1.3rem}
+  .stat-label{font-size:0.62rem}
+  .goal-inputs{grid-template-columns:1fr}
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:0.625rem}
+  .products-grid.list{grid-template-columns:1fr}
+  .product-img-wrap{height:140px}
+  .product-body{padding:0.625rem}
+  .product-name{font-size:0.8rem}
+  .product-price{font-size:0.9rem}
+  .product-actions{gap:0.3rem}
+  .btn{padding:0.4rem 0.625rem;font-size:0.72rem;min-height:34px}
+  .modal-body{padding:0.875rem}
+  .fab{bottom:1.25rem;right:1rem;width:52px;height:52px;font-size:1.2rem}
+}
+
+@media(max-width:360px){
+  .products-grid{grid-template-columns:1fr}
+}
+
+/* Ensure no horizontal overflow */
+.dashboard, .modal-body, .modal-box{
+  max-width:100%;
+  overflow-x:hidden;
+}
+img{max-width:100%}
 </style>
 </head>
 <body>
@@ -298,8 +815,11 @@ textarea.form-control{resize:vertical;min-height:80px}
 <header class="header">
   <div class="header-inner">
     <a class="logo" href="DOROShop.html">
-      <div class="logo-mark"><i class="fas fa-store"></i></div>
-      <span>DOROShop <span style="font-size:0.7rem;font-weight:400;opacity:0.7" data-i18n="seller_panel">Продавец</span></span>
+      <img src="https://dorosfamd.com/doroshop.png" alt="DOROShop" onerror="this.style.display='none'">
+      <div>
+        <div class="logo-text">DOROShop</div>
+        <div class="logo-sub" data-i18n="seller_panel">Продавец</div>
+      </div>
     </a>
     <div class="header-actions">
       <div class="lang-dd">
@@ -307,14 +827,25 @@ textarea.form-control{resize:vertical;min-height:80px}
         <div class="lang-panel" id="langPanel">
           <div class="lang-item" onclick="setLang('tg')">🇹🇯 Тоҷикӣ</div>
           <div class="lang-item" onclick="setLang('ru')">🇷🇺 Русский</div>
+          <div class="lang-item" onclick="setLang('uz')">🇺🇿 O'zbek</div>
           <div class="lang-item" onclick="setLang('en')">🇬🇧 English</div>
         </div>
       </div>
+<div class="header-actions">
+  <div class="lang-dd">
+    </div>
+  
+  <button class="hbtn" onclick="openModal('installModal')" style="color:var(--accent); border-color:var(--accent); background:rgba(0,191,165,0.1)">
+    <i class="fas fa-download"></i> <span class="hbtn-label">На экран</span>
+  </button>
+
+  <a href="DOROShop.html" class="hbtn"><i class="fas fa-store"></i> <span class="hbtn-label" data-i18n="to_marketplace">На маркетплейс</span></a>
+      <a href="DOROShop.html" class="hbtn"><i class="fas fa-store"></i> <span class="hbtn-label" data-i18n="to_marketplace">На маркетплейс</span></a>
       <div class="user-chip hidden" id="userChip" onclick="openSettingsModal()">
         <div class="user-ava" id="userAva">?</div>
         <span id="userName">—</span>
       </div>
-      <button class="hbtn danger hidden" id="logoutBtn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Выйти</span></button>
+      <button class="hbtn danger hidden" id="logoutBtn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="hbtn-label" data-i18n="logout">Выйти</span></button>
     </div>
   </div>
 </header>
@@ -323,7 +854,7 @@ textarea.form-control{resize:vertical;min-height:80px}
 <div id="authSection" class="auth-wrap">
   <div class="auth-card">
     <div class="auth-head">
-      <div class="auth-icon">🏪</div>
+      <div class="auth-logo"><img src="https://dorosfamd.com/doroshop.png" alt="DOROShop" onerror="this.parentElement.innerHTML='<div style=font-size:2.5rem>🏪</div>'"></div>
       <h2 class="auth-title" data-i18n="login_title">Кабинет продавца</h2>
       <p class="auth-sub" data-i18n="login_sub">Войдите, чтобы управлять товарами</p>
     </div>
@@ -356,7 +887,6 @@ textarea.form-control{resize:vertical;min-height:80px}
   </div>
 
   <div class="dashboard">
-
     <div class="stats-row">
       <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-label" data-i18n="stat_total">Товаров</div></div>
       <div class="stat-card"><div class="stat-val" id="statLeft">50</div><div class="stat-label" data-i18n="stat_left">Остаток</div></div>
@@ -366,7 +896,7 @@ textarea.form-control{resize:vertical;min-height:80px}
     <!-- Financial Goal -->
     <div class="goal-card" id="goalCard">
       <div class="goal-head">
-        <div class="notepad-title"><i class="fas fa-bullseye"></i> <span data-i18n="goal_title">Финансовая цель</span></div>
+        <div class="goal-title"><i class="fas fa-bullseye"></i> <span data-i18n="goal_title">Финансовая цель</span></div>
         <span id="goalSavedLabel" style="font-size:0.7rem;color:var(--accent);display:none"><i class="fas fa-check"></i> <span data-i18n="saved">Сохранено</span></span>
       </div>
       <div class="goal-progress-wrap">
@@ -399,7 +929,7 @@ textarea.form-control{resize:vertical;min-height:80px}
     <div class="toolbar">
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" class="search-input" id="searchInput" placeholder="Поиск среди своих товаров...">
+        <input type="text" class="search-input" id="searchInput" data-i18n-ph="search_ph" placeholder="Поиск товаров...">
       </div>
       <div class="view-toggle">
         <button class="view-btn active" id="viewGrid" onclick="setView('grid')" title="Сетка"><i class="fas fa-grip"></i></button>
@@ -413,7 +943,7 @@ textarea.form-control{resize:vertical;min-height:80px}
 </div>
 
 <!-- FAB -->
-<button class="fab hidden" id="fabBtn" onclick="openAddModal()" style="display:none"><i class="fas fa-plus"></i></button>
+<button class="fab" id="fabBtn" onclick="openAddModal()"><i class="fas fa-plus"></i></button>
 
 <!-- PRODUCT MODAL -->
 <div class="modal-bg" id="productModal">
@@ -422,13 +952,67 @@ textarea.form-control{resize:vertical;min-height:80px}
     <div class="modal-head">
       <div>
         <div class="modal-title" id="modalTitle" data-i18n="add_product">Добавить товар</div>
-        <div id="draftIndicator" class="hidden" style="margin-top:3px">
+        <div id="draftIndicator" class="hidden" style="margin-top:4px">
           <span class="draft-badge"><i class="fas fa-spinner"></i> <span data-i18n="draft_saved">Черновик сохранён</span></span>
         </div>
       </div>
-      <button class="modal-close" onclick="closeModal('productModal')"><i class="fas fa-times"></i></button>
+      <div style="display:flex;gap:0.4rem;align-items:center">
+        <button class="btn btn-preview" id="previewBtn" onclick="showProductPreview()" title="Предпросмотр" style="padding:0.4rem 0.7rem;font-size:0.75rem">
+          <i class="fas fa-eye"></i> <span class="hbtn-label">Предпросмотр</span>
+        </button>
+        <button class="modal-close" onclick="closeProductModal()"><i class="fas fa-times"></i></button>
+      </div>
     </div>
     <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- PRODUCT PREVIEW MODAL -->
+<div class="modal-bg" id="previewModal">
+  <div class="modal-box preview-sheet" style="max-width:420px">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <span class="modal-title"><i class="fas fa-eye" style="color:var(--accent)"></i> Предпросмотр карточки</span>
+      <button class="modal-close" onclick="closeModal('previewModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="preview-label"><i class="fas fa-mobile-alt"></i> Как будет выглядеть на главной странице</div>
+      <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap" id="previewCards"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="installModal">
+  <div class="modal-box" style="max-width:400px; text-align:center;">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <span class="modal-title"><i class="fas fa-mobile-alt" style="color:var(--accent)"></i> Установить панель</span>
+      <button class="modal-close" onclick="closeModal('installModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="width: 72px; height: 72px; margin: 0 auto 1rem; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px var(--accent-glow);">
+        <img src="https://dorosfamd.com/doroshop.png" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-2); margin-bottom: 1.5rem; font-family: var(--font-body);">Добавьте иконку на главный экран, чтобы открывать панель продавца в один клик без браузера.</p>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <button id="installAndroidBtn" class="btn-block" style="background: #3DDC84; color: white; border: none; min-height: 48px;">
+          <i class="fab fa-android" style="font-size: 1.1rem; margin-right: 5px;"></i> Для Android
+        </button>
+        
+        <button onclick="document.getElementById('iosInstructions').style.display='block'" class="btn-block" style="background: var(--surface-2); color: var(--text); border: 1px solid var(--border); min-height: 48px;">
+          <i class="fab fa-apple" style="font-size: 1.1rem; margin-right: 5px;"></i> Для iPhone (iOS)
+        </button>
+      </div>
+
+      <div id="iosInstructions" style="display: none; margin-top: 1.25rem; padding: 1rem; background: rgba(0,191,165,0.08); border-radius: var(--r-md); text-align: left; border: 1px solid rgba(0,191,165,0.2);">
+        <p style="font-size: 0.82rem; line-height: 1.6; color: var(--text); font-family: var(--font-body);">
+          1. Нажмите <b>«Поделиться»</b> <i class="fas fa-external-link-alt"></i> внизу Safari.<br>
+          2. Прокрутите меню вниз.<br>
+          3. Выберите <b>«На экран "Домой"»</b> <i class="far fa-plus-square"></i>.
+        </p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -454,10 +1038,20 @@ textarea.form-control{resize:vertical;min-height:80px}
             <button class="btn btn-outline" id="settingViewList" onclick="setView('list')" style="padding:0.35rem 0.6rem"><i class="fas fa-list"></i></button>
           </div>
         </div>
+        <!-- Language setting row -->
+        <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:0.625rem">
+          <div><div class="setting-label" data-i18n="language_setting">Язык интерфейса</div><div class="setting-desc" data-i18n="language_setting_desc">Язык кабинета продавца</div></div>
+          <div class="lang-selector-row" id="settingsLangRow">
+            <button class="lang-opt-btn" onclick="setLangFromSettings('ru')">🇷🇺 RU</button>
+            <button class="lang-opt-btn" onclick="setLangFromSettings('tg')">🇹🇯 TJ</button>
+            <button class="lang-opt-btn" onclick="setLangFromSettings('uz')">🇺🇿 UZ</button>
+            <button class="lang-opt-btn" onclick="setLangFromSettings('en')">🇬🇧 EN</button>
+          </div>
+        </div>
       </div>
-      <div style="margin-top:1rem;padding:1rem;background:var(--surface-2);border-radius:var(--r-md)">
+      <div style="margin-top:1rem;padding:1rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border)">
         <div style="font-weight:600;font-size:0.875rem;margin-bottom:0.25rem" id="profileName"></div>
-        <div style="font-size:0.78rem;color:var(--text-2)" id="profileEmail"></div>
+        <div style="font-size:0.78rem;color:var(--text-2);font-family:var(--font-body)" id="profileEmail"></div>
       </div>
     </div>
   </div>
@@ -470,6 +1064,27 @@ textarea.form-control{resize:vertical;min-height:80px}
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 
 <script>
+// ====== CATEGORIES WITH SUBCATEGORIES ======
+const CATEGORIES_DATA = {
+  electronics:  { sub: ['smartphones','laptops','tablets','accessories','audio','tv','cameras','gaming','smart_home','other_electronics'] },
+  clothing:     { sub: ['mens','womens','kids','shoes','bags','outerwear','sportswear','underwear','accessories_clothing','other_clothing'] },
+  home:         { sub: ['furniture','kitchen','bedding','decor','garden','tools','cleaning','lighting','storage','other_home'] },
+  beauty:       { sub: ['skincare','haircare','makeup','perfume','nails','shaving','bath','health_beauty','kids_beauty','other_beauty'] },
+  sports:       { sub: ['fitness','outdoor','cycling','swimming','team_sports','martial_arts','ski','yoga','fishing','other_sports'] },
+  books:        { sub: ['fiction','non_fiction','children','textbooks','comics','magazines','religion','business','science','other_books'] },
+  toys:         { sub: ['dolls','cars_toys','construction','board_games','outdoor_toys','educational','baby_toys','puzzles','remote_control','other_toys'] },
+  food:         { sub: ['fruits','vegetables','meat','dairy','bakery','snacks','beverages','sweets','spices','other_food'] },
+  cars:         { sub: ['new_cars','used_cars','parts','tires','accessories_cars','moto','trucks','boats','repair','other_cars'] },
+  health:       { sub: ['medicine','medical_devices','supplements','vitamins','orthopedics','vision','hygiene','baby_health','elderly','other_health'] },
+  real_estate:  { sub: ['apartments_sale','apartments_rent','houses','commercial','land','garages','offices','hotels','new_build','other_real_estate'] },
+  services:     { sub: ['repairs','tutoring','beauty_services','delivery','cleaning_services','photography','legal','finance_services','events','other_services'] },
+  animals:      { sub: ['dogs','cats','birds','fish','rodents','reptiles','feed','accessories_animals','veterinary','other_animals'] },
+  kids:         { sub: ['clothes_kids','shoes_kids','strollers','safety','feeding','furniture_kids','school','sports_kids','party','other_kids'] },
+  other:        { sub: ['antiques','art','music_instruments','hobbies','travel','gifts','handmade','collectibles','seeds','other_misc'] }
+};
+
+const CATEGORIES = Object.keys(CATEGORIES_DATA);
+
 // ====== I18N ======
 const T = {
   ru: {
@@ -481,15 +1096,60 @@ const T = {
     product_view:'Отображение',add_product:'Добавить товар',edit_product:'Редактировать товар',
     draft_saved:'Черновик сохранён',draft_found:'Найден несохранённый черновик. Восстановить?',
     save:'Сохранить',cancel:'Отмена',delete_confirm:'Удалить этот товар?',
-    quota_reached:'Достигнут лимит 50 товаров.',req_fields:'Заполните: название, цена, город, категория, фото',
+    quota_reached:'Достигнут лимит 50 товаров.',req_fields:'Заполните: название, цена, город, категория, подкатегория, фото',
     no_products:'У вас пока нет товаров',no_products_sub:'Нажмите + чтобы добавить',
     all_cats:'Все',edit:'Изменить',delete:'Удалить',
     prod_name:'Название *',prod_price:'Цена (сом) *',prod_orig_price:'Исходная цена',
-    prod_city:'Город *',prod_desc:'Описание',prod_cat:'Категория *',
+    prod_city:'Город *',prod_desc:'Описание',prod_cat:'Категория *',prod_subcat:'Подкатегория *',
     contacts:'Контакты',phone:'Телефон',youtube:'YouTube ссылка',dc_card:'Номер карты DC',
     image:'Фото товара *',choose_photo:'Нажмите для загрузки фото',uploading:'Загрузка...',
     goal_title:'Финансовая цель',goal_earned:'Заработано (сом)',goal_target:'Цель (сом)',
-    cat:{electronics:'Электроника',clothing:'Одежда',home:'Дом',beauty:'Красота',sports:'Спорт',books:'Книги',toys:'Игрушки',food:'Еда',cars:'Авто',health:'Здоровье'}
+    search_ph:'Поиск товаров...',
+    language_setting:'Язык интерфейса',language_setting_desc:'Язык кабинета продавца',
+    unsaved_confirm:'Данные не сохранятся. Вы уверены, что хотите закрыть?',
+    subcat_placeholder:'Сначала выберите категорию',
+    phone_hint:'Например: +992000000000',
+    whatsapp_hint:'Например: 992000000000',
+    telegram_hint:'Например: @username',
+    instagram_hint:'Например: @doroshop',
+    image_hint:'До 10 МБ · JPG, PNG, WEBP · Рекомендуем квадратное фото',
+    cat:{
+      electronics:'Электроника',clothing:'Одежда',home:'Дом',beauty:'Красота',sports:'Спорт',
+      books:'Книги',toys:'Игрушки',food:'Еда',cars:'Авто',health:'Здоровье',
+      real_estate:'Недвижимость',services:'Услуги',animals:'Животные',kids:'Детское',other:'Другое'
+    },
+    sub:{
+      smartphones:'Смартфоны',laptops:'Ноутбуки',tablets:'Планшеты',accessories:'Аксессуары',audio:'Аудио',
+      tv:'Телевизоры',cameras:'Камеры',gaming:'Игровое',smart_home:'Умный дом',other_electronics:'Другое',
+      mens:'Мужское',womens:'Женское',kids:'Детское',shoes:'Обувь',bags:'Сумки',
+      outerwear:'Верхняя одежда',sportswear:'Спортивное',underwear:'Нижнее бельё',accessories_clothing:'Аксессуары',other_clothing:'Другое',
+      furniture:'Мебель',kitchen:'Кухня',bedding:'Постельное',decor:'Декор',garden:'Сад',
+      tools:'Инструменты',cleaning:'Уборка',lighting:'Освещение',storage:'Хранение',other_home:'Другое',
+      skincare:'Уход за кожей',haircare:'Уход за волосами',makeup:'Макияж',perfume:'Парфюм',nails:'Ногти',
+      shaving:'Бритьё',bath:'Ванна и душ',health_beauty:'Здоровье',kids_beauty:'Детское',other_beauty:'Другое',
+      fitness:'Фитнес',outdoor:'Активный отдых',cycling:'Велоспорт',swimming:'Плавание',team_sports:'Командные',
+      martial_arts:'Единоборства',ski:'Горные лыжи',yoga:'Йога',fishing:'Рыбалка',other_sports:'Другое',
+      fiction:'Художественная',non_fiction:'Нон-фикшн',children:'Детские',textbooks:'Учебники',comics:'Комиксы',
+      magazines:'Журналы',religion:'Религия',business:'Бизнес',science:'Наука',other_books:'Другое',
+      dolls:'Куклы',cars_toys:'Машинки',construction:'Конструкторы',board_games:'Настолки',outdoor_toys:'Уличное',
+      educational:'Развивающие',baby_toys:'Для малышей',puzzles:'Пазлы',remote_control:'Радиоуправляемые',other_toys:'Другое',
+      fruits:'Фрукты',vegetables:'Овощи',meat:'Мясо',dairy:'Молочное',bakery:'Выпечка',
+      snacks:'Снеки',beverages:'Напитки',sweets:'Сладости',spices:'Специи',other_food:'Другое',
+      new_cars:'Новые авто',used_cars:'Б/у авто',parts:'Запчасти',tires:'Шины',accessories_cars:'Аксессуары',
+      moto:'Мотоциклы',trucks:'Грузовики',boats:'Лодки',repair:'Ремонт',other_cars:'Другое',
+      medicine:'Лекарства',medical_devices:'Медприборы',supplements:'Добавки',vitamins:'Витамины',orthopedics:'Ортопедия',
+      vision:'Зрение',hygiene:'Гигиена',baby_health:'Детское',elderly:'Пожилым',other_health:'Другое',
+      apartments_sale:'Квартиры (продажа)',apartments_rent:'Квартиры (аренда)',houses:'Дома',commercial:'Коммерческая',land:'Земля',
+      garages:'Гаражи',offices:'Офисы',hotels:'Гостиницы',new_build:'Новостройки',other_real_estate:'Другое',
+      repairs:'Ремонт',tutoring:'Репетиторство',beauty_services:'Красота',delivery:'Доставка',cleaning_services:'Уборка',
+      photography:'Фото/Видео',legal:'Юридические',finance_services:'Финансовые',events:'Мероприятия',other_services:'Другое',
+      dogs:'Собаки',cats:'Кошки',birds:'Птицы',fish:'Рыбы',rodents:'Грызуны',
+      reptiles:'Рептилии',feed:'Корм',accessories_animals:'Аксессуары',veterinary:'Ветеринария',other_animals:'Другое',
+      clothes_kids:'Одежда',shoes_kids:'Обувь',strollers:'Коляски',safety:'Безопасность',feeding:'Кормление',
+      furniture_kids:'Мебель',school:'Школа',sports_kids:'Спорт',party:'Праздники',other_kids:'Другое',
+      antiques:'Антиквариат',art:'Искусство',music_instruments:'Инструменты',hobbies:'Хобби',travel:'Путешествия',
+      gifts:'Подарки',handmade:'Ручная работа',collectibles:'Коллекции',seeds:'Семена',other_misc:'Другое'
+    }
   },
   tg: {
     seller_panel:'Фурӯшанда',logout:'Баромадан',login_title:'Кабинети фурӯшанда',login_sub:'Ворид шавед',
@@ -504,11 +1164,58 @@ const T = {
     no_products:'Молҳои шумо нест',no_products_sub:'+ пахш кунед',
     all_cats:'Ҳама',edit:'Таҳрир',delete:'Нест',
     prod_name:'Ном *',prod_price:'Нарх *',prod_orig_price:'Нархи асл',
-    prod_city:'Шаҳр *',prod_desc:'Тавсиф',prod_cat:'Категория *',
+    prod_city:'Шаҳр *',prod_desc:'Тавсиф',prod_cat:'Категория *',prod_subcat:'Зергурӯҳ *',
     contacts:'Тамосҳо',phone:'Телефон',youtube:'YouTube',dc_card:'Карти DC',
     image:'Аксу мол *',choose_photo:'Барои бор кардан пахш кунед',uploading:'Бор шудан...',
     goal_title:'Ҳадафи молӣ',goal_earned:'Даромад',goal_target:'Ҳадаф',
-    cat:{electronics:'Техника',clothing:'Либос',home:'Хона',beauty:'Зебоӣ',sports:'Варзиш',books:'Китобҳо',toys:'Бозичаҳо',food:'Хӯрок',cars:'Мошин',health:'Саломатӣ'}
+    search_ph:'Ҷустуҷӯи молҳо...',
+    language_setting:'Забони интерфейс',language_setting_desc:'Забони кабинети фурӯшанда',
+    unsaved_confirm:'Маълумот сабт нахоҳад шуд. Мутмаинед?',
+    subcat_placeholder:'Аввал категорияро интихоб кунед',
+    phone_hint:'Масалан: +992000000000',
+    whatsapp_hint:'Масалан: 992000000000',
+    telegram_hint:'Масалан: @username',
+    instagram_hint:'Масалан: @doroshop',
+    image_hint:'То 10 МБ · JPG, PNG, WEBP',
+    cat:{
+      electronics:'Техника',clothing:'Либос',home:'Хона',beauty:'Зебоӣ',sports:'Варзиш',
+      books:'Китобҳо',toys:'Бозичаҳо',food:'Хӯрок',cars:'Мошин',health:'Саломатӣ',
+      real_estate:'Амволи ғайриманқул',services:'Хизматрасонӣ',animals:'Ҳайвонот',kids:'Кӯдакон',other:'Дигар'
+    },
+    sub:{}
+  },
+  uz: {
+    seller_panel:'Sotuvchi',logout:'Chiqish',login_title:'Sotuvchi kabineti',login_sub:"Mahsulotlarni boshqarish uchun kiring",
+    email:'Email',password:'Parol',login_btn:'Kirish',become_seller:"Sotuvchi bo'lish",to_marketplace:'Bozorga',
+    quota_label:"Mahsulot kvotasi",stat_total:'Mahsulotlar',stat_left:'Qoldi',stat_cats:'Kategoriyalar',
+    notepad_title:'Eslatmalar',notepad_hint:"Eslatmalar avtomatik saqlanadi",saved:'Saqlandi',
+    settings_title:'Sozlamalar',interface:'Interfeys',dark_theme:'Qorong\'i mavzu',dark_theme_desc:"Kechasi qulay",
+    product_view:"Ko'rinish",add_product:"Mahsulot qo'shish",edit_product:'Tahrirlash',
+    draft_saved:"Qoralama saqlandi",draft_found:"Saqlanmagan qoralama topildi. Tiklash?",
+    save:'Saqlash',cancel:'Bekor',delete_confirm:"Bu mahsulotni o'chirish?",
+    quota_reached:"50 mahsulot limiti.",req_fields:"Majburiy maydonlarni to'ldiring",
+    no_products:"Mahsulotlar yo'q",no_products_sub:"+ bosing",
+    all_cats:'Barchasi',edit:'Tahrir',delete:"O'chirish",
+    prod_name:'Nomi *',prod_price:'Narxi *',prod_orig_price:'Asl narxi',
+    prod_city:'Shahar *',prod_desc:'Tavsif',prod_cat:'Kategoriya *',prod_subcat:'Subkategoriya *',
+    contacts:"Kontaktlar",phone:'Telefon',youtube:'YouTube',dc_card:'DC karta',
+    image:'Mahsulot rasmi *',choose_photo:"Rasm yuklash uchun bosing",uploading:'Yuklanmoqda...',
+    goal_title:'Moliyaviy maqsad',goal_earned:'Topildi',goal_target:'Maqsad',
+    search_ph:"Mahsulotlarni qidirish...",
+    language_setting:'Interfeys tili',language_setting_desc:"Sotuvchi kabineti tili",
+    unsaved_confirm:"Ma'lumotlar saqlanmaydi. Ishonchingiz komilmi?",
+    subcat_placeholder:'Avval kategoriyani tanlang',
+    phone_hint:'Masalan: +992000000000',
+    whatsapp_hint:'Masalan: 992000000000',
+    telegram_hint:'Masalan: @username',
+    instagram_hint:'Masalan: @doroshop',
+    image_hint:"10 MB gacha · JPG, PNG, WEBP",
+    cat:{
+      electronics:'Elektronika',clothing:'Kiyim',home:'Uy',beauty:'Goʻzellik',sports:'Sport',
+      books:'Kitoblar',toys:"O'yinchoqlar",food:'Oziq-ovqat',cars:'Avtomobil',health:'Salomatlik',
+      real_estate:"Ko'chmas mulk",services:'Xizmatlar',animals:'Hayvonlar',kids:'Bolalar',other:'Boshqa'
+    },
+    sub:{}
   },
   en: {
     seller_panel:'Seller',logout:'Log Out',login_title:'Seller Dashboard',login_sub:'Sign in to manage your products',
@@ -519,28 +1226,92 @@ const T = {
     product_view:'Display',add_product:'Add Product',edit_product:'Edit Product',
     draft_saved:'Draft Saved',draft_found:'Unsaved draft found. Restore it?',
     save:'Save',cancel:'Cancel',delete_confirm:'Delete this product?',
-    quota_reached:'Product limit of 50 reached.',req_fields:'Fill required fields: name, price, city, category, photo',
+    quota_reached:'Product limit of 50 reached.',req_fields:'Fill required fields: name, price, city, category, subcategory, photo',
     no_products:'No products yet',no_products_sub:'Tap + to add one',
     all_cats:'All',edit:'Edit',delete:'Delete',
     prod_name:'Name *',prod_price:'Price (som) *',prod_orig_price:'Original Price',
-    prod_city:'City *',prod_desc:'Description',prod_cat:'Category *',
+    prod_city:'City *',prod_desc:'Description',prod_cat:'Category *',prod_subcat:'Subcategory *',
     contacts:'Contacts',phone:'Phone',youtube:'YouTube URL',dc_card:'DC Card Number',
-    image:'Product Photo *',choose_photo:'Click to upload photo',uploading:'Uploading...',
+    image:'Product Photo *',choose_photo:'Tap to upload photo',uploading:'Uploading...',
     goal_title:'Financial Goal',goal_earned:'Earned (som)',goal_target:'Goal (som)',
-    cat:{electronics:'Electronics',clothing:'Clothing',home:'Home',beauty:'Beauty',sports:'Sports',books:'Books',toys:'Toys',food:'Food',cars:'Cars',health:'Health'}
+    search_ph:'Search your products...',
+    language_setting:'Interface Language',language_setting_desc:'Seller dashboard language',
+    unsaved_confirm:'Data will not be saved. Are you sure you want to close?',
+    subcat_placeholder:'First select a category',
+    phone_hint:'E.g.: +992000000000',
+    whatsapp_hint:'E.g.: 992000000000',
+    telegram_hint:'E.g.: @username',
+    instagram_hint:'E.g.: @doroshop',
+    image_hint:'Up to 10 MB · JPG, PNG, WEBP · Square photo recommended',
+    cat:{
+      electronics:'Electronics',clothing:'Clothing',home:'Home',beauty:'Beauty',sports:'Sports',
+      books:'Books',toys:'Toys',food:'Food',cars:'Cars',health:'Health',
+      real_estate:'Real Estate',services:'Services',animals:'Animals',kids:"Kids",other:'Other'
+    },
+    sub:{
+      smartphones:'Smartphones',laptops:'Laptops',tablets:'Tablets',accessories:'Accessories',audio:'Audio',
+      tv:'TV',cameras:'Cameras',gaming:'Gaming',smart_home:'Smart Home',other_electronics:'Other',
+      mens:"Men's",womens:"Women's",kids:'Kids',shoes:'Shoes',bags:'Bags',
+      outerwear:'Outerwear',sportswear:'Sportswear',underwear:'Underwear',accessories_clothing:'Accessories',other_clothing:'Other',
+      furniture:'Furniture',kitchen:'Kitchen',bedding:'Bedding',decor:'Decor',garden:'Garden',
+      tools:'Tools',cleaning:'Cleaning',lighting:'Lighting',storage:'Storage',other_home:'Other',
+      skincare:'Skincare',haircare:'Haircare',makeup:'Makeup',perfume:'Perfume',nails:'Nails',
+      shaving:'Shaving',bath:'Bath & Shower',health_beauty:'Health',kids_beauty:'Kids',other_beauty:'Other',
+      fitness:'Fitness',outdoor:'Outdoor',cycling:'Cycling',swimming:'Swimming',team_sports:'Team Sports',
+      martial_arts:'Martial Arts',ski:'Ski',yoga:'Yoga',fishing:'Fishing',other_sports:'Other',
+      fiction:'Fiction',non_fiction:'Non-Fiction',children:"Children's",textbooks:'Textbooks',comics:'Comics',
+      magazines:'Magazines',religion:'Religion',business:'Business',science:'Science',other_books:'Other',
+      dolls:'Dolls',cars_toys:'Toy Cars',construction:'Building Sets',board_games:'Board Games',outdoor_toys:'Outdoor',
+      educational:'Educational',baby_toys:'Baby Toys',puzzles:'Puzzles',remote_control:'RC Toys',other_toys:'Other',
+      fruits:'Fruits',vegetables:'Vegetables',meat:'Meat',dairy:'Dairy',bakery:'Bakery',
+      snacks:'Snacks',beverages:'Beverages',sweets:'Sweets',spices:'Spices',other_food:'Other',
+      new_cars:'New Cars',used_cars:'Used Cars',parts:'Parts',tires:'Tires',accessories_cars:'Accessories',
+      moto:'Motorcycles',trucks:'Trucks',boats:'Boats',repair:'Repair',other_cars:'Other',
+      medicine:'Medicine',medical_devices:'Medical Devices',supplements:'Supplements',vitamins:'Vitamins',orthopedics:'Orthopedics',
+      vision:'Vision',hygiene:'Hygiene',baby_health:'Baby',elderly:'Elderly',other_health:'Other',
+      apartments_sale:'Apartments (Sale)',apartments_rent:'Apartments (Rent)',houses:'Houses',commercial:'Commercial',land:'Land',
+      garages:'Garages',offices:'Offices',hotels:'Hotels',new_build:'New Build',other_real_estate:'Other',
+      repairs:'Repairs',tutoring:'Tutoring',beauty_services:'Beauty',delivery:'Delivery',cleaning_services:'Cleaning',
+      photography:'Photography',legal:'Legal',finance_services:'Finance',events:'Events',other_services:'Other',
+      dogs:'Dogs',cats:'Cats',birds:'Birds',fish:'Fish',rodents:'Rodents',
+      reptiles:'Reptiles',feed:'Feed',accessories_animals:'Accessories',veterinary:'Veterinary',other_animals:'Other',
+      clothes_kids:'Clothes',shoes_kids:'Shoes',strollers:'Strollers',safety:'Safety',feeding:'Feeding',
+      furniture_kids:'Furniture',school:'School',sports_kids:'Sports',party:'Party',other_kids:'Other',
+      antiques:'Antiques',art:'Art',music_instruments:'Instruments',hobbies:'Hobbies',travel:'Travel',
+      gifts:'Gifts',handmade:'Handmade',collectibles:'Collectibles',seeds:'Seeds',other_misc:'Other'
+    }
   }
 };
 
 let currentLang = localStorage.getItem('ds_lang') || 'ru';
-function t(k){return T[currentLang]?.[k]||T.ru[k]||k}
-function tCat(k){return T[currentLang]?.cat?.[k]||T.ru.cat[k]||k}
+function t(k){ return T[currentLang]?.[k] || T.ru?.[k] || k }
+function tCat(k){ return T[currentLang]?.cat?.[k] || T.ru.cat?.[k] || k }
+function tSub(k){ return T[currentLang]?.sub?.[k] || T.en.sub?.[k] || k }
 
 function applyLang(){
   document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.getAttribute('data-i18n')));
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>el.placeholder=t(el.getAttribute('data-i18n-ph')));
-  const names={ru:'RU',tg:'TJ',en:'EN'};
+  const names={ru:'RU',tg:'TJ',uz:'UZ',en:'EN'};
   const lb=document.getElementById('langBtn');
-  if(lb)lb.textContent=names[currentLang];
+  if(lb)lb.textContent=names[currentLang]||'RU';
+  // Update lang panel active state
+  document.querySelectorAll('.lang-item').forEach(el=>el.classList.remove('active-lang'));
+  // Update settings lang buttons
+  updateSettingsLangButtons();
+}
+
+function updateSettingsLangButtons(){
+  document.querySelectorAll('.lang-opt-btn').forEach(btn=>{
+    btn.classList.remove('active');
+  });
+  const row=document.getElementById('settingsLangRow');
+  if(row){
+    const btns=row.querySelectorAll('.lang-opt-btn');
+    const langOrder=['ru','tg','uz','en'];
+    btns.forEach((btn,i)=>{
+      if(langOrder[i]===currentLang) btn.classList.add('active');
+    });
+  }
 }
 
 function setLang(lang){
@@ -548,9 +1319,12 @@ function setLang(lang){
   applyLang();document.getElementById('langPanel').style.display='none';
   renderCategoryFilter();if(allProducts.length>0)renderProducts();
 }
+function setLangFromSettings(lang){
+  setLang(lang);
+}
 function toggleLangPanel(){
   const p=document.getElementById('langPanel');
-  p.style.display=p.style.display==='none'||!p.style.display?'block':'none';
+  p.style.display=(p.style.display==='none'||!p.style.display)?'block':'none';
 }
 
 // ====== FIREBASE ======
@@ -575,7 +1349,6 @@ const NOTE_KEY='ds_seller_notes';
 const GOAL_KEY='ds_seller_goal';
 const VIEW_KEY='ds_view_mode';
 const DARK_KEY='ds_dark_mode';
-const CATEGORIES=['electronics','clothing','home','beauty','sports','books','toys','food','cars','health'];
 
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 
@@ -584,6 +1357,12 @@ let currentUser=null,allProducts=[],filteredProducts=[],selectedCategory='',edit
 let currentView=localStorage.getItem(VIEW_KEY)||'grid';
 let draftTimer=null,noteTimer=null;
 let uploadedImageUrl='';
+let tempUploadedUrl=null;
+
+async function deleteStorageUrl(url){
+  if(!url||!url.includes('firebasestorage'))return;
+  try{const ref=storage.refFromURL(url);await ref.delete();}catch(e){}
+}
 
 // ====== THEME ======
 function initTheme(){
@@ -650,7 +1429,7 @@ function updateGoal(){
 }
 
 // ====== DRAFT ======
-const DRAFT_FIELDS=['prodName','prodPrice','prodOriginalPrice','prodCity','prodDesc','prodCategory','prodPhone','prodWhatsapp','prodTelegram','prodInstagram','prodYoutube','prodDcCard'];
+const DRAFT_FIELDS=['prodName','prodPrice','prodOriginalPrice','prodCity','prodDesc','prodCategory','prodSubcategory','prodPhone','prodWhatsapp','prodTelegram','prodInstagram','prodYoutube','prodDcCard'];
 
 function saveDraft(){
   const draft={};
@@ -672,15 +1451,35 @@ function clearDraft(){
   if(ind)ind.classList.add('hidden');
 }
 function applyDraftToForm(draft){
-  DRAFT_FIELDS.forEach(id=>{const el=document.getElementById(id);if(el&&draft[id]!==undefined)el.value=draft[id]});
+  DRAFT_FIELDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&draft[id]!==undefined){
+      el.value=draft[id];
+      // If category was set, also trigger subcat update
+      if(id==='prodCategory'&&draft[id])updateSubcategory(draft.prodSubcategory||'');
+    }
+  });
   if(draft.prodImage){
     uploadedImageUrl=draft.prodImage;
+    tempUploadedUrl=draft.prodImage;
     const preview=document.getElementById('imgPreview');
     const wrap=document.getElementById('imgPreviewWrap');
-    if(preview){preview.src=draft.prodImage}
+    if(preview)preview.src=draft.prodImage;
     if(wrap)wrap.style.display='block';
   }
 }
+
+// Check if form has any data entered
+function formHasData(){
+  const fields=['prodName','prodPrice','prodCity','prodDesc'];
+  for(const id of fields){
+    const el=document.getElementById(id);
+    if(el&&el.value.trim())return true;
+  }
+  if(uploadedImageUrl)return true;
+  return false;
+}
+
 function setupDraftAutosave(){
   clearTimeout(draftTimer);
   const form=document.getElementById('modalBody');
@@ -688,6 +1487,59 @@ function setupDraftAutosave(){
   form.querySelectorAll('input,textarea,select').forEach(inp=>{
     inp.addEventListener('input',()=>{clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,3000)});
   });
+}
+
+// ====== SUBCATEGORY ======
+function updateSubcategory(preselectSub=''){
+  const catEl=document.getElementById('prodCategory');
+  const subEl=document.getElementById('prodSubcategory');
+  if(!catEl||!subEl)return;
+  const catKey=catEl.value;
+  if(!catKey){
+    subEl.innerHTML=`<option value="">${t('subcat_placeholder')}</option>`;
+    subEl.disabled=true;
+    return;
+  }
+  const subs=CATEGORIES_DATA[catKey]?.sub||[];
+  subEl.innerHTML=`<option value="">${t('prod_subcat')}</option>`+
+    subs.map(s=>`<option value="${s}" ${preselectSub===s?'selected':''}>${tSub(s)}</option>`).join('');
+  subEl.disabled=false;
+}
+
+// ====== PRODUCT PREVIEW ======
+function showProductPreview(){
+  const name=document.getElementById('prodName')?.value||'Название товара';
+  const price=document.getElementById('prodPrice')?.value||'0';
+  const city=document.getElementById('prodCity')?.value||'Город';
+  const img=uploadedImageUrl||'https://placehold.co/300x300/0D1220/4A5A7A?text=📦';
+  const catKey=document.getElementById('prodCategory')?.value||'';
+  const catColors={electronics:'#3B82F6,#6366F1',clothing:'#EF4444,#EC4899',home:'#10B981,#059669',beauty:'#EC4899,#F43F5E',sports:'#8B5CF6,#7C3AED',books:'#F59E0B,#D97706',toys:'#FBBF24,#F59E0B',food:'#22C55E,#16A34A',cars:'#6B7280,#4B5563',health:'#14B8A6,#0D9488',real_estate:'#F97316,#EA580C',services:'#06B6D4,#0891B2',animals:'#84CC16,#65A30D',kids:'#FB7185,#F43F5E',other:'#A78BFA,#8B5CF6'};
+  const catColor=catColors[catKey]||'#0EA5E9,#0369A1';
+  const sellerName=(document.getElementById('userName')?.textContent||'Продавец').charAt(0).toUpperCase();
+
+  document.getElementById('previewCards').innerHTML=`
+    <div style="text-align:center">
+      <div style="font-size:0.72rem;color:#7A8EAA;margin-bottom:0.5rem;font-family:DM Sans,sans-serif">📱 Вид карточки</div>
+      <div class="mini-pcard">
+        <div class="mini-pcard-img-wrap">
+          <img class="mini-pcard-img" src="${esc(img)}" onerror="this.src='https://placehold.co/300x300/0D1220/4A5A7A?text=📦'">
+          <div class="mini-pcard-price">${esc(price)} сом</div>
+          <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,${catColor})"></div>
+        </div>
+        <div class="mini-pcard-body">
+          <div class="mini-pcard-name">${esc(name)}</div>
+          <div class="mini-pcard-city">${esc(city)}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px">
+            <div style="display:flex;align-items:center;gap:3px;font-size:0.6rem;color:#7A8EAA;font-family:DM Sans,sans-serif">
+              <span style="width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,#0EA5E9,#0369A1);display:inline-flex;align-items:center;justify-content:center;font-size:0.5rem;color:white;font-weight:700">${sellerName}</span>
+              <span>Продавец</span>
+            </div>
+            <div style="width:22px;height:22px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white">+</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  openModal('previewModal');
 }
 
 // ====== INIT ======
@@ -715,7 +1567,7 @@ function showDashboard(data,user){
   document.getElementById('authSection').classList.add('hidden');
   document.getElementById('dashboardSection').classList.remove('hidden');
   const fab=document.getElementById('fabBtn');
-  fab.classList.remove('hidden');fab.style.display='flex';
+  fab.style.display='flex';
   document.getElementById('userChip').classList.remove('hidden');
   document.getElementById('logoutBtn').classList.remove('hidden');
   const name=data?.username||t('seller_panel');
@@ -728,7 +1580,7 @@ function showDashboard(data,user){
 function hideDashboard(){
   document.getElementById('authSection').classList.remove('hidden');
   document.getElementById('dashboardSection').classList.add('hidden');
-  document.getElementById('fabBtn').classList.add('hidden');
+  document.getElementById('fabBtn').style.display='none';
   document.getElementById('userChip').classList.add('hidden');
   document.getElementById('logoutBtn').classList.add('hidden');
 }
@@ -761,9 +1613,10 @@ async function loadProducts(){
 }
 function updateAll(){updateStats();filterProducts()}
 function updateStats(){
-  const n=allProducts.length;const pct=(n/MAX_PRODUCTS)*100;
-  const fill=document.getElementById('quotaFill');
-  if(fill){fill.style.width=pct+'%';fill.className='quota-fill'+(pct>=90?' crit':pct>=70?' warn':'')}
+  const n=allProducts.length;
+  const pct=Math.round((n/MAX_PRODUCTS)*100);
+  const qf=document.getElementById('quotaFill');
+  if(qf){qf.style.width=pct+'%';qf.className='quota-fill'+(pct>=90?' crit':pct>=70?' warn':'')}
   const qn=document.getElementById('quotaNum');if(qn)qn.textContent=n+' / '+MAX_PRODUCTS;
   const st=document.getElementById('statTotal');if(st)st.textContent=n;
   const sl=document.getElementById('statLeft');if(sl)sl.textContent=MAX_PRODUCTS-n;
@@ -797,28 +1650,63 @@ function renderProducts(){
   }
   grid.innerHTML=filteredProducts.map((p,i)=>{
     const disc=p.originalPrice&&p.price<p.originalPrice?Math.round((1-p.price/p.originalPrice)*100):null;
-    const img=esc(p.image)||'https://placehold.co/300x180/E2E8F0/64748B?text=📦';
+    const img=esc(p.image)||'https://placehold.co/300x300/E8EDF8/94A3B8?text=📦';
     return `<div class="product-card" style="animation-delay:${i*0.04}s">
-      <img class="product-img" src="${img}" alt="${esc(p.name)}" onerror="this.src='https://placehold.co/300x180/E2E8F0/64748B?text=📦'" loading="lazy">
+      <div class="product-img-wrap">
+        <img class="product-img" src="${img}" alt="${esc(p.name)}" onerror="this.src='https://placehold.co/300x300/E8EDF8/94A3B8?text=📦'" loading="lazy">
+      </div>
       <div class="product-body">
         <div class="product-name">${esc(p.name)}</div>
-        <div class="product-price">${p.price} сом ${disc?`<span style="text-decoration:line-through;font-size:0.78rem;color:var(--text-2);margin-left:0.4rem">${p.originalPrice}</span>`:''}</div>
+        <div class="product-price">${p.price} сом ${disc?`<span style="text-decoration:line-through;font-size:0.75rem;color:var(--text-2);margin-left:0.3rem">${p.originalPrice}</span>`:''}</div>
         <div class="product-loc"><i class="fas fa-location-dot"></i> ${esc(p.city)||'—'}</div>
         <div class="product-actions">
           <button class="btn btn-outline" onclick="editProduct('${p.id}')"><i class="fas fa-pen"></i> ${t('edit')}</button>
-          <button class="btn btn-danger" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i> ${t('delete')}</button>
+          <button class="btn btn-preview" onclick="quickPreviewProduct('${p.id}')"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-danger" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
+function quickPreviewProduct(pid){
+  const p=allProducts.find(x=>x.id===pid);if(!p)return;
+  const catColors={electronics:'#3B82F6,#6366F1',clothing:'#EF4444,#EC4899',home:'#10B981,#059669',beauty:'#EC4899,#F43F5E',sports:'#8B5CF6,#7C3AED',books:'#F59E0B,#D97706',toys:'#FBBF24,#F59E0B',food:'#22C55E,#16A34A',cars:'#6B7280,#4B5563',health:'#14B8A6,#0D9488',real_estate:'#F97316,#EA580C',services:'#06B6D4,#0891B2',animals:'#84CC16,#65A30D',kids:'#FB7185,#F43F5E',other:'#A78BFA,#8B5CF6'};
+  const catColor=catColors[p.category]||'#0EA5E9,#0369A1';
+  const sellerName=(document.getElementById('userName')?.textContent||'?').charAt(0).toUpperCase();
+  const img=esc(p.image||'https://placehold.co/300x300/0D1220/4A5A7A?text=📦');
+  document.getElementById('previewCards').innerHTML=`
+    <div style="text-align:center">
+      <div style="font-size:0.72rem;color:#7A8EAA;margin-bottom:0.5rem;font-family:DM Sans,sans-serif">📱 Вид на DOROShop</div>
+      <div class="mini-pcard">
+        <div class="mini-pcard-img-wrap">
+          <img class="mini-pcard-img" src="${img}" onerror="this.src='https://placehold.co/300x300/0D1220/4A5A7A?text=📦'">
+          <div class="mini-pcard-price">${esc(String(p.price))} сом</div>
+          <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,${catColor})"></div>
+        </div>
+        <div class="mini-pcard-body">
+          <div class="mini-pcard-name">${esc(p.name)}</div>
+          <div class="mini-pcard-city">${esc(p.city||'—')}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px">
+            <div style="display:flex;align-items:center;gap:3px;font-size:0.6rem;color:#7A8EAA;font-family:DM Sans,sans-serif">
+              <span style="width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,#0EA5E9,#0369A1);display:inline-flex;align-items:center;justify-content:center;font-size:0.5rem;color:white;font-weight:700">${sellerName}</span>
+              <span>Продавец</span>
+            </div>
+            <div style="width:22px;height:22px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white">+</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  openModal('previewModal');
+}
+
 // ====== ADD/EDIT MODAL ======
 function openAddModal(){
   if(allProducts.length>=MAX_PRODUCTS){showToast(t('quota_reached'));return}
-  editingProductId=null;uploadedImageUrl='';
+  editingProductId=null;uploadedImageUrl='';tempUploadedUrl=null;
   document.getElementById('modalTitle').textContent=t('add_product');
   document.getElementById('modalBody').innerHTML=buildProductForm();
+  updateSubcategory();
   const draft=loadDraft();
   if(draft&&!draft.editingProductId&&confirm(t('draft_found')))applyDraftToForm(draft);
   else if(draft&&!draft.editingProductId)clearDraft();
@@ -826,71 +1714,43 @@ function openAddModal(){
 }
 function editProduct(pid){
   const p=allProducts.find(x=>x.id===pid);if(!p)return;
-  editingProductId=pid;uploadedImageUrl=p.image||'';
+  editingProductId=pid;uploadedImageUrl=p.image||'';tempUploadedUrl=null;
   document.getElementById('modalTitle').textContent=t('edit_product');
   document.getElementById('modalBody').innerHTML=buildProductForm(p);
+  updateSubcategory(p.subcategory||'');
   const draft=loadDraft();
   if(draft&&draft.editingProductId===pid&&confirm(t('draft_found')))applyDraftToForm(draft);
   else if(draft&&draft.editingProductId===pid)clearDraft();
   openModal('productModal');setTimeout(setupDraftAutosave,100);
 }
 
+async function closeProductModal(){
+  if(formHasData()){
+    if(!confirm(t('unsaved_confirm')))return;
+  }
+  closeModal('productModal');
+  if(tempUploadedUrl){
+    await deleteStorageUrl(tempUploadedUrl);
+    tempUploadedUrl=null;
+  }
+  uploadedImageUrl='';
+}
+
 function buildProductForm(p=null){
   const v=k=>esc(p?.[k]||'');
-  const catOpts=CATEGORIES.map(k=>`<option value="${k}" ${(p?.category||'electronics')===k?'selected':''}>${tCat(k)}</option>`).join('');
+  const catOpts=`<option value="">${t('prod_cat')}</option>`+
+    CATEGORIES.map(k=>`<option value="${k}" ${(p?.category||'')===k?'selected':''}>${tCat(k)}</option>`).join('');
+
   return `
-    <div class="form-group">
-      <label class="form-label">${t('prod_name')}</label>
-      <input type="text" id="prodName" class="form-control" value="${v('name')}" maxlength="200">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">${t('prod_price')}</label>
-        <input type="number" id="prodPrice" class="form-control" value="${p?.price||''}">
-      </div>
-      <div class="form-group">
-        <label class="form-label">${t('prod_orig_price')}</label>
-        <input type="number" id="prodOriginalPrice" class="form-control" value="${p?.originalPrice||''}">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">${t('prod_city')}</label>
-      <input type="text" id="prodCity" class="form-control" value="${v('city')}">
-    </div>
-    <div class="form-group">
-      <label class="form-label">${t('prod_desc')}</label>
-      <textarea id="prodDesc" class="form-control" rows="3" maxlength="2000">${v('description')}</textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">${t('prod_cat')}</label>
-      <select id="prodCategory" class="form-control">${catOpts}</select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">${t('contacts')}</label>
-      <div class="form-row">
-        <input type="tel" id="prodPhone" class="form-control" placeholder="${t('phone')}" value="${v('phone')}">
-        <input type="text" id="prodWhatsapp" class="form-control" placeholder="WhatsApp" value="${v('whatsapp')}">
-      </div>
-      <div class="form-row" style="margin-top:0.5rem">
-        <input type="text" id="prodTelegram" class="form-control" placeholder="Telegram" value="${v('telegram')}">
-        <input type="text" id="prodInstagram" class="form-control" placeholder="Instagram" value="${v('instagram')}">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">${t('youtube')}</label>
-      <input type="url" id="prodYoutube" class="form-control" value="${v('youtube')}">
-    </div>
-    <div class="form-group">
-      <label class="form-label">${t('dc_card')}</label>
-      <input type="text" id="prodDcCard" class="form-control" value="${v('dcCard')}">
-    </div>
-    <div class="form-group">
-      <label class="form-label">${t('image')}</label>
+    <!-- ===== PHOTO FIRST (UX improvement) ===== -->
+    <div class="img-upload-section">
+      <label class="img-upload-label-big"><i class="fas fa-camera"></i> ${t('image')}</label>
       <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileUpload(event)">
       <div class="img-upload-area" onclick="document.getElementById('fileInput').click()">
         <div class="progress-ring" id="uploadSpinner"></div>
-        <i class="fas fa-cloud-upload-alt" id="uploadIcon"></i>
+        <i class="fas fa-camera-retro" id="uploadIcon"></i>
         <p id="uploadLabel">${t('choose_photo')}</p>
+        <span class="img-upload-sub">${t('image_hint')}</span>
       </div>
       <div class="upload-progress" id="uploadProgressWrap">
         <div class="upload-progress-bar-wrap"><div class="upload-progress-bar" id="uploadProgressBar" style="width:0%"></div></div>
@@ -901,8 +1761,95 @@ function buildProductForm(p=null){
         <button class="img-remove" onclick="removeImage()"><i class="fas fa-times"></i></button>
       </div>
     </div>
-    <div class="modal-footer" style="margin:0 -1.25rem -1.25rem;border-top:1px solid var(--border);padding:1rem 1.25rem;display:flex;gap:0.625rem;justify-content:flex-end">
-      <button class="btn btn-outline" onclick="closeModal('productModal')">${t('cancel')}</button>
+
+    <!-- ===== MAIN INFO ===== -->
+    <div class="form-section-title"><i class="fas fa-tag"></i> Основное</div>
+    <div class="form-group">
+      <label class="form-label">${t('prod_name')}</label>
+      <input type="text" id="prodName" class="form-control" value="${v('name')}" maxlength="200"
+        placeholder="Например: iPhone 14 Pro Max 256GB">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">${t('prod_price')}</label>
+        <input type="number" id="prodPrice" class="form-control" value="${p?.price||''}"
+          placeholder="5000" inputmode="decimal">
+      </div>
+      <div class="form-group">
+        <label class="form-label">${t('prod_orig_price')}</label>
+        <input type="number" id="prodOriginalPrice" class="form-control" value="${p?.originalPrice||''}"
+          placeholder="7000" inputmode="decimal">
+        <div class="form-hint">Зачёркнутая цена для скидки</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">${t('prod_city')}</label>
+      <input type="text" id="prodCity" class="form-control" value="${v('city')}"
+        placeholder="Душанбе, Худжанд, Бохтар...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">${t('prod_desc')}</label>
+      <textarea id="prodDesc" class="form-control" rows="3" maxlength="2000"
+        placeholder="Опишите товар: состояние, характеристики, особенности...">${v('description')}</textarea>
+    </div>
+
+    <!-- ===== CATEGORY & SUBCATEGORY ===== -->
+    <div class="form-section-title"><i class="fas fa-layer-group"></i> Категория</div>
+    <div class="form-group">
+      <label class="form-label">${t('prod_cat')}</label>
+      <select id="prodCategory" class="form-control" onchange="updateSubcategory()">${catOpts}</select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">${t('prod_subcat')}</label>
+      <select id="prodSubcategory" class="form-control" disabled>
+        <option value="">${t('subcat_placeholder')}</option>
+      </select>
+    </div>
+
+    <!-- ===== CONTACTS ===== -->
+    <div class="form-section-title"><i class="fas fa-address-book"></i> ${t('contacts')}</div>
+    <div class="form-group">
+      <label class="form-label">${t('phone')}</label>
+      <div class="contact-input-wrap">
+        <i class="fas fa-phone contact-icon"></i>
+        <input type="tel" id="prodPhone" class="form-control" value="${v('phone')}"
+          placeholder="${t('phone_hint')}" inputmode="tel">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label"><i class="fab fa-whatsapp" style="color:#25D366"></i> WhatsApp</label>
+        <input type="tel" id="prodWhatsapp" class="form-control" value="${v('whatsapp')}"
+          placeholder="${t('whatsapp_hint')}" inputmode="tel">
+        <div class="form-hint">${t('whatsapp_hint')}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label"><i class="fab fa-telegram" style="color:#0088CC"></i> Telegram</label>
+        <input type="text" id="prodTelegram" class="form-control" value="${v('telegram')}"
+          placeholder="${t('telegram_hint')}">
+        <div class="form-hint">${t('telegram_hint')}</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label"><i class="fab fa-instagram" style="color:#E1306C"></i> Instagram</label>
+        <input type="text" id="prodInstagram" class="form-control" value="${v('instagram')}"
+          placeholder="${t('instagram_hint')}">
+      </div>
+      <div class="form-group">
+        <label class="form-label"><i class="fab fa-youtube" style="color:#FF0000"></i> YouTube</label>
+        <input type="url" id="prodYoutube" class="form-control" value="${v('youtube')}"
+          placeholder="https://youtube.com/...">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label"><i class="fas fa-credit-card" style="color:var(--gold)"></i> ${t('dc_card')}</label>
+      <input type="text" id="prodDcCard" class="form-control" value="${v('dcCard')}"
+        placeholder="XXXX XXXX XXXX XXXX" inputmode="numeric">
+    </div>
+
+    <div class="modal-footer" style="margin:0 -1.125rem -1.125rem;border-top:1px solid var(--border);padding:0.875rem 1.125rem;display:flex;gap:0.5rem;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeProductModal()">${t('cancel')}</button>
       <button class="btn btn-primary" onclick="saveProduct()"><i class="fas fa-save"></i> ${t('save')}</button>
     </div>`;
 }
@@ -913,10 +1860,12 @@ async function handleFileUpload(e){
   if(!file.type.startsWith('image/')){showToast('Выберите изображение');return}
   if(file.size>10*1024*1024){showToast('Максимум 10 МБ');return}
 
-  // Compress first
-  const compressed=await compressImage(file);
+  if(tempUploadedUrl){
+    await deleteStorageUrl(tempUploadedUrl);
+    tempUploadedUrl=null;
+  }
 
-  // Show progress
+  const compressed=await compressImage(file);
   const spinner=document.getElementById('uploadSpinner');
   const icon=document.getElementById('uploadIcon');
   const label=document.getElementById('uploadLabel');
@@ -950,6 +1899,7 @@ async function handleFileUpload(e){
       async()=>{
         const downloadURL=await uploadTask.snapshot.ref.getDownloadURL();
         uploadedImageUrl=downloadURL;
+        tempUploadedUrl=downloadURL;
         if(spinner)spinner.style.display='none';
         if(icon)icon.style.display='block';
         if(label)label.textContent='✅ Фото загружено';
@@ -1009,8 +1959,9 @@ async function saveProduct(){
   const price=parseFloat(document.getElementById('prodPrice')?.value);
   const city=document.getElementById('prodCity')?.value.trim();
   const category=document.getElementById('prodCategory')?.value;
+  const subcategory=document.getElementById('prodSubcategory')?.value;
 
-  if(!name||!price||!city||!category||!uploadedImageUrl){
+  if(!name||!price||!city||!category||!subcategory||!uploadedImageUrl){
     showToast(t('req_fields'));return;
   }
   if(allProducts.length>=MAX_PRODUCTS&&!editingProductId){
@@ -1023,6 +1974,7 @@ async function saveProduct(){
     city,
     description:document.getElementById('prodDesc')?.value.trim(),
     category,
+    subcategory,
     phone:document.getElementById('prodPhone')?.value.trim(),
     whatsapp:document.getElementById('prodWhatsapp')?.value.trim(),
     telegram:document.getElementById('prodTelegram')?.value.trim(),
@@ -1046,7 +1998,11 @@ async function saveProduct(){
       updates[`users/${currentUser.uid}/productCount`]=firebase.database.ServerValue.increment(1);
       await db.ref().update(updates);
     }
-    clearDraft();closeModal('productModal');showToast(t('saved'));
+    tempUploadedUrl=null;
+    clearDraft();
+    closeModal('productModal');
+    uploadedImageUrl='';
+    showToast(t('saved'));
   } catch(e){showToast('Error: '+e.message)}
 }
 
@@ -1064,6 +2020,7 @@ async function deleteProduct(pid){
 function openSettingsModal(){
   const isDark=document.body.classList.contains('dark');
   document.getElementById('darkToggle').classList.toggle('on',isDark);
+  updateSettingsLangButtons();
   openModal('settingsModal');
 }
 
@@ -1074,23 +2031,64 @@ function openModal(id){
 }
 function closeModal(id){
   document.getElementById(id).classList.remove('on');
-  document.body.style.overflow='';
+  const anyOpen=document.querySelectorAll('.modal-bg.on').length>0;
+  if(!anyOpen)document.body.style.overflow='';
   if(id==='productModal'){
     clearTimeout(draftTimer);
     const name=document.getElementById('prodName')?.value;
     if(name)saveDraft();
   }
 }
+// Click outside modal to close (but NOT productModal — handled by closeProductModal with confirmation)
 document.addEventListener('click',(e)=>{
-  if(e.target.classList.contains('modal-bg'))closeModal(e.target.id);
+  if(e.target.classList.contains('modal-bg')){
+    const id=e.target.id;
+    if(id==='productModal'){
+      closeProductModal();
+    } else {
+      closeModal(id);
+    }
+  }
 });
 
 // ====== TOAST ======
-function showToast(msg){
+function showToast(msg,type=''){
   const el=document.getElementById('toast');
-  el.textContent=msg;el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),2500);
+  el.textContent=msg;
+  el.className='toast'+(type?' '+type:'')+' show';
+  setTimeout(()=>el.classList.remove('show'),2800);
 }
+
+// ====== PWA INSTALL LOGIC ======
+let deferredPrompt;
+
+// Ловим системное событие Android
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); // Останавливаем автоматический показ
+  deferredPrompt = e; // Сохраняем для нашей кнопки
+});
+
+document.getElementById('installAndroidBtn').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      showToast('Установка запущена');
+      closeModal('installModal');
+    }
+    deferredPrompt = null;
+  } else {
+    showToast('Откройте сайт в браузере Chrome или иконка уже установлена', 'warning');
+  }
+});
+
+// Регистрация Service Worker для установки PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW ref fail', err));
+  });
+}
+
 </script>
 </body>
 </html>
