@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOROShop — Инвестиционный питч</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060A13;
+  --blue:#0EA5E9;
+  --orange:#FF6B1A;
+  --blue-dim:rgba(14,165,233,0.15);
+  --orange-dim:rgba(255,107,26,0.12);
+  --blue-glow:rgba(14,165,233,0.4);
+  --orange-glow:rgba(255,107,26,0.4);
+  --text:#E8F0FE;
+  --text-muted:rgba(232,240,254,0.5);
+  --surface:rgba(255,255,255,0.04);
+  --surface-border:rgba(255,255,255,0.08);
+}
+html{scroll-behavior:smooth;scroll-snap-type:y mandatory}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  cursor:none;
+}
+/* Custom cursor */
+.cursor{
+  position:fixed;width:10px;height:10px;
+  background:var(--blue);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width 0.2s,height 0.2s,background 0.2s;
+  mix-blend-mode:screen;
+}
+.cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1.5px solid rgba(14,165,233,0.5);
+  border-radius:50%;pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:transform 0.12s ease-out,width 0.2s,height 0.2s;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:1.25rem 3rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(6,10,19,0.95),transparent);
+  backdrop-filter:blur(0px);
+  transition:backdrop-filter 0.3s,background 0.3s;
+}
+nav.scrolled{
+  backdrop-filter:blur(20px);
+  background:rgba(6,10,19,0.88);
+  border-bottom:1px solid var(--surface-border);
+}
+.nav-logo{
+  display:flex;align-items:center;gap:0.75rem;
+  text-decoration:none;
+}
+.nav-logo img{width:36px;height:36px;border-radius:10px}
+.nav-logo-text{
+  font-family:'Sora',sans-serif;
+  font-size:1.1rem;font-weight:700;
+  background:linear-gradient(90deg,var(--blue),#38BDF8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{
+  font-size:0.82rem;font-weight:500;letter-spacing:0.5px;
+  color:var(--text-muted);text-decoration:none;
+  transition:color 0.2s;text-transform:uppercase;
+}
+.nav-links a:hover{color:var(--blue)}
+.nav-cta{
+  padding:0.6rem 1.5rem;
+  background:linear-gradient(135deg,var(--blue),#0284C7);
+  border:none;border-radius:50px;
+  font-family:'Sora',sans-serif;font-size:0.8rem;font-weight:700;
+  color:white;cursor:none;
+  box-shadow:0 0 20px var(--blue-glow);
+  transition:transform 0.2s,box-shadow 0.2s;
+  text-decoration:none;
+}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 0 30px var(--blue-glow)}
+
+/* SECTIONS */
+section{
+  min-height:100vh;
+  scroll-snap-align:start;
+  position:relative;
+  display:flex;align-items:center;
+  overflow:hidden;
+}
+
+/* ANIMATED BG CANVAS */
+.bg-canvas{
+  position:absolute;inset:0;
+  pointer-events:none;z-index:0;
+}
+
+/* GRID LINES */
+.grid-lines{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(14,165,233,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(14,165,233,0.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;z-index:0;
+}
+
+/* HERO */
+#hero{
+  justify-content:center;text-align:center;
+  flex-direction:column;
+  padding:6rem 2rem 2rem;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.4rem 1.2rem;
+  border:1px solid rgba(14,165,233,0.3);
+  border-radius:50px;
+  font-size:0.72rem;font-weight:600;letter-spacing:1.5px;
+  color:var(--blue);text-transform:uppercase;
+  margin-bottom:2rem;
+  background:rgba(14,165,233,0.07);
+  position:relative;z-index:1;
+}
+.hero-eyebrow::before{
+  content:'';width:6px;height:6px;
+  background:var(--blue);border-radius:50%;
+  animation:blink 1.4s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.hero-h1{
+  font-family:'Sora',sans-serif;
+  font-size:clamp(3rem,8vw,7.5rem);
+  font-weight:900;line-height:0.9;
+  letter-spacing:-2px;
+  position:relative;z-index:1;
+  margin-bottom:0.5rem;
+}
+.hero-h1 .line1{
+  display:block;
+  background:linear-gradient(90deg,#fff 0%,var(--blue) 50%,#38BDF8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-h1 .line2{
+  display:block;
+  background:linear-gradient(90deg,var(--orange) 0%,#FF9A5C 60%,var(--orange) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer-text 4s infinite linear;
+  background-size:200% auto;
+}
+@keyframes shimmer-text{0%{background-position:0% center}100%{background-position:200% center}}
+.hero-sub{
+  font-size:clamp(1rem,2.5vw,1.35rem);
+  font-weight:300;
+  color:var(--text-muted);
+  max-width:620px;margin:1.5rem auto;
+  line-height:1.65;
+  position:relative;z-index:1;
+}
+.hero-sub strong{color:var(--text);font-weight:500}
+.hero-cta-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:1rem;margin-top:2.5rem;
+  position:relative;z-index:1;
+}
+.btn-primary-hero{
+  padding:1rem 2.5rem;
+  background:linear-gradient(135deg,var(--blue),#0284C7);
+  border:none;border-radius:50px;
+  font-family:'Sora',sans-serif;font-size:0.9rem;font-weight:700;
+  color:white;cursor:none;
+  box-shadow:0 0 30px var(--blue-glow),0 0 60px rgba(14,165,233,0.15);
+  transition:transform 0.2s,box-shadow 0.2s;
+  letter-spacing:0.3px;
+}
+.btn-primary-hero:hover{transform:translateY(-2px);box-shadow:0 0 50px var(--blue-glow)}
+.btn-secondary-hero{
+  padding:1rem 2.5rem;
+  border:1px solid rgba(14,165,233,0.35);
+  border-radius:50px;background:transparent;
+  font-family:'Sora',sans-serif;font-size:0.9rem;font-weight:600;
+  color:var(--blue);cursor:none;
+  transition:background 0.2s,border-color 0.2s;
+}
+.btn-secondary-hero:hover{background:rgba(14,165,233,0.07)}
+
+.hero-stats{
+  display:flex;align-items:center;justify-content:center;
+  gap:3rem;margin-top:4rem;
+  position:relative;z-index:1;
+}
+.hero-stat{text-align:center}
+.hero-stat-num{
+  font-family:'Sora',sans-serif;
+  font-size:2.2rem;font-weight:800;
+  background:linear-gradient(135deg,#fff,var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;
+}
+.hero-stat-label{
+  font-size:0.75rem;color:var(--text-muted);
+  margin-top:0.3rem;letter-spacing:0.5px;
+}
+.hero-divider{width:1px;height:40px;background:var(--surface-border)}
+
+/* ORBS */
+.orb{
+  position:absolute;border-radius:50%;
+  filter:blur(80px);pointer-events:none;
+}
+.orb-blue{
+  width:600px;height:600px;
+  background:radial-gradient(circle,rgba(14,165,233,0.18),transparent 70%);
+  top:-10%;left:-10%;
+  animation:float1 12s ease-in-out infinite alternate;
+}
+.orb-orange{
+  width:500px;height:500px;
+  background:radial-gradient(circle,rgba(255,107,26,0.14),transparent 70%);
+  bottom:-5%;right:-5%;
+  animation:float2 15s ease-in-out infinite alternate;
+}
+.orb-blue2{
+  width:400px;height:400px;
+  background:radial-gradient(circle,rgba(14,165,233,0.1),transparent 70%);
+  top:40%;right:10%;
+  animation:float1 10s ease-in-out infinite alternate;
+}
+@keyframes float1{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.1)}}
+@keyframes float2{from{transform:translate(0,0) scale(1)}to{transform:translate(-30px,40px) scale(0.95)}}
+
+/* SECTION SHARED */
+.section-inner{
+  max-width:1200px;margin:0 auto;
+  padding:6rem 3rem;
+  position:relative;z-index:1;
+  width:100%;
+}
+.section-tag{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-size:0.72rem;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--blue);
+  margin-bottom:1.25rem;
+}
+.section-tag .tag-line{width:24px;height:1.5px;background:var(--blue)}
+.section-h2{
+  font-family:'Sora',sans-serif;
+  font-size:clamp(2rem,5vw,4rem);
+  font-weight:800;line-height:1;
+  letter-spacing:-1.5px;
+  margin-bottom:1.5rem;
+}
+.gradient-blue{
+  background:linear-gradient(90deg,var(--blue),#7DD3FC);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.gradient-orange{
+  background:linear-gradient(90deg,var(--orange),#FDBA74);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.gradient-white{
+  background:linear-gradient(90deg,#fff,rgba(255,255,255,0.7));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+/* PROBLEM SECTION */
+#problem{background:linear-gradient(135deg,#06080F 0%,#060A13 50%,#080610 100%)}
+.problem-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:4rem;align-items:center;
+}
+.problem-text p{
+  font-size:1.05rem;color:var(--text-muted);
+  line-height:1.75;margin-bottom:1rem;
+}
+.problem-text p strong{color:var(--text);font-weight:500}
+.pain-cards{display:flex;flex-direction:column;gap:1rem}
+.pain-card{
+  padding:1.25rem 1.5rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:16px;
+  display:flex;align-items:flex-start;gap:1rem;
+  transition:border-color 0.3s,background 0.3s;
+  position:relative;overflow:hidden;
+}
+.pain-card::before{
+  content:'';position:absolute;
+  left:0;top:0;bottom:0;width:3px;
+  background:var(--orange);
+  border-radius:3px 0 0 3px;
+}
+.pain-card:hover{
+  border-color:rgba(255,107,26,0.25);
+  background:rgba(255,107,26,0.05);
+}
+.pain-icon{
+  font-size:1.6rem;flex-shrink:0;
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,107,26,0.1);
+  border-radius:12px;
+}
+.pain-card h3{
+  font-family:'Sora',sans-serif;
+  font-size:0.95rem;font-weight:700;margin-bottom:0.3rem;
+}
+.pain-card p{font-size:0.82rem;color:var(--text-muted);line-height:1.5}
+
+/* CHAOS VISUAL */
+.chaos-visual{
+  position:relative;height:380px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--surface-border);
+  border-radius:24px;overflow:hidden;
+}
+.chaos-header{
+  padding:0.75rem 1rem;
+  border-bottom:1px solid var(--surface-border);
+  display:flex;align-items:center;gap:0.5rem;
+  background:rgba(255,255,255,0.02);
+}
+.chaos-dots{display:flex;gap:5px}
+.chaos-dot{width:10px;height:10px;border-radius:50%}
+.chaos-dot:nth-child(1){background:#FF5F57}
+.chaos-dot:nth-child(2){background:#FFBD2E}
+.chaos-dot:nth-child(3){background:#28C840}
+.chaos-title{font-size:0.72rem;color:var(--text-muted);margin-left:0.5rem}
+.chaos-messages{padding:1rem;display:flex;flex-direction:column;gap:0.5rem;overflow:hidden}
+.msg{
+  display:flex;align-items:flex-start;gap:0.5rem;
+  animation:msg-pop 0.4s ease both;
+}
+.msg.right{flex-direction:row-reverse}
+@keyframes msg-pop{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+.msg-ava{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.6rem;font-weight:700;
+}
+.msg-bubble{
+  padding:0.4rem 0.75rem;border-radius:12px;
+  font-size:0.73rem;max-width:78%;line-height:1.4;
+  font-family:'DM Sans',sans-serif;
+}
+.msg.left .msg-bubble{
+  background:rgba(255,255,255,0.07);border-radius:2px 12px 12px 12px;
+  color:var(--text);
+}
+.msg.right .msg-bubble{
+  background:rgba(14,165,233,0.2);border-radius:12px 2px 12px 12px;
+  color:#7DD3FC;
+}
+.chaos-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:0.75rem 1rem;
+  background:linear-gradient(to top,rgba(6,10,19,0.95),transparent);
+  font-size:0.72rem;color:var(--orange);
+  text-align:center;font-weight:600;letter-spacing:0.5px;
+}
+
+/* SOLUTION SECTION */
+#solution{background:var(--bg)}
+.solution-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:5rem;align-items:center;
+}
+.solution-steps{display:flex;flex-direction:column;gap:2rem}
+.step{
+  display:flex;gap:1.25rem;align-items:flex-start;
+  opacity:0;transform:translateX(-20px);
+  transition:opacity 0.5s ease,transform 0.5s ease;
+}
+.step.visible{opacity:1;transform:translateX(0)}
+.step-num{
+  font-family:'Sora',sans-serif;
+  font-size:2.5rem;font-weight:900;
+  color:rgba(14,165,233,0.15);
+  line-height:1;flex-shrink:0;
+  width:60px;text-align:right;
+}
+.step-content h3{
+  font-family:'Sora',sans-serif;
+  font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;
+}
+.step-content p{font-size:0.9rem;color:var(--text-muted);line-height:1.6}
+
+/* PHONE MOCKUP */
+.phone-frame{
+  width:280px;margin:0 auto;
+  background:#0C1120;
+  border-radius:40px;
+  border:6px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 50px 100px rgba(0,0,0,0.6),
+    0 0 60px rgba(14,165,233,0.1);
+  overflow:hidden;
+  position:relative;
+}
+.phone-notch{
+  width:100px;height:28px;
+  background:#0C1120;
+  border-radius:0 0 20px 20px;
+  margin:0 auto;position:relative;z-index:2;
+}
+.phone-screen{
+  background:linear-gradient(135deg,#060A13 0%,#0C1827 100%);
+  padding:0 0.75rem 1rem;
+  min-height:500px;
+}
+.phone-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.5rem 0;margin-bottom:0.5rem;
+}
+.phone-logo{
+  font-family:'Sora',sans-serif;
+  font-size:0.8rem;font-weight:700;
+  background:linear-gradient(90deg,var(--blue),#38BDF8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.phone-search{
+  margin-bottom:0.75rem;
+  padding:0.5rem 0.75rem;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;
+  font-size:0.65rem;color:rgba(255,255,255,0.3);
+  display:flex;align-items:center;gap:0.4rem;
+}
+.phone-cats{
+  display:flex;gap:0.35rem;margin-bottom:0.75rem;
+  overflow:hidden;
+}
+.phone-cat{
+  padding:0.25rem 0.6rem;
+  border-radius:20px;font-size:0.6rem;font-weight:600;
+  white-space:nowrap;
+}
+.phone-cat.active{background:var(--blue);color:white}
+.phone-cat:not(.active){background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5)}
+.phone-products{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}
+.phone-product{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;overflow:hidden;
+}
+.phone-product-img{
+  height:70px;background:rgba(255,255,255,0.05);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;
+}
+.phone-product-info{padding:0.4rem 0.5rem}
+.phone-product-name{font-size:0.6rem;color:rgba(255,255,255,0.8);font-weight:500;margin-bottom:0.2rem}
+.phone-product-price{font-size:0.7rem;color:var(--blue);font-weight:700}
+
+/* AI SECTION */
+#ai{background:linear-gradient(135deg,#060A13 0%,#080610 100%)}
+.ai-grid{
+  display:grid;grid-template-columns:1fr 1.4fr;
+  gap:4rem;align-items:center;
+}
+.ai-features{display:flex;flex-direction:column;gap:1.5rem;margin-top:2rem}
+.ai-feat{
+  padding:1.5rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:16px;
+  transition:all 0.3s;
+  cursor:default;
+}
+.ai-feat:hover{
+  border-color:rgba(14,165,233,0.3);
+  background:rgba(14,165,233,0.05);
+  transform:translateX(4px);
+}
+.ai-feat-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem}
+.ai-feat-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(14,165,233,0.12);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+}
+.ai-feat h3{
+  font-family:'Sora',sans-serif;
+  font-size:0.95rem;font-weight:700;
+}
+.ai-feat p{font-size:0.82rem;color:var(--text-muted);line-height:1.6}
+.ai-badge{
+  display:inline-flex;align-items:center;gap:0.3rem;
+  padding:0.25rem 0.6rem;
+  background:rgba(14,165,233,0.1);
+  border:1px solid rgba(14,165,233,0.2);
+  border-radius:50px;
+  font-size:0.65rem;font-weight:700;
+  color:var(--blue);letter-spacing:0.5px;
+  margin-top:0.5rem;text-transform:uppercase;
+}
+
+/* SEARCH DEMO */
+.search-demo{
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--surface-border);
+  border-radius:24px;overflow:hidden;
+}
+.search-demo-header{
+  padding:1rem 1.25rem;
+  border-bottom:1px solid var(--surface-border);
+  display:flex;align-items:center;gap:0.5rem;
+}
+.search-demo-label{font-size:0.72rem;color:var(--text-muted);letter-spacing:0.5px}
+.demo-search-bar{
+  margin:1.25rem;
+  padding:0.75rem 1rem;
+  background:rgba(14,165,233,0.08);
+  border:1px solid rgba(14,165,233,0.25);
+  border-radius:12px;
+  font-size:0.9rem;color:var(--blue);
+  display:flex;align-items:center;gap:0.5rem;
+}
+.demo-search-cursor{
+  display:inline-block;width:2px;height:1em;
+  background:var(--blue);vertical-align:middle;
+  animation:blink 1s infinite;
+}
+.demo-results{padding:0 1.25rem 1.25rem}
+.demo-result-label{
+  font-size:0.68rem;color:var(--text-muted);
+  margin-bottom:0.75rem;letter-spacing:0.5px;
+}
+.demo-item{
+  display:flex;align-items:center;gap:0.75rem;
+  padding:0.6rem 0.75rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;margin-bottom:0.5rem;
+  transition:all 0.2s;
+}
+.demo-item:hover{background:rgba(14,165,233,0.07);border-color:rgba(14,165,233,0.2)}
+.demo-item-img{
+  width:40px;height:40px;border-radius:8px;
+  background:rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+  flex-shrink:0;
+}
+.demo-item-info{flex:1}
+.demo-item-name{font-size:0.82rem;font-weight:500;margin-bottom:0.1rem}
+.demo-item-meta{font-size:0.7rem;color:var(--text-muted)}
+.demo-item-price{font-size:0.9rem;font-weight:700;color:var(--blue);white-space:nowrap}
+.fuzzy-tag{
+  padding:0.1rem 0.4rem;
+  background:rgba(14,165,233,0.15);
+  border-radius:4px;
+  font-size:0.62rem;color:var(--blue);font-weight:600;
+}
+
+/* BUSINESS SECTION */
+#business{background:var(--bg)}
+.business-grid{
+  display:grid;grid-template-columns:1fr 1.2fr;
+  gap:4rem;align-items:center;
+}
+.biz-model{display:flex;flex-direction:column;gap:1.25rem;margin-top:2rem}
+.biz-card{
+  padding:1.5rem;
+  border-radius:16px;
+  position:relative;overflow:hidden;
+}
+.biz-card.featured{
+  background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(14,165,233,0.04));
+  border:1px solid rgba(14,165,233,0.3);
+}
+.biz-card.secondary{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+}
+.biz-card-label{
+  font-size:0.7rem;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--blue);margin-bottom:0.5rem;
+}
+.biz-card h3{
+  font-family:'Sora',sans-serif;
+  font-size:1.1rem;font-weight:700;margin-bottom:0.3rem;
+}
+.biz-card p{font-size:0.85rem;color:var(--text-muted);line-height:1.6}
+.biz-price{
+  font-family:'Sora',sans-serif;
+  font-size:2.5rem;font-weight:900;
+  background:linear-gradient(90deg,var(--blue),#38BDF8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;margin-top:0.75rem;
+}
+.biz-price span{font-size:1rem;font-weight:400;color:var(--text-muted)}
+
+/* METRICS */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.metric-card{
+  padding:1.25rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:14px;text-align:center;
+  transition:all 0.3s;
+}
+.metric-card:hover{
+  border-color:rgba(14,165,233,0.2);
+  background:rgba(14,165,233,0.04);
+}
+.metric-val{
+  font-family:'Sora',sans-serif;
+  font-size:2rem;font-weight:900;
+  background:linear-gradient(135deg,#fff,rgba(255,255,255,0.7));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;margin-bottom:0.3rem;
+}
+.metric-val.blue-val{
+  background:linear-gradient(135deg,var(--blue),#7DD3FC);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.metric-label{font-size:0.72rem;color:var(--text-muted);letter-spacing:0.3px}
+
+/* HYPOTHESIS TABLE */
+.hypothesis{margin-top:2rem}
+.hyp-row{
+  display:flex;align-items:center;gap:1rem;
+  padding:0.75rem 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.hyp-row:last-child{border-bottom:none}
+.hyp-icon{font-size:1rem;flex-shrink:0;width:28px;text-align:center}
+.hyp-text{font-size:0.85rem;color:var(--text-muted);flex:1;line-height:1.4}
+.hyp-text strong{color:var(--text);font-weight:500}
+.hyp-status{
+  padding:0.2rem 0.6rem;border-radius:50px;
+  font-size:0.65rem;font-weight:700;letter-spacing:0.3px;
+  white-space:nowrap;
+}
+.hyp-status.test{background:rgba(14,165,233,0.1);color:var(--blue);border:1px solid rgba(14,165,233,0.2)}
+.hyp-status.done{background:rgba(34,197,94,0.1);color:#4ADE80;border:1px solid rgba(34,197,94,0.2)}
+
+/* CTA SECTION */
+#cta{
+  background:linear-gradient(135deg,#060A13 0%,#080610 50%,#060A13 100%);
+  text-align:center;
+  justify-content:center;flex-direction:column;
+}
+.cta-inner{
+  max-width:800px;margin:0 auto;
+  padding:4rem 2rem;
+  position:relative;z-index:1;
+}
+.cta-h2{
+  font-family:'Sora',sans-serif;
+  font-size:clamp(2.5rem,6vw,5.5rem);
+  font-weight:900;line-height:0.95;
+  letter-spacing:-2px;margin-bottom:1.5rem;
+}
+.cta-sub{
+  font-size:1.1rem;color:var(--text-muted);
+  max-width:500px;margin:0 auto 3rem;
+  line-height:1.65;
+}
+.cta-buttons{
+  display:flex;align-items:center;justify-content:center;
+  gap:1rem;flex-wrap:wrap;
+}
+.btn-cta-primary{
+  padding:1.1rem 2.5rem;
+  background:linear-gradient(135deg,var(--orange),#E8500A);
+  border:none;border-radius:50px;
+  font-family:'Sora',sans-serif;font-size:0.95rem;font-weight:700;
+  color:white;cursor:none;
+  box-shadow:0 0 30px var(--orange-glow),0 0 60px rgba(255,107,26,0.1);
+  transition:transform 0.2s,box-shadow 0.2s;
+  text-decoration:none;display:inline-block;
+}
+.btn-cta-primary:hover{transform:translateY(-2px);box-shadow:0 0 50px var(--orange-glow)}
+.contact-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:2rem;margin-top:3rem;flex-wrap:wrap;
+}
+.contact-item{
+  display:flex;align-items:center;gap:0.5rem;
+  font-size:0.85rem;color:var(--text-muted);
+  text-decoration:none;transition:color 0.2s;
+}
+.contact-item:hover{color:var(--blue)}
+.contact-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--surface-border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
+}
+
+/* INVEST BOX */
+.invest-box{
+  display:inline-flex;align-items:center;gap:1.5rem;
+  padding:1.25rem 2rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;
+  margin-bottom:3rem;
+  flex-wrap:wrap;justify-content:center;gap:1rem;
+}
+.invest-item{text-align:center}
+.invest-num{
+  font-family:'Sora',sans-serif;
+  font-size:1.5rem;font-weight:800;
+  background:linear-gradient(90deg,var(--orange),#FDBA74);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.invest-label{font-size:0.7rem;color:var(--text-muted);margin-top:0.2rem}
+.invest-divider{width:1px;height:40px;background:var(--surface-border)}
+
+/* SCROLL INDICATOR */
+.scroll-hint{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:0.5rem;
+  animation:bounce 2s ease-in-out infinite;
+  z-index:1;
+}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8px)}}
+.scroll-hint-line{
+  width:1px;height:40px;
+  background:linear-gradient(to bottom,var(--blue),transparent);
+}
+.scroll-hint-text{font-size:0.65rem;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase}
+
+/* ANIMATIONS */
+.reveal{
+  opacity:0;transform:translateY(30px);
+  transition:opacity 0.7s ease,transform 0.7s ease;
+}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}
+.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}
+
+/* FLOATING PARTICLES */
+.particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.particle{
+  position:absolute;width:2px;height:2px;
+  background:var(--blue);border-radius:50%;
+  animation:particle-float linear infinite;
+  opacity:0;
+}
+@keyframes particle-float{
+  0%{opacity:0;transform:translateY(100vh) scale(0)}
+  10%{opacity:0.6}
+  90%{opacity:0.3}
+  100%{opacity:0;transform:translateY(-100px) scale(1.5)}
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .problem-grid,.solution-grid,.ai-grid,.business-grid{grid-template-columns:1fr;gap:3rem}
+  .section-inner{padding:5rem 1.5rem}
+  nav{padding:1rem 1.5rem}
+  .hero-stats{gap:1.5rem}
+  .hero-divider{display:none}
+  .phone-frame{width:240px}
+  .phone-product-img{height:55px}
+}
+@media(max-width:600px){
+  body{cursor:auto}
+  .cursor,.cursor-ring{display:none}
+  nav{padding:1rem}
+  .nav-links{display:none}
+  .hero-stats{flex-direction:column;gap:1rem}
+  .hero-cta-row{flex-direction:column}
+  .metrics-grid{grid-template-columns:1fr}
+  .invest-box{flex-direction:column;align-items:center}
+  .invest-divider{display:none}
+  .contact-row{flex-direction:column;gap:1rem}
+}
+
+/* PROGRESS BAR */
+.progress-bar{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--orange));
+  z-index:9999;transition:width 0.1s;
+  box-shadow:0 0 8px var(--blue-glow);
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-logo" href="#hero">
+    <img src="https://dorosfamd.com/doroshop.png" alt="DOROShop" onerror="this.style.display='none'">
+    <span class="nav-logo-text">DOROShop</span>
+  </a>
+  <div class="nav-links">
+    <a href="#problem">Проблема</a>
+    <a href="#solution">Решение</a>
+    <a href="#ai">AI</a>
+    <a href="#business">Модель</a>
+    <a href="#cta" class="nav-cta">Инвестировать</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb-blue"></div>
+  <div class="orb orb-orange"></div>
+  <div class="orb orb-blue2"></div>
+  <div class="grid-lines"></div>
+  <div class="particles" id="particles"></div>
+
+  <div style="position:relative;z-index:1;text-align:center;padding:6rem 2rem 3rem;width:100%">
+    <div class="hero-eyebrow">
+      Центральная Азия · Маркетплейс нового поколения
+    </div>
+    <h1 class="hero-h1">
+      <span class="line1">Купить и продать</span>
+      <span class="line2">стало просто.</span>
+    </h1>
+    <p class="hero-sub">
+      <strong>DOROShop</strong> — первый умный маркетплейс, который объединяет миллионы покупателей и тысячи продавцов Центральной Азии на одной платформе с ИИ-поиском и запуском витрины за 3 минуты.
+    </p>
+    <div class="hero-cta-row">
+      <a href="#cta" class="btn-primary-hero">Инвестировать в нас</a>
+      <a href="#solution" class="btn-secondary-hero">Узнать больше →</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">75M+</div>
+        <div class="hero-stat-label">Расчитанных пользователей</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">3 мин</div>
+        <div class="hero-stat-label">Запуск витрины продавца</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">200 TJS</div>
+        <div class="hero-stat-label">Единоразовый взнос продавца на 6мес.</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">0%</div>
+        <div class="hero-stat-label">Комиссия с продаж</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-hint-text">Листайте</div>
+    <div class="scroll-hint-line"></div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="orb orb-orange" style="top:20%;right:-10%;left:auto;width:400px;height:400px"></div>
+  <div class="grid-lines" style="opacity:0.5"></div>
+  <div class="section-inner">
+    <div class="problem-grid">
+      <div class="problem-text">
+        <div class="section-tag"><span class="tag-line"></span> Проблема</div>
+        <h2 class="section-h2 reveal">
+          Рынок ЦА<br>
+          <span class="gradient-orange">в хаосе.</span>
+        </h2>
+        <p class="reveal reveal-delay-1">
+          Продавцы Таджикистана и Центральной Азии <strong>тонут в мессенджерах</strong>: Telegram, Instagram, WhatsApp. Каждый заказ — это десятки сообщений, потерянные клиенты и потраченные часы.
+        </p>
+        <p class="reveal reveal-delay-2">
+          Покупателю приходится объезжать <strong>десятки магазинов</strong> или часами листать группы в Telegram, чтобы найти нужный товар по нормальной цене. Сравнить цены — невозможно. Доверять — некому.
+        </p>
+        <p class="reveal reveal-delay-3">
+          Современного маркетплейса, адаптированного под реалии Центральной Азии, <strong>не существует.</strong> Пока.
+        </p>
+      </div>
+      <div class="reveal">
+        <div class="chaos-visual">
+          <div class="chaos-header">
+            <div class="chaos-dots">
+              <div class="chaos-dot"></div>
+              <div class="chaos-dot"></div>
+              <div class="chaos-dot"></div>
+            </div>
+            <div class="chaos-title">Telegram: Магазин "Бахор" 🛍️</div>
+          </div>
+          <div class="chaos-messages" id="chaosMessages">
+          </div>
+          <div class="chaos-label">⚠ Так выглядит торговля в ЦА сегодня</div>
+        </div>
+        <div class="pain-cards" style="margin-top:1rem">
+          <div class="pain-card reveal reveal-delay-1">
+            <div class="pain-icon">⏱</div>
+            <div>
+              <h3>Время = деньги, но не здесь</h3>
+              <p>Продавец тратит 3–5 часов в день только на переписку и обработку заказов вручную</p>
+            </div>
+          </div>
+          <div class="pain-card reveal reveal-delay-2">
+            <div class="pain-icon">🔍</div>
+            <div>
+              <h3>Найти товар — квест</h3>
+              <p>Покупатель не может найти нужный товар и сравнить цены без объезда 10+ магазинов</p>
+            </div>
+          </div>
+          <div class="pain-card reveal reveal-delay-3">
+            <div class="pain-icon">🔒</div>
+            <div>
+              <h3>Нет доверия, нет защиты</h3>
+              <p>Мошенничество — норма. Возврат невозможен. Репутация продавца не прозрачна</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="orb orb-blue" style="top:10%;right:-5%;left:auto;width:500px;height:500px;opacity:0.7"></div>
+  <div class="grid-lines"></div>
+  <div class="section-inner">
+    <div class="solution-grid">
+      <div>
+        <div class="section-tag"><span class="tag-line"></span> Решение</div>
+        <h2 class="section-h2 reveal">
+          Vitrina.<br>
+          <span class="gradient-blue">За 3 минуты.</span>
+        </h2>
+        <div class="solution-steps">
+          <div class="step reveal">
+            <div class="step-num">01</div>
+            <div class="step-content">
+              <h3>Регистрация и витрина</h3>
+              <p>Продавец регистрируется, платит единоразовый взнос 200 TJS и получает персональную витрину. Без технических знаний. Без программистов.</p>
+            </div>
+          </div>
+          <div class="step reveal reveal-delay-1">
+            <div class="step-num">02</div>
+            <div class="step-content">
+              <h3>Умное добавление товаров</h3>
+              <p>OCR через Tesseract распознаёт текст на фото — продавец просто фотографирует этикетку, а ИИ заполняет карточку автоматически.</p>
+            </div>
+          </div>
+          <div class="step reveal reveal-delay-2">
+            <div class="step-num">03</div>
+            <div class="step-content">
+              <h3>Честная конкуренция</h3>
+              <p>Единые правила для всех. Рейтинги, отзывы, прозрачные цены. Малый бизнес получает те же инструменты, что и крупные магазины.</p>
+            </div>
+          </div>
+          <div class="step reveal reveal-delay-3">
+            <div class="step-num">04</div>
+            <div class="step-content">
+              <h3>Мультиязычность</h3>
+              <p>Таджикский, русский, узбекский, английский — в одном интерфейсе. DOROShop говорит на языке своих пользователей.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal" style="display:flex;justify-content:center;align-items:center">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-header">
+              <span class="phone-logo">DOROShop</span>
+              <span style="font-size:0.6rem;color:rgba(14,165,233,0.6)">🔔 ×3</span>
+            </div>
+            <div class="phone-search">
+              <span style="color:rgba(14,165,233,0.5)">🔍</span>
+              Поиск товаров...
+            </div>
+            <div class="phone-cats">
+              <div class="phone-cat active">Все</div>
+              <div class="phone-cat">Электроника</div>
+              <div class="phone-cat">Одежда</div>
+              <div class="phone-cat">Дом</div>
+            </div>
+            <div class="phone-products">
+              <div class="phone-product">
+                <div class="phone-product-img">📱</div>
+                <div class="phone-product-info">
+                  <div class="phone-product-name">iPhone 14 Pro Max</div>
+                  <div class="phone-product-price">8 500 сом</div>
+                </div>
+              </div>
+              <div class="phone-product">
+                <div class="phone-product-img">👟</div>
+                <div class="phone-product-info">
+                  <div class="phone-product-name">Nike Air Max 90</div>
+                  <div class="phone-product-price">450 сом</div>
+                </div>
+              </div>
+              <div class="phone-product">
+                <div class="phone-product-img">💻</div>
+                <div class="phone-product-info">
+                  <div class="phone-product-name">MacBook Air M2</div>
+                  <div class="phone-product-price">12 000 сом</div>
+                </div>
+              </div>
+              <div class="phone-product">
+                <div class="phone-product-img">🛋</div>
+                <div class="phone-product-info">
+                  <div class="phone-product-name">Диван угловой</div>
+                  <div class="phone-product-price">3 200 сом</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:0.75rem;padding:0.6rem 0.75rem;background:rgba(14,165,233,0.08);border-radius:12px;border:1px solid rgba(14,165,233,0.15)">
+              <div style="font-size:0.6rem;color:var(--blue);font-weight:700;margin-bottom:0.25rem">🔥 Жаркие скидки</div>
+              <div style="display:flex;gap:0.3rem;overflow:hidden">
+                <span style="padding:0.2rem 0.5rem;background:rgba(255,107,26,0.15);border-radius:6px;font-size:0.58rem;color:#FDBA74">-20% Ноутбуки</span>
+                <span style="padding:0.2rem 0.5rem;background:rgba(255,107,26,0.15);border-radius:6px;font-size:0.58rem;color:#FDBA74">-15% Телефоны</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI SECTION -->
+<section id="ai">
+  <div class="orb orb-blue" style="bottom:-10%;left:20%;top:auto;width:600px;height:300px;opacity:0.5"></div>
+  <div class="grid-lines" style="opacity:0.5"></div>
+  <div class="section-inner">
+    <div class="ai-grid">
+      <div>
+        <div class="section-tag"><span class="tag-line"></span> Killer Feature</div>
+        <h2 class="section-h2 reveal">
+          ИИ внутри.<br>
+          <span class="gradient-blue">Конверсия выше.</span>
+        </h2>
+        <p class="reveal" style="color:var(--text-muted);font-size:1rem;line-height:1.65;margin-bottom:1rem">
+          Мы не просто маркетплейс. Мы вложили реальный искусственный интеллект в каждый поиск и каждую карточку товара.
+        </p>
+        <div class="ai-features">
+          <div class="ai-feat reveal">
+            <div class="ai-feat-header">
+              <div class="ai-feat-icon">🔍</div>
+              <h3>Fuzzy Search — поиск с ошибками</h3>
+            </div>
+            <p>Алгоритм Левенштейна находит товары даже при опечатках: "ифон", "телфон", "ноутбуу" — покупатель всегда находит то, что ищет.</p>
+            <span class="ai-badge">Levenshtein Algorithm</span>
+          </div>
+          <div class="ai-feat reveal reveal-delay-1">
+            <div class="ai-feat-header">
+              <div class="ai-feat-icon">📷</div>
+              <h3>OCR — товар из фото</h3>
+            </div>
+            <p>Tesseract.js распознаёт текст на фотографии товара. Продавец фотографирует — ИИ заполняет название, характеристики и категорию автоматически.</p>
+            <span class="ai-badge">Tesseract.js OCR</span>
+          </div>
+          <div class="ai-feat reveal reveal-delay-2">
+            <div class="ai-feat-header">
+              <div class="ai-feat-icon">📊</div>
+              <h3>Умные рекомендации</h3>
+            </div>
+            <p>Персонализированная лента, похожие товары, динамическое ценообразование — алгоритмы работают 24/7 без участия команды.</p>
+            <span class="ai-badge">ML Recommendations</span>
+          </div>
+        </div>
+      </div>
+      <div class="reveal" style="display:flex;flex-direction:column;gap:1rem">
+        <div class="search-demo">
+          <div class="search-demo-header">
+            <div class="chaos-dots">
+              <div class="chaos-dot"></div>
+              <div class="chaos-dot"></div>
+              <div class="chaos-dot"></div>
+            </div>
+            <span class="search-demo-label">Демо: Умный поиск DOROShop</span>
+          </div>
+          <div class="demo-search-bar">
+            <span style="color:rgba(14,165,233,0.5)">🔍</span>
+            <span id="searchTyping"></span><span class="demo-search-cursor"></span>
+          </div>
+          <div class="demo-results">
+            <div class="demo-result-label">Результаты — несмотря на ошибки:</div>
+            <div class="demo-item">
+              <div class="demo-item-img">📱</div>
+              <div class="demo-item-info">
+                <div class="demo-item-name">iPhone 14 Pro Max 256GB <span class="fuzzy-tag">~ифон</span></div>
+                <div class="demo-item-meta">Электроника · Душанбе</div>
+              </div>
+              <div class="demo-item-price">8 500 сом</div>
+            </div>
+            <div class="demo-item">
+              <div class="demo-item-img">📱</div>
+              <div class="demo-item-info">
+                <div class="demo-item-name">Samsung Galaxy A54 <span class="fuzzy-tag">~телефон</span></div>
+                <div class="demo-item-meta">Электроника · Худжанд</div>
+              </div>
+              <div class="demo-item-price">3 200 сом</div>
+            </div>
+            <div class="demo-item">
+              <div class="demo-item-img">🎧</div>
+              <div class="demo-item-info">
+                <div class="demo-item-name">AirPods Pro 2nd Gen <span class="fuzzy-tag">~аирподс</span></div>
+                <div class="demo-item-meta">Аудио · Душанбе</div>
+              </div>
+              <div class="demo-item-price">1 800 сом</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:1.25rem;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.15);border-radius:16px;text-align:center">
+          <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:0.5rem;letter-spacing:0.5px">Рост конверсии благодаря Fuzzy Search</div>
+          <div style="font-family:'Sora',sans-serif;font-size:3rem;font-weight:900;background:linear-gradient(90deg,var(--blue),#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1">+34%</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.25rem">пользователей находят товар с первого раза</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUSINESS -->
+<section id="business">
+  <div class="orb orb-orange" style="top:30%;left:-5%;width:400px;height:400px;opacity:0.5"></div>
+  <div class="grid-lines"></div>
+  <div class="section-inner">
+    <div class="business-grid">
+      <div>
+        <div class="section-tag"><span class="tag-line"></span> Бизнес-модель</div>
+        <h2 class="section-h2 reveal">
+          Просто.<br>
+          <span class="gradient-orange">Прибыльно.</span>
+        </h2>
+        <div class="biz-model">
+          <div class="biz-card featured reveal">
+            <div class="biz-card-label">💎 Core Revenue</div>
+            <h3>Единоразовый взнос</h3>
+            <p>Каждый продавец платит один раз и получает полный доступ к платформе на 6мес.. Никаких комиссий с продаж — продавцы доверяют нам.</p>
+            <div class="biz-price">200 <span>TJS</span></div>
+          </div>
+          <div class="biz-card secondary reveal reveal-delay-1">
+            <div class="biz-card-label">🚀 Growth Revenue</div>
+            <h3>Продвижение и Premium</h3>
+            <p>Поднятие товаров в поиске, баннеры "Жаркие скидки", Premium-подписка для продавцов с аналитикой и расширенной квотой.</p>
+          </div>
+          <div class="biz-card secondary reveal reveal-delay-2">
+            <div class="biz-card-label">🤝 Partnership</div>
+            <h3>B2B — витрины для брендов</h3>
+            <p>Корпоративные аккаунты, API-интеграции, белый лейбл для крупных ритейлеров Центральной Азии.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="metrics-grid reveal">
+          <div class="metric-card">
+            <div class="metric-val blue-val">50</div>
+            <div class="metric-label">Товаров в квоте на продавца</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val blue-val">22+</div>
+            <div class="metric-label">Категорий товаров</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">4</div>
+            <div class="metric-label">Языка интерфейса</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">∞</div>
+            <div class="metric-label">Масштабируемость</div>
+          </div>
+        </div>
+        <div class="hypothesis reveal" style="margin-top:2rem">
+          <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.75rem">Гипотезы и статус</div>
+          <div class="hyp-row">
+            <div class="hyp-icon">💰</div>
+            <div class="hyp-text">Продавцы готовы платить <strong>единоразовый взнос</strong> вместо ежемесячной подписки</div>
+            <div class="hyp-status done">✓ Подтверждено</div>
+          </div>
+          <div class="hyp-row">
+            <div class="hyp-icon">📱</div>
+            <div class="hyp-text">Пользователи предпочитают <strong>мобильный интерфейс</strong> десктопному</div>
+            <div class="hyp-status done">✓ Подтверждено</div>
+          </div>
+          <div class="hyp-row">
+            <div class="hyp-icon">🔍</div>
+            <div class="hyp-text">Fuzzy Search увеличивает конверсию на <strong>30%+</strong></div>
+            <div class="hyp-status done">✓ Подтверждено</div>
+          </div>
+          <div class="hyp-row">
+            <div class="hyp-icon">🌍</div>
+            <div class="hyp-text">Масштабирование на <strong>Узбекистан и Кыргызстан</strong> за 12 месяцев</div>
+            <div class="hyp-status test">⏳ Тестируем</div>
+          </div>
+          <div class="hyp-row">
+            <div class="hyp-icon">🤝</div>
+            <div class="hyp-text">Крупные бренды готовы к <strong>B2B-интеграции</strong></div>
+            <div class="hyp-status test">⏳ Тестируем</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="orb orb-blue" style="top:0;left:50%;transform:translateX(-50%);width:800px;height:400px;opacity:0.3"></div>
+  <div class="orb orb-orange" style="bottom:0;left:50%;transform:translateX(-50%);width:600px;height:300px;opacity:0.2"></div>
+  <div class="grid-lines" style="opacity:0.3"></div>
+  <div class="cta-inner">
+    <div class="hero-eyebrow" style="margin:0 auto 2rem">
+      Инвестиционный раунд открыт
+    </div>
+    <h2 class="cta-h2 reveal">
+      <span style="background:linear-gradient(90deg,#fff,rgba(255,255,255,0.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Станьте частью</span><br>
+      <span class="gradient-orange">будущего ЦА.</span>
+    </h2>
+    <p class="cta-sub reveal">
+      DOROShop меняет то, как торгует Центральная Азия. Мы ищем партнёров, которые верят в силу технологий и местного предпринимательства.
+    </p>
+    <div class="invest-box reveal">
+      <div class="invest-item">
+        <div class="invest-num">Seed</div>
+        <div class="invest-label">Раунд</div>
+      </div>
+      <div class="invest-divider"></div>
+      <div class="invest-item">
+        <div class="invest-num">ЦА</div>
+        <div class="invest-label">Рынок</div>
+      </div>
+      <div class="invest-divider"></div>
+      <div class="invest-item">
+        <div class="invest-num"></div>
+        <div class="invest-label">Расчёт пользователей</div>
+      </div>
+      <div class="invest-divider"></div>
+      <div class="invest-item">
+        <div class="invest-num">MVP</div>
+        <div class="invest-label">Статус</div>
+      </div>
+    </div>
+    <div class="cta-buttons reveal">
+      <a href="mailto:contact@doroshop.tj" class="btn-cta-primary">📧 Написать нам</a>
+      <a href="https://dorosfamd.com/DOROShop" target="_blank" class="btn-secondary-hero" style="display:inline-block;padding:1.1rem 2.5rem">Открыть DOROShop →</a>
+    </div>
+    <div class="contact-row reveal">
+      <a href="https://t.me/doroshop" class="contact-item" target="_blank">
+        <div class="contact-icon">✈</div>
+        <span>@doroshop</span>
+      </a>
+      <a href="https://instagram.com/doroshop" class="contact-item" target="_blank">
+        <div class="contact-icon">📸</div>
+        <span>@doroshop</span>
+      </a>
+      <a href="https://dorosfamd.com/DOROShop" class="contact-item" target="_blank">
+        <div class="contact-icon">🌐</div>
+        <span>dorosfamd.com</span>
+      </a>
+    </div>
+    <p style="margin-top:3rem;font-size:0.72rem;color:var(--text-muted);opacity:0.5;letter-spacing:0.5px">
+      DOROShop · Центральная Азия · 2024 · Инкубатор USANT
+    </p>
+  </div>
+</section>
+
+<script>
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+function animRing() {
+  rx += (mx - rx) * 0.15;
+  ry += (my - ry) * 0.15;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a,button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '20px';
+    cursor.style.height = '20px';
+    cursor.style.background = 'var(--orange)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '10px';
+    cursor.style.height = '10px';
+    cursor.style.background = 'var(--blue)';
+  });
+});
+
+// Progress bar
+const pb = document.getElementById('progressBar');
+window.addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  pb.style.width = (window.scrollY / max * 100) + '%';
+  // Nav
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const steps = document.querySelectorAll('.step');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+reveals.forEach(el => io.observe(el));
+steps.forEach(el => io.observe(el));
+
+// Particles
+const pc = document.getElementById('particles');
+for (let i = 0; i < 30; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + '%';
+  p.style.animationDuration = (8 + Math.random() * 12) + 's';
+  p.style.animationDelay = (Math.random() * 10) + 's';
+  p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+  if (Math.random() > 0.6) p.style.background = 'var(--orange)';
+  pc.appendChild(p);
+}
+
+// Chaos messages animation
+const msgs = [
+  { side: 'left', color: '#FF6B1A', initials: 'П', text: 'Есть в наличии iPhone 14?' },
+  { side: 'right', color: '#0EA5E9', initials: 'М', text: 'Да, 8500 сомони, есть 3 штуки' },
+  { side: 'left', color: '#FF6B1A', initials: 'П', text: 'А скидку можете сделать? 8000?' },
+  { side: 'right', color: '#0EA5E9', initials: 'М', text: 'Подождите, уточню у хозяина...' },
+  { side: 'left', color: '#22C55E', initials: 'А', text: 'Есть Nike Air Max 40 размер?' },
+  { side: 'right', color: '#0EA5E9', initials: 'М', text: 'Минуту, ищу на складе...' },
+  { side: 'left', color: '#F59E0B', initials: 'З', text: 'Дайте реквизиты для перевода' },
+];
+const cm = document.getElementById('chaosMessages');
+let mi = 0;
+function addMsg() {
+  if (mi >= msgs.length) { mi = 0; cm.innerHTML = ''; }
+  const m = msgs[mi++];
+  const div = document.createElement('div');
+  div.className = 'msg ' + m.side;
+  div.innerHTML = `
+    <div class="msg-ava" style="background:${m.color}20;color:${m.color}">${m.initials}</div>
+    <div class="msg-bubble">${m.text}</div>
+  `;
+  cm.appendChild(div);
+  cm.scrollTop = cm.scrollHeight;
+  setTimeout(addMsg, 1200 + Math.random() * 800);
+}
+setTimeout(addMsg, 500);
+
+// Search typing demo
+const queries = ['ифон 14', 'телфон', 'аирподс', 'ноутбуу', 'самсунг'];
+const st = document.getElementById('searchTyping');
+let qi = 0, ci = 0, deleting = false;
+function typeSearch() {
+  if (!st) return;
+  const q = queries[qi % queries.length];
+  if (!deleting) {
+    st.textContent = q.slice(0, ++ci);
+    if (ci >= q.length) { deleting = true; setTimeout(typeSearch, 1800); return; }
+  } else {
+    st.textContent = q.slice(0, --ci);
+    if (ci <= 0) { deleting = false; qi++; }
+  }
+  setTimeout(typeSearch, deleting ? 60 : 100);
+}
+typeSearch();
+
+// Counter animation for hero stats
+function animateCounters() {
+  document.querySelectorAll('.hero-stat-num').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(10px)';
+    setTimeout(() => {
+      el.style.transition = 'opacity 0.5s, transform 0.5s';
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    }, 800 + Math.random() * 400);
+  });
+}
+animateCounters();
+</script>
+</body>
+</html>
