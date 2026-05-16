@@ -1919,57 +1919,100 @@
   // ПЕРЕВОД СРЕДСТВ
   // (сохранена оригинальная Firebase-логика)
   // ===========================
-  document.getElementById('confirm-transfer')?.addEventListener('click', () => {
-    const toCardRaw = document.getElementById('recipient-card').value.replace(/\s/g, '');
-    const amount    = parseFloat(document.getElementById('transfer-amount').value);
-    const pin       = document.getElementById('transfer-pin').value;
-    const comment   = document.getElementById('transfer-comment').value;
-    const msg       = document.getElementById('transfer-message');
+document.getElementById('confirm-transfer')?.addEventListener('click', () => {
+  const toCardRaw = document.getElementById('recipient-card').value.replace(/\s/g, '');
+  const amount    = parseFloat(document.getElementById('transfer-amount').value);
+  const pin       = document.getElementById('transfer-pin').value;
+  const comment   = document.getElementById('transfer-comment').value;
+  const msg       = document.getElementById('transfer-message');
 
-    if (!toCardRaw || toCardRaw.length !== 16) return showMessage(msg, 'Неверный номер карты (16 цифр)', false);
-    if (!amount || amount <= 0) return showMessage(msg, 'Введите сумму', false);
+  if (!toCardRaw || toCardRaw.length !== 16) return showMessage(msg, 'Неверный номер карты (16 цифр)', false);
+  if (!amount || amount <= 0) return showMessage(msg, 'Введите сумму', false);
 
-    const senderCard = userCards[activeCardIndex];
-    if (pin !== senderCard.pin) return showMessage(msg, 'Неверный PIN', false);
+  const senderCard = userCards[activeCardIndex];
+  if (pin !== senderCard.pin) return showMessage(msg, 'Неверный PIN', false);
 
-    const fee   = amount * 0.01; // комиссия 1%
-    const total = amount + fee;
-    if (total > senderCard.balance) return showMessage(msg, `Недостаточно средств (нужно ${formatAmount(total)} с комиссией)`, false);
+  const fee   = amount * 0.01;
+  const total = amount + fee;
+  if (total > senderCard.balance) return showMessage(msg, `Недостаточно средств (нужно ${formatAmount(total)} с комиссией)`, false);
 
-    database.ref('users').once('value').then(snap => {
-      let recipientUid = null, recipientCard = null, recipientData = null;
-      snap.forEach(child => {
-        const u = child.val();
-        if (u.cards) {
-          const found = u.cards.find(c => c.number.replace(/\s/g, '') === toCardRaw);
-          if (found) { recipientUid = child.key; recipientCard = found; recipientData = u; }
+  database.ref('users').once('value').then(snap => {
+    let recipientUid = null, recipientCard = null, recipientData = null;
+    
+    // Получаем все данные как объект
+    const users = snap.val();
+    if (!users) {
+      return showMessage(msg, 'Нет пользователей в системе', false);
+    }
+    
+    // Перебираем всех пользователей в объекте
+    for (const uid in users) {
+      const u = users[uid];
+      // Проверяем, что u.cards существует и является массивом
+      if (u && u.cards && Array.isArray(u.cards)) {
+        const found = u.cards.find(c => c && c.number && c.number.replace(/\s/g, '') === toCardRaw);
+        if (found) {
+          recipientUid = uid;
+          recipientCard = found;
+          recipientData = u;
+          break;
         }
-      });
+      }
+    }
 
-      if (!recipientUid) return showMessage(msg, 'Получатель не найден в системе DOROSpay', false);
-      if (recipientUid === currentUser.uid) return showMessage(msg, 'Самоперевод запрещён', false);
+    if (!recipientUid) return showMessage(msg, 'Получатель не найден в системе DOROSpay', false);
+    if (recipientUid === currentUser.uid) return showMessage(msg, 'Самоперевод запрещён', false);
 
-      senderCard.balance    -= total;
-      recipientCard.balance += amount;
+    // Находим индекс карты получателя
+    const recipientCardIndex = recipientData.cards.findIndex(c => c.number === recipientCard.number);
+    
+    senderCard.balance    -= total;
+    recipientData.cards[recipientCardIndex].balance += amount;
 
-      const outTx = { id: Date.now(),   type: 'transfer_out', amount, to: toCardRaw, fee, comment, timestamp: new Date().toISOString() };
-      const inTx  = { id: Date.now()+1, type: 'transfer_in',  amount, from: senderCard.number, comment, timestamp: new Date().toISOString() };
+    const outTx = { 
+      id: Date.now(),   
+      type: 'transfer_out', 
+      amount, 
+      to: toCardRaw, 
+      fee, 
+      comment, 
+      timestamp: new Date().toISOString() 
+    };
+    const inTx  = { 
+      id: Date.now()+1, 
+      type: 'transfer_in',  
+      amount, 
+      from: senderCard.number, 
+      comment, 
+      timestamp: new Date().toISOString() 
+    };
 
-      if (!userData.transactions)      userData.transactions      = [];
-      if (!recipientData.transactions) recipientData.transactions = [];
-      userData.transactions.unshift(outTx);
-      recipientData.transactions.unshift(inTx);
+    if (!userData.transactions)      userData.transactions      = [];
+    if (!recipientData.transactions) recipientData.transactions = [];
+    userData.transactions.unshift(outTx);
+    recipientData.transactions.unshift(inTx);
 
-      const updates = {};
-      updates[`users/${currentUser.uid}`] = userData;
-      updates[`users/${recipientUid}`]    = recipientData;
-      database.ref().update(updates).then(() => {
-        showMessage(msg, `✅ Переведено ${formatAmount(amount)} (комиссия ${formatAmount(fee)})`, true);
-        setTimeout(closeAllModals, 2000);
+    const updates = {};
+    updates[`users/${currentUser.uid}`] = userData;
+    updates[`users/${recipientUid}`]    = recipientData;
+    
+    database.ref().update(updates).then(() => {
+      showMessage(msg, `✅ Переведено ${formatAmount(amount)} (комиссия ${formatAmount(fee)})`, true);
+      setTimeout(() => { 
+        closeAllModals(); 
         updateUI();
-      }).catch(err => showMessage(msg, 'Ошибка: ' + err.message, false));
-    }).catch(() => showMessage(msg, 'Ошибка доступа к базе', false));
+        // Обновляем локальные данные
+        loadUserData(currentUser.uid);
+      }, 2000);
+    }).catch(err => {
+      console.error('Update error:', err);
+      showMessage(msg, 'Ошибка: ' + err.message, false);
+    });
+  }).catch(err => {
+    console.error('Read error:', err);
+    showMessage(msg, 'Ошибка доступа к базе: ' + err.message, false);
   });
+});
 
   // ===========================
   // QR-СКАНЕР
@@ -2010,56 +2053,95 @@
   }
 
   // Перевод по сканированному QR (логика сохранена)
-  document.getElementById('confirm-scan-transfer')?.addEventListener('click', () => {
-    const toCardRaw = document.getElementById('scan-recipient-card').value.replace(/\s/g, '');
-    const amount    = parseFloat(document.getElementById('scan-transfer-amount').value);
-    const pin       = document.getElementById('scan-transfer-pin').value;
-    const comment   = document.getElementById('scan-transfer-comment').value;
-    const msg       = document.getElementById('scan-transfer-message');
+document.getElementById('confirm-scan-transfer')?.addEventListener('click', () => {
+  const toCardRaw = document.getElementById('scan-recipient-card').value.replace(/\s/g, '');
+  const amount    = parseFloat(document.getElementById('scan-transfer-amount').value);
+  const pin       = document.getElementById('scan-transfer-pin').value;
+  const comment   = document.getElementById('scan-transfer-comment').value;
+  const msg       = document.getElementById('scan-transfer-message');
 
-    if (!toCardRaw || toCardRaw.length !== 16) return showMessage(msg, 'Ошибка карты', false);
-    if (!amount || amount <= 0) return showMessage(msg, 'Введите сумму', false);
+  if (!toCardRaw || toCardRaw.length !== 16) return showMessage(msg, 'Ошибка карты', false);
+  if (!amount || amount <= 0) return showMessage(msg, 'Введите сумму', false);
 
-    const senderCard = userCards[activeCardIndex];
-    if (pin !== senderCard.pin) return showMessage(msg, 'Неверный PIN', false);
+  const senderCard = userCards[activeCardIndex];
+  if (pin !== senderCard.pin) return showMessage(msg, 'Неверный PIN', false);
 
-    const fee   = amount * 0.01;
-    const total = amount + fee;
-    if (total > senderCard.balance) return showMessage(msg, `Недостаточно (нужно ${formatAmount(total)})`, false);
+  const fee   = amount * 0.01;
+  const total = amount + fee;
+  if (total > senderCard.balance) return showMessage(msg, `Недостаточно (нужно ${formatAmount(total)})`, false);
 
-    database.ref('users').once('value').then(snap => {
-      let recipientUid = null, recipientCard = null, recipientData = null;
-      snap.forEach(child => {
-        const u = child.val();
-        if (u.cards) {
-          const found = u.cards.find(c => c.number.replace(/\s/g, '') === toCardRaw);
-          if (found) { recipientUid = child.key; recipientCard = found; recipientData = u; }
+  database.ref('users').once('value').then(snap => {
+    let recipientUid = null, recipientCard = null, recipientData = null;
+    
+    const users = snap.val();
+    if (!users) {
+      return showMessage(msg, 'Нет пользователей в системе', false);
+    }
+    
+    for (const uid in users) {
+      const u = users[uid];
+      if (u && u.cards && Array.isArray(u.cards)) {
+        const found = u.cards.find(c => c && c.number && c.number.replace(/\s/g, '') === toCardRaw);
+        if (found) {
+          recipientUid = uid;
+          recipientCard = found;
+          recipientData = u;
+          break;
         }
-      });
+      }
+    }
 
-      if (!recipientUid) return showMessage(msg, 'Получатель не найден', false);
-      if (recipientUid === currentUser.uid) return showMessage(msg, 'Самоперевод запрещён', false);
+    if (!recipientUid) return showMessage(msg, 'Получатель не найден', false);
+    if (recipientUid === currentUser.uid) return showMessage(msg, 'Самоперевод запрещён', false);
 
-      senderCard.balance    -= total;
-      recipientCard.balance += amount;
+    const recipientCardIndex = recipientData.cards.findIndex(c => c.number === recipientCard.number);
+    
+    senderCard.balance    -= total;
+    recipientData.cards[recipientCardIndex].balance += amount;
 
-      const outTx = { id: Date.now(),   type: 'transfer_out', amount, to: toCardRaw, fee, comment, timestamp: new Date().toISOString() };
-      const inTx  = { id: Date.now()+1, type: 'transfer_in',  amount, from: senderCard.number, comment, timestamp: new Date().toISOString() };
+    const outTx = { 
+      id: Date.now(),   
+      type: 'transfer_out', 
+      amount, 
+      to: toCardRaw, 
+      fee, 
+      comment, 
+      timestamp: new Date().toISOString() 
+    };
+    const inTx  = { 
+      id: Date.now()+1, 
+      type: 'transfer_in',  
+      amount, 
+      from: senderCard.number, 
+      comment, 
+      timestamp: new Date().toISOString() 
+    };
 
-      if (!userData.transactions)      userData.transactions      = [];
-      if (!recipientData.transactions) recipientData.transactions = [];
-      userData.transactions.unshift(outTx);
-      recipientData.transactions.unshift(inTx);
+    if (!userData.transactions)      userData.transactions      = [];
+    if (!recipientData.transactions) recipientData.transactions = [];
+    userData.transactions.unshift(outTx);
+    recipientData.transactions.unshift(inTx);
 
-      const updates = {};
-      updates[`users/${currentUser.uid}`] = userData;
-      updates[`users/${recipientUid}`]    = recipientData;
-      database.ref().update(updates).then(() => {
-        showMessage(msg, `✅ Переведено ${formatAmount(amount)}`, true);
-        setTimeout(() => { closeAllModals(); updateUI(); }, 1500);
-      }).catch(err => showMessage(msg, err.message, false));
-    }).catch(err => showMessage(msg, err.message, false));
+    const updates = {};
+    updates[`users/${currentUser.uid}`] = userData;
+    updates[`users/${recipientUid}`]    = recipientData;
+    
+    database.ref().update(updates).then(() => {
+      showMessage(msg, `✅ Переведено ${formatAmount(amount)}`, true);
+      setTimeout(() => { 
+        closeAllModals(); 
+        updateUI();
+        loadUserData(currentUser.uid);
+      }, 1500);
+    }).catch(err => {
+      console.error('Update error:', err);
+      showMessage(msg, 'Ошибка: ' + err.message, false);
+    });
+  }).catch(err => {
+    console.error('Read error:', err);
+    showMessage(msg, 'Ошибка доступа к базе: ' + err.message, false);
   });
+});
 
   // ===========================
   // QR-ГЕНЕРАТОР
