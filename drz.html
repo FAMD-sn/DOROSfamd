@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dr. Zulfon · Medical AI Ecosystem</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style type="text/tailwindcss">
+        @theme {
+            --color-cyan: #06cdd4;
+            --color-blue-accent: #2563eb;
+            --color-bg-deep: #0a0c12;
+            --radius-xl: 32px;
+            --radius-2xl: 48px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0c12;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .syne { font-family: 'Syne', sans-serif; }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-cyan {
+            background: rgba(6, 205, 212, 0.05);
+            border: 1px solid rgba(6, 205, 212, 0.2);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(6, 205, 212, 0.3);
+            border-radius: 10px;
+        }
+
+        @keyframes orb-float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+
+        .orb {
+            animation: orb-float 10s infinite ease-in-out;
+        }
+
+        .tab-active {
+            background: white;
+            color: black;
+            box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+        }
+
+        .symptom-card.selected {
+            background: rgba(6, 205, 212, 0.1);
+            border-color: #06cdd4;
+            box-shadow: 0 0 20px rgba(6, 205, 212, 0.3);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <!-- Animated Orbs -->
+    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-accent/20 rounded-full blur-[120px] -z-10 orb"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan/15 rounded-full blur-[120px] -z-10 orb" style="animation-delay: -5s"></div>
+
+    <div class="max-w-6xl mx-auto space-y-8">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row items-center justify-between gap-6 glass rounded-2xl p-6 md:p-8 shadow-2xl">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-accent to-cyan rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg shadow-cyan/20">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black tracking-tighter" id="ui-title">Dr. Zulfon</h1>
+                    <p class="text-[10px] uppercase tracking-[0.3em] font-black text-cyan/70 mt-1" id="ui-subtitle">DOROSphere Medical AI Ecosystem</p>
+                </div>
+            </div>
+            
+            <!-- Language Switcher -->
+            <div class="flex items-center gap-2 bg-white/5 rounded-full p-1.5 border border-white/5">
+                <button onclick="setLanguage('ru')" class="lang-btn px-4 py-2 rounded-full text-[10px] font-black uppercase transition-all" id="btn-ru">РУ</button>
+                <button onclick="setLanguage('tj')" class="lang-btn px-4 py-2 rounded-full text-[10px] font-black uppercase transition-all" id="btn-tj">ТҶ</button>
+                <button onclick="setLanguage('en')" class="lang-btn px-4 py-2 rounded-full text-[10px] font-black uppercase transition-all" id="btn-en">EN</button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex justify-center bg-white/[0.02] border border-white/5 rounded-full p-1.5 max-w-sm mx-auto shadow-inner relative z-10">
+            <button onclick="switchTab('analyzer')" id="tab-analyzer" class="nav-tab flex-1 py-3 px-4 rounded-full text-[10px] font-black uppercase transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-stethoscope"></i> <span id="txt-analyzer">Анализ</span>
+            </button>
+            <button onclick="switchTab('chat')" id="tab-chat" class="nav-tab flex-1 py-3 px-4 rounded-full text-[10px] font-black uppercase transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-comments"></i> <span id="txt-chat">Чат ИИ</span>
+            </button>
+            <button onclick="switchTab('hub')" id="tab-hub" class="nav-tab flex-1 py-3 px-4 rounded-full text-[10px] font-black uppercase transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-heartbeat"></i> <span id="txt-hub">Хаб</span>
+            </button>
+        </nav>
+
+        <main>
+            <!-- ANALYZER TAB -->
+            <section id="pane-analyzer" class="tab-pane space-y-8">
+                <div id="analyzer-initial" class="glass rounded-[48px] p-8 md:p-14 space-y-12">
+                    <div class="text-center space-y-4">
+                        <h2 class="text-4xl md:text-5xl font-black tracking-tighter" id="txt-symptoms-title">Выберите симптомы</h2>
+                        <p class="text-gray-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed" id="txt-symptoms-desc">Укажите все жалобы для глубокого анализа вашего состояния.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="symptoms-grid">
+                        <!-- Symptoms injected by JS -->
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] ml-4" id="txt-additional">Дополнительные детали</label>
+                        <textarea id="additional-info" class="w-full bg-black/40 border border-white/10 rounded-[40px] p-8 focus:outline-none focus:border-cyan min-h-[160px] transition-all text-sm leading-relaxed shadow-inner" placeholder="..."></textarea>
+                    </div>
+
+                    <div class="flex justify-center pt-6">
+                        <button onclick="performAnalysis()" class="group flex items-center gap-5 bg-cyan text-black font-black py-6 px-16 rounded-full hover:scale-105 active:scale-95 transition-all shadow-[0_20px_50px_rgba(6,205,212,0.3)]">
+                            <i class="fas fa-microscope text-xl"></i> 
+                            <span class="tracking-tighter" id="txt-analyze-btn">АНАЛИЗИРОВАТЬ СОСТОЯНИЕ</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="analyzer-loading" class="hidden py-40 flex flex-col items-center gap-10">
+                    <div class="relative w-24 h-24 border-[6px] border-cyan/10 border-t-cyan rounded-full animate-spin"></div>
+                    <div class="text-center space-y-2">
+                        <h3 class="text-3xl font-black tracking-tighter" id="txt-loading">Доктор Зульфон анализирует...</h3>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="analyzer-results" class="hidden space-y-8 pb-20">
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <!-- Chart -->
+                        <div class="glass rounded-[48px] p-10 flex flex-col items-center justify-center">
+                            <h3 class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-10" id="txt-prob-title">Вероятность заболевания</h3>
+                            <div class="w-56 h-56 relative flex items-center justify-center">
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="112" cy="112" r="95" stroke="rgba(255,255,255,0.03)" stroke-width="18" fill="transparent"/>
+                                    <circle id="prob-ring" cx="112" cy="112" r="95" stroke="#06cdd4" stroke-width="18" fill="transparent" stroke-dasharray="596.9" stroke-dashoffset="596.9" class="transition-all duration-[1.5s] ease-out"/>
+                                </svg>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span class="text-6xl font-black" id="res-prob-val">0%</span>
+                                    <span class="text-[10px] text-gray-600 uppercase mt-2 font-black tracking-widest" id="txt-accuracy">Точность ИИ</span>
+                                </div>
+                            </div>
+                            <div id="res-urgency" class="mt-12 px-8 py-3 rounded-full text-[10px] font-black uppercase border tracking-widest">
+                                СТАТУС: ---
+                            </div>
+                        </div>
+
+                        <!-- Diagnosis Info -->
+                        <div class="lg:col-span-2 glass rounded-[48px] p-10 md:p-14 space-y-10">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-3xl font-black tracking-tighter" id="txt-profile">Профиль состояния</h3>
+                                <button onclick="resetAnalyzer()" class="text-[10px] font-black uppercase tracking-widest text-gray-600 hover:text-cyan flex items-center gap-2"><i class="fas fa-sync-alt"></i> <span id="txt-restart">Начать заново</span></button>
+                            </div>
+                            <div id="diagnosis-list" class="space-y-5">
+                                <!-- Cards injected here -->
+                            </div>
+                            <div class="p-8 rounded-[40px] glass-cyan flex gap-8 items-center shadow-xl">
+                                <div class="w-16 h-16 rounded-full bg-cyan/10 flex items-center justify-center text-cyan"><i class="fas fa-user-md text-3xl"></i></div>
+                                <div>
+                                    <p class="text-[10px] uppercase text-gray-600 font-black tracking-widest mb-1" id="txt-recommended">Рекомендованный специалист</p>
+                                    <p id="res-doctor" class="text-3xl font-black text-white">---</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medications -->
+                    <div class="glass rounded-[48px] p-8 md:p-14 space-y-14 shadow-2xl">
+                        <h3 class="text-3xl font-black tracking-tighter flex items-center gap-5"><i class="fas fa-pills text-cyan"></i> <span id="txt-meds">Терапевтические советы</span></h3>
+                        <div id="meds-grid" class="grid md:grid-cols-3 gap-8">
+                            <!-- Cards injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <div class="glass rounded-[56px] p-10 md:p-20 space-y-16 border-t-cyan/20">
+                        <div id="booking-form-area">
+                            <div class="text-center space-y-4 mb-14">
+                                <h3 class="text-4xl md:text-5xl font-black tracking-tighter" id="txt-book-title">Запись на консультацию</h3>
+                                <p class="text-gray-500 text-sm font-medium max-w-lg mx-auto" id="txt-book-desc">Заполните форму, и мы свяжемся с вами.</p>
+                            </div>
+                            <form onsubmit="handleBooking(event)" class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-end">
+                                <div class="space-y-4">
+                                    <label class="text-[10px] font-black text-gray-600 uppercase tracking-widest ml-4" id="txt-fname">Имя</label>
+                                    <input name="fname" type="text" required class="w-full bg-black/40 border border-white/10 rounded-full py-5 px-10 focus:outline-none focus:border-cyan text-sm transition-all">
+                                </div>
+                                <div class="space-y-4">
+                                    <label class="text-[10px] font-black text-gray-600 uppercase tracking-widest ml-4" id="txt-lname">Фамилия</label>
+                                    <input name="lname" type="text" required class="w-full bg-black/40 border border-white/10 rounded-full py-5 px-10 focus:outline-none focus:border-cyan text-sm transition-all">
+                                </div>
+                                <div class="space-y-4">
+                                    <label class="text-[10px] font-black text-gray-600 uppercase tracking-widest ml-4" id="txt-phone">Телефон</label>
+                                    <input name="phone" type="tel" required class="w-full bg-black/40 border border-white/10 rounded-full py-5 px-10 focus:outline-none focus:border-cyan text-sm transition-all" placeholder="+7...">
+                                </div>
+                                <div class="space-y-4">
+                                    <label class="text-[10px] font-black text-gray-600 uppercase tracking-widest ml-4" id="txt-spec">Специалист</label>
+                                    <select name="doctor" id="booking-doctor-select" class="w-full bg-black/40 border border-white/10 rounded-full py-5 px-10 focus:outline-none focus:border-cyan appearance-none text-sm transition-all text-gray-400">
+                                        <option value="">...</option>
+                                    </select>
+                                </div>
+                                <button type="submit" id="btn-submit-book" class="md:col-span-2 mt-6 bg-white text-black font-black py-7 px-14 rounded-full hover:bg-cyan hover:text-white transition-all transform active:scale-95 shadow-[0_20px_60px_rgba(255,255,255,0.1)] uppercase text-xs tracking-[0.3em]">
+                                    ПОДТВЕРДИТЬ ЗАПИСЬ
+                                </button>
+                            </form>
+                        </div>
+                        <div id="booking-success" class="hidden text-center space-y-8 animate-in zoom-in">
+                            <div class="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-green-500/30">
+                                <i class="fas fa-check text-4xl text-white"></i>
+                            </div>
+                            <h4 class="text-3xl font-black tracking-tighter" id="txt-sent-success">Заявка отправлена успешно!</h4>
+                            <button onclick="resetAnalyzer()" class="text-cyan font-black uppercase text-[10px] tracking-widest underline underline-offset-8 decoration-2" id="txt-restart-2">Начать заново</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CHAT TAB -->
+            <section id="pane-chat" class="tab-pane hidden">
+                <div class="glass rounded-[48px] p-8 min-h-[700px] flex flex-col shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-10 opacity-5 pointer-events-none text-cyan"><i class="fas fa-brain text-[250px]"></i></div>
+                    <div class="pb-8 mb-8 border-b border-white/5 relative z-10">
+                        <h3 class="text-3xl font-black tracking-tighter" id="txt-chat-title">Консультация Dr. Zulfon</h3>
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1" id="txt-chat-desc">Задайте любой медицинский вопрос в режиме реального времени.</p>
+                    </div>
+                    <div id="chat-messages" class="flex-1 overflow-y-auto space-y-6 pr-4 custom-scrollbar relative z-10">
+                        <!-- Messages -->
+                    </div>
+                    <form onsubmit="handleChatSubmit(event)" class="mt-10 flex gap-4 relative z-10">
+                        <input id="chat-input" type="text" class="flex-1 bg-black/50 border border-white/10 rounded-full py-6 px-10 text-sm font-medium focus:outline-none focus:border-cyan shadow-inner" placeholder="...">
+                        <button type="submit" class="w-20 h-20 rounded-full bg-cyan text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-[0_20px_40px_rgba(6,205,212,0.35)]"><i class="fas fa-paper-plane text-2xl"></i></button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- HUB TAB -->
+            <section id="pane-hub" class="tab-pane hidden grid md:grid-cols-2 gap-8 items-start">
+                <!-- BMI -->
+                <div class="glass rounded-[56px] p-10 md:p-14 space-y-12 shadow-2xl relative overflow-hidden group">
+                    <div class="absolute -top-10 -right-10 opacity-5 text-cyan transition-transform group-hover:scale-110 duration-700"><i class="fas fa-weight text-[180px]"></i></div>
+                    <h3 class="text-2xl font-black tracking-tighter flex items-center gap-4 relative z-10"><i class="fas fa-balance-scale text-cyan"></i> <span id="txt-bmi-title">Калькулятор ИМТ</span></h3>
+                    <div class="grid grid-cols-2 gap-8 relative z-10">
+                        <div class="space-y-4">
+                            <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-4" id="txt-weight">Вес (кг)</label>
+                            <input type="number" id="bmi-weight" class="w-full bg-black/40 border border-white/10 rounded-[32px] py-5 px-8 focus:border-cyan text-center text-xl font-black">
+                        </div>
+                        <div class="space-y-4">
+                            <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-4" id="txt-height">Рост (см)</label>
+                            <input type="number" id="bmi-height" class="w-full bg-black/40 border border-white/10 rounded-[32px] py-5 px-8 focus:border-cyan text-center text-xl font-black">
+                        </div>
+                    </div>
+                    <button onclick="calculateBMI()" class="w-full py-6 rounded-[32px] bg-cyan text-black font-black uppercase text-[10px] tracking-[0.3em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all relative z-10" id="txt-calculate">Рассчитать</button>
+                    <div id="bmi-result-area" class="hidden p-12 bg-white/5 rounded-[44px] text-center space-y-3 border border-white/5 relative z-10 shadow-inner">
+                        <p class="text-7xl font-black text-white" id="bmi-val">0</p>
+                        <p class="text-xs uppercase font-black tracking-[0.3em] text-cyan" id="bmi-category">---</p>
+                    </div>
+                </div>
+
+                <!-- Water -->
+                <div class="glass rounded-[56px] p-10 md:p-14 space-y-12 shadow-2xl relative overflow-hidden group">
+                    <div class="absolute -top-10 -right-10 opacity-5 text-cyan transition-transform group-hover:scale-110 duration-700"><i class="fas fa-tint text-[180px]"></i></div>
+                    <h3 class="text-2xl font-black tracking-tighter flex items-center gap-4 relative z-10"><i class="fas fa-droplet text-cyan"></i> <span id="txt-water-title">Трекер воды</span></h3>
+                    <div class="flex flex-col items-center justify-center space-y-12 p-8 relative z-10">
+                        <div class="relative w-56 h-56">
+                            <div class="absolute inset-0 border-[18px] border-white/5 rounded-full"></div>
+                            <div id="water-ring" class="absolute inset-0 border-[18px] border-cyan rounded-full border-t-transparent shadow-[0_0_40px_rgba(6,205,212,0.15)] transition-all duration-700"></div>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-5xl font-black"><span id="water-val">0</span> <span class="text-[10px] font-black text-gray-600 block tracking-[0.5em] mt-1 ml-2">ML</span></span>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-[0.4em] font-black" id="txt-water-goal">Цель: 2.0л</p>
+                    </div>
+                    <div class="flex gap-5 relative z-10">
+                        <button onclick="addWater(250)" class="flex-1 py-6 rounded-[32px] border-2 border-cyan/40 text-cyan font-black uppercase text-[10px] tracking-[0.3em] hover:bg-cyan hover:text-black transition-all shadow-xl active:scale-95" id="txt-add-water">Добавить 250мл</button>
+                        <button onclick="resetWater()" class="w-20 rounded-[32px] bg-white/[0.04] border border-white/10 text-gray-600 hover:text-red-500 transition-all flex items-center justify-center"><i class="fas fa-sync-alt text-2xl"></i></button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="pt-24 pb-16 border-t border-white/5 text-center mt-20 opacity-50 space-y-10">
+            <div class="flex flex-wrap items-center justify-center gap-x-16 gap-y-8 grayscale hover:grayscale-0 transition-all duration-700 font-bold overflow-hidden h-10">
+                <div class="syne text-2xl tracking-tighter">DOROSphere</div>
+                <div class="syne text-2xl tracking-tighter">DR.ZULFON</div>
+                <div class="syne text-2xl tracking-tighter">HEALTH_ID</div>
+                <div class="syne text-2xl tracking-tighter">CENTRAL_AI</div>
+            </div>
+            <div class="space-y-4">
+                <p class="text-[10px] uppercase tracking-[0.6em] text-gray-600 font-black">
+                    &copy; 2026 Integrated Medical Ecosystem · Tajik AI Alliance Submission
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="med-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div onclick="closeMedModal()" class="absolute inset-0 bg-black/95 backdrop-blur-2xl"></div>
+        <div class="relative bg-[#121620] border border-white/10 p-10 md:p-14 rounded-[64px] max-w-2xl w-full space-y-12 shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <div class="absolute top-0 right-0 p-14 opacity-5 text-cyan -rotate-12 pointer-events-none text-[150px]"><i class="fas fa-capsules"></i></div>
+            <div class="flex justify-between items-start relative z-10">
+                <div class="w-24 h-24 rounded-[36px] bg-cyan/10 flex items-center justify-center text-cyan shadow-xl shadow-cyan/10 ring-1 ring-cyan/20">
+                    <i class="fas fa-pills text-5xl"></i>
+                </div>
+                <button onclick="closeMedModal()" class="p-4 hover:bg-white/10 rounded-full text-gray-500 transition-all"><i class="fas fa-arrow-left text-3xl"></i></button>
+            </div>
+            <div class="space-y-6 relative z-10">
+                <h2 id="modal-med-name" class="text-5xl font-black tracking-tighter leading-none text-white">---</h2>
+                <div class="flex flex-wrap gap-4">
+                    <span id="modal-med-dosage" class="text-[10px] bg-cyan text-black px-6 py-2.5 rounded-full font-black uppercase tracking-[0.2em] shadow-lg shadow-cyan/20">---</span>
+                    <span id="modal-med-freq" class="text-[10px] border border-white/10 bg-white/5 px-6 py-2.5 rounded-full font-black uppercase tracking-[0.2em] text-gray-400">---</span>
+                </div>
+            </div>
+            <div class="space-y-6 relative z-10">
+                <label class="text-[10px] uppercase font-black text-gray-600 tracking-[0.4em] block ml-4">Medical Report</label>
+                <div id="modal-med-desc" class="bg-white/[0.03] p-10 rounded-[44px] text-gray-400 text-sm leading-relaxed border border-white/5 shadow-inner backdrop-blur-md">
+                    ---
+                </div>
+            </div>
+            <button onclick="closeMedModal()" class="w-full py-8 rounded-[36px] bg-white text-black font-black hover:bg-cyan hover:text-white transition-all uppercase tracking-[0.4em] text-[10px] relative z-10 shadow-2xl">
+                Close Report
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const TELEGRAM_BOT_TOKEN = '8875495232:AAF2hRRiPnxU_SB9WJHvIG5eKDgKcvnJ_Bw';
+        const TELEGRAM_CHAT_ID = '6379225282';
+
+        const SYMPTOMS_DATA = [
+            { id: 'cough', name: { ru: 'Кашель', tj: 'Сулфа', en: 'Cough' }, icon: 'fa-wind' },
+            { id: 'fever', name: { ru: 'Температура', tj: 'Табларза', en: 'Fever' }, icon: 'fa-thermometer-half' },
+            { id: 'headache', name: { ru: 'Головная боль', tj: 'Дарди сар', en: 'Headache' }, icon: 'fa-brain' },
+            { id: 'throat', name: { ru: 'Боль в горле', tj: 'Дарди гулӯ', en: 'Sore throat' }, icon: 'fa-virus-slash' },
+            { id: 'nausea', name: { ru: 'Тошнота', tj: 'Дилбеҳузурӣ', en: 'Nausea' }, icon: 'fa-stomach' },
+            { id: 'weakness', name: { ru: 'Слабость', tj: 'Беҳолӣ', en: 'Weakness' }, icon: 'fa-battery-quarter' },
+            { id: 'back', name: { ru: 'Боль в спине', tj: 'Дарди миён', en: 'Back pain' }, icon: 'fa-bone' },
+            { id: 'nose', name: { ru: 'Насморк', tj: 'Зуком', en: 'Runny nose' }, icon: 'fa-head-side-mask' },
+        ];
+
+        const TRANSLATIONS = {
+            ru: {
+                title: 'Dr. Zulfon',
+                subtitle: 'Медицинский ИИ экосистемы DOROSphere',
+                analyzer: 'Анализ',
+                chat: 'Чат ИИ',
+                hub: 'Хаб',
+                symptomsTitle: 'Выберите симптомы',
+                symptomsDesc: 'Укажите все жалобы для глубокого нейросетевого анализа вашего состояния.',
+                analyzeBtn: 'АНАЛИЗИРОВАТЬ СОСТОЯНИЕ',
+                chatTitle: 'Консультация Dr. Zulfon',
+                chatDesc: 'Задайте медицинский вопрос в режиме реального времени.',
+                hubTitle: 'Medical Hub',
+                hubDesc: 'Инструменты контроля здоровья',
+                bmiTitle: 'Калькулятор ИМТ',
+                waterTitle: 'Трекер воды',
+                appointmentTitle: 'Запись на консультацию',
+                appointmentDesc: 'Заполните форму, и мы свяжемся с вами.',
+                firstName: 'Имя',
+                lastName: 'Фамилия',
+                phone: 'Телефон',
+                specialist: 'Специалист',
+                bookBtn: 'ПОДТВЕРДИТЬ ЗАПИСЬ',
+                other: 'Другое',
+                additionalInfo: 'Дополнительные детали',
+                diagnoses: 'Профиль состояния',
+                urgency: 'СТАТУС',
+                medications: 'Терапевтические советы',
+                restart: 'Начать заново',
+                loading: 'Доктор Зульфон анализирует...',
+                chatPlaceholder: 'Спросите о здоровье...',
+                weight: 'Вес (кг)',
+                height: 'Рост (см)',
+                calculate: 'Рассчитать',
+                waterGoal: 'Цель: 2.0л',
+                addWater: 'Добавить 250мл',
+                recommended: 'Рекомендованный специалист',
+                probTitle: 'Вероятность заболевания',
+                accuracy: 'Точность ИИ',
+                bmiCats: ['Дефицит веса', 'Норма', 'Избыток веса', 'Ожирение'],
+                medBtn: 'Подробнее',
+                sentSuccess: 'Заявка отправлена успешно!',
+                sending: 'Отправка...'
+            },
+            tj: {
+                title: 'Dr. Zulfon',
+                subtitle: 'Интеллекти сунъии тиббии DOROSphere',
+                analyzer: 'Таҳлил',
+                chat: 'Чат бо ИС',
+                hub: 'Марказ',
+                symptomsTitle: 'Аломатҳоро интихоб кунед',
+                symptomsDesc: 'Ҳамаи шикоятҳои худро барои таҳлили амиқи вазъияти саломатиатон нишон диҳед.',
+                analyzeBtn: 'ТАҲЛИЛИ ВАЗЪИЯТ',
+                chatTitle: 'Машварати Dr. Zulfon',
+                chatDesc: 'Ҳар гуна саволи тиббиро дар вақти воқеӣ пурсед.',
+                hubTitle: 'Маркази саломатӣ',
+                hubDesc: 'Асбобҳо барои назорати саломатӣ',
+                bmiTitle: 'Ҳисобкунаки ИМТ',
+                waterTitle: 'Назорати об',
+                appointmentTitle: 'Номнавис шудан',
+                appointmentDesc: 'Шаклро пур кунед ва мо бо шумо тамос мегирем.',
+                firstName: 'Ном',
+                lastName: 'Насаб',
+                phone: 'Телефон',
+                specialist: 'Мутахассис',
+                bookBtn: 'ТАСДИҚИ ҚАБУЛ',
+                other: 'Дигар',
+                additionalInfo: 'Тафсилоти иловагӣ',
+                diagnoses: 'Натиҷаи таҳлил',
+                urgency: 'ҲОЛАТ',
+                medications: 'Тавсияҳои табобатӣ',
+                restart: 'Аз нав сар кардан',
+                loading: 'Доктор Зулфон таҳлил карда истодааст...',
+                chatPlaceholder: 'Дар бораи саломатӣ пурсед...',
+                weight: 'Вазн (кг)',
+                height: 'Қад (см)',
+                calculate: 'Ҳисоб кардан',
+                waterGoal: 'Ҳадаф: 2.0л',
+                addWater: 'Иловаи 250мл',
+                recommended: 'Мутахассиси тавсияшуда',
+                probTitle: 'Эҳтимолияти беморӣ',
+                accuracy: 'Нишондиҳандаи дақиқӣ',
+                bmiCats: ['Вазни кам', 'Муътадил', 'Вазни зиёд', 'Фарбеҳӣ'],
+                medBtn: 'Муфассал',
+                sentSuccess: 'Дархост бомуваффақият фиристода шуд!',
+                sending: 'Фиристода истодаем...'
+            },
+            en: {
+                title: 'Dr. Zulfon',
+                subtitle: 'DOROSphere Medical AI Ecosystem',
+                analyzer: 'Analyze',
+                chat: 'AI Chat',
+                hub: 'Hub',
+                symptomsTitle: 'Select Symptoms',
+                symptomsDesc: 'Identify all symptoms for a deep neural analysis of your health status.',
+                analyzeBtn: 'ANALYZE HEALTH STATUS',
+                chatTitle: 'Consult Dr. Zulfon',
+                chatDesc: 'Ask any medical question in real-time.',
+                hubTitle: 'Health Hub',
+                hubDesc: 'Health monitoring tools',
+                bmiTitle: 'BMI Calculator',
+                waterTitle: 'Water Tracker',
+                appointmentTitle: 'Book Appointment',
+                appointmentDesc: 'Fill out the form and we will contact you.',
+                firstName: 'First Name',
+                lastName: 'Last Name',
+                phone: 'Phone',
+                specialist: 'Specialist',
+                bookBtn: 'CONFIRM BOOKING',
+                other: 'Other',
+                additionalInfo: 'Additional Details',
+                diagnoses: 'Health Profile',
+                urgency: 'STATUS',
+                medications: 'Therapy Advice',
+                restart: 'Start Over',
+                loading: 'Dr. Zulfon is analyzing...',
+                chatPlaceholder: 'Ask anything about health...',
+                weight: 'Weight (kg)',
+                height: 'Height (cm)',
+                calculate: 'Calculate',
+                waterGoal: 'Goal: 2.0L',
+                addWater: 'Add 250ml',
+                recommended: 'Recommended Specialist',
+                probTitle: 'Disease Probability',
+                accuracy: 'AI Accuracy',
+                bmiCats: ['Underweight', 'Normal', 'Overweight', 'Obesity'],
+                medBtn: 'Details',
+                sentSuccess: 'Request sent successfully!',
+                sending: 'Sending...'
+            }
+        };
+
+        const DOCTOR_OPTIONS = ['Терапевт', 'Кардиолог', 'ЛОР', 'Невролог', 'Окулист', 'Хирург', 'Педиатр'];
+
+        // --- STATE ---
+        let lang = localStorage.getItem('dz_lang') || 'ru';
+        let selectedSymptoms = new Set();
+        let waterVal = parseInt(localStorage.getItem('dz_water')) || 0;
+
+        // --- APP LOGIC ---
+        function setLanguage(l) {
+            lang = l;
+            localStorage.setItem('dz_lang', l);
+            updateUI();
+        }
+
+        function updateUI() {
+            const t = TRANSLATIONS[lang];
+            
+            // Texts
+            document.getElementById('ui-title').innerText = t.title;
+            document.getElementById('ui-subtitle').innerText = t.subtitle;
+            document.getElementById('txt-analyzer').innerText = t.analyzer;
+            document.getElementById('txt-chat').innerText = t.chat;
+            document.getElementById('txt-hub').innerText = t.hub;
+            document.getElementById('txt-symptoms-title').innerText = t.symptomsTitle;
+            document.getElementById('txt-symptoms-desc').innerText = t.symptomsDesc;
+            document.getElementById('txt-analyze-btn').innerText = t.analyzeBtn;
+            document.getElementById('txt-chat-title').innerText = t.chatTitle;
+            document.getElementById('txt-chat-desc').innerText = t.chatDesc;
+            document.getElementById('txt-hub-title-in')?.innerText || (document.getElementById('txt-bmi-title').innerText = t.bmiTitle);
+            document.getElementById('txt-water-title').innerText = t.waterTitle;
+            document.getElementById('txt-book-title').innerText = t.appointmentTitle;
+            document.getElementById('txt-book-desc').innerText = t.appointmentDesc;
+            document.getElementById('txt-fname').innerText = t.firstName;
+            document.getElementById('txt-lname').innerText = t.lastName;
+            document.getElementById('txt-phone').innerText = t.phone;
+            document.getElementById('txt-spec').innerText = t.specialist;
+            document.getElementById('btn-submit-book').innerText = t.bookBtn;
+            document.getElementById('txt-additional').innerText = t.additionalInfo;
+            document.getElementById('txt-profile').innerText = t.diagnoses;
+            document.getElementById('txt-restart').innerText = t.restart;
+            document.getElementById('txt-restart-2').innerText = t.restart;
+            document.getElementById('txt-loading').innerText = t.loading;
+            document.getElementById('txt-prob-title').innerText = t.probTitle;
+            document.getElementById('txt-accuracy').innerText = t.accuracy;
+            document.getElementById('txt-recommended').innerText = t.recommended;
+            document.getElementById('txt-meds').innerText = t.medications;
+            document.getElementById('chat-input').placeholder = t.chatPlaceholder;
+            document.getElementById('txt-weight').innerText = t.weight;
+            document.getElementById('txt-height').innerText = t.height;
+            document.getElementById('txt-calculate').innerText = t.calculate;
+            document.getElementById('txt-water-goal').innerText = t.waterGoal;
+            document.getElementById('txt-add-water').innerText = t.addWater;
+            document.getElementById('txt-sent-success').innerText = t.sentSuccess;
+
+            // Buttons Highlight
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('bg-cyan', 'text-black'));
+            document.getElementById('btn-' + lang).classList.add('bg-cyan', 'text-black');
+
+            // Re-render symptoms names
+            renderSymptoms();
+            
+            // Re-render select options
+            const select = document.getElementById('booking-doctor-select');
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">...</option>';
+            DOCTOR_OPTIONS.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.innerText = d;
+                if(d === currentVal) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function renderSymptoms() {
+            const grid = document.getElementById('symptoms-grid');
+            grid.innerHTML = '';
+            SYMPTOMS_DATA.forEach(s => {
+                const card = document.createElement('button');
+                const isSelected = selectedSymptoms.has(s.id);
+                card.className = `relative p-6 rounded-[32px] border transition-all duration-500 flex flex-col items-center gap-4 text-center overflow-hidden symptom-card ${isSelected ? 'selected' : 'bg-white/[0.02] border-white/5 hover:border-white/20'}`;
+                card.innerHTML = `
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isSelected ? 'text-cyan bg-cyan/10' : 'text-gray-600 bg-white/5'}">
+                        <i class="fas ${s.icon} text-2xl"></i>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-widest ${isSelected ? 'text-white' : 'text-gray-500'}">${s.name[lang]}</span>
+                    ${isSelected ? '<div class="absolute top-4 right-4 text-cyan"><i class="fas fa-check-circle"></i></div>' : ''}
+                `;
+                card.onclick = () => {
+                    if(selectedSymptoms.has(s.id)) selectedSymptoms.delete(s.id);
+                    else selectedSymptoms.add(s.id);
+                    renderSymptoms();
+                };
+                grid.appendChild(card);
+            });
+
+            // "Other" button
+            const other = document.createElement('button');
+            other.className = "p-6 rounded-[32px] border border-dashed border-white/10 flex flex-col items-center justify-center gap-4 text-gray-700 hover:text-gray-500 transition-all";
+            other.innerHTML = `
+                <div class="w-14 h-14 border border-dashed border-gray-800 rounded-2xl flex items-center justify-center"><i class="fas fa-plus"></i></div>
+                <span class="text-[10px] uppercase font-black tracking-widest">${TRANSLATIONS[lang].other}</span>
+            `;
+            other.onclick = () => document.getElementById('additional-info').focus();
+            grid.appendChild(other);
+        }
+
+        function switchTab(t) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+            document.getElementById('pane-' + t).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('tab-active'));
+            document.getElementById('tab-' + t).classList.add('tab-active');
+        }
+
+        async function performAnalysis() {
+            if(selectedSymptoms.size === 0 && !document.getElementById('additional-info').value) {
+                alert("Please select symptoms or describe state");
+                return;
+            }
+
+            document.getElementById('analyzer-initial').classList.add('hidden');
+            document.getElementById('analyzer-loading').classList.remove('hidden');
+
+            const symps = Array.from(selectedSymptoms).map(id => SYMPTOMS_DATA.find(x => x.id === id).name[lang]).join(', ');
+            const extra = document.getElementById('additional-info').value;
+
+            const prompt = `Ты — Dr.Zulfon. Пациент говорит на языке: ${lang}. Симптомы: ${symps}. Детали: ${extra}. Ответь СТРОГО в JSON на языке пациента: 
+            {
+                "diagnoses": [{"name": "Болезнь", "probability": 90, "description": "описание"}],
+                "recommended_doctor": "Специалист",
+                "urgency": "Срочно/Планово",
+                "medications": [{"name": "Препарат", "dosage": "500мг", "frequency": "1 раз", "description": "детали", "image_url": "https://dummyimage.com/300x200/06cdd4/ffffff&text=Med"}]
+            }`;
+
+            try {
+                const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);
+                const text = await res.text();
+                const jsonText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const data = JSON.parse(jsonText);
+                showAnalyzerResults(data);
+            } catch(e) {
+                console.error(e);
+                alert("AI error. Check connection.");
+                resetAnalyzer();
+            }
+        }
+
+        function showAnalyzerResults(data) {
+            document.getElementById('analyzer-loading').classList.add('hidden');
+            document.getElementById('analyzer-results').classList.remove('hidden');
+
+            const mainProb = data.diagnoses[0].probability;
+            document.getElementById('res-prob-val').innerText = mainProb + '%';
+            
+            const ring = document.getElementById('prob-ring');
+            const dash = 596.9;
+            ring.style.strokeDashoffset = dash - (mainProb / 100) * dash;
+
+            const urgEl = document.getElementById('res-urgency');
+            urgEl.innerText = `${TRANSLATIONS[lang].urgency}: ${data.urgency.toUpperCase()}`;
+            if(data.urgency.toLowerCase().includes('срочно')) {
+                urgEl.className = "mt-12 px-8 py-3 rounded-full text-[10px] font-black uppercase border border-red-500/30 bg-red-500/10 text-red-500 animate-pulse tracking-widest";
+            } else {
+                urgEl.className = "mt-12 px-8 py-3 rounded-full text-[10px] font-black uppercase border border-white/10 bg-white/5 text-gray-400 tracking-widest";
+            }
+
+            const diagList = document.getElementById('diagnosis-list');
+            diagList.innerHTML = '';
+            data.diagnoses.forEach(d => {
+                const card = document.createElement('div');
+                card.className = "p-8 rounded-[40px] bg-white/[0.02] border border-white/5";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-black text-xl tracking-tight text-white border-b-2 border-cyan/20 pb-1">${d.name}</span>
+                        <span class="text-sm font-black text-cyan font-mono">${d.probability}%</span>
+                    </div>
+                    <p class="text-sm text-gray-500 leading-relaxed font-medium">${d.description}</p>
+                `;
+                diagList.appendChild(card);
+            });
+
+            document.getElementById('res-doctor').innerText = data.recommended_doctor;
+            
+            // Sync doctor select
+            const select = document.getElementById('booking-doctor-select');
+            for(let opt of select.options) {
+                if(opt.value === data.recommended_doctor) opt.selected = true;
+            }
+
+            const medGrid = document.getElementById('meds-grid');
+            medGrid.innerHTML = '';
+            data.medications.forEach(m => {
+                const card = document.createElement('div');
+                card.className = "group bg-white/[0.02] border border-white/5 rounded-[40px] overflow-hidden flex flex-col transition-all hover:bg-white/[0.04]";
+                card.innerHTML = `
+                    <div class="h-44 overflow-hidden relative">
+                        <img src="${m.image_url}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#0a0c12]/60 to-transparent"></div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col space-y-5">
+                        <h4 class="font-black text-xl leading-tight">${m.name}</h4>
+                        <div class="flex-1 space-y-3 text-xs text-gray-500 font-bold">
+                            <p><i class="fas fa-info-circle text-cyan/60 mr-2"></i> ${m.dosage}</p>
+                            <p><i class="fas fa-clock text-cyan/60 mr-2"></i> ${m.frequency}</p>
+                        </div>
+                        <button onclick='openMedModal(${JSON.stringify(m).replace(/'/g, "&apos;")})' class="w-full py-5 rounded-[24px] bg-white/5 border border-white/10 text-[10px] font-black text-cyan uppercase tracking-[0.2em] hover:bg-cyan hover:text-black transition-all">
+                            ${TRANSLATIONS[lang].medBtn}
+                        </button>
+                    </div>
+                `;
+                medGrid.appendChild(card);
+            });
+        }
+
+        function resetAnalyzer() {
+            selectedSymptoms.clear();
+            document.getElementById('additional-info').value = '';
+            document.getElementById('analyzer-initial').classList.remove('hidden');
+            document.getElementById('analyzer-results').classList.add('hidden');
+            document.getElementById('analyzer-loading').classList.add('hidden');
+            document.getElementById('booking-success').classList.add('hidden');
+            document.getElementById('booking-form-area').classList.remove('hidden');
+            renderSymptoms();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function handleBooking(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-book');
+            btn.innerText = TRANSLATIONS[lang].sending;
+            btn.disabled = true;
+
+            const fd = new FormData(e.target);
+            const msg = `🏥 ЗАПИСЬ (Dr. Zulfon)\n\nПациент: ${fd.get('fname')} ${fd.get('lname')}\nТел: ${fd.get('phone')}\nВрач: ${fd.get('doctor')}`;
+
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg })
+                });
+                if(res.ok) {
+                    document.getElementById('booking-form-area').classList.add('hidden');
+                    document.getElementById('booking-success').classList.remove('hidden');
+                } else throw new Error();
+            } catch(err) {
+                alert("Booking failed.");
+                btn.innerText = TRANSLATIONS[lang].bookBtn;
+                btn.disabled = false;
+            }
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const container = document.getElementById('chat-messages');
+            const val = input.value.trim();
+            if(!val) return;
+
+            input.value = '';
+            
+            // Add User Message
+            addChatMessage('user', val);
+
+            // AI Response
+            const prompt = `Ты — Dr. Zulfon (Medical AI). Отвечай четко и по делу на языке: ${lang}. Вопрос: ${val}`;
+            
+            try {
+                const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);
+                const answer = await res.text();
+                addChatMessage('assistant', answer);
+            } catch(err) {
+                addChatMessage('assistant', 'Error connecting to brain core.');
+            }
+        }
+
+        function addChatMessage(role, content) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `flex gap-5 max-w-[88%] ${role === 'user' ? 'ml-auto flex-row-reverse' : ''} animate-in fade-in slide-in-from-bottom-5`;
+            div.innerHTML = `
+                <div class="w-12 h-12 rounded-[18px] flex items-center justify-center shrink-0 shadow-lg ${role === 'assistant' ? 'bg-cyan text-black' : 'bg-white/10 text-white'}">
+                    <i class="fas ${role === 'assistant' ? 'fa-brain' : 'fa-user-astronaut'}"></i>
+                </div>
+                <div class="p-6 rounded-[32px] text-sm leading-relaxed font-medium shadow-md ${role === 'assistant' ? 'bg-white/5 border border-white/5 text-gray-300' : 'bg-cyan/20 border border-cyan/30 text-white'}">
+                    ${content}
+                </div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function calculateBMI() {
+            const w = parseFloat(document.getElementById('bmi-weight').value);
+            const h = parseFloat(document.getElementById('bmi-height').value) / 100;
+            if(w && h) {
+                const bmi = (w / (h * h)).toFixed(1);
+                document.getElementById('bmi-val').innerText = bmi;
+                document.getElementById('bmi-result-area').classList.remove('hidden');
+                
+                let cat = '';
+                if(bmi < 18.5) cat = TRANSLATIONS[lang].bmiCats[0];
+                else if(bmi < 25) cat = TRANSLATIONS[lang].bmiCats[1];
+                else if(bmi < 30) cat = TRANSLATIONS[lang].bmiCats[2];
+                else cat = TRANSLATIONS[lang].bmiCats[3];
+                document.getElementById('bmi-category').innerText = cat;
+            }
+        }
+
+        function addWater(ml) {
+            waterVal += ml;
+            localStorage.setItem('dz_water', waterVal);
+            updateWaterUI();
+        }
+
+        function resetWater() {
+            waterVal = 0;
+            localStorage.setItem('dz_water', 0);
+            updateWaterUI();
+        }
+
+        function updateWaterUI() {
+            document.getElementById('water-val').innerText = waterVal;
+            const target = 2000;
+            const progress = Math.min((waterVal / target) * 100, 100);
+            // Invert progress for CSS ring logic if needed, but simple display is fine
+        }
+
+        function openMedModal(m) {
+            document.getElementById('modal-med-name').innerText = m.name;
+            document.getElementById('modal-med-dosage').innerText = m.dosage;
+            document.getElementById('modal-med-freq').innerText = m.frequency;
+            document.getElementById('modal-med-desc').innerText = m.description || "Consult specialist.";
+            document.getElementById('med-modal').classList.remove('hidden');
+        }
+
+        function closeMedModal() {
+            document.getElementById('med-modal').classList.add('hidden');
+        }
+
+        // Init
+        switchTab('analyzer');
+        updateUI();
+        updateWaterUI();
+    </script>
+</body>
+</html>
