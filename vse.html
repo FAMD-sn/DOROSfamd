@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>DOROSfamd — Умная экосистема будущего</title>
+    <meta name="description" content="Персонализированная платформа с играми, ИИ-помощниками и инструментами. Абсолютная безопасность и релевантные рекомендации.">
+    <meta name="keywords" content="DOROSfamd, безопасность, игры, ИИ, экосистема, защита данных">
+    <meta name="author" content="DOROSfamd Team">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://dorosfamd.com/logof.png" type="image/png">
+    
+    <style>
+        /* ===== MODERN DESIGN SYSTEM ===== */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --primary-50: #eef2ff;
+            --primary-100: #e0e7ff;
+            --primary-200: #c7d2fe;
+            --primary-300: #a5b4fc;
+            --primary-400: #818cf8;
+            --primary-500: #6366f1;
+            --primary-600: #4f46e5;
+            --primary-700: #4338ca;
+            --primary-800: #3730a3;
+            --primary-900: #312e81;
+            --neutral-50: #fafafa;
+            --neutral-100: #f5f5f5;
+            --neutral-200: #e5e5e5;
+            --neutral-300: #d4d4d4;
+            --neutral-400: #a3a3a3;
+            --neutral-500: #737373;
+            --neutral-600: #525252;
+            --neutral-700: #404040;
+            --neutral-800: #262626;
+            --neutral-900: #171717;
+            --bg-primary: var(--neutral-50);
+            --bg-secondary: #ffffff;
+            --text-primary: var(--neutral-900);
+            --text-secondary: var(--neutral-600);
+            --text-tertiary: var(--neutral-400);
+            --border-light: var(--neutral-200);
+            --border-medium: var(--neutral-300);
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+            --space-16: 64px;
+            --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-2xl: 32px;
+            --radius-full: 9999px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --header-height: 80px;
+            --bottom-nav-height: 70px;
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-smooth: 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: var(--neutral-900);
+            --bg-secondary: var(--neutral-800);
+            --text-primary: var(--neutral-50);
+            --text-secondary: var(--neutral-300);
+            --text-tertiary: var(--neutral-400);
+            --border-light: var(--neutral-700);
+            --border-medium: var(--neutral-600);
+        }
+        
+        [data-color-scheme="indigo"] { --primary-500: #6366f1; --primary-600: #4f46e5; --primary-400: #818cf8; }
+        [data-color-scheme="emerald"] { --primary-500: #10b981; --primary-600: #059669; --primary-400: #34d399; }
+        [data-color-scheme="violet"] { --primary-500: #8b5cf6; --primary-600: #7c3aed; --primary-400: #a78bfa; }
+        [data-color-scheme="sky"] { --primary-500: #0ea5e9; --primary-600: #0284c7; --primary-400: #38bdf8; }
+        [data-color-scheme="rose"] { --primary-500: #f43f5e; --primary-600: #e11d48; --primary-400: #fb7185; }
+        [data-color-scheme="amber"] { --primary-500: #f59e0b; --primary-600: #d97706; --primary-400: #fbbf24; }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding-bottom: var(--bottom-nav-height);
+            transition: background-color var(--transition-base);
+        }
+
+        /* Анимированный фон с частицами */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(244, 63, 94, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(16, 185, 129, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gradientShift 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes gradientShift {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.08); }
+        }
+        
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.4;
+            animation: floatParticle 20s infinite linear;
+        }
+        
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+        }
+        
+        /* ===== ФИРМЕННЫЙ АНИМИРОВАННЫЙ КУРСОР ===== */
+        .custom-cursor {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.05));
+            backdrop-filter: blur(2px);
+            border: 2px solid var(--primary-500);
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: width 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), height 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), background 0.2s;
+            animation: cursorGlow 2s infinite;
+        }
+        
+        .custom-cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: var(--primary-500);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--primary-500);
+        }
+        
+        .custom-cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.5);
+            border-radius: 50%;
+            animation: cursorRing 1.5s infinite;
+        }
+        
+        @keyframes cursorGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.8); }
+        }
+        
+        @keyframes cursorRing {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+        
+        .custom-cursor.hover {
+            width: 56px;
+            height: 56px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3), rgba(99, 102, 241, 0.08));
+            border-color: var(--primary-400);
+        }
+        
+        .custom-cursor.hover::before {
+            width: 8px;
+            height: 8px;
+            box-shadow: 0 0 12px var(--primary-400);
+        }
+        
+        /* Скрываем стандартный курсор */
+        a, button, .project-card, .interest-chip, .nav-item, .icon-btn, .pin-button, .service-link, 
+        .top-trigger, .security-trigger, .scroll-to-top, .search-result-item {
+            cursor: none;
+        }
+        
+        /* ===== TYPOGRAPHY ===== */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        
+        .display-1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600), var(--primary-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% auto;
+            animation: textShine 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes textShine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-4);
+        }
+        
+        .section {
+            padding: var(--space-16) 0;
+            position: relative;
+        }
+        
+        .text-center { text-align: center; }
+        .mb-4 { margin-bottom: var(--space-4); }
+        .mb-8 { margin-bottom: var(--space-8); }
+        .mb-12 { margin-bottom: var(--space-12); }
+        
+        /* ===== HEADER ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            z-index: 1000;
+            transition: all var(--transition-base);
+        }
+        [data-theme="dark"] .header {
+            background: rgba(38, 38, 38, 0.8);
+        }
+        .header.scrolled { 
+            box-shadow: var(--shadow-lg);
+            background: rgba(var(--bg-secondary-rgb), 0.9);
+        }
+        .header-container { display: flex; flex-direction: column; padding: 0 var(--space-4); }
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: var(--header-height);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            transition: transform var(--transition-smooth);
+        }
+        .logo:hover { transform: scale(1.02); }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: url('https://dorosfamd.com/logof.png') center/cover no-repeat, var(--gradient-1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center; justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: all var(--transition-bounce);
+        }
+        .logo:hover .logo-icon { 
+            transform: rotate(180deg) scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+        .header-actions { display: flex; gap: var(--space-2); }
+        .icon-btn {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-full);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .icon-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--primary-500);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+            z-index: -1;
+        }
+        .icon-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        .icon-btn:hover {
+            color: white;
+            transform: translateY(-2px) scale(1.05);
+            border-color: var(--primary-500);
+        }
+        
+        /* Interests Bar */
+        .interests-bar {
+            display: flex;
+            gap: var(--space-2);
+            overflow-x: auto;
+            padding: var(--space-2) 0 var(--space-4);
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-500) var(--border-light);
+        }
+        .interests-bar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .interests-bar::-webkit-scrollbar-track {
+            background: var(--border-light);
+            border-radius: var(--radius-full);
+        }
+        .interests-bar::-webkit-scrollbar-thumb {
+            background: var(--primary-500);
+            border-radius: var(--radius-full);
+        }
+        .interest-chip {
+            padding: var(--space-2) var(--space-4);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            display: inline-flex; align-items: center; gap: var(--space-2);
+            position: relative;
+            overflow: hidden;
+        }
+        .interest-chip::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .interest-chip:hover::before { left: 100%; }
+        .interest-chip:hover { 
+            border-color: var(--primary-500); 
+            color: var(--primary-500);
+            transform: translateY(-2px);
+        }
+        .interest-chip.active { 
+            background: var(--primary-500); 
+            border-color: var(--primary-500); 
+            color: white;
+            box-shadow: 0 4px 12px rgba(var(--primary-500), 0.3);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: var(--bottom-nav-height);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-light);
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 0 var(--space-4);
+            z-index: 1000;
+        }
+        [data-theme="dark"] .bottom-nav {
+            background: rgba(38, 38, 38, 0.9);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: var(--space-1);
+            text-decoration: none; color: var(--text-tertiary);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-full);
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+        .nav-item i { font-size: 1.3rem; transition: transform var(--transition-fast); }
+        .nav-item span { font-size: 0.7rem; font-weight: 500; }
+        .nav-item:hover i { transform: translateY(-3px); }
+        .nav-item.active { color: var(--primary-500); background: rgba(var(--primary-500), 0.1); }
+        
+        /* ===== HERO SECTION ===== */
+        .hero {
+            padding-top: calc(var(--header-height) + 40px);
+            padding-bottom: var(--space-16);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: var(--space-2);
+            background: rgba(var(--primary-500), 0.1);
+            color: var(--primary-500);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            font-weight: 500; margin-bottom: var(--space-4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--primary-500), 0.2);
+            animation: badgePulse 2s infinite;
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(var(--primary-500), 0.2); }
+            50% { box-shadow: 0 0 0 8px rgba(var(--primary-500), 0); }
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-8);
+            margin-top: var(--space-8);
+            flex-wrap: wrap;
+        }
+        .stat-item { 
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        .stat-item:nth-child(1) { animation-delay: 0.1s; }
+        .stat-item:nth-child(2) { animation-delay: 0.2s; }
+        .stat-item:nth-child(3) { animation-delay: 0.3s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stat-number { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            color: var(--primary-500); 
+            line-height: 1;
+            transition: all var(--transition-smooth);
+        }
+        .stat-item:hover .stat-number {
+            transform: scale(1.1);
+            text-shadow: 0 0 10px rgba(var(--primary-500), 0.5);
+        }
+        .stat-label { font-size: 0.9rem; color: var(--text-secondary); }
+        
+        /* Floating buttons */
+        .security-trigger, .top-trigger, .scroll-to-top {
+            transition: all var(--transition-bounce);
+            cursor: pointer;
+            z-index: 900;
+            position: fixed;
+            border: 2px solid white;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+        }
+        
+        .security-trigger {
+            bottom: 90px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            animation: floatButton 3s ease-in-out infinite;
+        }
+        
+        .top-trigger {
+            bottom: 160px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            color: white;
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            animation: floatButton 3s ease-in-out infinite 0.5s;
+        }
+        
+        .scroll-to-top {
+            bottom: 230px;
+            right: 20px;
+            background: var(--bg-secondary);
+            color: var(--primary-500);
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        @keyframes floatButton {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .security-trigger:hover, .top-trigger:hover {
+            transform: scale(1.12) rotate(8deg);
+            background: var(--primary-700);
+            box-shadow: 0 8px 30px rgba(99,102,241,0.6);
+        }
+        
+        .scroll-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        .scroll-to-top:hover {
+            transform: translateY(-5px) scale(1.1);
+            background: var(--primary-500);
+            color: white;
+        }
+        
+        @media (min-width: 769px) {
+            .security-trigger { bottom: 30px; }
+            .top-trigger { bottom: 100px; }
+            .scroll-to-top { bottom: 170px; }
+        }
+        
+        /* ===== PROJECTS GRID ===== */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: var(--space-6);
+            margin: var(--space-8) 0;
+        }
+        .project-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            position: relative;
+            transition: all var(--transition-smooth);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            animation: cardAppear 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+            opacity: 0; transform: translateY(30px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: var(--shadow-sm);
+        }
+        @keyframes cardAppear { 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-2xl);
+            border-color: var(--primary-500);
+        }
+        .project-card.pinned { 
+            border: 2px solid var(--primary-500); 
+            box-shadow: 0 0 0 4px rgba(var(--primary-500), 0.2);
+            background: linear-gradient(145deg, var(--bg-secondary), rgba(var(--primary-500), 0.02));
+        }
+        .pin-button {
+            position: absolute; top: var(--space-4); right: var(--space-4);
+            width: 36px; height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            color: var(--text-tertiary);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all var(--transition-fast);
+            z-index: 10;
+        }
+        .pin-button:hover { 
+            background: var(--primary-500); 
+            border-color: var(--primary-500); 
+            color: white; 
+            transform: scale(1.15) rotate(45deg);
+        }
+        .pin-button.pinned { 
+            background: var(--primary-500); 
+            border-color: var(--primary-500); 
+            color: white; 
+            transform: rotate(45deg);
+        }
+        .project-icon {
+            width: 56px; height: 56px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem; margin-bottom: var(--space-4);
+            transition: all var(--transition-smooth);
+        }
+        .project-card:hover .project-icon { 
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(var(--primary-500), 0.3);
+        }
+        .project-title { 
+            font-size: 1.3rem; 
+            font-weight: 700; 
+            margin-bottom: var(--space-2); 
+            color: var(--text-primary); 
+            padding-right: 40px;
+            transition: color var(--transition-fast);
+        }
+        .project-card:hover .project-title { color: var(--primary-500); }
+        .project-categories { display: flex; flex-wrap: wrap; gap: var(--space-1); margin-bottom: var(--space-3); }
+        .project-category-tag { 
+            font-size: 0.7rem; 
+            padding: 2px 8px; 
+            background: rgba(var(--primary-500), 0.1); 
+            color: var(--primary-500); 
+            border-radius: var(--radius-full); 
+            font-weight: 600;
+            transition: all var(--transition-fast);
+        }
+        .project-card:hover .project-category-tag {
+            background: rgba(var(--primary-500), 0.2);
+        }
+        .project-description { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: var(--space-4); line-height: 1.6; flex-grow: 1; }
+        .project-footer { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-4); border-top: 1px solid var(--border-light); margin-top: auto; }
+        .project-link { 
+            display: inline-flex; align-items: center; gap: var(--space-2); 
+            color: var(--primary-500); text-decoration: none; font-weight: 600; 
+            font-size: 0.95rem; transition: all var(--transition-fast);
+        }
+        .project-link:hover { gap: var(--space-3); letter-spacing: 0.3px; }
+        .match-indicator { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--primary-500); font-weight: 600; }
+        
+        /* ===== MODALS ===== */
+        .modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+            padding: var(--space-4);
+            opacity: 0; visibility: hidden;
+            transition: all var(--transition-base);
+        }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: scale(0.95) translateY(20px);
+            transition: all var(--transition-bounce);
+            box-shadow: var(--shadow-2xl);
+            border: 1px solid rgba(var(--primary-500), 0.2);
+        }
+        .modal.active .modal-content { transform: scale(1) translateY(0); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: var(--space-4);
+        }
+        .modal-header h2 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-tertiary);
+            transition: all var(--transition-fast);
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-modal:hover {
+            color: var(--primary-500);
+            background: rgba(var(--primary-500), 0.1);
+            transform: rotate(90deg);
+        }
+        
+        /* Модальное окно ТОПа */
+        .top-modal .modal-content { max-width: 500px; }
+        .top-services-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            max-height: 55vh;
+            overflow-y: auto;
+            padding-right: var(--space-2);
+        }
+        .top-service-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-3) var(--space-4);
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-fast);
+            border: 1px solid var(--border-light);
+            animation: slideIn 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .top-service-item:nth-child(1) { animation-delay: 0.05s; }
+        .top-service-item:nth-child(2) { animation-delay: 0.1s; }
+        .top-service-item:nth-child(3) { animation-delay: 0.15s; }
+        .top-service-item:hover {
+            transform: translateX(5px) scale(1.01);
+            border-color: var(--primary-500);
+            background: linear-gradient(90deg, var(--bg-primary), rgba(var(--primary-500), 0.05));
+        }
+        .top-service-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            flex-grow: 1;
+        }
+        .top-service-rank {
+            font-weight: 800;
+            font-size: 1.3rem;
+            width: 45px;
+            color: var(--primary-500);
+        }
+        .top-service-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        .top-service-count {
+            background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+            color: var(--primary-700);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        
+        /* Модальное окно поиска */
+        .search-modal .modal-content { max-width: 550px; }
+        .search-input-wrapper {
+            position: relative;
+            margin-bottom: var(--space-4);
+        }
+        .search-icon {
+            position: absolute;
+            left: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+        .search-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-3) var(--space-3) var(--space-8);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-full);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(var(--primary-500), 0.1);
+        }
+        .search-results-list {
+            max-height: 55vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+        .search-result-item {
+            padding: var(--space-3);
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            animation: fadeInUp 0.3s ease-out forwards;
+        }
+        .search-result-item:hover {
+            border-color: var(--primary-500);
+            transform: translateX(5px);
+            background: linear-gradient(90deg, var(--bg-primary), rgba(var(--primary-500), 0.05));
+        }
+        .search-result-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+        .search-result-info {
+            flex-grow: 1;
+        }
+        .search-result-title {
+            font-weight: 700;
+            margin-bottom: var(--space-1);
+            color: var(--text-primary);
+        }
+        .search-result-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .no-results {
+            text-align: center;
+            padding: var(--space-8);
+            color: var(--text-secondary);
+        }
+        
+        /* Модальное окно безопасности */
+        .security-modal .modal-content {
+            background: linear-gradient(145deg, var(--neutral-800), var(--neutral-900));
+            color: white;
+            border: 2px solid var(--primary-500);
+        }
+        .security-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            margin: var(--space-6) 0;
+        }
+        .security-card {
+            background: rgba(255,255,255,0.08);
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all var(--transition-fast);
+        }
+        .security-card:hover {
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.12);
+            border-color: var(--primary-500);
+        }
+        .security-card i { font-size: 2.5rem; color: var(--primary-400); margin-bottom: var(--space-2); }
+        .security-card h4 { font-size: 1.1rem; margin-bottom: var(--space-1); }
+        .security-card p { font-size: 0.8rem; opacity: 0.8; }
+        
+        /* Кнопки */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius-full);
+            font-weight: 600; font-size: 1rem;
+            border: none; cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+        .btn:hover::before {
+            width: 300%;
+            height: 300%;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            color: white;
+            box-shadow: 0 4px 15px rgba(var(--primary-500), 0.3);
+        }
+        .btn-primary:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 25px rgba(var(--primary-500), 0.4);
+        }
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+        }
+        .btn-secondary:hover { border-color: var(--primary-500); color: var(--primary-500); transform: translateY(-2px); }
+        .btn-block { width: 100%; }
+        
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-6);
+        }
+        .feature-card {
+            text-align: center;
+            padding: var(--space-8) var(--space-6);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--border-light);
+            transition: all var(--transition-smooth);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(var(--primary-500), 0.05), transparent);
+            transition: left 0.6s;
+        }
+        .feature-card:hover::before { left: 100%; }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-500);
+            box-shadow: var(--shadow-xl);
+        }
+        .feature-icon {
+            width: 80px; height: 80px;
+            margin: 0 auto var(--space-4);
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            border-radius: var(--radius-xl);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 2rem;
+            transition: all var(--transition-smooth);
+        }
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 10px 30px rgba(var(--primary-500), 0.3);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: var(--space-12) 0;
+            margin-top: var(--space-16);
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-8);
+            margin-bottom: var(--space-8);
+        }
+        .footer-links { display: flex; flex-direction: column; gap: var(--space-2); }
+        .footer-link { color: var(--text-secondary); text-decoration: none; transition: all var(--transition-fast); }
+        .footer-link:hover { color: var(--primary-500); transform: translateX(5px); }
+        .footer-bottom { text-align: center; padding-top: var(--space-8); border-top: 1px solid var(--border-light); color: var(--text-tertiary); font-size: 0.9rem; }
+
+        /* Interests Grid in Modal */
+        .interests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-2);
+            margin-bottom: var(--space-6);
+            max-height: 400px;
+            overflow-y: auto;
+            padding: var(--space-2);
+        }
+        .interest-checkbox {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+        }
+        .interest-checkbox:hover {
+            border-color: var(--primary-500);
+            background: rgba(var(--primary-500), 0.05);
+            transform: translateX(3px);
+        }
+        .interest-checkbox input[type="checkbox"] {
+            accent-color: var(--primary-500);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .interest-checkbox label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        .interest-checkbox i {
+            color: var(--primary-500);
+            width: 20px;
+        }
+
+        /* Settings */
+        .settings-group {
+            margin-bottom: var(--space-6);
+        }
+        .settings-group label {
+            display: block;
+            margin-bottom: var(--space-2);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .settings-select {
+            width: 100%;
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all var(--transition-fast);
+        }
+        .settings-select:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 2px rgba(var(--primary-500), 0.2);
+        }
+
+        /* Live counter */
+        .live-counter {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            margin-left: var(--space-2);
+        }
+        .live-counter i {
+            font-size: 0.6rem;
+            animation: livePulse 1.5s infinite;
+        }
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--border-light);
+            border-radius: var(--radius-full);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-500);
+            border-radius: var(--radius-full);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-600);
+        }
+        
+        @media (max-width: 768px) {
+            .header-top { height: 60px; }
+            .hero { padding-top: calc(60px + 20px); }
+            .projects-grid { grid-template-columns: 1fr; }
+            .security-grid { grid-template-columns: 1fr; }
+            .interests-grid { grid-template-columns: 1fr; }
+            .top-service-info { gap: var(--space-2); }
+            .top-service-rank { width: 35px; font-size: 1rem; }
+            .top-service-name { font-size: 0.85rem; }
+            .security-trigger, .top-trigger, .scroll-to-top {
+                transform: scale(0.9);
+            }
+        }
+        @media (min-width: 769px) { 
+            body { padding-bottom: 0; } 
+            .bottom-nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Фирменный курсор -->
+    <div class="custom-cursor" id="customCursor"></div>
+    
+    <!-- Floating particles -->
+    <div id="particles"></div>
+    
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container header-container">
+            <div class="header-top">
+                <a href="#" class="logo">
+                    <div class="logo-icon" style="background: url('https://dorosfamd.com/logof.png') center/cover no-repeat, linear-gradient(135deg, #667eea, #764ba2);"></div>
+                    <span>DOROSfamd</span>
+                </a>
+                <div class="header-actions">
+                    <button class="icon-btn" id="searchBtn"><i class="fas fa-search"></i></button>
+                    <button class="icon-btn" id="settingsBtn"><i class="fas fa-sliders-h"></i></button>
+                </div>
+            </div>
+            <div class="interests-bar" id="interestsBar"></div>
+        </div>
+    </header>
+
+    <!-- Кнопки -->
+    <div class="security-trigger" id="securityTrigger" title="Кибербезопасность"><i class="fas fa-shield-halved"></i></div>
+    <div class="top-trigger" id="topTrigger" title="ТОП сервисов"><i class="fas fa-trophy"></i></div>
+    <div class="scroll-to-top" id="scrollToTopBtn" title="Наверх"><i class="fas fa-arrow-up"></i></div>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-badge">
+                    <i class="fas fa-crown"></i><span>Экосистема премиум-класса</span>
+                    <span class="live-counter"><i class="fas fa-circle"></i> 1000+ онлайн</span>
+                </div>
+                
+                <h1 class="display-1 mb-4">
+                    Цифровая экосистема нового поколения
+                </h1>
+                <p class="h4 text-secondary mb-8" style="max-width: 700px; margin-left: auto; margin-right: auto;">
+                    DOROSfamd — одна система вместо сотни приложений.
+                </p>
+                
+                <a href="https://dorosfamd.com/onas" id="aboutMainBtn" class="btn btn-primary" style="padding: var(--space-3) var(--space-10);">О нас</a>
+                
+                <div class="hero-stats">
+                    <div class="stat-item"><div class="stat-number">100+</div><div class="stat-label">Проектов</div></div>
+                    <div class="stat-item"><div class="stat-number">9</div><div class="stat-label">Категорий</div></div>
+                    <div class="stat-item"><div class="stat-number">12</div><div class="stat-label">Сфер</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="section" id="projects">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-8); flex-wrap: wrap; gap: var(--space-4);">
+                    <h2 class="h2">Рекомендованные проекты</h2>
+                    <button class="btn btn-secondary" id="openInterestsBtn"><i class="fas fa-sliders-h"></i><span>Настроить интересы</span></button>
+                </div>
+                <div class="projects-grid" id="projectsGrid"></div>
+                <div style="text-align: center; margin-top: var(--space-12);">
+                    <a href="https://dorosfamd.com/dfapp" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i><span>Скачать полное приложение</span></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="section">
+            <div class="container">
+                <h2 class="h2 text-center mb-12">Почему выбирают DOROSfamd</h2>
+                <div class="features-grid">
+                    <div class="feature-card"><div class="feature-icon"><i class="fas fa-brain"></i></div><h3 class="h4 mb-3">ИИ-рекомендации</h3><p class="text-secondary">Точно под ваш профиль, без лишнего шума</p></div>
+                    <div class="feature-card"><div class="feature-icon"><i class="fas fa-rocket"></i></div><h3 class="h4 mb-3">Мгновенный доступ</h3><p class="text-secondary">Никаких установок — все в браузере</p></div>
+                    <div class="feature-card"><div class="feature-icon"><i class="fas fa-magic"></i></div><h3 class="h4 mb-3">Приватность по умолчанию</h3><p class="text-secondary">Ваши данные не покидают устройство</p></div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div><div class="logo mb-4"><div class="logo-icon" style="background: url('https://dorosfamd.com/logof.png') center/cover no-repeat, linear-gradient(135deg, #667eea, #764ba2);"></div><span>DOROSfamd</span></div><p class="text-secondary">Будущее уже здесь</p></div>
+                    <div class="footer-links"><h4>О проекте</h4><a href="https://dorosfamd.com/onas" id="aboutFooterBtn" class="footer-link">О нас</a><a href="https://www.instagram.com/dorosfamd/?g=5" class="footer-link">Блог</a><a href="https://t.me/dorosfamd" class="footer-link">Вакансии</a></div>
+                    <div class="footer-links"><h4>Поддержка</h4><a href="mailto:dorosfamd@gmail.com" class="footer-link">Связаться</a><a href="https://t.me/dorosfamd" class="footer-link">FAQ</a><a href="#" class="footer-link" id="termsBtn">Условия</a></div>
+                </div>
+                <div class="footer-bottom"><p>© 2026 DOROSfamd. Все права защищены.</p></div>
+            </div>
+        </footer>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active"><i class="fas fa-home"></i><span>Главная</span></a>
+        <a href="#projects" class="nav-item"><i class="fas fa-th-large"></i><span>Проекты</span></a>
+        <a href="#" class="nav-item" id="mobileSearchBtn"><i class="fas fa-search"></i><span>Поиск</span></a>
+        <a href="#" class="nav-item" id="mobileInterestsBtn"><i class="fas fa-sliders-h"></i><span>Интересы</span></a>
+    </nav>
+
+    <!-- Modals -->
+    <div class="modal" id="interestsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ваши интересы</h2>
+                <button class="close-modal" id="closeInterestsModal">&times;</button>
+            </div>
+            <p>Отметьте то, что вам близко. Это поможет нам подбирать проекты.</p>
+            <div class="interests-grid" id="interestsGrid"></div>
+            <button class="btn btn-primary btn-block" id="saveInterestsBtn"><i class="fas fa-check"></i> Сохранить</button>
+        </div>
+    </div>
+
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Настройки</h2>
+                <button class="close-modal" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="settings-group">
+                <label for="colorScheme">Цветовая схема</label>
+                <select id="colorScheme" class="settings-select">
+                    <option value="indigo">Индиго</option>
+                    <option value="emerald">Изумрудная</option>
+                    <option value="violet">Фиолетовая</option>
+                    <option value="sky">Небесная</option>
+                    <option value="rose">Розовая</option>
+                    <option value="amber">Янтарная</option>
+                </select>
+            </div>
+            <div class="settings-group">
+                <label for="theme">Тема</label>
+                <select id="theme" class="settings-select">
+                    <option value="light">Светлая</option>
+                    <option value="dark">Тёмная</option>
+                </select>
+            </div>
+            <button class="btn btn-primary btn-block" id="saveSettingsBtn">Сохранить</button>
+        </div>
+    </div>
+
+    <div class="modal search-modal" id="searchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-search"></i> Поиск сервисов</h2>
+                <button class="close-modal" id="closeSearchModal">&times;</button>
+            </div>
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Введите название сервиса..." id="searchInput">
+            </div>
+            <div id="searchResultsList" class="search-results-list">
+                <div class="no-results">✨ Начните вводить текст для поиска</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal top-modal" id="topModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-trophy"></i> 🔥 ТОП сервисов</h2>
+                <button class="close-modal" id="closeTopModal">&times;</button>
+            </div>
+            <div id="topServicesList" class="top-services-list">
+                <div class="no-results"><i class="fas fa-spinner fa-pulse"></i> Загрузка рейтинга...</div>
+            </div>
+            <div style="margin-top: var(--space-4); text-align: center; font-size: 0.75rem; color: var(--text-tertiary);">
+                <i class="fas fa-chart-line"></i> Рейтинг обновляется автоматически
+            </div>
+        </div>
+    </div>
+
+    <div class="modal security-modal" id="securityModal">
+        <div class="modal-content">
+            <div style="text-align: center; margin-bottom: var(--space-6);">
+                <i class="fas fa-shield-halved" style="font-size: 4rem; color: var(--primary-400);"></i>
+                <h2 style="color: white; margin-top: var(--space-2);">Кибербезопасность</h2>
+                <p style="color: rgba(255,255,255,0.7);">Максимальный уровень защиты — абсолютная приватность</p>
+            </div>
+            <div class="security-grid">
+                <div class="security-card"><i class="fas fa-lock"></i><h4>AES-256</h4><p>Шифрование военного уровня</p></div>
+                <div class="security-card"><i class="fas fa-eye-slash"></i><h4>Zero-логи</h4><p>Мы не храним ваши данные</p></div>
+                <div class="security-card"><i class="fas fa-shield-halved"></i><h4>DDoS-защита</h4><p>Стабильность 24/7</p></div>
+                <div class="security-card"><i class="fas fa-user-secret"></i><h4>Анонимность</h4><p>Никакой слежки</p></div>
+                <div class="security-card"><i class="fas fa-code"></i><h4>Анти-XSS</h4><p>Защита от скриптов</p></div>
+                <div class="security-card"><i class="fas fa-database"></i><h4>Децентрализация</h4><p>Данные только у вас</p></div>
+            </div>
+            <button class="btn btn-primary btn-block" id="closeSecurityModal">Понятно, спасибо</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== КОНФИГУРАЦИЯ =====
+        // ⚠️ ЗАМЕНИТЕ НА ВАШ РЕАЛЬНЫЙ URL ⚠️
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyYmb1mg68jXdSbrfFmo209vmVUIuRof_xOtVVJMIyxX-CJsDkz1WyT2_O7OysYrZVr/exec';
+        
+        // ===== ЧАСТИЦЫ =====
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 4 + 2;
+                particle.style.cssText = `
+                    position: fixed;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: rgba(99, 102, 241, ${Math.random() * 0.3});
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    animation-duration: ${Math.random() * 15 + 10}s;
+                    animation-delay: ${Math.random() * 10}s;
+                `;
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // ===== КУРСОР =====
+        const cursor = document.getElementById('customCursor');
+        if (cursor) {
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+            
+            const hoverElements = document.querySelectorAll('a, button, .project-card, .interest-chip, .nav-item, .icon-btn, .pin-button, .service-link, .top-trigger, .security-trigger, .scroll-to-top, .search-result-item');
+            hoverElements.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+            });
+        }
+        
+        // ===== ФУНКЦИИ ДЛЯ РАБОТЫ С GAS =====
+        async function trackServiceVisit(serviceId, serviceTitle) {
+            try {
+                fetch(`${GAS_URL}?action=track&id=${encodeURIComponent(serviceId)}&title=${encodeURIComponent(serviceTitle)}&_=${Date.now()}`, {
+                    method: 'GET',
+                    mode: 'cors'
+                }).catch(() => {});
+            } catch (error) {}
+        }
+
+        async function fetchTopServices() {
+            const topContainer = document.getElementById('topServicesList');
+            if (!topContainer) return;
+            topContainer.innerHTML = '<div class="no-results"><i class="fas fa-spinner fa-pulse"></i> Загрузка рейтинга...</div>';
+            try {
+                const response = await fetch(`${GAS_URL}?action=getTop&_=${Date.now()}`, { method: 'GET', mode: 'cors' });
+                const data = await response.json();
+                if (data && data.status === 'success' && data.data && data.data.length > 0) {
+                    renderTopServices(data.data);
+                } else {
+                    topContainer.innerHTML = '<div class="no-results"><i class="fas fa-chart-simple"></i> Пока нет данных. Нажмите на любой сервис!</div>';
+                }
+            } catch (error) {
+                topContainer.innerHTML = '<div class="no-results"><i class="fas fa-exclamation-triangle"></i> Ошибка загрузки. Проверьте подключение.</div>';
+            }
+        }
+        
+        function renderTopServices(servicesArray) {
+            const topContainer = document.getElementById('topServicesList');
+            if (!topContainer) return;
+            if (!servicesArray || servicesArray.length === 0) {
+                topContainer.innerHTML = '<div class="no-results">Нет данных для отображения</div>';
+                return;
+            }
+            let html = '';
+            servicesArray.forEach((service, index) => {
+                const rank = index + 1;
+                let rankIcon = '';
+                if (rank === 1) rankIcon = '🥇';
+                else if (rank === 2) rankIcon = '🥈';
+                else if (rank === 3) rankIcon = '🥉';
+                else rankIcon = `${rank}.`;
+                html += `
+                    <div class="top-service-item" style="animation-delay: ${index * 0.05}s">
+                        <div class="top-service-info">
+                            <div class="top-service-rank">${rankIcon}</div>
+                            <div class="top-service-name">${escapeHtml(service.title)}</div>
+                        </div>
+                        <div class="top-service-count">👁️ ${service.count}</div>
+                    </div>
+                `;
+            });
+            topContainer.innerHTML = html;
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // ===== ИНТЕРЕСЫ =====
+        const interestsList = [
+            { id: 'student', label: 'Ученик', icon: 'fa-graduation-cap' },
+            { id: 'business', label: 'Бизнесмен', icon: 'fa-briefcase' },
+            { id: 'teacher', label: 'Преподаватель', icon: 'fa-chalkboard-teacher' },
+            { id: 'minor', label: 'Несовершеннолетний', icon: 'fa-child' },
+            { id: 'adult', label: 'Совершеннолетний', icon: 'fa-user' },
+            { id: 'artist', label: 'Художник', icon: 'fa-paint-brush' },
+            { id: 'author', label: 'Писатель', icon: 'fa-pencil-alt' },
+            { id: 'creative', label: 'Творческая личность', icon: 'fa-lightbulb' },
+            { id: 'gamer', label: 'Геймер', icon: 'fa-gamepad' },
+            { id: 'developer', label: 'Разработчик', icon: 'fa-code' },
+            { id: 'musician', label: 'Музыкант', icon: 'fa-music' },
+            { id: 'photographer', label: 'Фотограф', icon: 'fa-camera' }
+        ];
+
+        // ===== ПРОЕКТЫ =====
+        const projects = [
+            // НОВЫЕ ПРОЕКТЫ (Добавленные)
+            { id: 'addmarket', title: 'AddMarket', description: 'Панель для добавления товаров в Fmarket', icon: 'fas fa-cart-plus', categories: ['business', 'tools', 'new'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/addmarket', badge: 'НОВОЕ' },
+            { id: 'ai_online', title: 'AI Online', description: 'Универсальный ИИ на любую тему: пиши, спрашивай, анализируй', icon: 'fas fa-robot', categories: ['tools', 'new', 'education'], interests: ['student', 'teacher', 'developer', 'business'], url: 'https://dorosfamd.com/ai_online', badge: 'ИИ' },
+            { id: 'FAMDflag', title: 'FAMDflag', description: 'Угадай страну по вопросам — география в увлекательной форме', icon: 'fas fa-flag', categories: ['games', 'education', 'new'], interests: ['student', 'gamer', 'teacher'], url: 'https://dorosfamd.com/FAMDflag', badge: 'КВИЗ' },
+            { id: 'FAMDlearn', title: 'FAMDlearn', description: 'Видеоуроки по алгебре 5-11 класс. Проходи темы и получай сертификаты!', icon: 'fas fa-graduation-cap', categories: ['education', 'new'], interests: ['student', 'teacher'], url: 'https://dorosfamd.com/FAMDlearn', badge: 'ОБУЧЕНИЕ' },
+            { id: 'fmarket', title: 'Fmarket', description: 'Маркетплейс от FAMD. Покупай и продавай с безопасной сделкой', icon: 'fas fa-store', categories: ['business', 'new'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/fmarket', badge: 'МАРКЕТ' },
+            { id: 'shash', title: 'Shash', description: 'Классические шашки с разными уровнями сложности', icon: 'fas fa-chess-board', categories: ['games', 'new'], interests: ['gamer', 'student', 'adult'], url: 'https://dorosfamd.com/shash', badge: 'ЛОГИКА' },
+            { id: 'losyash', title: 'Losyash Library', description: 'Библиотека Лосяша из Смешариков. Введи тему (Природа, Космос) и узнай новое!', icon: 'fas fa-book-open', categories: ['education', 'entertainment', 'new'], interests: ['minor', 'student', 'teacher'], url: 'https://dorosfamd.com/losyash', badge: 'ДЕТЯМ' },
+            
+            // Существующие проекты (для полноты списка)
+            { id: 'famdria', title: 'FAMDria', description: 'Песочница в стиле Terraria: строй, сражайся, исследуй', icon: 'fas fa-tree', categories: ['games','new'], interests: ['gamer','minor','creative'], url: 'https://dorosfamd.com/famdria', badge: 'НОВОЕ' },
+            { id: 'learnai', title: 'LearnAI', description: 'ИИ-решатель школьных и студенческих задач', icon: 'fas fa-robot', categories: ['education','new'], interests: ['student','teacher','developer'], url: 'https://dorosfamd.com/learnai', badge: 'ИИ' },
+            { id: 'phone_d', title: 'Phone Detector', description: 'Для учителей: следит за камерами, оповещает о телефонах', icon: 'fas fa-mobile-alt', categories: ['tools','education','new'], interests: ['teacher','business'], url: 'https://dorosfamd.com/phone_d', badge: 'ДЕТЕКТОР' },
+            { id: 'prib', title: 'QR-Прибытие', description: 'Ученик сканирует QR на входе — автоматическая отметка', icon: 'fas fa-qrcode', categories: ['education','tools','new'], interests: ['teacher','student'], url: 'https://dorosfamd.com/prib', badge: 'УЧЁТ' },
+            { id: 'simulator_zhizn', title: 'Симулятор Жизни', description: 'Развивай логику: принимай решения и строй судьбу', icon: 'fas fa-heart', categories: ['games','education','new'], interests: ['gamer','minor','student','creative'], url: 'https://dorosfamd.com/simulator_zhizn', badge: 'ЛОГИКА' },
+            { id: 'snake', title: 'Snake', description: 'Классическая змейка с современной графикой', icon: 'fas fa-utensils', categories: ['games','new'], interests: ['gamer','minor','student'], url: 'https://dorosfamd.com/snake', badge: 'АРКАДА' },
+            { id: 'asassin', title: 'Assassin Circles', description: 'Аркада на реакцию: уничтожай кругляшки', icon: 'fas fa-bullseye', categories: ['games','new'], interests: ['gamer','minor','student'], url: 'https://dorosfamd.com/asassin', badge: 'ЭКШН' },
+            { id: 'doroobeat', title: 'DOROSbeat', description: 'Создание музыки и битов с профессиональным интерфейсом', icon: 'fas fa-music', categories: ['new', 'creative'], interests: ['musician', 'creative', 'artist'], url: 'https://dorosfamd.com/beat', badge: 'НОВОЕ' },
+            { id: 'dorosfile', title: 'DOROSfile', description: 'Конвертер файлов с поддержкой 50+ форматов', icon: 'fas fa-file-export', categories: ['new', 'tools'], interests: ['business', 'developer', 'teacher'], url: 'https://dorosfamd.com/file', badge: 'НОВОЕ' },
+            { id: 'doroscub', title: 'DOROScub', description: 'Динамичная игра с прыгающим кубиком', icon: 'fas fa-cube', categories: ['new', 'games'], interests: ['gamer', 'minor', 'student'], url: 'https://dorosfamd.com/cub', badge: 'НОВОЕ' },
+            { id: 'dorosris', title: 'DOROSris', description: 'Продвинутый графический редактор для художников', icon: 'fas fa-paint-brush', categories: ['new', 'creative'], interests: ['artist', 'creative', 'photographer'], url: 'https://dorosfamd.com/ris', badge: 'НОВОЕ' },
+            { id: 'famdstock', title: 'FAMDstock', description: 'Биржевой монитор в реальном времени', icon: 'fas fa-chart-line', categories: ['new', 'business'], interests: ['business', 'adult', 'developer'], url: 'https://dorosfamd.com/akci.html', badge: 'АКЦИИ' },
+            { id: 'chessfamd', title: 'ChessFAMD', description: 'Классические шахматы с элегантным интерфейсом', icon: 'fas fa-chess-queen', categories: ['new', 'games'], interests: ['gamer', 'student', 'teacher'], url: 'https://dorosfamd.com/chees.html', badge: 'ЛОГИКА' },
+            { id: 'famdcoin', title: 'FAMDcoin', description: 'Крипто-кошелек и обменник от FAMD', icon: 'fas fa-coins', categories: ['new', 'business'], interests: ['business', 'adult', 'developer'], url: 'https://dorosfamd.com/coin.html', badge: 'КРИПТО' },
+            { id: 'photocollage', title: 'PhotoCollage', description: 'Простой и стильный конструктор коллажей', icon: 'fas fa-images', categories: ['new', 'creative'], interests: ['photographer', 'artist', 'creative'], url: 'https://dorosfamd.com/collage.html', badge: 'ТВОРЧЕСТВО' },
+            { id: 'gta2dclassic', title: 'GTA2D Classic', description: 'Двумерная версия культовой игры с открытым миром', icon: 'fas fa-car', categories: ['new', 'games'], interests: ['gamer', 'minor', 'student'], url: 'https://dorosfamd.com/GTA2d.html', badge: 'НОСТАЛЬГИЯ' },
+            { id: 'numberguess', title: 'NumberGuess', description: 'Игра с ботом: угадай число', icon: 'fas fa-question-circle', categories: ['new', 'games'], interests: ['gamer', 'student', 'minor'], url: 'https://dorosfamd.com/number.html', badge: 'ГОЛОВОЛОМКА' },
+            { id: 'imagetolink', title: 'ImageToLink', description: 'Загрузи фото и получи прямую ссылку', icon: 'fas fa-link', categories: ['new', 'tools'], interests: ['developer', 'student', 'photographer'], url: 'https://dorosfamd.com/picurl.html', badge: 'УТИЛИТА' },
+            { id: 'dorosaper', title: 'DOROSaper', description: 'Классический сапёр с улучшениями', icon: 'fas fa-bomb', categories: ['new', 'games'], interests: ['gamer', 'minor', 'student'], url: 'https://dorosfamd.com/saper', badge: 'НОВОЕ' },
+            { id: 'dorostransport', title: 'DOROStransport', description: 'Игра с различными видами транспорта', icon: 'fas fa-car', categories: ['new', 'games'], interests: ['gamer', 'minor', 'student'], url: 'https://dorosfamd.com/transport', badge: 'НОВОЕ' },
+            { id: 'skysiege', title: 'SkySiege', description: 'Аркадная физическая игра, запускай птиц', icon: 'fas fa-dove', categories: ['new', 'games'], interests: ['gamer', 'minor', 'student'], url: 'ab.html', badge: 'НОВОЕ' },
+            { id: 'cryptopulse', title: 'CryptoPulse', description: 'Платформа с данными по криптовалютам', icon: 'fas fa-chart-line', categories: ['new', 'business'], interests: ['business', 'adult', 'developer'], url: 'birza.html', badge: 'НОВОЕ' },
+            { id: 'voidrider', title: 'VoidRider', description: 'Космический экшен, управляй кораблём', icon: 'fas fa-rocket', categories: ['new', 'games'], interests: ['gamer', 'minor', 'student'], url: 'cosmo.html', badge: 'НОВОЕ' },
+            { id: 'whitecube', title: 'WhiteCube', description: 'Минималистичная реакционная игра', icon: 'fas fa-cube', categories: ['new', 'games'], interests: ['gamer', 'minor', 'student'], url: 'cubred.html', badge: 'НОВОЕ' },
+            { id: 'tastebook', title: 'TasteBook', description: 'Кулинарная энциклопедия с 70+ рецептами', icon: 'fas fa-utensils', categories: ['new', 'tools'], interests: ['adult', 'teacher', 'creative'], url: 'food.html', badge: 'НОВОЕ' },
+            { id: 'cityforge', title: 'CityForge', description: 'Градостроительная стратегия', icon: 'fas fa-city', categories: ['new', 'games'], interests: ['gamer', 'adult', 'business'], url: 'citycraft.html', badge: 'НОВОЕ' },
+            { id: 'noteflow', title: 'NoteFlow', description: 'Быстрый цифровой блокнот', icon: 'fas fa-sticky-note', categories: ['new', 'tools'], interests: ['teacher', 'author', 'developer', 'student'], url: 'notes.html', badge: 'НОВОЕ' },
+            { id: 'greendefense', title: 'GreenDefense', description: 'Тактическая игра, растения против врагов', icon: 'fas fa-leaf', categories: ['new', 'games'], interests: ['gamer', 'minor', 'student'], url: 'pvz.html', badge: 'НОВОЕ' },
+            { id: 'cipherlink', title: 'CipherLink', description: 'Создание собственных шифров', icon: 'fas fa-lock', categories: ['new', 'tools'], interests: ['developer', 'business', 'teacher'], url: 'shifr.html', badge: 'НОВОЕ' },
+            { id: 'worldclock', title: 'WorldClock', description: 'Мировое время, часовые пояса', icon: 'fas fa-globe-americas', categories: ['new', 'tools'], interests: ['business', 'teacher', 'adult'], url: 'time.html', badge: 'НОВОЕ' },
+            { id: 'urban2d', title: 'Urban2D', description: '2D-игра с открытым миром', icon: 'fas fa-map', categories: ['new', 'games'], interests: ['gamer', 'minor', 'student'], url: '2dom.html', badge: 'НОВОЕ' },
+            { id: 'famdconnect', title: 'FAMD Connect', description: 'Социальная платформа нового поколения', icon: 'fas fa-users', categories: ['new', 'social'], interests: ['student', 'adult', 'business', 'gamer'], url: 'fc.html', badge: 'НОВОЕ' },
+            { id: 'pacfamd', title: 'PACfamd', description: 'Классическая аркадная игра в современном стиле', icon: 'fas fa-ghost', categories: ['games'], interests: ['gamer', 'minor', 'student'], url: 'https://dorosfamd.com/pacfamd' },
+            { id: 'pacfamd2', title: 'PACfamd 2 игрока', description: 'Кооперативная версия для игры вдвоём', icon: 'fas fa-users', categories: ['games'], interests: ['gamer', 'minor', 'student'], url: 'https://dorosfamd.com/pac7' },
+            { id: 'krestikinoliti', title: 'Крестики-Нолики', description: 'Интеллектуальная игра с ИИ', icon: 'fas fa-times', categories: ['games'], interests: ['gamer', 'student', 'teacher'], url: 'https://dorosfamd.com/krestikinolikifamd' },
+            { id: 'chetnechet', title: 'Чёт/Нечёт', description: 'Азартная игра на логику и интуицию', icon: 'fas fa-dice', categories: ['games'], interests: ['gamer', 'adult'], url: 'https://dorosfamd.com/index2' },
+            { id: 'pixball', title: 'PixBall Football', description: '2D футбольный симулятор с физикой', icon: 'fas fa-futbol', categories: ['games'], interests: ['gamer', 'minor', 'student'], url: 'https://dorosfamd.com/PIXBALL' },
+            { id: 'sheenyystar', title: 'Sheenyystar Game', description: 'Эксклюзивный шутер с уникальным оружием', icon: 'fas fa-gun', categories: ['games'], interests: ['gamer', 'minor'], url: 'https://dorosfamd.com/ShGun' },
+            { id: 'shutter', title: 'Шуттер', description: 'Интенсивный шутер с мультиплеером', icon: 'fas fa-crosshairs', categories: ['games'], interests: ['gamer', 'minor', 'adult'], url: 'https://dorosfamd.com/strike' },
+            { id: 'minecraft', title: 'Minecraft', description: 'Браузерная версия популярной песочницы', icon: 'fas fa-cubes', categories: ['games'], interests: ['gamer', 'minor', 'creative', 'student'], url: 'https://dorosfamd.com/craft' },
+            { id: 'dictionary', title: 'Словарь', description: 'Обширная база терминов и определений', icon: 'fas fa-book', categories: ['tools'], interests: ['teacher', 'student', 'author', 'developer'], url: 'https://dorosfamd.com/словарь' },
+            { id: 'translator', title: 'Переводчик', description: 'Многоязычный переводчик 100+ языков', icon: 'fas fa-language', categories: ['tools'], interests: ['business', 'teacher', 'student', 'author'], url: 'https://dorosfamd.com/FAMDai' },
+            { id: 'weather', title: 'Погода', description: 'Точный прогноз для любого города', icon: 'fas fa-cloud-sun', categories: ['tools'], interests: ['business', 'teacher', 'adult', 'student'], url: 'https://dorosfamd.com/FAMDweather' },
+            { id: 'currency', title: 'Конвертер валют', description: 'Актуальные курсы валют и криптовалют', icon: 'fas fa-exchange-alt', categories: ['tools'], interests: ['business', 'adult', 'developer'], url: 'https://dorosfamd.com/FAMDvaluta' },
+            { id: 'browser', title: 'Браузер', description: 'Безопасный браузер с защитой приватности', icon: 'fas fa-globe', categories: ['tools'], interests: ['student', 'adult', 'business', 'developer'], url: 'https://dorosfamd.com/b' },
+            { id: 'map', title: 'Карта', description: 'Интерактивная карта с навигацией', icon: 'fas fa-map-marked-alt', categories: ['tools'], interests: ['business', 'teacher', 'adult'], url: 'https://dorosfamd.com/index3' },
+            { id: 'calculator', title: 'Калькулятор', description: 'Продвинутый калькулятор с научными функциями', icon: 'fas fa-calculator', categories: ['tools'], interests: ['student', 'teacher', 'developer', 'business'], url: 'https://dorosfamd.com/cal' },
+            { id: 'cloud', title: 'Облако', description: 'Надёжное облачное хранилище файлов', icon: 'fas fa-cloud', categories: ['tools'], interests: ['business', 'developer', 'teacher', 'adult'], url: 'https://dorosfamd.com/data' },
+            { id: 'dayorganizer', title: 'Организация дня', description: 'Планировщик задач и расписания', icon: 'fas fa-calendar-alt', categories: ['tools'], interests: ['business', 'teacher', 'student', 'adult'], url: 'https://dorosfamd.com/day' },
+            { id: 'shortlinks', title: 'Короткие ссылки', description: 'Создание и управление короткими ссылками', icon: 'fas fa-link', categories: ['tools'], interests: ['business', 'developer', 'teacher'], url: 'https://dorosfamd.com/link' },
+            { id: 'qrgenerator', title: 'QR-генератор', description: 'Создание QR-кодов для любой информации', icon: 'fas fa-qrcode', categories: ['tools'], interests: ['business', 'teacher', 'student', 'adult'], url: 'https://dorosfamd.com/QR' },
+            { id: 'worldtime', title: 'Мировое время', description: 'Точное время в разных часовых поясах', icon: 'fas fa-clock', categories: ['tools'], interests: ['business', 'teacher', 'adult'], url: 'https://dorosfamd.com/time' },
+            { id: 'codeeditor', title: 'Редактор кода', description: 'Профессиональный редактор для программирования', icon: 'fas fa-code', categories: ['tools'], interests: ['developer', 'student', 'teacher'], url: 'https://dorosfamd.com/code' },
+            { id: 'planner', title: 'Планировщик', description: 'Система управления проектами и задачами', icon: 'fas fa-tasks', categories: ['tools'], interests: ['business', 'developer', 'teacher', 'adult'], url: 'https://dorosfamd.com/plan' },
+            { id: 'services', title: 'Услуги сервисов', description: 'Каталог профессиональных услуг', icon: 'fas fa-concierge-bell', categories: ['tools'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/service' },
+            { id: 'graphiceditor', title: 'Графический редактор', description: 'Инструмент для создания цифровых изображений', icon: 'fas fa-paint-brush', categories: ['creative'], interests: ['artist', 'creative', 'photographer'], url: 'https://dorosfamd.com/paint' },
+            { id: 'photoeditor', title: 'Редактор фото', description: 'Мощный редактор для обработки фотографий', icon: 'fas fa-camera-retro', categories: ['creative'], interests: ['photographer', 'artist', 'creative'], url: 'https://dorosfamd.com/photo' },
+            { id: 'fontgenerator', title: 'Генератор шрифтов', description: 'Создание уникальных шрифтов и стилей', icon: 'fas fa-font', categories: ['creative'], interests: ['artist', 'creative', 'author', 'developer'], url: 'https://dorosfamd.com/textgen' },
+            { id: 'rhymegenerator', title: 'Генератор рифм', description: 'Инструмент для создания рифмованных текстов', icon: 'fas fa-pencil-alt', categories: ['creative'], interests: ['author', 'creative', 'musician'], url: 'https://dorosfamd.com/rifm' },
+            { id: 'gallery', title: 'Галерея', description: 'Управление и организация медиафайлов', icon: 'fas fa-images', categories: ['creative'], interests: ['artist', 'photographer', 'creative'], url: 'https://dorosfamd.com/index8' },
+            { id: 'dreamfamd', title: 'DREAMfamd', description: 'Платформа для творческих проектов', icon: 'fas fa-heart', categories: ['creative'], interests: ['creative', 'artist', 'author'], url: 'https://dorosfamd.com/DREAMfamd' },
+            { id: 'globalchat', title: 'Глобальный чат', description: 'Общение с пользователями по всему миру', icon: 'fas fa-comments', categories: ['social'], interests: ['student', 'gamer', 'adult'], url: 'https://dorosfamd.com/DOROSchat' },
+            { id: 'privatechat', title: 'Приватный чат', description: 'Защищённое общение с шифрованием', icon: 'fas fa-lock', categories: ['social'], interests: ['business', 'adult', 'developer'], url: 'https://dorosfamd.com/DOROSchatv4' },
+            { id: 'calls', title: 'Звонки', description: 'Аудио и видео звонки через интернет', icon: 'fas fa-phone-alt', categories: ['social'], interests: ['business', 'adult', 'student', 'teacher'], url: 'https://dorosfamd.com/phone' },
+            { id: 'wiki', title: 'Вики', description: 'Пользовательская энциклопедия', icon: 'fas fa-wikipedia-w', categories: ['social'], interests: ['teacher', 'student', 'author', 'creative'], url: 'https://dorosfamd.com/wiki' },
+            { id: 'personalitytest', title: 'Тест личности', description: 'Профессиональное тестирование психологического типа', icon: 'fas fa-user-astronaut', categories: ['education'], interests: ['student', 'teacher', 'creative'], url: 'https://dorosfamd.com/dinofamd' },
+            { id: 'quiz', title: 'Викторина', description: 'Интерактивные тесты по различным темам', icon: 'fas fa-question-circle', categories: ['education'], interests: ['student', 'teacher', 'gamer'], url: 'https://dorosfamd.com/FAMDquiz' },
+            { id: 'encyclopedia', title: 'Энциклопедия', description: 'Достоверный источник знаний', icon: 'fas fa-info-circle', categories: ['education'], interests: ['student', 'teacher', 'creative'], url: 'https://dorosfamd.com/incoklopedia' },
+            { id: 'voicedictionary', title: 'Голосовой словарь', description: 'Словарь с аудиоподдержкой произношения', icon: 'fas fa-microphone', categories: ['education'], interests: ['student', 'teacher', 'author'], url: 'https://dorosfamd.com/Dr.Zulfon' },
+            { id: 'frontendlearning', title: 'Frontend обучение', description: 'Интерактивные курсы по веб-разработке', icon: 'fas fa-laptop-code', categories: ['education'], interests: ['student', 'developer', 'teacher'], url: 'https://dorosfamd.com/lfront' },
+            { id: 'onlinechool', title: 'Обучение', description: 'Инструменты для учителей и учеников.', icon: 'fas fa-laptop-code', categories: ['education'], interests: ['student', 'teacher'], url: 'https://dorosfamd.com/obuch' },
+            { id: 'habittracker', title: 'Трекер привычек', description: 'Отслеживание и формирование полезных привычек', icon: 'fas fa-chart-bar', categories: ['education'], interests: ['student', 'business', 'adult'], url: 'https://dorosfamd.com/priv' },
+            { id: 'doroshop', title: 'DOROShop', description: 'Платформа для онлайн-торговли', icon: 'fas fa-shopping-cart', categories: ['business'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/DOROShop' },
+            { id: 'news', title: 'Новости', description: 'Актуальные новости из проверенных источников', icon: 'fas fa-newspaper', categories: ['business'], interests: ['business', 'adult', 'teacher'], url: 'https://dorosfamd.com/index5' },
+            { id: 'taxi', title: 'Такси', description: 'Заказ такси в любой точке страны', icon: 'fas fa-taxi', categories: ['business'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/taxi' },
+            { id: 'taxiexpress', title: 'Такси Express', description: 'Экспресс-заказ такси', icon: 'fas fa-car', categories: ['business'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/khtaxi' },
+            { id: 'bank', title: 'Khujand City Bank', description: 'Инновационный банк с онлайн-услугами', icon: 'fas fa-bank', categories: ['business'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/KhujandCityBank' },
+            { id: 'finance', title: 'Финансы', description: 'Управление личными финансами и инвестициями', icon: 'fas fa-chart-line', categories: ['business'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/fin' },
+            { id: 'businessideas', title: 'Идеи для бизнеса', description: 'Генератор бизнес-идей и планирование стартапов', icon: 'fas fa-lightbulb', categories: ['business'], interests: ['business', 'adult', 'creative'], url: 'https://dorosfamd.com/ideya' },
+            { id: 'accounting', title: 'Бухгалтерия', description: 'Система управления финансами для бизнеса', icon: 'fas fa-calculator', categories: ['business'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/bschool' },
+            { id: 'hotels', title: 'Квартиры и отели', description: 'Поиск и бронирование жилья', icon: 'fas fa-hotel', categories: ['business'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/room' },
+            { id: 'payments', title: 'Платежи', description: 'Безопасные онлайн-платежи', icon: 'fas fa-credit-card', categories: ['business'], interests: ['business', 'adult'], url: 'https://dorosfamd.com/school' },
+            { id: 'music', title: 'Музыка', description: 'Стриминговая платформа с обширной библиотекой', icon: 'fas fa-music', categories: ['entertainment'], interests: ['musician', 'creative', 'gamer', 'student'], url: 'https://dorosfamd.com/DOROSmus4' },
+            { id: 'musicpro', title: 'Музыка Pro', description: 'Продвинутый музыкальный плеер', icon: 'fas fa-headphones-alt', categories: ['entertainment'], interests: ['musician', 'creative'], url: 'https://dorosfamd.com/music' },
+            { id: 'videoplatform', title: 'Видеоплатформа', description: 'Платформа для просмотра и загрузки видео', icon: 'fas fa-video', categories: ['entertainment'], interests: ['student', 'gamer', 'adult', 'creative'], url: 'https://dorosfamd.com/DOROSvid' },
+            { id: 'moviesbooks', title: 'Фильмы и книги', description: 'Каталог фильмов, сериалов и литературы', icon: 'fas fa-film', categories: ['entertainment'], interests: ['student', 'adult', 'creative', 'author'], url: 'https://dorosfamd.com/FAMDcm' },
+            { id: 'muslimsearch', title: 'Мусульманский поиск', description: 'Поисковая система с исламским контентом', icon: 'fas fa-mosque', categories: ['other'], interests: ['teacher', 'student', 'adult'], url: 'https://dorosfamd.com/musl' },
+            { id: 'doroslang_editor', title: 'DOROSlang Editor', description: 'Редактор для написания и выполнения кода на языке DOROSlang. Поддержка синтаксиса, автодополнение и запуск кода в один клик.', icon: 'fas fa-code', categories: ['tools', 'new', 'developer'], interests: ['developer', 'student', 'creative'], url: 'https://dorosfamd.com/de14', badge: 'РЕДАКТОР' },
+            { id: 'doroslang_translator', title: 'DOROSlang Translator', description: 'Конвертер текста и кода в зашифрованный формат DOROSlang. Преобразует обычный код в цифровую шифрованную нотацию и обратно.', icon: 'fas fa-exchange-alt', categories: ['tools', 'new', 'developer'], interests: ['developer', 'student', 'creative'], url: 'https://dorosfamd.com/de_t14', badge: 'ШИФРАТОР' }
+        ];
+
+        // ===== APP STATE =====
+        let userInterests = JSON.parse(localStorage.getItem('dorosfamd_interests')) || [];
+        let pinnedProjects = JSON.parse(localStorage.getItem('dorosfamd_pinned')) || [];
+        let currentCategory = 'all';
+        let searchTerm = '';
+        let settings = JSON.parse(localStorage.getItem('dorosfamd_settings')) || { colorScheme: 'indigo', theme: 'light' };
+
+        // ===== DOM =====
+        const header = document.getElementById('header');
+        const interestsBar = document.getElementById('interestsBar');
+        const projectsGrid = document.getElementById('projectsGrid');
+        const interestsGrid = document.getElementById('interestsGrid');
+        const interestsModal = document.getElementById('interestsModal');
+        const settingsModal = document.getElementById('settingsModal');
+        const searchModal = document.getElementById('searchModal');
+        const topModal = document.getElementById('topModal');
+        const securityModal = document.getElementById('securityModal');
+        const securityTrigger = document.getElementById('securityTrigger');
+        const topTrigger = document.getElementById('topTrigger');
+        const closeSecurityModal = document.getElementById('closeSecurityModal');
+        const closeTopModal = document.getElementById('closeTopModal');
+        const searchBtn = document.getElementById('searchBtn');
+        const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const openInterestsBtn = document.getElementById('openInterestsBtn');
+        const mobileInterestsBtn = document.getElementById('mobileInterestsBtn');
+        const saveInterestsBtn = document.getElementById('saveInterestsBtn');
+        const searchInput = document.getElementById('searchInput');
+        const searchResultsList = document.getElementById('searchResultsList');
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+        const closeInterestsModal = document.getElementById('closeInterestsModal');
+        const closeSettingsModal = document.getElementById('closeSettingsModal');
+        const closeSearchModal = document.getElementById('closeSearchModal');
+        const colorSchemeSelect = document.getElementById('colorScheme');
+        const themeSelect = document.getElementById('theme');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+
+        // Модалки
+        securityTrigger.addEventListener('click', () => securityModal.classList.add('active'));
+        closeSecurityModal.addEventListener('click', () => securityModal.classList.remove('active'));
+        securityModal.addEventListener('click', (e) => { if(e.target === securityModal) securityModal.classList.remove('active'); });
+        
+        topTrigger.addEventListener('click', () => { fetchTopServices(); topModal.classList.add('active'); });
+        closeTopModal.addEventListener('click', () => topModal.classList.remove('active'));
+        topModal.addEventListener('click', (e) => { if(e.target === topModal) topModal.classList.remove('active'); });
+
+        function saveUserData() { 
+            localStorage.setItem('dorosfamd_interests', JSON.stringify(userInterests)); 
+            localStorage.setItem('dorosfamd_pinned', JSON.stringify(pinnedProjects)); 
+        }
+        function saveSettings() { localStorage.setItem('dorosfamd_settings', JSON.stringify(settings)); }
+        function applySettings() {
+            document.documentElement.setAttribute('data-color-scheme', settings.colorScheme);
+            document.documentElement.setAttribute('data-theme', settings.theme);
+            if (colorSchemeSelect) colorSchemeSelect.value = settings.colorScheme;
+            if (themeSelect) themeSelect.value = settings.theme;
+        }
+
+        function renderInterestsBar() {
+            interestsBar.innerHTML = '<button class="interest-chip active" data-category="all"><i class="fas fa-th-large"></i>Все</button>';
+            ['games','tools','creative','business','education','social','entertainment','new'].forEach(cat => {
+                let chip = document.createElement('button');
+                chip.className = `interest-chip ${currentCategory===cat?'active':''}`;
+                chip.dataset.category = cat;
+                let icon = cat==='games'?'gamepad':cat==='tools'?'wrench':cat==='creative'?'paint-brush':cat==='business'?'briefcase':cat==='education'?'graduation-cap':cat==='social'?'users':cat==='entertainment'?'film':'star';
+                chip.innerHTML = `<i class="fas fa-${icon}"></i>${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+                chip.addEventListener('click', () => { currentCategory = cat; renderProjects(); renderInterestsBar(); });
+                interestsBar.appendChild(chip);
+            });
+        }
+
+        function renderInterestsCheckboxes() {
+            interestsGrid.innerHTML = '';
+            interestsList.forEach(interest => {
+                let div = document.createElement('div'); div.className = 'interest-checkbox';
+                div.innerHTML = `<input type="checkbox" id="int_${interest.id}" value="${interest.id}" ${userInterests.includes(interest.id)?'checked':''}><label for="int_${interest.id}"><i class="fas ${interest.icon}"></i> ${interest.label}</label>`;
+                interestsGrid.appendChild(div);
+            });
+        }
+
+        function calculateMatchScore(project) {
+            if (!userInterests.length) return 50;
+            let matches = (project.interests || []).filter(i => userInterests.includes(i)).length;
+            return Math.min(100, matches * 25 + 20);
+        }
+
+        function performSearch() {
+            const term = searchInput.value.toLowerCase().trim();
+            if (!term) {
+                searchResultsList.innerHTML = '<div class="no-results">✨ Введите название сервиса для поиска</div>';
+                return;
+            }
+            const results = projects.filter(p => 
+                p.title.toLowerCase().includes(term) || 
+                p.description.toLowerCase().includes(term) ||
+                p.categories.some(c => c.toLowerCase().includes(term))
+            );
+            if (results.length === 0) {
+                searchResultsList.innerHTML = '<div class="no-results"><i class="fas fa-search"></i> Ничего не найдено</div>';
+                return;
+            }
+            let html = '';
+            results.slice(0, 20).forEach(p => {
+                html += `
+                    <div class="search-result-item" data-url="${p.url}" data-id="${p.id}" data-title="${p.title}">
+                        <div class="search-result-icon"><i class="${p.icon}"></i></div>
+                        <div class="search-result-info">
+                            <div class="search-result-title">${p.title}</div>
+                            <div class="search-result-desc">${p.description.substring(0, 60)}...</div>
+                        </div>
+                    </div>
+                `;
+            });
+            searchResultsList.innerHTML = html;
+            document.querySelectorAll('.search-result-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const url = el.dataset.url;
+                    const id = el.dataset.id;
+                    const title = el.dataset.title;
+                    trackServiceVisit(id, title);
+                    setTimeout(() => window.open(url, '_blank'), 50);
+                    searchModal.classList.remove('active');
+                });
+            });
+        }
+
+        function renderProjects() {
+            let filtered = projects.filter(p => currentCategory==='all' || p.categories.includes(currentCategory));
+            if (searchTerm) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()) || p.description.toLowerCase().includes(searchTerm.toLowerCase()));
+            filtered.sort((a,b) => (pinnedProjects.includes(b.id)?1:0) - (pinnedProjects.includes(a.id)?1:0) || calculateMatchScore(b)-calculateMatchScore(a) || a.title.localeCompare(b.title));
+            
+            if (filtered.length === 0) {
+                projectsGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center;padding:var(--space-16); background: var(--bg-secondary); border-radius: var(--radius-2xl);"><i class="fas fa-search" style="font-size:3rem; color: var(--text-tertiary);"></i><h3 style="margin: var(--space-4) 0;">Ничего не найдено</h3><p class="text-secondary">Попробуйте изменить параметры поиска</p></div>';
+                return;
+            }
+            
+            projectsGrid.innerHTML = '';
+            filtered.forEach((p,i) => {
+                let card = document.createElement('div');
+                card.className = `project-card ${pinnedProjects.includes(p.id)?'pinned':''}`;
+                card.style.animationDelay = i*0.03+'s';
+                let categoriesHtml = p.categories.map(c=>`<span class="project-category-tag">${c}</span>`).join('');
+                let badgeHtml = p.badge ? `<span style="position:absolute;top:var(--space-4);left:var(--space-4);background:linear-gradient(135deg, var(--primary-500), var(--primary-600));color:white;padding:4px 12px;border-radius:var(--radius-full);font-size:0.7rem; font-weight: 600; z-index:5; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">${p.badge}</span>` : '';
+                
+                card.innerHTML = `
+                    <button class="pin-button ${pinnedProjects.includes(p.id)?'pinned':''}" data-id="${p.id}"><i class="fas fa-thumbtack"></i></button>
+                    ${badgeHtml}
+                    <div class="project-icon"><i class="${p.icon}"></i></div>
+                    <h3 class="project-title">${p.title}</h3>
+                    <div class="project-categories">${categoriesHtml}</div>
+                    <p class="project-description">${p.description}</p>
+                    <div class="project-footer">
+                        <a href="${p.url}" target="_blank" class="project-link service-link" data-service-id="${p.id}" data-service-title="${p.title}">Открыть <i class="fas fa-arrow-right"></i></a>
+                        ${userInterests.length?`<div class="match-indicator"><i class="fas fa-chart-line"></i>${calculateMatchScore(p)}%</div>`:''}
+                    </div>`;
+                
+                card.querySelector('.pin-button').addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    let id = p.id; 
+                    pinnedProjects.includes(id) ? pinnedProjects.splice(pinnedProjects.indexOf(id),1) : pinnedProjects.push(id); 
+                    saveUserData(); 
+                    renderProjects(); 
+                });
+                card.addEventListener('click', (e) => { 
+                    if(!e.target.closest('.pin-button') && !e.target.closest('.project-link')) {
+                        trackServiceVisit(p.id, p.title);
+                        setTimeout(() => window.open(p.url, '_blank'), 10);
+                    } 
+                });
+                projectsGrid.appendChild(card);
+            });
+            attachServiceLinkHandlers();
+        }
+        
+        function attachServiceLinkHandlers() {
+            document.querySelectorAll('.service-link').forEach(link => {
+                link.removeEventListener('click', handleServiceLinkClick);
+                link.addEventListener('click', handleServiceLinkClick);
+            });
+        }
+        
+        function handleServiceLinkClick(e) {
+            e.preventDefault();
+            const link = e.currentTarget;
+            const serviceId = link.getAttribute('data-service-id');
+            const serviceTitle = link.getAttribute('data-service-title');
+            const url = link.getAttribute('href');
+            if (serviceId && serviceTitle) trackServiceVisit(serviceId, serviceTitle);
+            setTimeout(() => window.open(url, '_blank'), 10);
+        }
+
+        function setupEventListeners() {
+            searchBtn.addEventListener('click', () => { searchModal.classList.add('active'); searchInput.focus(); searchInput.value = ''; searchResultsList.innerHTML = '<div class="no-results">✨ Введите название сервиса для поиска</div>'; });
+            mobileSearchBtn.addEventListener('click', () => { searchModal.classList.add('active'); searchInput.focus(); searchInput.value = ''; searchResultsList.innerHTML = '<div class="no-results">✨ Введите название сервиса для поиска</div>'; });
+            searchInput.addEventListener('input', () => performSearch());
+            if (closeSearchModal) closeSearchModal.addEventListener('click', () => { searchModal.classList.remove('active'); searchInput.value = ''; });
+            searchModal.addEventListener('click', (e) => { if(e.target===searchModal) { searchModal.classList.remove('active'); searchInput.value = ''; } });
+            settingsBtn.addEventListener('click', () => { colorSchemeSelect.value = settings.colorScheme; themeSelect.value = settings.theme; settingsModal.classList.add('active'); });
+            if (closeSettingsModal) closeSettingsModal.addEventListener('click', () => settingsModal.classList.remove('active'));
+            openInterestsBtn.addEventListener('click', () => { renderInterestsCheckboxes(); interestsModal.classList.add('active'); });
+            mobileInterestsBtn.addEventListener('click', () => { renderInterestsCheckboxes(); interestsModal.classList.add('active'); });
+            if (closeInterestsModal) closeInterestsModal.addEventListener('click', () => interestsModal.classList.remove('active'));
+            saveInterestsBtn.addEventListener('click', () => { 
+                let checkboxes = interestsGrid.querySelectorAll('input:checked'); 
+                userInterests = Array.from(checkboxes).map(cb=>cb.value); 
+                saveUserData(); interestsModal.classList.remove('active'); renderProjects(); renderInterestsBar(); 
+            });
+            saveSettingsBtn.addEventListener('click', () => {
+                settings.colorScheme = colorSchemeSelect.value;
+                settings.theme = themeSelect.value;
+                saveSettings(); applySettings(); settingsModal.classList.remove('active');
+            });
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('scrolled', window.scrollY > 100);
+                scrollToTopBtn.classList.toggle('visible', window.scrollY > 400);
+            });
+            scrollToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+            document.addEventListener('keydown', (e) => { 
+                if(e.key==='Escape') { 
+                    interestsModal.classList.remove('active'); settingsModal.classList.remove('active'); 
+                    searchModal.classList.remove('active'); securityModal.classList.remove('active'); topModal.classList.remove('active');
+                } 
+            });
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => { 
+            createParticles();
+            applySettings(); 
+            renderInterestsBar(); 
+            renderInterestsCheckboxes(); 
+            renderProjects(); 
+            setupEventListeners(); 
+            if (userInterests.length === 0) setTimeout(() => interestsModal.classList.add('active'), 500);
+        });
+    </script>
+</body>
+</html>
