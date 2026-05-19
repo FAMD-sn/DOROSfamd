@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Kitob Test · Образовательное тестирование</title>
+    <meta name="description" content="Создавайте и проходите тесты в экосистеме Kitob. Умная платформа для проверки знаний.">
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            min-height: 100vh;
+            padding: 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* фоновые декоративные элементы (как в Kitob School) */
+        .bg-aura {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 40rem;
+            height: 40rem;
+            background: radial-gradient(circle, rgba(16,185,129,0.08), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-aura-right {
+            position: fixed;
+            bottom: -10%;
+            right: -10%;
+            width: 45rem;
+            height: 45rem;
+            background: radial-gradient(circle, rgba(6,95,70,0.06), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-aura-center {
+            position: fixed;
+            top: 40%;
+            left: 20%;
+            width: 30rem;
+            height: 30rem;
+            background: radial-gradient(circle, rgba(245,158,11,0.04), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* карточки в стиле Kitob School — светлое стекло */
+        .glass-card {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(2px);
+            border: 1px solid #e2e8f0;
+            border-radius: 32px;
+            box-shadow: 0 8px 20px -6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        /* заголовок / шапка */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+            padding: 12px 0;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 14px -6px rgba(16,185,129,0.25);
+        }
+        .logo-icon i {
+            font-size: 26px;
+            color: white;
+        }
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #065f46, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+        .logo-text span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #475569;
+            letter-spacing: 1px;
+        }
+
+        /* tabs */
+        .tabs-container {
+            background: white;
+            border-radius: 60px;
+            padding: 6px;
+            display: inline-flex;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .tab-btn {
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #334155;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .tab-btn.active {
+            background: linear-gradient(95deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 10px rgba(16,185,129,0.2);
+        }
+        .tab-btn:not(.active):hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        /* карточки контента */
+        .content-card {
+            padding: 32px;
+            margin-top: 24px;
+        }
+
+        /* формы */
+        .form-group {
+            margin-bottom: 24px;
+        }
+        label {
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1e293b;
+            display: block;
+            margin-bottom: 8px;
+        }
+        input, textarea, select {
+            width: 100%;
+            background: #f9fafb;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 14px 18px;
+            font-family: 'Plus Jakarta Sans', monospace;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            color: #0f172a;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+            background: white;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        /* вопрос карточка */
+        .question-card {
+            background: #ffffff;
+            border: 1px solid #eef2ff;
+            border-radius: 28px;
+            padding: 22px;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        .question-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 10px 20px -12px rgba(0,0,0,0.1);
+        }
+        .question-actions {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+        }
+        .btn-icon {
+            background: #f1f5f9;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 30px;
+            color: #475569;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .btn-icon:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* кнопки */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: none;
+            background: #f1f5f9;
+            color: #1e293b;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .btn-primary {
+            background: linear-gradient(95deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 8px rgba(16,185,129,0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.02);
+            box-shadow: 0 12px 18px -10px rgba(16,185,129,0.3);
+        }
+        .btn-secondary {
+            background: #eef2ff;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* генерация ссылки */
+        .quiz-link-container {
+            margin-top: 32px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 32px;
+            padding: 24px;
+            text-align: center;
+        }
+        .quiz-link-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            margin: 16px 0;
+        }
+        .quiz-code-input {
+            background: white;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 1px;
+            font-size: 1.2rem;
+            width: auto;
+            min-width: 200px;
+        }
+
+        /* викторина (прохождение) */
+        .quiz-option {
+            background: #fefce8;
+            border-radius: 18px;
+            margin: 12px 0;
+            padding: 12px 18px;
+            border: 1px solid #fde68a;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.2s;
+        }
+        .quiz-option:hover {
+            background: #fffbeb;
+            border-color: #fcd34d;
+        }
+        .quiz-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #10b981;
+            margin: 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 0%;
+            height: 100%;
+            transition: width 0.4s ease;
+        }
+        .result-score {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #065f46;
+            margin: 16px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* адаптив */
+        @media (max-width: 700px) {
+            body { padding: 16px; }
+            .content-card { padding: 20px; }
+            .logo-text h1 { font-size: 1.4rem; }
+            .tabs-container .tab-btn { padding: 6px 18px; font-size: 0.8rem; }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 24px;
+        }
+        i.fa, i.far, i.fas {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-aura"></div>
+<div class="bg-aura-right"></div>
+<div class="bg-aura-center"></div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+            <div class="logo-text">
+                <h1>Kitob Test</h1>
+                <span>оценка знаний • академическая платформа</span>
+            </div>
+        </div>
+        <div class="tabs-container" id="tabContainer">
+            <button class="tab-btn active" data-tab="create"><i class="fa-regular fa-file-lines"></i> Создать тест</button>
+            <button class="tab-btn" data-tab="take"><i class="fa-regular fa-circle-check"></i> Пройти тест</button>
+        </div>
+    </div>
+
+    <!-- Секция СОЗДАНИЯ -->
+    <div id="createSection" class="glass-card content-card">
+        <div class="form-group">
+            <label><i class="fa-regular fa-bookmark"></i> Название теста</label>
+            <input type="text" id="quizTitle" placeholder="Например: Итоговый тест по литературе 9 класс">
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px;">
+            <button class="btn btn-primary" id="addQuestionBtn"><i class="fa-solid fa-plus"></i> Добавить вопрос</button>
+            <button class="btn btn-secondary" id="generateTestBtn" style="display: none;"><i class="fa-solid fa-microchip"></i> Сформировать тест</button>
+        </div>
+
+        <div id="quizLinkBlock" class="quiz-link-container hidden">
+            <i class="fa-solid fa-qrcode" style="font-size: 2rem; color: #10b981;"></i>
+            <h3 style="margin: 10px 0;">Тест создан!</h3>
+            <p>Код доступа для учеников</p>
+            <div class="quiz-link-box">
+                <input type="text" id="testCodeInput" class="quiz-code-input" readonly>
+                <button class="btn btn-primary" id="copyCodeBtn"><i class="fa-regular fa-copy"></i> Копировать код</button>
+            </div>
+            <button class="btn btn-secondary" id="resetAllBtn"><i class="fa-solid fa-arrows-rotate"></i> Создать новый тест</button>
+        </div>
+    </div>
+
+    <!-- Секция ПРОХОЖДЕНИЯ -->
+    <div id="takeSection" class="glass-card content-card hidden">
+        <div id="enterCodePanel">
+            <div class="form-group">
+                <label><i class="fa-regular fa-keyboard"></i> Введите код теста</label>
+                <input type="text" id="accessCode" placeholder="например: a7f3k9p2">
+            </div>
+            <button class="btn btn-primary" id="startTestBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i> Начать тестирование</button>
+        </div>
+
+        <div id="activeTestPanel" class="hidden">
+            <h2 id="testTitleDisplay" style="font-weight: 800; font-size: 1.6rem; margin-bottom: 8px;"></h2>
+            <div id="testQuestionsList"></div>
+            <div style="margin-top: 28px;">
+                <button class="btn btn-primary" id="submitTestBtn"><i class="fa-solid fa-check-double"></i> Завершить тест</button>
+            </div>
+        </div>
+
+        <div id="resultPanel" class="hidden">
+            <div class="quiz-link-container" style="background: #ecfdf5; border-color: #a7f3d0;">
+                <i class="fa-regular fa-chart-bar" style="font-size: 2rem; color: #10b981;"></i>
+                <h3>Результаты</h3>
+                <div class="result-score" id="finalScoreSpan">0/0</div>
+                <div class="progress-bar"><div class="progress-fill" id="resultProgress"></div></div>
+                <p id="resultMessageText" style="font-weight: 500; margin: 12px 0;"></p>
+                <button class="btn btn-secondary" id="restartTestBtn"><i class="fa-regular fa-repeat"></i> Пройти заново</button>
+            </div>
+        </div>
+    </div>
+    <footer>© 2026 Kitob School · тестирование на основе локального хранилища. Безопасно, академично.</footer>
+</div>
+
+<script>
+    // ------------------- СОСТОЯНИЕ -------------------
+    let questionsLocal = [];          // массив индексов для UI
+    let currentQuizObject = null;     // объект теста при прохождении
+    let currentTestId = null;
+    let soundEnabled = true;          // опционально, звуки убрали для академичности, но оставим нейтрально
+
+    // DOM элементы
+    const createSection = document.getElementById('createSection');
+    const takeSection = document.getElementById('takeSection');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const questionsContainer = document.getElementById('questionsContainer');
+    const addQuestionBtn = document.getElementById('addQuestionBtn');
+    const generateTestBtn = document.getElementById('generateTestBtn');
+    const quizTitleInput = document.getElementById('quizTitle');
+    const quizLinkBlock = document.getElementById('quizLinkBlock');
+    const testCodeInput = document.getElementById('testCodeInput');
+    const copyCodeBtn = document.getElementById('copyCodeBtn');
+    const resetAllBtn = document.getElementById('resetAllBtn');
+
+    // take panel
+    const enterCodePanel = document.getElementById('enterCodePanel');
+    const activeTestPanel = document.getElementById('activeTestPanel');
+    const resultPanel = document.getElementById('resultPanel');
+    const accessCodeInput = document.getElementById('accessCode');
+    const startTestBtn = document.getElementById('startTestBtn');
+    const submitTestBtn = document.getElementById('submitTestBtn');
+    const restartTestBtn = document.getElementById('restartTestBtn');
+    const testTitleDisplay = document.getElementById('testTitleDisplay');
+    const testQuestionsList = document.getElementById('testQuestionsList');
+    const finalScoreSpan = document.getElementById('finalScoreSpan');
+    const resultProgress = document.getElementById('resultProgress');
+    const resultMessageText = document.getElementById('resultMessageText');
+
+    // Helper: генерация короткого кода
+    function generateTestId() {
+        return Math.random().toString(36).substring(2, 10) + Math.floor(Math.random() * 10);
+    }
+
+    // рендер списка вопросов (создание)
+    function renderQuestionsUI() {
+        if (!questionsContainer) return;
+        questionsContainer.innerHTML = '';
+        if (questionsLocal.length === 0) {
+            questionsContainer.innerHTML = '<div style="padding: 24px; text-align: center; background: #f9fafb; border-radius: 24px; color: #475569;"><i class="fa-regular fa-message"></i> Добавьте первый вопрос, чтобы создать тест</div>';
+            generateTestBtn.style.display = 'none';
+            return;
+        }
+        generateTestBtn.style.display = 'inline-flex';
+        questionsLocal.forEach((_, idx) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.setAttribute('data-qidx', idx);
+            card.innerHTML = `
+                <div class="question-actions">
+                    <button class="btn-icon delete-question-btn" data-idx="${idx}"><i class="fa-regular fa-trash-can"></i></button>
+                </div>
+                <div class="form-group">
+                    <label>Вопрос ${idx+1}</label>
+                    <input type="text" class="q-text" data-idx="${idx}" placeholder="Например: Кто написал «Евгений Онегин»?" value="${escapeHtml(getQuestionValue(idx, 'text'))}">
+                </div>
+                <div class="form-group">
+                    <label>Варианты ответов (через запятую)</label>
+                    <textarea class="q-options" data-idx="${idx}" placeholder="Пушкин, Лермонтов, Гоголь, Тургенев">${escapeHtml(getQuestionValue(idx, 'options'))}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Правильный ответ (точное совпадение)</label>
+                    <input type="text" class="q-correct" data-idx="${idx}" placeholder="Пушкин" value="${escapeHtml(getQuestionValue(idx, 'correct'))}">
+                </div>
+            `;
+            questionsContainer.appendChild(card);
+        });
+
+        // навесить события на кнопки удаления
+        document.querySelectorAll('.delete-question-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                removeQuestionByIndex(idx);
+            });
+        });
+        // добавить события на инпуты, чтобы сохранять в массив (синхронизация)
+        document.querySelectorAll('.q-text').forEach(inp => {
+            inp.addEventListener('input', (e) => syncQuestionField(e.target.dataset.idx, 'text', e.target.value));
+        });
+        document.querySelectorAll('.q-options').forEach(area => {
+            area.addEventListener('input', (e) => syncQuestionField(e.target.dataset.idx, 'options', e.target.value));
+        });
+        document.querySelectorAll('.q-correct').forEach(inp => {
+            inp.addEventListener('input', (e) => syncQuestionField(e.target.dataset.idx, 'correct', e.target.value));
+        });
+    }
+
+    function getQuestionValue(idx, field) {
+        if (!questionsLocal[idx]) return '';
+        return questionsLocal[idx][field] || '';
+    }
+
+    function syncQuestionField(idx, field, value) {
+        if (!questionsLocal[idx]) return;
+        questionsLocal[idx][field] = value;
+    }
+
+    function removeQuestionByIndex(idx) {
+        if (idx >= 0 && idx < questionsLocal.length) {
+            questionsLocal.splice(idx, 1);
+            renderQuestionsUI();
+        }
+    }
+
+    function addQuestion() {
+        questionsLocal.push({
+            text: '',
+            options: '',
+            correct: ''
+        });
+        renderQuestionsUI();
+    }
+
+    // сбор данных для сохранения теста
+    function collectTestData() {
+        const title = quizTitleInput.value.trim();
+        if (!title) {
+            alert('Укажите название теста');
+            return null;
+        }
+        if (questionsLocal.length === 0) {
+            alert('Добавьте хотя бы один вопрос');
+            return null;
+        }
+        const validQuestions = [];
+        for (let i = 0; i < questionsLocal.length; i++) {
+            const q = questionsLocal[i];
+            const qText = q.text.trim();
+            const rawOptions = q.options.trim();
+            const correctAns = q.correct.trim();
+            if (!qText || !rawOptions || !correctAns) {
+                alert(`Заполните все поля в вопросе ${i+1}`);
+                return null;
+            }
+            const optionsArr = rawOptions.split(',').map(s => s.trim()).filter(s => s);
+            if (optionsArr.length < 2) {
+                alert(`В вопросе ${i+1} должно быть минимум 2 варианта ответа`);
+                return null;
+            }
+            if (!optionsArr.includes(correctAns)) {
+                alert(`Правильный ответ "${correctAns}" не найден среди вариантов в вопросе ${i+1}`);
+                return null;
+            }
+            validQuestions.push({
+                questionText: qText,
+                answers: optionsArr,
+                correctAnswer: correctAns
+            });
+        }
+        return { title, questions: validQuestions, createdAt: new Date().toISOString() };
+    }
+
+    function generateTest() {
+        const testData = collectTestData();
+        if (!testData) return;
+        const testId = generateTestId();
+        localStorage.setItem(`kitob_test_${testId}`, JSON.stringify(testData));
+        testCodeInput.value = testId;
+        quizLinkBlock.classList.remove('hidden');
+        // Прокрутка
+        quizLinkBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Небольшой фидбек (без звуков)
+    }
+
+    function copyTestCode() {
+        testCodeInput.select();
+        document.execCommand('copy');
+        const btn = copyCodeBtn;
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-regular fa-check"></i> Скопировано!';
+        setTimeout(() => { btn.innerHTML = originalHtml; }, 1500);
+    }
+
+    function resetCreation() {
+        quizTitleInput.value = '';
+        questionsLocal = [];
+        renderQuestionsUI();
+        quizLinkBlock.classList.add('hidden');
+        generateTestBtn.style.display = 'none';
+    }
+
+    // =========== ПРОХОЖДЕНИЕ ===========
+    function startQuizByCode() {
+        const code = accessCodeInput.value.trim();
+        if (!code) {
+            alert('Введите код теста');
+            return;
+        }
+        const raw = localStorage.getItem(`kitob_test_${code}`);
+        if (!raw) {
+            alert('Тест не найден. Проверьте код доступа');
+            return;
+        }
+        currentQuizObject = JSON.parse(raw);
+        currentTestId = code;
+        testTitleDisplay.innerText = currentQuizObject.title;
+
+        // отрисовка вопросов для прохождения
+        testQuestionsList.innerHTML = '';
+        currentQuizObject.questions.forEach((q, idx) => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-card';
+            qDiv.style.background = '#ffffff';
+            qDiv.innerHTML = `<h4 style="font-weight: 800; margin-bottom: 16px;">${idx+1}. ${escapeHtml(q.questionText)}</h4>`;
+            q.answers.forEach(answer => {
+                const optDiv = document.createElement('div');
+                optDiv.className = 'quiz-option';
+                optDiv.innerHTML = `
+                    <input type="radio" name="q_${idx}" value="${escapeHtml(answer)}" id="opt_${idx}_${escapeHtml(answer)}">
+                    <label for="opt_${idx}_${escapeHtml(answer)}" style="font-weight:500;">${escapeHtml(answer)}</label>
+                `;
+                qDiv.appendChild(optDiv);
+            });
+            testQuestionsList.appendChild(qDiv);
+        });
+
+        enterCodePanel.classList.add('hidden');
+        activeTestPanel.classList.remove('hidden');
+        resultPanel.classList.add('hidden');
+    }
+
+    function submitTest() {
+        if (!currentQuizObject) return;
+        let score = 0;
+        const total = currentQuizObject.questions.length;
+        for (let i = 0; i < total; i++) {
+            const selectedRadio = document.querySelector(`input[name="q_${i}"]:checked`);
+            if (selectedRadio) {
+                const userAnswer = selectedRadio.value;
+                if (userAnswer === currentQuizObject.questions[i].correctAnswer) {
+                    score++;
+                }
+            }
+        }
+        const percentage = Math.round((score / total) * 100);
+        finalScoreSpan.innerText = `${score}/${total}`;
+        resultProgress.style.width = `${percentage}%`;
+        let message = '';
+        if (percentage >= 85) message = '🎉 Отлично! Вы показали высокий уровень знаний. Награда — виртуальная медаль Kitob.';
+        else if (percentage >= 60) message = '📚 Хороший результат! Рекомендуем повторить сложные темы.';
+        else message = '📖 Стоит ещё потренироваться. Используйте материалы библиотеки Kitob School для подготовки.';
+        resultMessageText.innerText = message;
+
+        activeTestPanel.classList.add('hidden');
+        resultPanel.classList.remove('hidden');
+    }
+
+    function restartSameTest() {
+        if (!currentTestId) return;
+        const raw = localStorage.getItem(`kitob_test_${currentTestId}`);
+        if (raw) {
+            currentQuizObject = JSON.parse(raw);
+            enterCodePanel.classList.add('hidden');
+            activeTestPanel.classList.remove('hidden');
+            resultPanel.classList.add('hidden');
+            testTitleDisplay.innerText = currentQuizObject.title;
+            testQuestionsList.innerHTML = '';
+            currentQuizObject.questions.forEach((q, idx) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'question-card';
+                qDiv.innerHTML = `<h4 style="font-weight: 800; margin-bottom: 16px;">${idx+1}. ${escapeHtml(q.questionText)}</h4>`;
+                q.answers.forEach(answer => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'quiz-option';
+                    optDiv.innerHTML = `<input type="radio" name="q_${idx}" value="${escapeHtml(answer)}" id="opt_r_${idx}_${escapeHtml(answer)}">
+                                        <label for="opt_r_${idx}_${escapeHtml(answer)}">${escapeHtml(answer)}</label>`;
+                    qDiv.appendChild(optDiv);
+                });
+                testQuestionsList.appendChild(qDiv);
+            });
+        } else {
+            alert('Тест более не доступен, создайте новый');
+            window.location.reload();
+        }
+    }
+
+    // переключение вкладок
+    function switchTab(tabId) {
+        if (tabId === 'create') {
+            createSection.classList.remove('hidden');
+            takeSection.classList.add('hidden');
+        } else {
+            createSection.classList.add('hidden');
+            takeSection.classList.remove('hidden');
+            // сброс панелей прохождения
+            enterCodePanel.classList.remove('hidden');
+            activeTestPanel.classList.add('hidden');
+            resultPanel.classList.add('hidden');
+            accessCodeInput.value = '';
+        }
+        tabBtns.forEach(btn => {
+            const val = btn.getAttribute('data-tab');
+            if ((tabId === 'create' && val === 'create') || (tabId === 'take' && val === 'take')) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    // инициализация
+    function init() {
+        renderQuestionsUI();
+
+        addQuestionBtn.addEventListener('click', addQuestion);
+        generateTestBtn.addEventListener('click', generateTest);
+        copyCodeBtn.addEventListener('click', copyTestCode);
+        resetAllBtn.addEventListener('click', resetCreation);
+        startTestBtn.addEventListener('click', startQuizByCode);
+        submitTestBtn.addEventListener('click', submitTest);
+        restartTestBtn.addEventListener('click', restartSameTest);
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-tab');
+                switchTab(target);
+            });
+        });
+
+        // если в url есть параметр ?id=xxx, то автоматически открыть вкладку прохождения
+        const urlParams = new URLSearchParams(window.location.search);
+        const quizFromUrl = urlParams.get('id');
+        if (quizFromUrl) {
+            document.querySelector('.tab-btn[data-tab="take"]').click();
+            accessCodeInput.value = quizFromUrl;
+            startQuizByCode();
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
