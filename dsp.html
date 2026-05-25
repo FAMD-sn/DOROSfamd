@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -971,9 +972,6 @@ img{max-width:100%;height:auto}
     <div class="modal-head">
       <div>
         <div class="modal-title" id="modalTitle" data-i18n="add_product">Добавить товар</div>
-        <div id="draftIndicator" class="hidden" style="margin-top:4px">
-          <span class="draft-badge"><i class="fas fa-spinner"></i> <span data-i18n="draft_saved">Черновик сохранён</span></span>
-        </div>
       </div>
       <div style="display:flex;gap:0.4rem;align-items:center">
         <button class="btn btn-preview" id="previewBtn" onclick="showProductPreview()" style="padding:0.4rem 0.75rem;font-size:0.75rem">
@@ -1549,9 +1547,9 @@ const storage=firebase.storage();
 
 // ====== CONSTANTS ======
 const MAX_PRODUCTS=50;
-const DRAFT_KEY='ds_product_draft';
 const NOTE_KEY='ds_seller_notes';
 const GOAL_KEY='ds_seller_goal';
+const CONTACTS_KEY='ds_seller_contacts';
 const VIEW_KEY='ds_view_mode';
 const DARK_KEY='ds_dark_mode';
 
@@ -1560,7 +1558,7 @@ function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/<
 // ====== STATE ======
 let currentUser=null,allProducts=[],filteredProducts=[],selectedCategory='',editingProductId=null;
 let currentView=localStorage.getItem(VIEW_KEY)||'grid';
-let draftTimer=null,noteTimer=null;
+let noteTimer=null;
 let uploadedImageUrl='';
 let tempUploadedUrl=null;
 
@@ -1631,45 +1629,112 @@ function updateGoal(){
   if(savedLbl){savedLbl.style.display='inline-flex';setTimeout(()=>savedLbl.style.display='none',1500)}
 }
 
-// ====== DRAFT ======
-const DRAFT_FIELDS=['prodName','prodPrice','prodOriginalPrice','prodCity','prodDesc',
-  'prodCategory','prodSubcategory','prodPhone','prodWhatsapp','prodTelegram',
-  'prodInstagram','prodYoutube','prodDcCard'];
-
-function saveDraft(){
-  const draft={};
-  DRAFT_FIELDS.forEach(id=>{const el=document.getElementById(id);if(el)draft[id]=el.value});
-  draft.prodImage=uploadedImageUrl;
-  draft.editingProductId=editingProductId;
-  localStorage.setItem(DRAFT_KEY,JSON.stringify(draft));
-  document.getElementById('draftIndicator')?.classList.remove('hidden');
+// ====== CONTACT AUTOFILL ======
+const CONTACT_FIELDS=['city','phone','whatsapp','telegram','instagram','youtube','dcCard'];
+function saveContactsToStorage(data){
+  if(!currentUser)return;
+  const saved={};
+  CONTACT_FIELDS.forEach(f=>{if(data[f])saved[f]=data[f]});
+  localStorage.setItem(CONTACTS_KEY+'_'+currentUser.uid,JSON.stringify(saved));
 }
-function loadDraft(){
-  const raw=localStorage.getItem(DRAFT_KEY);
+function loadSavedContacts(){
+  if(!currentUser)return null;
+  const raw=localStorage.getItem(CONTACTS_KEY+'_'+currentUser.uid);
   if(!raw)return null;
   try{return JSON.parse(raw)}catch{return null}
 }
-function clearDraft(){
-  localStorage.removeItem(DRAFT_KEY);
-  document.getElementById('draftIndicator')?.classList.add('hidden');
-}
-function applyDraftToForm(draft){
-  DRAFT_FIELDS.forEach(id=>{
+function applyContactsToForm(contacts){
+  if(!contacts)return;
+  const map={city:'prodCity',phone:'prodPhone',whatsapp:'prodWhatsapp',telegram:'prodTelegram',instagram:'prodInstagram',youtube:'prodYoutube',dcCard:'prodDcCard'};
+  Object.entries(map).forEach(([key,id])=>{
     const el=document.getElementById(id);
-    if(el&&draft[id]!==undefined){
-      el.value=draft[id];
-      if(id==='prodCategory'&&draft[id])updateSubcategory(draft.prodSubcategory||'');
-    }
+    if(el&&!el.value&&contacts[key])el.value=contacts[key];
   });
-  if(draft.prodImage){
-    uploadedImageUrl=draft.prodImage;
-    tempUploadedUrl=draft.prodImage;
-    const preview=document.getElementById('imgPreview');
-    const wrap=document.getElementById('imgPreviewWrap');
-    if(preview)preview.src=draft.prodImage;
-    if(wrap)wrap.style.display='block';
+}
+
+// ====== VALIDATION ======
+function validateProduct(){
+  const name=document.getElementById('prodName')?.value.trim();
+  const price=parseFloat(document.getElementById('prodPrice')?.value);
+  const city=document.getElementById('prodCity')?.value.trim();
+  const category=document.getElementById('prodCategory')?.value;
+  const subcategory=document.getElementById('prodSubcategory')?.value;
+  const phone=document.getElementById('prodPhone')?.value.trim();
+  const whatsapp=document.getElementById('prodWhatsapp')?.value.trim();
+  let telegram=document.getElementById('prodTelegram')?.value.trim();
+  let instagram=document.getElementById('prodInstagram')?.value.trim();
+  const youtube=document.getElementById('prodYoutube')?.value.trim();
+  const dcCard=document.getElementById('prodDcCard')?.value.trim();
+
+  if(!name){showToast(t('req_fields'),'error');return false}
+  if(name.length>200){showToast('Название: макс 200 символов','error');return false}
+  if(!price||price<=0){showToast('Цена: введите число > 0','error');return false}
+  if(!city||city.length<2){showToast('Город: минимум 2 символа','error');return false}
+  if(!category||!subcategory){showToast(t('req_fields'),'error');return false}
+  if(!uploadedImageUrl){showToast(t('req_fields'),'error');return false}
+
+  if(phone){
+    const digits=phone.replace(/\D/g,'');
+    if(digits.length!==9){showToast('Телефон: 9 цифр','error');return false}
+  }
+  if(whatsapp){
+    const wdig=whatsapp.replace(/\D/g,'');
+    if(wdig.length!==12||!wdig.startsWith('992')){showToast('WhatsApp: 992XXXXXXXXX (12 цифр)','error');return false}
+  }
+  if(telegram){
+    if(telegram.startsWith('@'))telegram=telegram.slice(1);
+    if(telegram.startsWith('t.me/'))telegram=telegram.slice(5);
+    document.getElementById('prodTelegram').value=telegram;
+    if(!/^[a-zA-Z0-9_]{5,32}$/.test(telegram)){showToast('Telegram: 5-32 символа, только лат/цифры/_','error');return false}
+  }
+  if(instagram){
+    if(instagram.startsWith('@'))instagram=instagram.slice(1);
+    document.getElementById('prodInstagram').value=instagram;
+    if(!/^[a-zA-Z0-9._]{3,30}$/.test(instagram)){showToast('Instagram: 3-30 символа, лат/цифры/._','error');return false}
+  }
+  if(youtube){
+    if(!/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(youtube)){showToast('YouTube: укажите полную ссылку https://','error');return false}
+  }
+  if(dcCard){
+    const dc=dcCard.replace(/\D/g,'');
+    if(dc.length<16||dc.length>19){showToast('DC Card: 16-19 цифр','error');return false}
+  }
+  return true;
+}
+
+// ====== AI IMPROVE DESCRIPTION ======
+async function aiImproveDescription(){
+  const name=document.getElementById('prodName')?.value.trim();
+  const price=document.getElementById('prodPrice')?.value.trim();
+  const catKey=document.getElementById('prodCategory')?.value;
+  const city=document.getElementById('prodCity')?.value.trim();
+  const desc=document.getElementById('prodDesc')?.value.trim();
+  const catLabel=catKey?tCat(catKey):'';
+
+  const prompt=`Напиши продающее, честное, лаконичное описание для товара: Название: ${name||'Товар'}, Цена: ${price||'?'} сом, Категория: ${catLabel||catKey||'?'}, Город: ${city||'?'}. ${desc?'Базовое описание: '+desc+'.':''} Без воды, без фраз «Конечно, вот», без приветствий. Только текст описания (2-4 предложения).`;
+
+  const btn=document.getElementById('aiBtnImprove');
+  const spinner=document.getElementById('aiSpinner');
+  if(btn)btn.disabled=true;
+  if(spinner)spinner.style.display='inline-block';
+
+  try{
+    const url='https://text.pollinations.ai/'+encodeURIComponent(prompt)+'?model=openai&seed=42';
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    let text=await res.text();
+    text=text.trim().replace(/^["']|["']$/g,'');
+    const ta=document.getElementById('prodDesc');
+    if(ta)ta.value=text;
+  } catch(e){
+    showToast('Ошибка ИИ, попробуйте позже','error');
+  } finally {
+    if(btn)btn.disabled=false;
+    if(spinner)spinner.style.display='none';
   }
 }
+
+// ====== FORM DATA CHECK (for close confirmation) ======
 function formHasData(){
   const fields=['prodName','prodPrice','prodCity','prodDesc'];
   for(const id of fields){
@@ -1678,14 +1743,6 @@ function formHasData(){
   }
   if(uploadedImageUrl)return true;
   return false;
-}
-function setupDraftAutosave(){
-  clearTimeout(draftTimer);
-  const form=document.getElementById('modalBody');
-  if(!form)return;
-  form.querySelectorAll('input,textarea,select').forEach(inp=>{
-    inp.addEventListener('input',()=>{clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,3000)});
-  });
 }
 
 // ====== SUBCATEGORY ======
@@ -1911,11 +1968,10 @@ function openAddModal(){
   document.getElementById('modalTitle').textContent=t('add_product');
   document.getElementById('modalBody').innerHTML=buildProductForm();
   updateSubcategory();
-  const draft=loadDraft();
-  if(draft&&!draft.editingProductId&&confirm(t('draft_found')))applyDraftToForm(draft);
-  else if(draft&&!draft.editingProductId)clearDraft();
+  // Autofill contacts from previous save
+  const saved=loadSavedContacts();
+  if(saved)applyContactsToForm(saved);
   openModal('productModal');
-  setTimeout(setupDraftAutosave,100);
 }
 function editProduct(pid){
   const p=allProducts.find(x=>x.id===pid);if(!p)return;
@@ -1923,11 +1979,7 @@ function editProduct(pid){
   document.getElementById('modalTitle').textContent=t('edit_product');
   document.getElementById('modalBody').innerHTML=buildProductForm(p);
   updateSubcategory(p.subcategory||'');
-  const draft=loadDraft();
-  if(draft&&draft.editingProductId===pid&&confirm(t('draft_found')))applyDraftToForm(draft);
-  else if(draft&&draft.editingProductId===pid)clearDraft();
   openModal('productModal');
-  setTimeout(setupDraftAutosave,100);
 }
 
 async function closeProductModal(){
@@ -1993,7 +2045,13 @@ function buildProductForm(p=null){
         placeholder="Душанбе, Худжанд, Бохтар...">
     </div>
     <div class="form-group">
-      <label class="form-label">${t('prod_desc')}</label>
+      <label class="form-label" style="display:flex;align-items:center;justify-content:space-between">
+        <span>${t('prod_desc')}</span>
+        <button type="button" id="aiBtnImprove" onclick="aiImproveDescription()" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.7rem;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:white;border:none;border-radius:50px;font-size:0.7rem;font-weight:600;font-family:var(--font);cursor:pointer;transition:var(--trans);white-space:nowrap;box-shadow:0 3px 10px rgba(99,102,241,0.35)">
+          <i class="fas fa-wand-magic-sparkles"></i> ИИ
+          <span id="aiSpinner" style="display:none;width:10px;height:10px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite"></span>
+        </button>
+      </label>
       <textarea id="prodDesc" class="form-control" rows="3" maxlength="2000"
         placeholder="Опишите товар: состояние, характеристики, особенности...">${v('description')}</textarea>
     </div>
@@ -2108,7 +2166,6 @@ async function handleFileUpload(e){
         if(preview)preview.src=downloadURL;
         if(wrap)wrap.style.display='block';
         showToast('Фото загружено!','success');
-        saveDraft();
       }
     );
   } catch(err){
@@ -2154,18 +2211,28 @@ function removeImage(){
 }
 
 async function saveProduct(){
+  if(!validateProduct())return;
+
   const name=document.getElementById('prodName')?.value.trim();
   const price=parseFloat(document.getElementById('prodPrice')?.value);
   const city=document.getElementById('prodCity')?.value.trim();
   const category=document.getElementById('prodCategory')?.value;
   const subcategory=document.getElementById('prodSubcategory')?.value;
 
-  if(!name||!price||!city||!category||!subcategory||!uploadedImageUrl){
-    showToast(t('req_fields'),'error');return;
-  }
   if(allProducts.length>=MAX_PRODUCTS&&!editingProductId){
     showToast(t('quota_reached'),'warning');return;
   }
+
+  // Clean contact fields
+  let phone=document.getElementById('prodPhone')?.value.trim()||'';
+  let whatsapp=document.getElementById('prodWhatsapp')?.value.trim()||'';
+  let telegram=document.getElementById('prodTelegram')?.value.trim()||'';
+  if(telegram.startsWith('@'))telegram=telegram.slice(1);
+  if(telegram.startsWith('t.me/'))telegram=telegram.slice(5);
+  let instagram=document.getElementById('prodInstagram')?.value.trim()||'';
+  if(instagram.startsWith('@'))instagram=instagram.slice(1);
+  let youtube=document.getElementById('prodYoutube')?.value.trim()||'';
+  let dcCard=document.getElementById('prodDcCard')?.value.replace(/\D/g,'')||'';
 
   const data={
     name,price,
@@ -2174,12 +2241,7 @@ async function saveProduct(){
     description:document.getElementById('prodDesc')?.value.trim(),
     category,
     subcategory,
-    phone:document.getElementById('prodPhone')?.value.trim(),
-    whatsapp:document.getElementById('prodWhatsapp')?.value.trim(),
-    telegram:document.getElementById('prodTelegram')?.value.trim(),
-    instagram:document.getElementById('prodInstagram')?.value.trim(),
-    youtube:document.getElementById('prodYoutube')?.value.trim(),
-    dcCard:document.getElementById('prodDcCard')?.value.trim(),
+    phone,whatsapp,telegram,instagram,youtube,dcCard,
     image:uploadedImageUrl,
     userId:currentUser.uid,
     username:document.getElementById('userName').textContent
@@ -2197,8 +2259,9 @@ async function saveProduct(){
       updates[`users/${currentUser.uid}/productCount`]=firebase.database.ServerValue.increment(1);
       await db.ref().update(updates);
     }
+    // Save contacts for autofill
+    saveContactsToStorage({city,phone,whatsapp,telegram,instagram,youtube,dcCard});
     tempUploadedUrl=null;
-    clearDraft();
     closeModal('productModal');
     uploadedImageUrl='';
     showToast(t('saved'),'success');
@@ -2232,11 +2295,6 @@ function closeModal(id){
   document.getElementById(id).classList.remove('on');
   const anyOpen=document.querySelectorAll('.modal-bg.on').length>0;
   if(!anyOpen)document.body.style.overflow='';
-  if(id==='productModal'){
-    clearTimeout(draftTimer);
-    const name=document.getElementById('prodName')?.value;
-    if(name)saveDraft();
-  }
 }
 // Click outside to close
 document.addEventListener('click',(e)=>{
