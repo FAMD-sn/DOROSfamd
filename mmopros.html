@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>MijMary | Опрос для красоты</title>
+    <title>MijMary · опрос</title>
+    <!-- Font Awesome 6 (бесплатные иконки) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
     <style>
-        /* ----- базовые сбросы и шрифты ----- */
+        /* ----- сброс и базовый фон ----- */
         * {
             margin: 0;
             padding: 0;
@@ -13,510 +19,736 @@
         }
 
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-            background: linear-gradient(145deg, #f8f2f0 0%, #f0e9e7 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 20px;
+            justify-content: center;
+            padding: 32px 20px;
+            background: #f5efec;
+            background-image: 
+                radial-gradient(circle at 10% 30%, #f0e4df 0%, transparent 60%),
+                radial-gradient(circle at 90% 70%, #f0e4df 0%, transparent 60%),
+                linear-gradient(135deg, #faf6f4 0%, #f0e4df 100%);
+            background-attachment: fixed;
             margin: 0;
         }
 
-        /* ----- карточка-контейнер ----- */
+        /* ----- главная карточка с премиальным стеклом ----- */
         .survey-card {
-            max-width: 640px;
+            max-width: 660px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 48px;
-            padding: 32px 28px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08), 0 12px 30px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            transition: all 0.2s ease;
+            background: rgba(255, 252, 250, 0.55);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 72px;
+            padding: 44px 40px 36px;
+            box-shadow: 
+                0 30px 80px rgba(140, 110, 100, 0.06),
+                0 10px 40px rgba(140, 110, 100, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* ----- заголовок ----- */
+        /* декоративный элемент */
+        .survey-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(220, 196, 188, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .survey-card::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(220, 196, 188, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ----- шапка ----- */
+        .brand-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 12px;
         }
 
         .brand-icon {
-            font-size: 2.2rem;
-            line-height: 1;
-            letter-spacing: -1px;
-            background: #d9b8b0;
-            width: 56px;
-            height: 56px;
+            width: 54px;
+            height: 54px;
+            background: linear-gradient(135deg, #dcc4bc, #c9ada2);
+            border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 28px;
             color: #fff;
-            box-shadow: 0 8px 18px rgba(200, 150, 140, 0.25);
+            font-size: 1.5rem;
+            box-shadow: 0 8px 24px rgba(180, 140, 130, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .brand-icon:hover {
+            transform: rotate(-4deg) scale(1.02);
         }
 
         .brand-text {
-            font-size: 1.9rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
             font-weight: 600;
-            letter-spacing: -0.5px;
-            color: #3d2c28;
+            letter-spacing: -0.02em;
+            color: #3b2a24;
         }
 
         .brand-text span {
-            font-weight: 300;
-            color: #b18a80;
-        }
-
-        .subhead {
-            font-size: 1rem;
-            color: #5f4a44;
-            padding-left: 6px;
-            margin-top: -2px;
-            margin-bottom: 28px;
             font-weight: 400;
-            border-left: 4px solid #d9b8b0;
-            padding-left: 16px;
-            background: rgba(217, 184, 176, 0.1);
-            border-radius: 0 12px 12px 0;
-            line-height: 1.4;
+            color: #b9998d;
         }
 
-        /* ----- общие стили для полей ----- */
+        .tagline {
+            font-size: 0.75rem;
+            color: #9a7f76;
+            background: rgba(220, 196, 188, 0.12);
+            padding: 4px 16px;
+            border-radius: 40px;
+            border: 1px solid rgba(220, 196, 188, 0.1);
+            letter-spacing: 0.5px;
+            font-weight: 400;
+            text-transform: uppercase;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ----- информационная панель ----- */
+        .info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 18px;
+            margin: 14px 0 30px 0;
+            padding: 10px 0 12px 0;
+            border-top: 1px solid rgba(200, 180, 170, 0.12);
+            border-bottom: 1px solid rgba(200, 180, 170, 0.12);
+            font-size: 0.8rem;
+            color: #6a554c;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-bar span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-bar .dot {
+            width: 3px;
+            height: 3px;
+            background: #dcc4bc;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .info-bar i {
+            opacity: 0.5;
+            font-size: 0.85rem;
+            width: 16px;
+        }
+
+        /* ----- поле имени ----- */
+        .name-field {
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(180, 160, 150, 0.08);
+            padding: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.25s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .name-field:focus-within {
+            border-bottom-color: #cbb0a6;
+        }
+
+        .name-field i {
+            font-size: 1.1rem;
+            color: #bfa89e;
+            opacity: 0.6;
+            transition: 0.2s;
+        }
+
+        .name-field:focus-within i {
+            opacity: 1;
+            color: #b28276;
+        }
+
+        .name-field input {
+            border: none;
+            background: transparent;
+            padding: 12px 4px 10px 0;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            color: #2d1f1b;
+            outline: none;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+
+        .name-field input::placeholder {
+            color: #bfa89e;
+            font-weight: 300;
+        }
+
+        /* ----- вопросы ----- */
         .question {
-            margin-bottom: 32px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(180, 150, 140, 0.15);
-        }
-
-        .question:last-of-type {
-            border-bottom: none;
             margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
         }
 
         .q-label {
-            display: block;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #2d1f1b;
-            margin-bottom: 14px;
-            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: #3b2a24;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
         }
 
         .q-label .q-num {
-            display: inline-block;
-            background: #d9b8b0;
-            color: #fff;
-            font-size: 0.8rem;
-            width: 24px;
-            height: 24px;
-            text-align: center;
-            line-height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #eae0db;
+            color: #5f453c;
+            width: 26px;
+            height: 26px;
             border-radius: 30px;
-            margin-right: 10px;
-            font-weight: 500;
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex-shrink: 0;
         }
 
+        .q-label .q-icon {
+            font-size: 1rem;
+            opacity: 0.5;
+            color: #b28276;
+        }
+
+        /* ------ опции (элегантные) ------ */
         .options-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
+            gap: 8px;
         }
 
         .option-item {
-            background: rgba(255, 247, 245, 0.7);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(220, 190, 180, 0.2);
-            border-radius: 60px;
-            padding: 10px 14px;
+            background: rgba(255, 248, 245, 0.2);
+            border: 1px solid rgba(200, 180, 170, 0.08);
+            border-radius: 40px;
+            padding: 8px 14px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            color: #2f201c;
-            transition: all 0.15s;
+            gap: 10px;
+            font-size: 0.88rem;
+            color: #3b2a24;
+            transition: all 0.2s ease;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            backdrop-filter: blur(2px);
         }
 
         .option-item:hover {
-            background: rgba(217, 184, 176, 0.15);
-            border-color: #d9b8b0;
+            background: rgba(220, 196, 188, 0.08);
+            border-color: rgba(200, 180, 170, 0.2);
+            transform: translateY(-1px);
         }
 
         .option-item input[type="checkbox"],
-        .option-item input[type="radio"] {
-            accent-color: #b28276;
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-            margin: 0;
-            cursor: pointer;
-        }
-
-        .option-item label {
-            cursor: pointer;
-            flex: 1;
-            user-select: none;
-        }
-
-        /* текстовые поля */
-        .text-input {
-            width: 100%;
-            padding: 16px 18px;
-            border: 1px solid rgba(200, 170, 160, 0.25);
-            border-radius: 40px;
-            font-size: 1rem;
-            background: rgba(255, 250, 248, 0.6);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            transition: 0.2s;
-            color: #2d1f1b;
-            font-family: inherit;
-            resize: vertical;
-        }
-
-        .text-input:focus {
-            outline: none;
-            border-color: #c9a098;
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 0 4px rgba(200, 150, 140, 0.15);
-        }
-
-        .text-input::placeholder {
-            color: #b0988e;
-            font-weight: 300;
-        }
-
-        /* кастомный текст "другое" */
-        .other-wrap {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-            background: rgba(255, 247, 245, 0.3);
-            padding: 8px 12px 8px 16px;
-            border-radius: 60px;
-            border: 1px dashed rgba(180, 150, 140, 0.2);
-        }
-
-        .other-wrap input[type="text"] {
-            flex: 1;
-            min-width: 120px;
-            border: none;
-            background: transparent;
-            padding: 8px 4px;
-            font-size: 0.95rem;
-            border-bottom: 1px solid rgba(180, 150, 140, 0.2);
-            color: #2d1f1b;
-        }
-
-        .other-wrap input[type="text"]:focus {
-            outline: none;
-            border-bottom-color: #b28276;
-        }
-
-        /* кнопка */
-        .btn-submit {
-            display: block;
-            width: 100%;
-            padding: 18px 18px;
-            background: #2d1f1b;
-            border: none;
-            border-radius: 60px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #fff;
-            letter-spacing: 0.3px;
-            box-shadow: 0 12px 28px rgba(45, 31, 27, 0.15);
-            transition: 0.2s;
-            cursor: pointer;
-            margin-top: 12px;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .btn-submit:hover {
-            background: #1f1411;
-            transform: scale(1.01);
-            box-shadow: 0 16px 36px rgba(45, 31, 27, 0.2);
-        }
-
-        .btn-submit:active {
-            transform: scale(0.97);
-        }
-
-        /* статус */
-        #statusMessage {
-            margin-top: 24px;
-            text-align: center;
-            font-size: 0.95rem;
-            padding: 14px 10px;
-            border-radius: 60px;
-            background: rgba(217, 184, 176, 0.08);
-            color: #3d2c28;
-            border: 1px solid rgba(217, 184, 176, 0.2);
-            display: none;
-        }
-
-        #statusMessage.success {
-            display: block;
-            background: #e1f0e7;
-            border-color: #a3c9b5;
-            color: #1f4b39;
-        }
-
-        #statusMessage.error {
-            display: block;
-            background: #fce9e6;
-            border-color: #e6bfb8;
-            color: #8f4a3c;
-        }
-
-        /* мелкие правки */
-        .inline-label {
-            display: inline-block;
-            margin-right: 10px;
-        }
-
-        .mt-1 {
-            margin-top: 6px;
-        }
-
-        /* адаптивность */
-        @media (max-width: 500px) {
-            .survey-card {
-                padding: 24px 18px;
-                border-radius: 32px;
-            }
-
-            .brand-text {
-                font-size: 1.6rem;
-            }
-
-            .brand-icon {
-                width: 48px;
-                height: 48px;
-                font-size: 1.8rem;
-            }
-
-            .options-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-
-            .option-item {
-                padding: 10px 12px;
-                font-size: 0.9rem;
-                border-radius: 40px;
-            }
-
-            .q-label {
-                font-size: 1rem;
-            }
-
-            .subhead {
-                font-size: 0.9rem;
-            }
-
-            .btn-submit {
-                font-size: 1rem;
-                padding: 16px;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .other-wrap {
-                flex-direction: column;
-                align-items: stretch;
-                border-radius: 30px;
-                padding: 14px;
-            }
-        }
-
-        /* Чекбоксы и радио – красиво */
         .option-item input[type="radio"] {
             appearance: none;
             -webkit-appearance: none;
             width: 20px;
             height: 20px;
-            border: 2px solid #c9b0a8;
+            border: 2px solid #cfb9b0;
             border-radius: 50%;
-            background: #fff;
-            transition: 0.15s;
-            position: relative;
+            background: white;
+            transition: 0.15s ease;
             flex-shrink: 0;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .option-item input[type="checkbox"] {
+            border-radius: 7px;
         }
 
         .option-item input[type="radio"]:checked {
             border-color: #b28276;
             background: #b28276;
-            box-shadow: inset 0 0 0 4px #fff, 0 0 0 1px #b28276;
-        }
-
-        .option-item input[type="checkbox"] {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #c9b0a8;
-            border-radius: 8px;
-            background: #fff;
-            transition: 0.15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            box-shadow: inset 0 0 0 4px white, 0 0 0 1px #b28276;
         }
 
         .option-item input[type="checkbox"]:checked {
             background: #b28276;
             border-color: #b28276;
-            position: relative;
         }
 
         .option-item input[type="checkbox"]:checked::after {
             content: "✓";
             color: white;
             font-size: 14px;
-            font-weight: 700;
-            display: block;
-            line-height: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            inset: 0;
         }
 
-        /* скрыть стандартные radio/checkbox */
-        .option-item input[type="radio"],
-        .option-item input[type="checkbox"] {
-            filter: none;
-            opacity: 1;
+        .option-item label {
+            cursor: pointer;
+            flex: 1;
+            user-select: none;
+            font-weight: 400;
         }
 
-        /* маленькие звёздочки, вайб */
-        .soft-badge {
-            background: #f0e2de;
+        /* ----- текстовые поля ----- */
+        .text-input {
+            width: 100%;
+            padding: 12px 18px;
+            border: 1px solid rgba(200, 180, 170, 0.1);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            background: rgba(255, 252, 250, 0.2);
+            backdrop-filter: blur(4px);
+            transition: 0.25s ease;
+            color: #2d1f1b;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #dcc4bc;
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 0 4px rgba(220, 196, 188, 0.08);
+        }
+
+        .text-input::placeholder {
+            color: #bfa89e;
+            font-weight: 300;
+        }
+
+        /* блок "другое" */
+        .other-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding: 4px 4px 4px 18px;
+            border: 1px dashed rgba(180, 160, 150, 0.12);
             border-radius: 40px;
-            padding: 4px 12px;
-            font-size: 0.75rem;
-            color: #5f4a44;
-            display: inline-block;
+            background: rgba(255, 248, 245, 0.1);
+            transition: 0.2s;
+        }
+
+        .other-wrap:focus-within {
+            border-color: #dcc4bc;
+            background: rgba(255, 248, 245, 0.2);
+        }
+
+        .other-wrap input[type="text"] {
+            flex: 1;
+            min-width: 100px;
+            border: none;
+            background: transparent;
+            padding: 8px 4px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid transparent;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+            color: #2d1f1b;
+        }
+
+        .other-wrap input[type="text"]:focus {
+            outline: none;
+            border-bottom-color: #dcc4bc;
+        }
+
+        .other-wrap span {
+            color: #6a554c;
+            font-size: 0.8rem;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .other-wrap span i {
+            font-size: 0.7rem;
+            opacity: 0.4;
+        }
+
+        /* ----- кнопка отправки (премиум) ----- */
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #3b2a24, #2d1f1b);
+            border: none;
+            border-radius: 60px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: white;
             letter-spacing: 0.3px;
+            box-shadow: 0 12px 32px rgba(60, 40, 35, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent);
+            pointer-events: none;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(60, 40, 35, 0.15);
+            background: linear-gradient(135deg, #2d1f1b, #1f1411);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.97);
+        }
+
+        .btn-submit i {
+            font-size: 1.1rem;
+            opacity: 0.6;
+        }
+
+        /* ----- статус ----- */
+        #statusMessage {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 14px 20px;
+            border-radius: 60px;
+            background: rgba(220, 196, 188, 0.05);
+            color: #3b2a24;
+            border: 1px solid rgba(220, 196, 188, 0.08);
+            display: none;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        #statusMessage.success {
+            display: block;
+            background: #ecf5f0;
+            border-color: #c8dfd2;
+            color: #2d5b47;
+        }
+
+        #statusMessage.success i {
+            color: #4a8b72;
+        }
+
+        #statusMessage.error {
+            display: block;
+            background: #faece8;
+            border-color: #edd7d0;
+            color: #7f4f42;
+        }
+
+        #statusMessage.error i {
+            color: #b26a5a;
+        }
+
+        /* ----- футер с соцсетями и инфо ----- */
+        .footer-info {
+            margin-top: 30px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(200, 180, 170, 0.12);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #9a7f76;
+            letter-spacing: 0.2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-info .copy {
+            opacity: 0.5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .footer-info .social {
+            display: flex;
+            gap: 16px;
+        }
+
+        .footer-info .social a {
+            color: #9a7f76;
+            text-decoration: none;
+            transition: 0.2s ease;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+        }
+
+        .footer-info .social a i {
+            font-size: 0.85rem;
+        }
+
+        .footer-info .social a:hover {
+            color: #3b2a24;
+        }
+
+        /* ----- адаптивность ----- */
+        @media (max-width: 540px) {
+            .survey-card {
+                padding: 30px 22px 26px;
+                border-radius: 48px;
+            }
+            .brand-text {
+                font-size: 1.6rem;
+            }
+            .brand-icon {
+                width: 46px;
+                height: 46px;
+                font-size: 1.2rem;
+            }
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            .option-item {
+                padding: 6px 12px;
+                font-size: 0.82rem;
+            }
+            .tagline {
+                font-size: 0.65rem;
+                padding: 2px 12px;
+            }
+            .info-bar {
+                font-size: 0.7rem;
+                gap: 4px 12px;
+                padding: 8px 0 10px;
+            }
+            .footer-info {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            .btn-submit {
+                font-size: 0.95rem;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .other-wrap {
+                padding: 6px 10px 6px 14px;
+            }
+            .survey-card {
+                padding: 24px 16px 20px;
+                border-radius: 36px;
+            }
+        }
+
+        /* кастомный скролл */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #dcc4bc;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <div class="survey-card" role="main">
         <!-- шапка -->
-        <div class="brand">
-            <div class="brand-icon">✦</div>
-            <div class="brand-text">Mij<span>Mary</span></div>
+        <div class="brand-head">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-spa"></i></div>
+                <div class="brand-text">Mij<span>Mary</span></div>
+            </div>
+            <div class="tagline"><i class="fas fa-crown" style="margin-right:4px;font-size:0.6rem;"></i> beauty studio</div>
         </div>
-        <div class="subhead">
-            ✦ Опрос для создания идеального салона<br> 
-            <span style="font-size:0.85rem; opacity:0.7;">Анонимно, 2–3 минуты</span>
+
+        <!-- информационная строка -->
+        <div class="info-bar">
+            <span><i class="fas fa-lock"></i> анонимно</span>
+            <span class="dot"></span>
+            <span><i class="far fa-clock"></i> 2–3 минуты</span>
+            <span class="dot"></span>
+            <span><i class="fas fa-heart"></i> поможем создать идеальный салон</span>
         </div>
 
         <form id="surveyForm">
+            <!-- Имя -->
+            <div class="name-field">
+                <i class="far fa-user"></i>
+                <input type="text" id="userName" placeholder="Как к вам обращаться? (необязательно)" autocomplete="given-name">
+            </div>
+
             <!-- 1. Возраст -->
             <div class="question">
-                <span class="q-label"><span class="q-num">1</span> Ваш возраст</span>
-                <div class="options-grid" id="ageGroup">
-                    <div class="option-item"><input type="radio" name="age" value="До 18 лет" id="age1"><label for="age1">До 18 лет</label></div>
-                    <div class="option-item"><input type="radio" name="age" value="18–25 лет" id="age2"><label for="age2">18–25 лет</label></div>
-                    <div class="option-item"><input type="radio" name="age" value="26–35 лет" id="age3"><label for="age3">26–35 лет</label></div>
-                    <div class="option-item"><input type="radio" name="age" value="36–45 лет" id="age4"><label for="age4">36–45 лет</label></div>
-                    <div class="option-item"><input type="radio" name="age" value="Старше 45 лет" id="age5"><label for="age5">Старше 45 лет</label></div>
+                <span class="q-label"><span class="q-num">1</span> <i class="fas fa-rose q-icon"></i> Ваш возраст</span>
+                <div class="options-grid">
+                    <div class="option-item"><input type="radio" name="age" value="До 18 лет" id="age1"><label for="age1">До 18</label></div>
+                    <div class="option-item"><input type="radio" name="age" value="18–25 лет" id="age2"><label for="age2">18–25</label></div>
+                    <div class="option-item"><input type="radio" name="age" value="26–35 лет" id="age3"><label for="age3">26–35</label></div>
+                    <div class="option-item"><input type="radio" name="age" value="36–45 лет" id="age4"><label for="age4">36–45</label></div>
+                    <div class="option-item"><input type="radio" name="age" value="Старше 45 лет" id="age5"><label for="age5">45+</label></div>
                 </div>
             </div>
 
-            <!-- 2. Услуги (множественный выбор) -->
+            <!-- 2. Услуги -->
             <div class="question">
-                <span class="q-label"><span class="q-num">2</span> Какие услуги посещаете чаще всего?</span>
-                <div class="options-grid" id="servicesGroup">
-                    <div class="option-item"><input type="checkbox" name="services" value="Парикмахер" id="s1"><label for="s1">Парикмахер</label></div>
-                    <div class="option-item"><input type="checkbox" name="services" value="Маникюр" id="s2"><label for="s2">Маникюр</label></div>
-                    <div class="option-item"><input type="checkbox" name="services" value="Педикюр" id="s3"><label for="s3">Педикюр</label></div>
-                    <div class="option-item"><input type="checkbox" name="services" value="Косметолог" id="s4"><label for="s4">Косметолог</label></div>
-                    <div class="option-item"><input type="checkbox" name="services" value="Лазерная эпиляция" id="s5"><label for="s5">Лазерная эпиляция</label></div>
-                    <div class="option-item"><input type="checkbox" name="services" value="Макияж" id="s6"><label for="s6">Макияж</label></div>
+                <span class="q-label"><span class="q-num">2</span> <i class="fas fa-hand-sparkles q-icon"></i> Какие услуги посещаете чаще всего?</span>
+                <div class="options-grid">
+                    <div class="option-item"><input type="checkbox" name="services" value="Парикмахер" id="s1"><label for="s1"><i class="fas fa-cut" style="opacity:0.4;margin-right:4px;"></i> Парикмахер</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Маникюр" id="s2"><label for="s2"><i class="fas fa-hand" style="opacity:0.4;margin-right:4px;"></i> Маникюр</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Педикюр" id="s3"><label for="s3"><i class="fas fa-foot" style="opacity:0.4;margin-right:4px;"></i> Педикюр</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Косметолог" id="s4"><label for="s4"><i class="fas fa-face-smile" style="opacity:0.4;margin-right:4px;"></i> Косметолог</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Лазерная эпиляция" id="s5"><label for="s5"><i class="fas fa-bolt" style="opacity:0.4;margin-right:4px;"></i> Лазерная эпиляция</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Макияж" id="s6"><label for="s6"><i class="fas fa-paintbrush" style="opacity:0.4;margin-right:4px;"></i> Макияж</label></div>
                 </div>
-                <div class="other-wrap mt-1">
-                    <span style="color:#5f4a44; font-size:0.9rem;">Другое:</span>
-                    <input type="text" id="otherService" placeholder="напишите" class="text-input" style="padding:10px 14px; border-radius:40px;">
+                <div class="other-wrap">
+                    <span><i class="fas fa-pen"></i> другое</span>
+                    <input type="text" id="otherService" placeholder="напишите">
                 </div>
             </div>
 
-            <!-- 3. Что не устраивает (текст) -->
+            <!-- 3. Не устраивает -->
             <div class="question">
-                <span class="q-label"><span class="q-num">3</span> Что чаще всего не устраивает в салонах?</span>
-                <textarea id="dislikes" rows="2" class="text-input" placeholder="Поделитесь ..." style="border-radius:24px;"></textarea>
+                <span class="q-label"><span class="q-num">3</span> <i class="fas fa-face-frown q-icon"></i> Что чаще всего не устраивает в салонах?</span>
+                <textarea id="dislikes" rows="2" class="text-input" placeholder="Поделитесь ..."></textarea>
             </div>
 
-            <!-- 4. Разные салоны? -->
+            <!-- 4. Разные салоны -->
             <div class="question">
-                <span class="q-label"><span class="q-num">4</span> Приходится посещать разные салоны для разных услуг?</span>
+                <span class="q-label"><span class="q-num">4</span> <i class="fas fa-store q-icon"></i> Приходится посещать разные салоны для разных услуг?</span>
                 <div class="options-grid" style="grid-template-columns: 1fr 1fr;">
                     <div class="option-item"><input type="radio" name="differentSalons" value="Да" id="diffYes"><label for="diffYes">Да</label></div>
                     <div class="option-item"><input type="radio" name="differentSalons" value="Нет" id="diffNo"><label for="diffNo">Нет</label></div>
                 </div>
-                <div style="margin-top:14px;">
-                    <input type="text" id="reasonDifferent" class="text-input" placeholder="Если да, то почему?" style="border-radius:40px;">
+                <div style="margin-top:12px;">
+                    <input type="text" id="reasonDifferent" class="text-input" placeholder="Если да, то почему? (необязательно)">
                 </div>
             </div>
 
-            <!-- 5. Важное при выборе (чекбоксы) -->
+            <!-- 5. Важное -->
             <div class="question">
-                <span class="q-label"><span class="q-num">5</span> Что для вас самое важное при выборе салона?</span>
-                <div class="options-grid" id="importantGroup">
-                    <div class="option-item"><input type="checkbox" name="important" value="Качество услуг" id="i1"><label for="i1">Качество услуг</label></div>
-                    <div class="option-item"><input type="checkbox" name="important" value="Опыт мастеров" id="i2"><label for="i2">Опыт мастеров</label></div>
-                    <div class="option-item"><input type="checkbox" name="important" value="Чистота" id="i3"><label for="i3">Чистота</label></div>
-                    <div class="option-item"><input type="checkbox" name="important" value="Комфортная атмосфера" id="i4"><label for="i4">Комфортная атмосфера</label></div>
-                    <div class="option-item"><input type="checkbox" name="important" value="Цена" id="i5"><label for="i5">Цена</label></div>
-                    <div class="option-item"><input type="checkbox" name="important" value="Удобное расположение" id="i6"><label for="i6">Удобное расположение</label></div>
+                <span class="q-label"><span class="q-num">5</span> <i class="fas fa-star q-icon"></i> Что для вас самое важное при выборе салона?</span>
+                <div class="options-grid">
+                    <div class="option-item"><input type="checkbox" name="important" value="Качество услуг" id="i1"><label for="i1"><i class="fas fa-award" style="opacity:0.3;margin-right:4px;"></i> Качество</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Опыт мастеров" id="i2"><label for="i2"><i class="fas fa-user-tie" style="opacity:0.3;margin-right:4px;"></i> Опыт</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Чистота" id="i3"><label for="i3"><i class="fas fa-broom" style="opacity:0.3;margin-right:4px;"></i> Чистота</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Комфортная атмосфера" id="i4"><label for="i4"><i class="fas fa-couch" style="opacity:0.3;margin-right:4px;"></i> Атмосфера</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Цена" id="i5"><label for="i5"><i class="fas fa-tag" style="opacity:0.3;margin-right:4px;"></i> Цена</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Удобное расположение" id="i6"><label for="i6"><i class="fas fa-location-dot" style="opacity:0.3;margin-right:4px;"></i> Расположение</label></div>
                 </div>
-                <div class="other-wrap mt-1">
-                    <span style="color:#5f4a44; font-size:0.9rem;">Другое:</span>
-                    <input type="text" id="otherImportant" placeholder="что ещё" class="text-input" style="padding:10px 14px; border-radius:40px;">
+                <div class="other-wrap">
+                    <span><i class="fas fa-pen"></i> другое</span>
+                    <input type="text" id="otherImportant" placeholder="что ещё">
                 </div>
             </div>
 
-            <!-- 6. Чего не хватает (текст) -->
+            <!-- 6. Чего не хватает -->
             <div class="question">
-                <span class="q-label"><span class="q-num">6</span> Чего вам не хватает в современных салонах?</span>
-                <textarea id="missing" rows="2" class="text-input" placeholder="Расскажите ..." style="border-radius:24px;"></textarea>
+                <span class="q-label"><span class="q-num">6</span> <i class="fas fa-wand-magic-sparkles q-icon"></i> Чего вам не хватает в современных салонах?</span>
+                <textarea id="missing" rows="2" class="text-input" placeholder="Ваши идеи ..."></textarea>
             </div>
 
-            <!-- 7. ИИ, диагностика (текст) -->
+            <!-- 7. ИИ-диагностика -->
             <div class="question">
-                <span class="q-label"><span class="q-num">7</span> Хотели бы ИИ-диагностику кожи / подбор макияжа и прически?</span>
-                <textarea id="aiWish" rows="2" class="text-input" placeholder="Напишите, что думаете ..." style="border-radius:24px;"></textarea>
+                <span class="q-label"><span class="q-num">7</span> <i class="fas fa-microchip q-icon"></i> Хотели бы ИИ-диагностику кожи / подбор макияжа и прически?</span>
+                <textarea id="aiWish" rows="2" class="text-input" placeholder="Напишите, что думаете ..."></textarea>
             </div>
 
-            <!-- 8. Что сделает постоянным клиентом (текст) -->
-            <div class="question" style="border-bottom: none; margin-bottom: 16px;">
-                <span class="q-label"><span class="q-num">8</span> Что заставит вас стать постоянным клиентом?</span>
-                <textarea id="loyalty" rows="2" class="text-input" placeholder="Ваши идеи ..." style="border-radius:24px;"></textarea>
+            <!-- 8. Лояльность -->
+            <div class="question" style="margin-bottom: 16px;">
+                <span class="q-label"><span class="q-num">8</span> <i class="fas fa-heart q-icon"></i> Что заставит вас стать постоянным клиентом?</span>
+                <textarea id="loyalty" rows="2" class="text-input" placeholder="Ваши пожелания ..."></textarea>
             </div>
 
             <!-- кнопка -->
             <button type="button" id="submitBtn" class="btn-submit">
-                <span>✦</span> Готово <span>✦</span>
+                <i class="fas fa-paper-plane"></i> Отправить <i class="fas fa-arrow-right" style="opacity:0.4;font-size:0.9rem;"></i>
             </button>
             <div id="statusMessage"></div>
         </form>
+
+        <!-- футер -->
+        <div class="footer-info">
+            <div class="copy"><i class="far fa-copyright"></i> MijMary · создаём красоту с 2025</div>
+            <div class="social">
+                <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+                <a href="#"><i class="fab fa-telegram-plane"></i> Telegram</a>
+                <a href="#"><i class="fas fa-phone"></i> +7 (999) 123-45-67</a>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -527,47 +759,39 @@
             const submitBtn = document.getElementById('submitBtn');
             const statusMsg = document.getElementById('statusMessage');
 
-            // сбор данных
             function collectFormData() {
-                // 1. возраст
+                const userName = document.getElementById('userName').value.trim() || 'Не указано';
+
                 const ageRadio = document.querySelector('input[name="age"]:checked');
                 const age = ageRadio ? ageRadio.value : 'Не указано';
 
-                // 2. услуги (чекбоксы)
                 const serviceChecks = document.querySelectorAll('input[name="services"]:checked');
                 const services = Array.from(serviceChecks).map(el => el.value);
                 const otherService = document.getElementById('otherService').value.trim();
                 if (otherService) services.push('Другое: ' + otherService);
                 const servicesStr = services.length ? services.join(', ') : 'Не выбрано';
 
-                // 3. что не устраивает
                 const dislikes = document.getElementById('dislikes').value.trim() || 'Не указано';
 
-                // 4. разные салоны
                 const diffRadio = document.querySelector('input[name="differentSalons"]:checked');
                 const differentSalons = diffRadio ? diffRadio.value : 'Не указано';
-                const reasonDiff = document.getElementById('reasonDifferent').value.trim() || '';
+                const reasonDiff = document.getElementById('reasonDifferent').value.trim();
 
-                // 5. важное
                 const importantChecks = document.querySelectorAll('input[name="important"]:checked');
                 const important = Array.from(importantChecks).map(el => el.value);
                 const otherImportant = document.getElementById('otherImportant').value.trim();
                 if (otherImportant) important.push('Другое: ' + otherImportant);
                 const importantStr = important.length ? important.join(', ') : 'Не выбрано';
 
-                // 6. не хватает
                 const missing = document.getElementById('missing').value.trim() || 'Не указано';
-
-                // 7. ИИ
                 const aiWish = document.getElementById('aiWish').value.trim() || 'Не указано';
-
-                // 8. лояльность
                 const loyalty = document.getElementById('loyalty').value.trim() || 'Не указано';
 
-                // Собираем в читаемый текст
-                const msg = `✨ *Новый ответ на опрос MijMary* ✨
+                const msg = `🌸 *MijMary · ответ на опрос* 🌸
 
-👤 *Возраст:* ${age}
+👤 *Имя:* ${userName}
+
+👶 *Возраст:* ${age}
 
 💄 *Услуги:* ${servicesStr}
 
@@ -584,12 +808,11 @@
 ❤️ *Что сделает постоянным клиентом:* ${loyalty}
 
 ---
-*Спасибо за участие!* 🌸`;
+*Спасибо, что помогаете нам стать лучше!* ✨`;
 
                 return msg;
             }
 
-            // отправка в телеграм
             async function sendToTelegram(message) {
                 const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
                 const payload = {
@@ -597,7 +820,6 @@
                     text: message,
                     parse_mode: 'Markdown'
                 };
-
                 try {
                     const response = await fetch(url, {
                         method: 'POST',
@@ -605,45 +827,33 @@
                         body: JSON.stringify(payload)
                     });
                     const data = await response.json();
-                    if (data.ok) {
-                        return { success: true };
-                    } else {
-                        console.error('Telegram API error:', data);
-                        return { success: false, error: data.description || 'Ошибка отправки' };
-                    }
+                    if (data.ok) return { success: true };
+                    return { success: false, error: data.description || 'Ошибка отправки' };
                 } catch (err) {
-                    console.error('Network error:', err);
                     return { success: false, error: 'Ошибка сети. Проверьте подключение.' };
                 }
             }
 
-            // обработчик
             submitBtn.addEventListener('click', async function() {
-                // показать статус загрузки
                 statusMsg.className = '';
                 statusMsg.style.display = 'block';
-                statusMsg.textContent = '⏳ Отправка...';
-                statusMsg.style.background = 'rgba(217,184,176,0.2)';
-                statusMsg.style.borderColor = '#d9b8b0';
-                statusMsg.style.color = '#3d2c28';
+                statusMsg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+                statusMsg.style.background = 'rgba(220,196,188,0.06)';
+                statusMsg.style.borderColor = '#dcc4bc';
+                statusMsg.style.color = '#3b2a24';
 
                 const message = collectFormData();
                 const result = await sendToTelegram(message);
 
                 if (result.success) {
                     statusMsg.className = 'success';
-                    statusMsg.textContent = '✅ Спасибо! Ваши ответы отправлены. 🌸';
-                    // можно очистить форму? не очищаем, чтобы пользователь видел свои ответы.
+                    statusMsg.innerHTML = '<i class="fas fa-check-circle"></i> Спасибо! Ваши ответы отправлены. 🌸';
                 } else {
                     statusMsg.className = 'error';
-                    statusMsg.textContent = '❌ Ошибка: ' + (result.error || 'Не удалось отправить. Попробуйте позже.');
+                    statusMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + (result.error || 'Не удалось отправить. Попробуйте позже.');
                 }
             });
-
-            // небольшая проверка: при клике на лейбл чекбоксы работают корректно
-            // всё встроено
         })();
     </script>
-
 </body>
 </html>
