@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>MijMary | Опрос для красоты</title>
+    <style>
+        /* ----- базовые сбросы и шрифты ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #f8f2f0 0%, #f0e9e7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* ----- карточка-контейнер ----- */
+        .survey-card {
+            max-width: 640px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 32px 28px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08), 0 12px 30px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: all 0.2s ease;
+        }
+
+        /* ----- заголовок ----- */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .brand-icon {
+            font-size: 2.2rem;
+            line-height: 1;
+            letter-spacing: -1px;
+            background: #d9b8b0;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 28px;
+            color: #fff;
+            box-shadow: 0 8px 18px rgba(200, 150, 140, 0.25);
+        }
+
+        .brand-text {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #3d2c28;
+        }
+
+        .brand-text span {
+            font-weight: 300;
+            color: #b18a80;
+        }
+
+        .subhead {
+            font-size: 1rem;
+            color: #5f4a44;
+            padding-left: 6px;
+            margin-top: -2px;
+            margin-bottom: 28px;
+            font-weight: 400;
+            border-left: 4px solid #d9b8b0;
+            padding-left: 16px;
+            background: rgba(217, 184, 176, 0.1);
+            border-radius: 0 12px 12px 0;
+            line-height: 1.4;
+        }
+
+        /* ----- общие стили для полей ----- */
+        .question {
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(180, 150, 140, 0.15);
+        }
+
+        .question:last-of-type {
+            border-bottom: none;
+            margin-bottom: 28px;
+        }
+
+        .q-label {
+            display: block;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2d1f1b;
+            margin-bottom: 14px;
+            letter-spacing: -0.2px;
+        }
+
+        .q-label .q-num {
+            display: inline-block;
+            background: #d9b8b0;
+            color: #fff;
+            font-size: 0.8rem;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            border-radius: 30px;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .option-item {
+            background: rgba(255, 247, 245, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(220, 190, 180, 0.2);
+            border-radius: 60px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            color: #2f201c;
+            transition: all 0.15s;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .option-item:hover {
+            background: rgba(217, 184, 176, 0.15);
+            border-color: #d9b8b0;
+        }
+
+        .option-item input[type="checkbox"],
+        .option-item input[type="radio"] {
+            accent-color: #b28276;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .option-item label {
+            cursor: pointer;
+            flex: 1;
+            user-select: none;
+        }
+
+        /* текстовые поля */
+        .text-input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 1px solid rgba(200, 170, 160, 0.25);
+            border-radius: 40px;
+            font-size: 1rem;
+            background: rgba(255, 250, 248, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            transition: 0.2s;
+            color: #2d1f1b;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #c9a098;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 4px rgba(200, 150, 140, 0.15);
+        }
+
+        .text-input::placeholder {
+            color: #b0988e;
+            font-weight: 300;
+        }
+
+        /* кастомный текст "другое" */
+        .other-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            background: rgba(255, 247, 245, 0.3);
+            padding: 8px 12px 8px 16px;
+            border-radius: 60px;
+            border: 1px dashed rgba(180, 150, 140, 0.2);
+        }
+
+        .other-wrap input[type="text"] {
+            flex: 1;
+            min-width: 120px;
+            border: none;
+            background: transparent;
+            padding: 8px 4px;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(180, 150, 140, 0.2);
+            color: #2d1f1b;
+        }
+
+        .other-wrap input[type="text"]:focus {
+            outline: none;
+            border-bottom-color: #b28276;
+        }
+
+        /* кнопка */
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 18px 18px;
+            background: #2d1f1b;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 0.3px;
+            box-shadow: 0 12px 28px rgba(45, 31, 27, 0.15);
+            transition: 0.2s;
+            cursor: pointer;
+            margin-top: 12px;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-submit:hover {
+            background: #1f1411;
+            transform: scale(1.01);
+            box-shadow: 0 16px 36px rgba(45, 31, 27, 0.2);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.97);
+        }
+
+        /* статус */
+        #statusMessage {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 0.95rem;
+            padding: 14px 10px;
+            border-radius: 60px;
+            background: rgba(217, 184, 176, 0.08);
+            color: #3d2c28;
+            border: 1px solid rgba(217, 184, 176, 0.2);
+            display: none;
+        }
+
+        #statusMessage.success {
+            display: block;
+            background: #e1f0e7;
+            border-color: #a3c9b5;
+            color: #1f4b39;
+        }
+
+        #statusMessage.error {
+            display: block;
+            background: #fce9e6;
+            border-color: #e6bfb8;
+            color: #8f4a3c;
+        }
+
+        /* мелкие правки */
+        .inline-label {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .mt-1 {
+            margin-top: 6px;
+        }
+
+        /* адаптивность */
+        @media (max-width: 500px) {
+            .survey-card {
+                padding: 24px 18px;
+                border-radius: 32px;
+            }
+
+            .brand-text {
+                font-size: 1.6rem;
+            }
+
+            .brand-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.8rem;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .option-item {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+                border-radius: 40px;
+            }
+
+            .q-label {
+                font-size: 1rem;
+            }
+
+            .subhead {
+                font-size: 0.9rem;
+            }
+
+            .btn-submit {
+                font-size: 1rem;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .other-wrap {
+                flex-direction: column;
+                align-items: stretch;
+                border-radius: 30px;
+                padding: 14px;
+            }
+        }
+
+        /* Чекбоксы и радио – красиво */
+        .option-item input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #c9b0a8;
+            border-radius: 50%;
+            background: #fff;
+            transition: 0.15s;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .option-item input[type="radio"]:checked {
+            border-color: #b28276;
+            background: #b28276;
+            box-shadow: inset 0 0 0 4px #fff, 0 0 0 1px #b28276;
+        }
+
+        .option-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #c9b0a8;
+            border-radius: 8px;
+            background: #fff;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .option-item input[type="checkbox"]:checked {
+            background: #b28276;
+            border-color: #b28276;
+            position: relative;
+        }
+
+        .option-item input[type="checkbox"]:checked::after {
+            content: "✓";
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            display: block;
+            line-height: 16px;
+        }
+
+        /* скрыть стандартные radio/checkbox */
+        .option-item input[type="radio"],
+        .option-item input[type="checkbox"] {
+            filter: none;
+            opacity: 1;
+        }
+
+        /* маленькие звёздочки, вайб */
+        .soft-badge {
+            background: #f0e2de;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            color: #5f4a44;
+            display: inline-block;
+            letter-spacing: 0.3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="survey-card" role="main">
+        <!-- шапка -->
+        <div class="brand">
+            <div class="brand-icon">✦</div>
+            <div class="brand-text">Mij<span>Mary</span></div>
+        </div>
+        <div class="subhead">
+            ✦ Опрос для создания идеального салона<br> 
+            <span style="font-size:0.85rem; opacity:0.7;">Анонимно, 2–3 минуты</span>
+        </div>
+
+        <form id="surveyForm">
+            <!-- 1. Возраст -->
+            <div class="question">
+                <span class="q-label"><span class="q-num">1</span> Ваш возраст</span>
+                <div class="options-grid" id="ageGroup">
+                    <div class="option-item"><input type="radio" name="age" value="До 18 лет" id="age1"><label for="age1">До 18 лет</label></div>
+                    <div class="option-item"><input type="radio" name="age" value="18–25 лет" id="age2"><label for="age2">18–25 лет</label></div>
+                    <div class="option-item"><input type="radio" name="age" value="26–35 лет" id="age3"><label for="age3">26–35 лет</label></div>
+                    <div class="option-item"><input type="radio" name="age" value="36–45 лет" id="age4"><label for="age4">36–45 лет</label></div>
+                    <div class="option-item"><input type="radio" name="age" value="Старше 45 лет" id="age5"><label for="age5">Старше 45 лет</label></div>
+                </div>
+            </div>
+
+            <!-- 2. Услуги (множественный выбор) -->
+            <div class="question">
+                <span class="q-label"><span class="q-num">2</span> Какие услуги посещаете чаще всего?</span>
+                <div class="options-grid" id="servicesGroup">
+                    <div class="option-item"><input type="checkbox" name="services" value="Парикмахер" id="s1"><label for="s1">Парикмахер</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Маникюр" id="s2"><label for="s2">Маникюр</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Педикюр" id="s3"><label for="s3">Педикюр</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Косметолог" id="s4"><label for="s4">Косметолог</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Лазерная эпиляция" id="s5"><label for="s5">Лазерная эпиляция</label></div>
+                    <div class="option-item"><input type="checkbox" name="services" value="Макияж" id="s6"><label for="s6">Макияж</label></div>
+                </div>
+                <div class="other-wrap mt-1">
+                    <span style="color:#5f4a44; font-size:0.9rem;">Другое:</span>
+                    <input type="text" id="otherService" placeholder="напишите" class="text-input" style="padding:10px 14px; border-radius:40px;">
+                </div>
+            </div>
+
+            <!-- 3. Что не устраивает (текст) -->
+            <div class="question">
+                <span class="q-label"><span class="q-num">3</span> Что чаще всего не устраивает в салонах?</span>
+                <textarea id="dislikes" rows="2" class="text-input" placeholder="Поделитесь ..." style="border-radius:24px;"></textarea>
+            </div>
+
+            <!-- 4. Разные салоны? -->
+            <div class="question">
+                <span class="q-label"><span class="q-num">4</span> Приходится посещать разные салоны для разных услуг?</span>
+                <div class="options-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="option-item"><input type="radio" name="differentSalons" value="Да" id="diffYes"><label for="diffYes">Да</label></div>
+                    <div class="option-item"><input type="radio" name="differentSalons" value="Нет" id="diffNo"><label for="diffNo">Нет</label></div>
+                </div>
+                <div style="margin-top:14px;">
+                    <input type="text" id="reasonDifferent" class="text-input" placeholder="Если да, то почему?" style="border-radius:40px;">
+                </div>
+            </div>
+
+            <!-- 5. Важное при выборе (чекбоксы) -->
+            <div class="question">
+                <span class="q-label"><span class="q-num">5</span> Что для вас самое важное при выборе салона?</span>
+                <div class="options-grid" id="importantGroup">
+                    <div class="option-item"><input type="checkbox" name="important" value="Качество услуг" id="i1"><label for="i1">Качество услуг</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Опыт мастеров" id="i2"><label for="i2">Опыт мастеров</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Чистота" id="i3"><label for="i3">Чистота</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Комфортная атмосфера" id="i4"><label for="i4">Комфортная атмосфера</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Цена" id="i5"><label for="i5">Цена</label></div>
+                    <div class="option-item"><input type="checkbox" name="important" value="Удобное расположение" id="i6"><label for="i6">Удобное расположение</label></div>
+                </div>
+                <div class="other-wrap mt-1">
+                    <span style="color:#5f4a44; font-size:0.9rem;">Другое:</span>
+                    <input type="text" id="otherImportant" placeholder="что ещё" class="text-input" style="padding:10px 14px; border-radius:40px;">
+                </div>
+            </div>
+
+            <!-- 6. Чего не хватает (текст) -->
+            <div class="question">
+                <span class="q-label"><span class="q-num">6</span> Чего вам не хватает в современных салонах?</span>
+                <textarea id="missing" rows="2" class="text-input" placeholder="Расскажите ..." style="border-radius:24px;"></textarea>
+            </div>
+
+            <!-- 7. ИИ, диагностика (текст) -->
+            <div class="question">
+                <span class="q-label"><span class="q-num">7</span> Хотели бы ИИ-диагностику кожи / подбор макияжа и прически?</span>
+                <textarea id="aiWish" rows="2" class="text-input" placeholder="Напишите, что думаете ..." style="border-radius:24px;"></textarea>
+            </div>
+
+            <!-- 8. Что сделает постоянным клиентом (текст) -->
+            <div class="question" style="border-bottom: none; margin-bottom: 16px;">
+                <span class="q-label"><span class="q-num">8</span> Что заставит вас стать постоянным клиентом?</span>
+                <textarea id="loyalty" rows="2" class="text-input" placeholder="Ваши идеи ..." style="border-radius:24px;"></textarea>
+            </div>
+
+            <!-- кнопка -->
+            <button type="button" id="submitBtn" class="btn-submit">
+                <span>✦</span> Готово <span>✦</span>
+            </button>
+            <div id="statusMessage"></div>
+        </form>
+    </div>
+
+    <script>
+        (function() {
+            const BOT_TOKEN = '8257553077:AAF_lOkFJMPVa4crLaJGcR0ZqDWm8VBsgIU';
+            const CHAT_ID = '-1004470347288';
+
+            const submitBtn = document.getElementById('submitBtn');
+            const statusMsg = document.getElementById('statusMessage');
+
+            // сбор данных
+            function collectFormData() {
+                // 1. возраст
+                const ageRadio = document.querySelector('input[name="age"]:checked');
+                const age = ageRadio ? ageRadio.value : 'Не указано';
+
+                // 2. услуги (чекбоксы)
+                const serviceChecks = document.querySelectorAll('input[name="services"]:checked');
+                const services = Array.from(serviceChecks).map(el => el.value);
+                const otherService = document.getElementById('otherService').value.trim();
+                if (otherService) services.push('Другое: ' + otherService);
+                const servicesStr = services.length ? services.join(', ') : 'Не выбрано';
+
+                // 3. что не устраивает
+                const dislikes = document.getElementById('dislikes').value.trim() || 'Не указано';
+
+                // 4. разные салоны
+                const diffRadio = document.querySelector('input[name="differentSalons"]:checked');
+                const differentSalons = diffRadio ? diffRadio.value : 'Не указано';
+                const reasonDiff = document.getElementById('reasonDifferent').value.trim() || '';
+
+                // 5. важное
+                const importantChecks = document.querySelectorAll('input[name="important"]:checked');
+                const important = Array.from(importantChecks).map(el => el.value);
+                const otherImportant = document.getElementById('otherImportant').value.trim();
+                if (otherImportant) important.push('Другое: ' + otherImportant);
+                const importantStr = important.length ? important.join(', ') : 'Не выбрано';
+
+                // 6. не хватает
+                const missing = document.getElementById('missing').value.trim() || 'Не указано';
+
+                // 7. ИИ
+                const aiWish = document.getElementById('aiWish').value.trim() || 'Не указано';
+
+                // 8. лояльность
+                const loyalty = document.getElementById('loyalty').value.trim() || 'Не указано';
+
+                // Собираем в читаемый текст
+                const msg = `✨ *Новый ответ на опрос MijMary* ✨
+
+👤 *Возраст:* ${age}
+
+💄 *Услуги:* ${servicesStr}
+
+😔 *Не устраивает:* ${dislikes}
+
+🏢 *Разные салоны:* ${differentSalons}${reasonDiff ? '\n📌 Причина: ' + reasonDiff : ''}
+
+⭐ *Важное при выборе:* ${importantStr}
+
+🔍 *Чего не хватает:* ${missing}
+
+🤖 *ИИ/диагностика:* ${aiWish}
+
+❤️ *Что сделает постоянным клиентом:* ${loyalty}
+
+---
+*Спасибо за участие!* 🌸`;
+
+                return msg;
+            }
+
+            // отправка в телеграм
+            async function sendToTelegram(message) {
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                const payload = {
+                    chat_id: CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                };
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await response.json();
+                    if (data.ok) {
+                        return { success: true };
+                    } else {
+                        console.error('Telegram API error:', data);
+                        return { success: false, error: data.description || 'Ошибка отправки' };
+                    }
+                } catch (err) {
+                    console.error('Network error:', err);
+                    return { success: false, error: 'Ошибка сети. Проверьте подключение.' };
+                }
+            }
+
+            // обработчик
+            submitBtn.addEventListener('click', async function() {
+                // показать статус загрузки
+                statusMsg.className = '';
+                statusMsg.style.display = 'block';
+                statusMsg.textContent = '⏳ Отправка...';
+                statusMsg.style.background = 'rgba(217,184,176,0.2)';
+                statusMsg.style.borderColor = '#d9b8b0';
+                statusMsg.style.color = '#3d2c28';
+
+                const message = collectFormData();
+                const result = await sendToTelegram(message);
+
+                if (result.success) {
+                    statusMsg.className = 'success';
+                    statusMsg.textContent = '✅ Спасибо! Ваши ответы отправлены. 🌸';
+                    // можно очистить форму? не очищаем, чтобы пользователь видел свои ответы.
+                } else {
+                    statusMsg.className = 'error';
+                    statusMsg.textContent = '❌ Ошибка: ' + (result.error || 'Не удалось отправить. Попробуйте позже.');
+                }
+            });
+
+            // небольшая проверка: при клике на лейбл чекбоксы работают корректно
+            // всё встроено
+        })();
+    </script>
+
+</body>
+</html>
