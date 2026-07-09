@@ -2061,7 +2061,7 @@ async function aiImproveDescription(){
   const desc=document.getElementById('prodDesc')?.value.trim();
   const catLabel=catKey?tCat(catKey):'';
 
-  const prompt=`Напиши продающее, честное, лаконичное описание для товара: Название: ${name||'Товар'}, Цена: ${price||'?'} сом, Категория: ${catLabel||catKey||'?'}, Город: ${city||'?'}. ${desc?'Базовое описание: '+desc+'.':''} Без воды, без фраз «Конечно, вот», без приветствий. Только текст описания (2-4 предложения).`;
+  const prompt = `Анализируй фото товара. Определи точную модель по надписям на коробке или самом товаре. Категорию определи строго по тому, что изображено. Описание пиши на РУССКОМ языке, продающее, с эмодзи. Верни JSON: {"category":"electronics|clothing|furniture|home|beauty|sports|health|food|transport|realestate|appliances|shoes|accessories|books|toys|jewelry|chemistry|stationery|pets|garden|cars|services","subcategory":"подкатегория","name":"название модели на русском","description":"продающее описание на русском, 3-4 предложения, для рынка Таджикистана","city":"город если виден"}. Если на коробке написана модель — используй её в названии. Всё на РУССКОМ языке.`;
 
   const btn=document.getElementById('aiBtnImprove');
   const spinner=document.getElementById('aiSpinner');
