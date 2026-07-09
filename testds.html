@@ -1192,6 +1192,16 @@ body.light .cbtn.whatsapp,body.light .pcard-cart,body.light .cart-wa-btn{box-sha
 
 <!-- MAIN -->
 <main class="main" id="mainContent">
+
+  <!-- PWA Install Banner (lightweight) -->
+<div id="pwaInstallBanner" style="display:none;background:linear-gradient(135deg,var(--accent),#009984);border-radius:var(--r-md);padding:0.75rem 1rem;margin-bottom:0.75rem;display:flex;align-items:center;justify-content:space-between;color:#fff;flex-wrap:wrap;gap:0.5rem">
+  <span style="display:flex;align-items:center;gap:0.5rem;font-weight:600;font-size:0.85rem"><i class="fas fa-mobile-alt" style="font-size:1.2rem"></i> Установите DOROShop на главный экран</span>
+  <div style="display:flex;gap:0.5rem">
+    <button onclick="installPWA()" style="background:#fff;color:#1A1E2E;border:none;padding:0.4rem 1.2rem;border-radius:50px;font-weight:700;font-size:0.75rem;cursor:pointer;font-family:var(--font)">Установить</button>
+    <button onclick="document.getElementById('pwaInstallBanner').style.display='none'" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.3);padding:0.4rem 1rem;border-radius:50px;font-weight:600;font-size:0.7rem;cursor:pointer;font-family:var(--font)">Скрыть</button>
+  </div>
+</div>
+
   <!-- Banner Carousel -->
   <div class="banner-carousel" id="bannerCarousel"></div>
 
@@ -3192,7 +3202,7 @@ function refreshPricesUI() {
 
 // ====== AI SMART SEARCH (Pollinations) ======
 async function aiUnderstandQuery(query) {
-  const prompt = `Проанализируй запрос покупателя на маркетплейсе: "${query}".
+    const prompt = `Проанализируй запрос покупателя на маркетплейсе: "${query}".
 Определи, что он ищет. Верни JSON с полями:
 - category: одна из [electronics, clothing, home, beauty, sports, health, food, transport, realestate, appliances, shoes, accessories, books, toys, jewelry, chemistry, stationery, pets, garden, cars, services, furniture] или "" если непонятно
 - price_min: минимальная цена числом или null
@@ -3200,12 +3210,22 @@ async function aiUnderstandQuery(query) {
 - keywords: массив из 2-4 ключевых слов на русском для полнотекстового поиска
 - season: "лето"|"зима"|"весна"|"осень" или "" если не указано
 Ответ — ТОЛЬКО валидный JSON без пояснений и markdown.`;
-  const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`;
-  const response = await fetch(url);
-  const text = await response.text();
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('AI: не удалось разобрать ответ');
-  return JSON.parse(jsonMatch[0]);
+
+    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`;
+
+    try {
+        const response = await fetch(AI_PROXY + url);
+        if (!response.ok) throw new Error('Network error');
+        const text = await response.text();
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error('AI: не удалось разобрать ответ');
+        return JSON.parse(jsonMatch[0]);
+    } catch (err) {
+        console.warn('AI search failed, using fallback:', err);
+        // Fallback: простой поиск по ключевым словам
+        const words = query.split(/\s+/).filter(w => w.length > 2);
+        return { category: '', price_min: null, price_max: null, keywords: words, season: '' };
+    }
 }
 
 let lastAiFilters = null;
@@ -3383,8 +3403,12 @@ async function sendAiChatMessage() {
   }
 }
 
+// ====== AI CONFIG ======
+const AI_PROXY = 'https://cors-anywhere.herokuapp.com/';
+// Если cors-anywhere не работает, попробуйте: https://api.allorigins.win/raw?url=
+
 async function askAiAboutProduct(userQuestion, productContext) {
-  const prompt = `Ты — консультант по товару на маркетплейсе DOROShop.
+    const prompt = `Ты — консультант по товару на маркетплейсе DOROShop.
 
 Информация о товаре:
 - Название: ${productContext.name}
@@ -3401,10 +3425,18 @@ async function askAiAboutProduct(userQuestion, productContext) {
 Если вопрос о товаре — используй информацию из описания.
 Если не знаешь ответа — честно скажи, что информации нет.
 Отвечай на РУССКОМ языке.`;
-  const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('AI chat network error');
-  return await response.text();
+
+    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`;
+
+    try {
+        // Используем CORS-прокси!
+        const response = await fetch(AI_PROXY + url);
+        if (!response.ok) throw new Error('Network error');
+        return await response.text();
+    } catch (err) {
+        console.error('AI chat error:', err);
+        return 'Извините, AI-ассистент временно недоступен. Вы можете связаться с продавцом по контактам выше. 🙏';
+    }
 }
 
 function clearAiChat() {
@@ -3426,6 +3458,17 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW ref fail', err));
   });
+}
+
+function installPWA() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+            document.getElementById('pwaInstallBanner').style.display = 'none';
+        });
+    } else {
+        showToast('Откройте сайт в Google Chrome и нажмите "Установить" в меню', 'info');
+    }
 }
 
 </script>
