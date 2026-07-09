@@ -3449,29 +3449,14 @@ async function aiUnderstandQuery(query) {
     return JSON.parse(jsonMatch[0]);
 }
 
-// ====== AI PRODUCT ASSISTANT ======
+// ====== AI PRODUCT ASSISTANT (КОРОТКИЙ ПРОМПТ) ======
 async function askAiAboutProduct(userQuestion, productContext) {
-    const prompt = `Ты — консультант по товару на маркетплейсе DOROShop.
-
-Информация о товаре:
-- Название: ${productContext.name}
-- Цена: ${productContext.price} сом
-- Категория: ${productContext.category}
-- Описание: ${productContext.description}
-- Город: ${productContext.city}
-- Контакты продавца: телефон ${productContext.phone}, WhatsApp ${productContext.whatsapp}, Telegram ${productContext.telegram}, Instagram ${productContext.instagram}
-
-Покупатель спросил: "${userQuestion}"
-
-Ответь дружелюбно, полезно и кратко (2-4 предложения).
-Если вопрос о покупке — скажи, что можно связаться с продавцом по контактам выше.
-Если вопрос о товаре — используй информацию из описания.
-Если не знаешь ответа — честно скажи, что информации нет.
-Отвечай на РУССКОМ языке.`;
+    // ОЧЕНЬ КОРОТКИЙ ПРОМПТ — только самое важное!
+    const prompt = `Товар: ${productContext.name}. Цена: ${productContext.price} сом. Город: ${productContext.city}. Контакты: ${productContext.phone || 'не указан'}. Вопрос: "${userQuestion}". Ответь кратко, 2-3 предложения, на РУССКОМ.`;
 
     const result = await callPollinationsAI(prompt);
     if (!result) {
-        return 'Извините, AI-ассистент временно недоступен. Вы можете связаться с продавцом по контактам выше. 🙏';
+        return 'Извините, AI-ассистент временно недоступен. Свяжитесь с продавцом по контактам выше. 🙏';
     }
     return result;
 }
