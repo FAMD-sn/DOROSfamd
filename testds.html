@@ -3404,35 +3404,44 @@ async function sendAiChatMessage() {
 }
 
 // ====== AI CONFIG ======
-// Используем рабочий прокси вместо cors-anywhere
-const AI_PROXY = 'https://api.allorigins.win/raw?url=';
-
-// Универсальная функция для вызова Pollinations AI
-async function callPollinationsAI(prompt) {
-    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`;
+// Используем JSONP для обхода CORS (работает всегда!)
+function callPollinationsAI(prompt, callback) {
+    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai&seed=42`;
     
-    // Пробуем через прокси
-    try {
-        const response = await fetch(AI_PROXY + encodeURIComponent(url));
-        if (!response.ok) throw new Error('Proxy error: ' + response.status);
-        const text = await response.text();
-        // Проверяем, не вернул ли прокси HTML-ошибку
-        if (text.startsWith('<') || text.includes('error')) {
-            throw new Error('Proxy returned error page');
-        }
-        return text;
-    } catch (err) {
-        console.warn('Proxy failed, trying direct fetch:', err);
-        // Fallback: пробуем напрямую (может не работать из-за CORS)
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Direct fetch error: ' + response.status);
-            return await response.text();
-        } catch (directErr) {
-            console.error('All AI attempts failed:', directErr);
-            return null;
-        }
-    }
+    // Создаём уникальное имя для callback-функции
+    const callbackName = 'aiCallback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+    
+    // Оборачиваем промис
+    return new Promise((resolve, reject) => {
+        // Создаём глобальную функцию для JSONP
+        window[callbackName] = function(data) {
+            // Ответ приходит как строка
+            resolve(data);
+            // Удаляем скрипт и функцию
+            document.body.removeChild(script);
+            delete window[callbackName];
+        };
+        
+        // Создаём скрипт с JSONP-запросом
+        const script = document.createElement('script');
+        script.src = url + '&callback=' + callbackName;
+        script.onerror = function() {
+            // Если скрипт не загрузился
+            document.body.removeChild(script);
+            delete window[callbackName];
+            reject(new Error('JSONP request failed'));
+        };
+        document.body.appendChild(script);
+        
+        // Таймаут на случай, если ничего не пришло
+        setTimeout(() => {
+            if (window[callbackName]) {
+                document.body.removeChild(script);
+                delete window[callbackName];
+                reject(new Error('JSONP timeout'));
+            }
+        }, 15000);
+    });
 }
 
 // ====== AI SMART SEARCH ======
@@ -3446,14 +3455,17 @@ async function aiUnderstandQuery(query) {
 - season: "лето"|"зима"|"весна"|"осень" или "" если не указано
 Ответ — ТОЛЬКО валидный JSON без пояснений и markdown.`;
 
-    const result = await callPollinationsAI(prompt);
-    if (!result) {
+    try {
+        const result = await callPollinationsAI(prompt);
+        if (!result) throw new Error('No response');
+        const jsonMatch = result.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error('AI: не удалось разобрать ответ');
+        return JSON.parse(jsonMatch[0]);
+    } catch (err) {
+        console.warn('AI search failed, using fallback:', err);
         const words = query.split(/\s+/).filter(w => w.length > 2);
         return { category: '', price_min: null, price_max: null, keywords: words, season: '' };
     }
-    const jsonMatch = result.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('AI: не удалось разобрать ответ');
-    return JSON.parse(jsonMatch[0]);
 }
 
 // ====== AI PRODUCT ASSISTANT ======
@@ -3476,11 +3488,16 @@ async function askAiAboutProduct(userQuestion, productContext) {
 Если не знаешь ответа — честно скажи, что информации нет.
 Отвечай на РУССКОМ языке.`;
 
-    const result = await callPollinationsAI(prompt);
-    if (!result) {
+    try {
+        const result = await callPollinationsAI(prompt);
+        if (!result) {
+            return 'Извините, AI-ассистент временно недоступен. Вы можете связаться с продавцом по контактам выше. 🙏';
+        }
+        return result;
+    } catch (err) {
+        console.error('AI chat error:', err);
         return 'Извините, AI-ассистент временно недоступен. Вы можете связаться с продавцом по контактам выше. 🙏';
     }
-    return result;
 }
 
 // ====== LAUNCH ======
