@@ -3404,9 +3404,59 @@ async function sendAiChatMessage() {
 }
 
 // ====== AI CONFIG ======
-const AI_PROXY = 'https://cors-anywhere.herokuapp.com/';
-// Если cors-anywhere не работает, попробуйте: https://api.allorigins.win/raw?url=
+// Используем рабочий прокси вместо cors-anywhere
+const AI_PROXY = 'https://api.allorigins.win/raw?url=';
 
+// Универсальная функция для вызова Pollinations AI
+async function callPollinationsAI(prompt) {
+    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`;
+    
+    // Пробуем через прокси
+    try {
+        const response = await fetch(AI_PROXY + encodeURIComponent(url));
+        if (!response.ok) throw new Error('Proxy error: ' + response.status);
+        const text = await response.text();
+        // Проверяем, не вернул ли прокси HTML-ошибку
+        if (text.startsWith('<') || text.includes('error')) {
+            throw new Error('Proxy returned error page');
+        }
+        return text;
+    } catch (err) {
+        console.warn('Proxy failed, trying direct fetch:', err);
+        // Fallback: пробуем напрямую (может не работать из-за CORS)
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Direct fetch error: ' + response.status);
+            return await response.text();
+        } catch (directErr) {
+            console.error('All AI attempts failed:', directErr);
+            return null;
+        }
+    }
+}
+
+// ====== AI SMART SEARCH ======
+async function aiUnderstandQuery(query) {
+    const prompt = `Проанализируй запрос покупателя на маркетплейсе: "${query}".
+Определи, что он ищет. Верни JSON с полями:
+- category: одна из [electronics, clothing, home, beauty, sports, health, food, transport, realestate, appliances, shoes, accessories, books, toys, jewelry, chemistry, stationery, pets, garden, cars, services, furniture] или "" если непонятно
+- price_min: минимальная цена числом или null
+- price_max: максимальная цена числом или null
+- keywords: массив из 2-4 ключевых слов на русском для полнотекстового поиска
+- season: "лето"|"зима"|"весна"|"осень" или "" если не указано
+Ответ — ТОЛЬКО валидный JSON без пояснений и markdown.`;
+
+    const result = await callPollinationsAI(prompt);
+    if (!result) {
+        const words = query.split(/\s+/).filter(w => w.length > 2);
+        return { category: '', price_min: null, price_max: null, keywords: words, season: '' };
+    }
+    const jsonMatch = result.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('AI: не удалось разобрать ответ');
+    return JSON.parse(jsonMatch[0]);
+}
+
+// ====== AI PRODUCT ASSISTANT ======
 async function askAiAboutProduct(userQuestion, productContext) {
     const prompt = `Ты — консультант по товару на маркетплейсе DOROShop.
 
@@ -3426,28 +3476,12 @@ async function askAiAboutProduct(userQuestion, productContext) {
 Если не знаешь ответа — честно скажи, что информации нет.
 Отвечай на РУССКОМ языке.`;
 
-    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`;
-
-    try {
-        // Используем CORS-прокси!
-        const response = await fetch(AI_PROXY + url);
-        if (!response.ok) throw new Error('Network error');
-        return await response.text();
-    } catch (err) {
-        console.error('AI chat error:', err);
+    const result = await callPollinationsAI(prompt);
+    if (!result) {
         return 'Извините, AI-ассистент временно недоступен. Вы можете связаться с продавцом по контактам выше. 🙏';
     }
+    return result;
 }
-
-function clearAiChat() {
-  if (!currentAiProduct) return;
-  aiChatHistory[currentAiProduct.id] = [];
-  renderAiChatMessages();
-}
-
-document.getElementById('aiChatInput')?.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { e.preventDefault(); sendAiChatMessage(); }
-});
 
 // ====== LAUNCH ======
 updateBadges();
