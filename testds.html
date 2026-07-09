@@ -3404,41 +3404,24 @@ async function sendAiChatMessage() {
 }
 
 // ====== AI CONFIG ======
-// Пробуем разные прокси
-const PROXIES = [
-    'https://corsproxy.io/?',
-    'https://api.allorigins.win/raw?url=',
-    'https://cors-anywhere.herokuapp.com/'
-];
-
-let currentProxyIndex = 0;
+// Используем ваш Cloudflare Worker как прокси
+const AI_PROXY = 'https://doroshop.doriush8.workers.dev/?target=';
 
 async function callPollinationsAI(prompt) {
     const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`;
     
-    // Пробуем прокси по очереди
-    for (let i = 0; i < PROXIES.length; i++) {
-        const proxy = PROXIES[i];
-        try {
-            const response = await fetch(proxy + encodeURIComponent(url));
-            if (!response.ok) throw new Error('HTTP ' + response.status);
-            const text = await response.text();
-            if (text.startsWith('<') || text.includes('html')) {
-                throw new Error('HTML response');
-            }
-            return text;
-        } catch (err) {
-            console.warn(`Proxy ${i} failed:`, err);
-        }
-    }
-    
-    // Если все прокси не работают — пробуем напрямую
     try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Direct error');
-        return await response.text();
+        const response = await fetch(AI_PROXY + encodeURIComponent(url));
+        if (!response.ok) throw new Error('Proxy error: ' + response.status);
+        const text = await response.text();
+        // Проверяем, не вернул ли прокси ошибку
+        if (text.startsWith('{') && text.includes('error')) {
+            const err = JSON.parse(text);
+            throw new Error(err.error || 'Unknown error');
+        }
+        return text;
     } catch (err) {
-        console.error('All AI attempts failed:', err);
+        console.error('AI error:', err);
         return null;
     }
 }
