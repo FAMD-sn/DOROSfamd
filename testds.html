@@ -14,30 +14,31 @@
 <link rel="canonical" href="https://dorosfamd.com/DOROShop">
 <link rel="icon" href="https://dorosfamd.com/doroshop.png" type="image/png">
 <link rel="apple-touch-icon" href="https://dorosfamd.com/doroshop.png">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="manifest" href="/manifest_ds.json">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"DOROShop","url":"https://dorosfamd.com/DOROShop","potentialAction":{"@type":"SearchAction","target":"https://dorosfamd.com/DOROShop?search={search_term_string}","query-input":"required name=search_term_string"}}</script>
 
 <style>
 :root {
-  --bg: #060A13;
-  --surface: #0C1120;
-  --surface2: #111827;
-  --surface3: #1A2235;
-  --surface4: #1F2D42;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.11);
-  --text: #EEF2FF;
-  --text2: #7A8EAA;
-  --text3: #3D4F68;
+  --bg: #0b0c10;
+  --surface: #0e1118;
+  --surface2: #161923;
+  --surface3: #1c202c;
+  --surface4: #232838;
+  --border: rgba(255,255,255,0.04);
+  --border2: rgba(255,255,255,0.09);
+  --text: #F5F6F8;
+  --text2: #8A90A2;
+  --text3: #4A5064;
   --accent: #0EA5E9;
   --accent2: #38BDF8;
+  --accent-rgb: 14,165,233;
   --accent-glow: rgba(14,165,233,0.18);
   --green: #10B981;
-  --red: #EF4444;
-  --red-glow: rgba(239,68,68,0.2);
-  --gold: #F59E0B;
+  --red: #E63950;
+  --red-glow: rgba(230,57,80,0.22);
+  --gold: #F5B133;
   --purple: #8B5CF6;
   --accent-orange: #FF6B35;
   --accent-orange2: #FF8A5C;
@@ -45,18 +46,20 @@
   --dc-from: #C62828;
   --dc-to: #E53935;
   --dc-glow: rgba(229,57,53,0.35);
-  --font: 'Sora', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Inter', sans-serif;
   --r-sm: 10px;
   --r-md: 16px;
   --r-lg: 22px;
   --r-xl: 28px;
-  --r-card: 24px;
-  --ease: cubic-bezier(0.4,0,0.2,1);
+  --r-card: 20px;
+  --ease: cubic-bezier(0.2,0.8,0.2,1);
   --spring: cubic-bezier(0.34,1.56,0.64,1);
-  --trans: all 0.25s var(--ease);
+  --trans: all 0.35s var(--ease);
   --header-h: 60px;
   --bottom-h: 68px;
+  --glass-bg: rgba(14,17,24,0.7);
+  --glass-bg-light: rgba(255,255,255,0.7);
 }
 
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -101,7 +104,7 @@ body{
 .header{
   position:fixed;top:0;left:0;right:0;
   height:var(--header-h);
-  background:rgba(6,10,19,0.88);
+  background:rgba(14,17,24,0.88);
   backdrop-filter:blur(24px) saturate(180%);
   -webkit-backdrop-filter:blur(24px) saturate(180%);
   border-bottom:1px solid var(--border);
@@ -235,7 +238,7 @@ body{
 /* ====== FILTER BAR ====== */
 .filter-bar-wrap{
   position:fixed;top:var(--header-h);left:0;right:0;
-  background:rgba(6,10,19,0.92);
+  background:rgba(14,17,24,0.92);
   backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
   z-index:190;
@@ -373,84 +376,83 @@ body{
 .products-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:0.875rem;
-  padding:0.75rem 0;
+  gap:1.25rem 0.875rem;
+  padding:1rem 0;
 }
-@media(min-width:560px){.products-grid{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:768px){.products-grid{grid-template-columns:repeat(4,1fr)}}
-@media(min-width:1024px){.products-grid{grid-template-columns:repeat(5,1fr)}}
-@media(min-width:1280px){.products-grid{grid-template-columns:repeat(6,1fr)}}
+@media(min-width:560px){.products-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:20px}}
 
-/* ====== PRODUCT CARD ====== */
+/* ====== PRODUCT CARD (Air Design premium rebuild) ====== */
 .pcard{
-  background:var(--surface);
-  border-radius:var(--r-card);
-  border:1px solid var(--border);
-  overflow:hidden;
-  transition:transform 0.3s var(--ease),box-shadow 0.3s var(--ease),border-color 0.3s;
+  background:transparent;
+  border-radius:0;
+  border:none;
+  overflow:visible;
+  transition:transform 0.4s var(--spring);
   cursor:pointer;
   position:relative;
   display:flex;flex-direction:column;
   animation:stagger-fade 0.45s var(--ease) both;
 }
-.pcard:hover{
-  transform:translateY(-5px);
-  box-shadow:0 18px 48px rgba(0,0,0,0.55),0 0 0 1px rgba(14,165,233,0.22);
-  border-color:rgba(14,165,233,0.28);
-}
+.pcard:hover{ transform:translateY(-3px); }
 .pcard:active{transform:scale(0.97)}
 
-/* FIXED: object-fit:contain для правильного отображения картинок */
 .pcard-img-wrap{
   width:100%;
-  padding-top:100%;
+  aspect-ratio:4/5;
   position:relative;
   overflow:hidden;
   background:var(--surface2);
+  border-radius:16px;
   flex-shrink:0;
+  transition:box-shadow 0.4s var(--ease);
 }
+.pcard:hover .pcard-img-wrap{ box-shadow:0 16px 40px rgba(0,0,0,0.28), 0 0 0 1px rgba(var(--accent-rgb),0.12); }
+body.light .pcard:hover .pcard-img-wrap{ box-shadow:0 16px 40px rgba(29,29,31,0.1); }
 .pcard-img{
   position:absolute;inset:0;
   width:100%;height:100%;
-  object-fit:contain;
-  transition:transform 0.55s var(--ease);
-  padding:4px;
+  object-fit:cover;
+  transition:transform 0.5s var(--ease);
 }
-.pcard:hover .pcard-img{transform:scale(1.06)}
+.pcard:hover .pcard-img{transform:scale(1.04)}
 
 .pcard-badge{
-  position:absolute;top:0.55rem;right:0.55rem;
-  background:linear-gradient(135deg,#EF4444,#DC2626);
+  position:absolute;bottom:0.6rem;left:0.6rem;
+  background:linear-gradient(135deg,#E63950,#C21F3D);
   color:white;
-  padding:0.22rem 0.5rem;
-  border-radius:7px;
+  padding:0.24rem 0.55rem;
+  border-radius:6px;
   font-size:0.64rem;font-weight:700;
-  box-shadow:0 2px 10px rgba(239,68,68,0.45);
+  box-shadow:0 4px 14px rgba(230,57,80,0.4);
   animation:badgePop 0.4s var(--spring);
   z-index:2;
+  letter-spacing:0.02em;
 }
 
 .pcard-fav{
-  position:absolute;top:0.55rem;left:0.55rem;
-  width:30px;height:30px;
-  background:rgba(6,10,19,0.72);
-  backdrop-filter:blur(8px);
-  border:1px solid var(--border2);
+  position:absolute;top:0.6rem;right:0.6rem;
+  width:32px;height:32px;
+  background:rgba(14,17,24,0.45);
+  backdrop-filter:blur(12px) saturate(180%);
+  -webkit-backdrop-filter:blur(12px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.14);
   border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;
-  transition:all 0.2s var(--ease);
-  color:var(--text2);
-  font-size:0.8rem;
+  transition:all 0.25s var(--spring);
+  color:#fff;
+  font-size:0.82rem;
   z-index:3;
 }
-.pcard-fav:hover{background:rgba(239,68,68,0.18);border-color:var(--red);color:var(--red)}
-.pcard-fav.active{color:var(--red);border-color:var(--red);background:rgba(239,68,68,0.18)}
+.pcard-fav:hover{transform:scale(1.08);color:#E63950}
+.pcard-fav:active{transform:scale(0.92)}
+.pcard-fav.active{color:#E63950}
 .pcard-fav.active i{animation:heartBeat 0.55s var(--ease)}
 .pcard-fav.pop i{animation:heartPulse 0.6s ease both}
+body.light .pcard-fav{background:rgba(255,255,255,0.45);border-color:rgba(29,29,31,0.08);color:#1d1d1f}
 
 .pcard-verified{
-  position:absolute;bottom:0.55rem;right:0.55rem;
+  position:absolute;bottom:0.6rem;right:0.6rem;
   width:22px;height:22px;
   background:linear-gradient(135deg,var(--accent),#0369A1);
   border-radius:50%;
@@ -463,12 +465,12 @@ body{
 
 .pcard-price-glass{
   position:absolute;bottom:0;left:0;right:0;
-  background:linear-gradient(to top,rgba(6,10,19,0.92) 0%,rgba(6,10,19,0.6) 60%,transparent 100%);
-  padding:1.5rem 0.7rem 0.7rem;
-  z-index:2;
+  background:linear-gradient(to top,rgba(0,0,0,0.55) 0%,transparent 55%);
+  padding:1.5rem 0.7rem 0.6rem;
+  z-index:1;
+  pointer-events:none;
+  opacity:0;
 }
-.pcard-price-glass .pcard-price{font-size:0.98rem;font-weight:800;color:white;font-family:var(--font-body);text-shadow:0 1px 4px rgba(0,0,0,0.5)}
-.pcard-price-glass .pcard-old-price{font-size:0.65rem;color:rgba(255,255,255,0.55);text-decoration:line-through;font-family:var(--font-body);margin-left:0.3rem}
 
 .cat-line{position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 3px 3px}
 .cat-electronics{background:linear-gradient(90deg,#3B82F6,#6366F1)}
@@ -495,48 +497,62 @@ body{
 .cat-garden{background:linear-gradient(90deg,#22C55E,#15803D)}
 
 .pcard-body{
-  padding:0.625rem 0.75rem 0.5rem;
-  flex:1;display:flex;flex-direction:column;gap:0.2rem;
+  padding:0.65rem 0 0;
+  flex:1;display:flex;flex-direction:column;gap:0.25rem;
 }
-.pcard-cat{font-size:0.61rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;font-weight:600;font-family:var(--font-body)}
+.pcard-cat{font-size:0.6rem;color:var(--text2);opacity:0.5;text-transform:uppercase;letter-spacing:0.03em;font-weight:600;font-family:var(--font-body)}
+.pcard-price-row{display:flex;align-items:baseline;gap:0.4rem}
+.pcard-price{font-size:1rem;font-weight:800;color:var(--text);font-family:var(--font-body);letter-spacing:-0.01em}
+.pcard-old-price{font-size:0.72rem;color:var(--text3,#8e8e93);text-decoration:line-through;font-family:var(--font-body);position:relative;top:0.05em}
 .pcard-name{
-  font-size:0.83rem;font-weight:600;color:var(--text);
+  font-size:0.8rem;font-weight:500;color:var(--text);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   line-height:1.35;
   font-family:var(--font-body);
 }
-.pcard-city{font-size:0.64rem;color:var(--text3);display:flex;align-items:center;gap:2px;font-family:var(--font-body)}
+.pcard-name b, .pcard-name strong, .pcard-brand{font-weight:700}
+.pcard-rating{font-size:0.7rem;color:var(--text2);opacity:0.7;display:flex;align-items:center;gap:0.28rem;font-family:var(--font-body)}
+.pcard-rating i{color:var(--gold);font-size:0.62rem}
+.pcard-rating .rv-count{opacity:0.75}
+.pcard-city{font-size:0.64rem;color:var(--text3);display:flex;align-items:center;gap:2px;font-family:var(--font-body);opacity:0.6}
 .pcard-city i{font-size:0.58rem}
 
 .pcard-footer{
-  padding:0 0.75rem 0.75rem;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:0.5rem;
+  padding:0.35rem 0 0.1rem;
+  display:flex;flex-direction:column;align-items:stretch;
+  gap:0.4rem;
 }
+.pcard-footer .pcard-seller{max-width:100%}
 .pcard-seller{
   font-size:0.67rem;color:var(--text2);
   display:flex;align-items:center;gap:0.3rem;
   cursor:pointer;transition:var(--trans);
   max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   font-family:var(--font-body);
+  opacity:0.75;
 }
-.pcard-seller:hover{color:var(--accent)}
+.pcard-seller:hover{color:var(--accent);opacity:1}
 .pcard-seller-verified{color:var(--accent);font-size:0.6rem}
 
 .pcard-cart{
-  width:30px;height:30px;
-  background:linear-gradient(135deg,var(--accent),#0284C7);
+  width:100%;height:34px;
+  background:var(--surface3);
   border:none;border-radius:10px;
-  color:white;
+  color:var(--text);
   display:flex;align-items:center;justify-content:center;
-  font-size:0.72rem;cursor:pointer;
-  transition:all 0.2s var(--ease);
+  gap:0.4rem;
+  font-size:0.74rem;font-weight:700;cursor:pointer;
+  transition:all 0.3s var(--spring);
   flex-shrink:0;
-  box-shadow:0 2px 8px var(--accent-glow);
+  font-family:var(--font-body);
 }
-.pcard-cart:hover{background:linear-gradient(135deg,var(--accent2),var(--accent));transform:scale(1.1)}
-.pcard-cart:active{transform:scale(0.9)}
+.pcard-cart:hover{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;box-shadow:0 8px 20px var(--accent-glow)}
+.pcard-cart:active{transform:scale(0.96)}
 .pcard-cart.bounce{animation:cartBounce 0.4s var(--spring)}
+@media(min-width:900px){
+  .pcard-cart{opacity:0.88}
+  .pcard:hover .pcard-cart{opacity:1;transform:translateY(-1px)}
+}
 
 /* ====== LIST VIEW (improved) ====== */
 .products-grid.list-view{grid-template-columns:1fr !important}
@@ -559,7 +575,7 @@ body{
   object-fit:contain;
 }
 .products-grid.list-view .pcard-price-glass{
-  background:linear-gradient(to right,rgba(6,10,19,0.85) 0%,transparent 100%);
+  background:linear-gradient(to right,rgba(14,17,24,0.85) 0%,transparent 100%);
   padding:0.4rem 0.5rem;
   bottom:0;top:0;left:0;right:auto;
   width:110px;
@@ -861,7 +877,7 @@ body{
 .bottom-nav{
   position:fixed;bottom:0;left:0;right:0;
   height:var(--bottom-h);
-  background:rgba(6,10,19,0.94);
+  background:rgba(14,17,24,0.94);
   backdrop-filter:blur(24px) saturate(180%);
   border-top:1px solid var(--border);
   z-index:200;
@@ -952,33 +968,34 @@ body{
 
 /* ====== LIGHT THEME (default — WB/Ozon style) ====== */
 body.light{
-  --bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F4F6F9;--surface3:#EDF1F5;--surface4:#E2E8F0;
-  --border:rgba(15,23,42,0.07);--border2:rgba(15,23,42,0.12);
-  --text:#1A1E2E;--text2:#64748B;--text3:#94A3B8;
-  --accent:#00BFA5;--accent2:#14D6BA;--accent-glow:rgba(0,191,165,0.16);
-  --green:#10B981;--red:#EF4444;--red-glow:rgba(239,68,68,0.15);--gold:#F59E0B;--purple:#8B5CF6;
+  --bg:#ffffff;--surface:#f5f5f7;--surface2:#f8f9fa;--surface3:#eef0f3;--surface4:#e4e7ec;
+  --border:rgba(29,29,31,0.06);--border2:rgba(29,29,31,0.11);
+  --text:#1d1d1f;--text2:#6e6e76;--text3:#9a9aa2;
+  --accent:#00BFA5;--accent2:#14D6BA;--accent-rgb:0,191,165;--accent-glow:rgba(0,191,165,0.16);
+  --green:#10B981;--red:#E63950;--red-glow:rgba(230,57,80,0.15);--gold:#F5B133;--purple:#8B5CF6;
+  --glass-bg:rgba(255,255,255,0.7);
 }
-body.light .header{background:rgba(255,255,255,0.92)}
-body.light .filter-bar-wrap{background:rgba(255,255,255,0.96)}
-body.light .pcard{background:#FFFFFF;border-color:rgba(15,23,42,0.06);box-shadow:0 4px 20px rgba(0,0,0,0.06)}
-body.light .pcard:hover{box-shadow:0 12px 32px rgba(0,0,0,0.1),0 0 0 1px rgba(0,191,165,0.2)}
+body.light .header{background:var(--glass-bg-light,rgba(255,255,255,0.7));backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%)}
+body.light .filter-bar-wrap{background:rgba(255,255,255,0.75);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%)}
+body.light .pcard{background:var(--surface2);border-color:rgba(29,29,31,0.04);box-shadow:none}
+body.light .pcard:hover{box-shadow:0 16px 40px rgba(29,29,31,0.08);border-color:rgba(0,191,165,0.18)}
 body.light .sheet{background:#FFFFFF}
 body.light .sheet-head{background:#FFFFFF}
-body.light .bottom-nav{background:rgba(255,255,255,0.96);border-top:1px solid rgba(15,23,42,0.06)}
+body.light .bottom-nav{background:rgba(255,255,255,0.7);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-top:1px solid rgba(29,29,31,0.05)}
 body.light .sidebar{background:#FFFFFF}
-body.light .haction{background:#F4F6F9;border-color:rgba(15,23,42,0.07);color:#64748B}
+body.light .haction{background:var(--surface2);border-color:rgba(29,29,31,0.05);color:#6e6e76}
 body.light .haction:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,191,165,0.08)}
-body.light .toast{background:#1A1E2E;border-color:rgba(15,23,42,0.1);color:#FFFFFF}
+body.light .toast{background:#1d1d1f;border-color:rgba(29,29,31,0.1);color:#FFFFFF}
 body.light .pcard-price-glass{background:linear-gradient(to top,rgba(255,255,255,0.97) 0%,rgba(255,255,255,0.75) 55%,transparent 100%)}
-body.light .pcard-price{color:#1A1E2E}
-body.light .cart-group{background:#F8FAFC;border-color:rgba(15,23,42,0.06)}
+body.light .pcard-price{color:#1d1d1f}
+body.light .cart-group{background:var(--surface2);border-color:rgba(29,29,31,0.05)}
 body.light .view-toggle-btn{background:rgba(0,191,165,0.1);border-color:var(--accent)}
-body.light .header-search-input{background:#F4F6F9;border-color:rgba(15,23,42,0.08)}
+body.light .header-search-input{background:var(--surface3);border-color:rgba(29,29,31,0.06)}
 body.light .header-search-input:focus{background:#FFFFFF}
-body.light .fchip{background:#F4F6F9;border-color:rgba(15,23,42,0.07)}
-body.light .subchip{background:#EDF1F5}
-body.light .skel-card{background:#FFFFFF}
-body.light .cbtn.whatsapp,body.light .pcard-cart,body.light .cart-wa-btn{box-shadow:0 4px 14px rgba(0,0,0,0.1)}
+body.light .fchip{background:var(--surface3);border-color:rgba(29,29,31,0.05)}
+body.light .subchip{background:var(--surface3)}
+body.light .skel-card{background:var(--surface2)}
+body.light .cbtn.whatsapp,body.light .pcard-cart,body.light .cart-wa-btn{box-shadow:0 4px 14px rgba(29,29,31,0.08)}
 /* Secondary orange CTA (Ozon/WB "Buy now" accent) */
 .btn-orange{background:linear-gradient(135deg,var(--accent-orange),var(--accent-orange2)) !important;box-shadow:0 4px 16px var(--orange-glow) !important}
 
@@ -2676,17 +2693,16 @@ function createProductCard(p, index) {
       <div class="pcard-compare-check hover-tip ${isCompareSelected ? 'checked' : ''}" onclick="toggleCompareSelect('${p.id}',event)" title="Выбрать для сравнения">
         <i class="fas fa-check"></i>
       </div>
-      <div class="pcard-price-glass">
-        <span class="pcard-price">${fmtPrice(p.price)}</span>
-        ${p.originalPrice ? `<span class="pcard-old-price">${fmtPrice(p.originalPrice)}</span>` : ''}
-      </div>
       ${isVerified ? `<div class="pcard-verified" title="Проверенный продавец"><i class="fas fa-check"></i></div>` : ''}
       <div class="cat-line cat-${p.category}"></div>
     </div>
     <div class="pcard-body" onclick="showDetail('${p.id}')">
-      <div class="pcard-cat">${esc(catLabel)}</div>
-      <div class="pcard-name">${esc(p.name)}</div>
-      <div class="pcard-city"><i class="fas fa-location-dot"></i> ${esc(p.city || 'Не указан')}</div>
+      <div class="pcard-price-row">
+        <span class="pcard-price">${fmtPrice(p.price)}</span>
+        ${p.originalPrice ? `<span class="pcard-old-price">${fmtPrice(p.originalPrice)}</span>` : ''}
+      </div>
+      <div class="pcard-name"><span class="pcard-brand">${esc(username)}</span> ${esc(p.name)}</div>
+      <div class="pcard-city"><i class="fas fa-location-dot"></i> ${esc(p.city || 'Не указан')} · ${esc(catLabel)}</div>
     </div>
     <div class="pcard-footer">
       <div class="pcard-seller" onclick="showProfile('${p.userId}',event)">
@@ -2694,7 +2710,7 @@ function createProductCard(p, index) {
         ${isVerified ? '<i class="fas fa-circle-check pcard-seller-verified"></i>' : ''}
       </div>
       <button class="pcard-cart hover-tip" onclick="addToCartAnim(this,'${p.id}',event)" title="${t('add_cart')}">
-        <i class="fas fa-plus"></i>
+        <i class="fas fa-plus"></i> В корзину
       </button>
     </div>`;
   return el;
@@ -3045,10 +3061,12 @@ async function showProfile(uid, event) {
           <div class="pcard-img-wrap">
             <img class="pcard-img" src="${esc(p.image||'https://placehold.co/300x300/F1F5F9/94A3B8?text=Фото+товара')}" loading="lazy"
                  onerror="this.src='https://placehold.co/300x300/F1F5F9/94A3B8?text=Фото+товара'">
-            <div class="pcard-price-glass"><span class="pcard-price">${fmtPrice(p.price)}</span></div>
             <div class="cat-line cat-${p.category}"></div>
           </div>
-          <div class="pcard-body"><div class="pcard-name">${esc(p.name)}</div></div>
+          <div class="pcard-body">
+            <div class="pcard-price-row"><span class="pcard-price">${fmtPrice(p.price)}</span></div>
+            <div class="pcard-name">${esc(p.name)}</div>
+          </div>
         </div>`).join('')}
       ${userProducts.length === 0 ? '<div style="color:var(--text2);font-size:0.82rem;grid-column:1/-1;font-family:var(--font-body)">Нет загруженных товаров</div>' : ''}
     </div>`;
@@ -3099,10 +3117,12 @@ function renderWishlist() {
         <img class="pcard-img" src="${esc(p.image||'https://placehold.co/300x300/F1F5F9/94A3B8?text=Фото+товара')}" loading="lazy"
              onerror="this.src='https://placehold.co/300x300/F1F5F9/94A3B8?text=Фото+товара'">
         <button class="pcard-fav active" onclick="toggleFav('${p.id}',event);renderWishlist()"><i class="fas fa-heart"></i></button>
-        <div class="pcard-price-glass"><span class="pcard-price">${fmtPrice(p.price)}</span></div>
         <div class="cat-line cat-${p.category}"></div>
       </div>
-      <div class="pcard-body"><div class="pcard-name">${esc(p.name)}</div></div>
+      <div class="pcard-body">
+        <div class="pcard-price-row"><span class="pcard-price">${fmtPrice(p.price)}</span></div>
+        <div class="pcard-name">${esc(p.name)}</div>
+      </div>
     </div>`).join('')}</div>`;
 }
 
