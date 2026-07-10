@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="ru" dir="ltr">
 <head>
@@ -1140,6 +1141,9 @@ body.light .cbtn.whatsapp,body.light .pcard-cart,body.light .cart-wa-btn{box-sha
     <button class="haction" id="currencyBtn" onclick="openSheet('currencySheet')" title="Валюта" style="width:auto;padding:0 0.6rem;border-radius:20px;font-size:0.72rem;font-weight:700;gap:0.25rem"><span id="currencyBtnLabel">TJS</span> <i class="fas fa-chevron-down" style="font-size:0.55rem"></i></button>
     <button class="haction" id="themeToggleBtn" onclick="toggleTheme()" title="Сменить тему"><i class="fas fa-sun" id="themeIcon"></i></button>
     <button class="haction" id="sortBtn" onclick="openSheet('sortSheet')" title="Сортировка"><i class="fas fa-sort-amount-down"></i></button>
+    <button class="view-toggle-btn" id="compareToggleBtn" onclick="toggleCompareMode()" title="Сравнить товары">
+      <i class="fas fa-scale-balanced"></i>
+    </button>
     <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleViewMode()" title="Переключить вид">
       <i id="viewIcon" class="fas fa-th-large"></i>
     </button>
@@ -1535,6 +1539,7 @@ body.light .cbtn.whatsapp,body.light .pcard-cart,body.light .cart-wa-btn{box-sha
     <button class="sheet-close" onclick="closeSheet('currencySheet')"><i class="fas fa-times"></i></button>
   </div>
   <div class="sheet-body">
+    <div id="currencyUpdatedInfo" style="font-size:0.72rem;color:var(--text3);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.35rem;font-family:var(--font-body)"></div>
     <div class="sort-options" id="currencyOptions"></div>
   </div>
 </div>
@@ -1556,6 +1561,16 @@ body.light .cbtn.whatsapp,body.light .pcard-cart,body.light .cart-wa-btn{box-sha
       <button class="ai-chat-send" id="aiChatSendBtn" onclick="sendAiChatMessage()"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
+</div>
+
+<!-- COMPARE MODAL SHEET -->
+<div class="sheet" id="compareModalSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <span class="sheet-title"><i class="fas fa-scale-balanced" style="color:var(--accent)"></i> Сравнение товаров</span>
+    <button class="sheet-close" onclick="closeSheet('compareModalSheet')"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="sheet-body" id="compareModalBody"></div>
 </div>
 
 <!-- FIREBASE -->
@@ -1979,6 +1994,11 @@ let cart = JSON.parse(localStorage.getItem('ds_cart') || '[]');
 let renderedCount = 0;
 let filteredProducts = [];
 
+// ====== COMPARE MODE STATE ======
+const COMPARE_KEY = 'ds_compare_items';
+let compareMode = false;
+let compareItems = new Set(JSON.parse(localStorage.getItem(COMPARE_KEY) || '[]'));
+
 // ====== INIT ======
 async function init() {
   initTheme();
@@ -2340,6 +2360,7 @@ function renderBatch(batch) {
   grid.appendChild(fragment);
   if (currentViewMode === 'list') grid.classList.add('list-view');
   else grid.classList.remove('list-view');
+  grid.classList.toggle('compare-active', compareMode);
   document.getElementById('scrollSentinel').style.display = isEndReached ? 'none' : 'flex';
 }
 
@@ -2357,6 +2378,7 @@ function renderNextPage() {
   grid.appendChild(fragment);
   if (currentViewMode === 'list') grid.classList.add('list-view');
   else grid.classList.remove('list-view');
+  grid.classList.toggle('compare-active', compareMode);
   renderedCount += slice.length;
   document.getElementById('scrollSentinel').style.display = renderedCount < filteredProducts.length ? 'flex' : 'none';
   isLoading = false;
@@ -2368,6 +2390,7 @@ function createProductCard(p, index) {
   el.style.animationDelay = `${index * 0.05}s`;
 
   const isFav = favorites.has(p.id);
+  const isCompareSelected = compareItems.has(p.id);
   const disc = p.originalPrice && parseFloat(p.price) < parseFloat(p.originalPrice)
     ? Math.round((1 - parseFloat(p.price) / parseFloat(p.originalPrice)) * 100) : null;
 
@@ -2389,6 +2412,9 @@ function createProductCard(p, index) {
       <button class="pcard-fav ${isFav ? 'active' : ''}" onclick="toggleFav('${p.id}',event)" title="${t('add_wishlist')}">
         <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
       </button>
+      <div class="pcard-compare-check ${isCompareSelected ? 'checked' : ''}" onclick="toggleCompareSelect('${p.id}',event)" title="Выбрать для сравнения">
+        <i class="fas fa-check"></i>
+      </div>
       <div class="pcard-price-glass">
         <span class="pcard-price">${fmtPrice(p.price)}</span>
         ${p.originalPrice ? `<span class="pcard-old-price">${fmtPrice(p.originalPrice)}</span>` : ''}
@@ -2627,6 +2653,11 @@ async function showDetail(pid) {
       <i class="${isFav?'fas':'far'} fa-heart"></i> ${isFav ? t('remove_wishlist') : t('add_wishlist')}
     </button>
 
+    <div class="recs-section" id="recsSection" style="display:none">
+      <div class="recs-header">🔥 <span data-i18n="recs_title">Вам также может понравиться</span> <span class="ai-search-badge" style="margin-left:auto"><i class="fas fa-robot"></i> AI</span></div>
+      <div class="recs-scroll" id="recsScroll"></div>
+    </div>
+
     <div class="share-section">
       <div class="share-title">${t('share')}</div>
       <div class="share-row">
@@ -2638,6 +2669,7 @@ async function showDetail(pid) {
     </div>`;
 
   openSheet('detailSheet');
+  renderRecommendations(p);
 }
 
 function refreshDetailFavBtn(pid) {
@@ -2657,6 +2689,40 @@ async function getUserRating(uid) {
     const vals = Object.values(snap.val());
     return { average: Math.round(vals.reduce((s,v)=>s+v,0)/vals.length*10)/10, count: vals.length };
   } catch { return { average: 0, count: 0 }; }
+}
+
+// ====== AI-STYLE RECOMMENDATIONS ("Вам также может понравиться") ======
+// Простой алгоритм: та же категория + похожая цена, без реального AI (быстро и без нагрузки на сервер)
+function getRecommendations(product, products) {
+  let candidates = products.filter(p => p.category === product.category && p.id !== product.id);
+  candidates.sort((a, b) => {
+    const diffA = Math.abs(parseFloat(a.price) - parseFloat(product.price));
+    const diffB = Math.abs(parseFloat(b.price) - parseFloat(product.price));
+    return diffA - diffB;
+  });
+  return candidates.slice(0, 4);
+}
+
+function renderRecommendations(product) {
+  const section = document.getElementById('recsSection');
+  const scroll = document.getElementById('recsScroll');
+  if (!section || !scroll) return;
+  const source = currentMode === MODE_SEARCH ? searchResults : allProducts;
+  const recs = getRecommendations(product, source);
+  if (recs.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  scroll.innerHTML = recs.map(p => `
+    <div class="recs-card" onclick="showDetail('${p.id}')">
+      <div class="recs-card-img-wrap">
+        <img src="${esc(p.image || 'https://placehold.co/200x200/0D1220/4A5A7A?text=📦')}" loading="lazy"
+             onerror="this.src='https://placehold.co/200x200/0D1220/4A5A7A?text=📦'">
+      </div>
+      <div class="recs-card-name">${esc(p.name)}</div>
+      <div class="recs-card-price">${fmtPrice(p.price)}</div>
+    </div>`).join('');
+  section.style.display = 'block';
 }
 
 // ====== PROFILE / SELLER STORE ======
@@ -2984,6 +3050,229 @@ function applyViewMode(mode) {
 
 function toggleViewMode() { applyViewMode(currentViewMode === 'grid' ? 'list' : 'grid'); }
 
+// ====== COMPARE MODE ======
+function setCompareMode(on) {
+  compareMode = on;
+  const btn = document.getElementById('compareToggleBtn');
+  const grid = document.getElementById('productsGrid');
+  if (btn) btn.classList.toggle('active-compare', on);
+  if (grid) grid.classList.toggle('compare-active', on);
+  if (!on) {
+    compareItems.clear();
+    saveCompareItems();
+  }
+  renderCompareBar();
+}
+
+function toggleCompareMode() {
+  setCompareMode(!compareMode);
+  showToast(compareMode ? 'Режим сравнения: выберите 2-3 товара' : 'Режим сравнения выключен');
+}
+
+function cancelCompare() {
+  setCompareMode(false);
+  showToast('Сравнение отменено');
+}
+
+function saveCompareItems() {
+  localStorage.setItem(COMPARE_KEY, JSON.stringify([...compareItems]));
+}
+
+function toggleCompareSelect(id, event) {
+  if (event) { event.stopPropagation(); event.preventDefault(); }
+  if (compareItems.has(id)) {
+    compareItems.delete(id);
+  } else {
+    if (compareItems.size >= 3) {
+      showToast('Максимум 3 товара для сравнения');
+      const bar = document.getElementById('compareFloatBar');
+      if (bar) { bar.classList.add('shake'); setTimeout(() => bar.classList.remove('shake'), 500); }
+      return;
+    }
+    compareItems.add(id);
+  }
+  saveCompareItems();
+  updateCardCompareUI(id);
+  renderCompareBar();
+}
+
+function updateCardCompareUI(id) {
+  document.querySelectorAll('.pcard-compare-check').forEach(el => {
+    const onc = el.getAttribute('onclick') || '';
+    if (onc.includes(`'${id}'`)) {
+      el.classList.toggle('checked', compareItems.has(id));
+    }
+  });
+}
+
+function renderCompareBar() {
+  const bar = document.getElementById('compareFloatBar');
+  if (!bar) return;
+  if (!compareMode) { bar.classList.remove('visible'); return; }
+  bar.classList.add('visible');
+  const n = compareItems.size;
+  const text = document.getElementById('compareFloatText');
+  const goBtn = document.getElementById('compareGoBtn');
+  if (!text || !goBtn) return;
+  if (n > 3) {
+    text.innerHTML = `<i class="fas fa-triangle-exclamation"></i> Максимум 3 товара`;
+    text.style.color = 'var(--red)';
+    goBtn.disabled = true;
+  } else if (n >= 2) {
+    text.innerHTML = `Выбрано <strong>${n}</strong> товар(а). Готово к сравнению! ✅`;
+    text.style.color = '';
+    goBtn.disabled = false;
+  } else {
+    text.innerHTML = `Выбрано <strong>${n}</strong> товар(ов). Выберите 2-3 для сравнения`;
+    text.style.color = '';
+    goBtn.disabled = true;
+  }
+}
+
+async function openCompareModal() {
+  const ids = [...compareItems];
+  if (ids.length < 2) { showToast('Выберите минимум 2 товара'); return; }
+  const source = currentMode === MODE_SEARCH ? searchResults : allProducts;
+  const products = ids.map(id => source.find(p => p.id === id) || allProducts.find(p => p.id === id)).filter(Boolean);
+  if (products.length < 2) { showToast('Не удалось найти выбранные товары'); return; }
+
+  renderCompareTable(products, { loading: true });
+  openSheet('compareModalSheet');
+
+  const ratings = await Promise.all(products.map(p => getUserRating(p.userId)));
+  const usernames = await Promise.all(products.map(async p => (await getSellerData(p.userId))?.username || 'Продавец'));
+
+  renderCompareTable(products, { ratings, usernames, aiLoading: true });
+
+  try {
+    const ai = await runAiCompareAnalysis(products, ratings);
+    renderCompareTable(products, { ratings, usernames, ai });
+    spawnConfetti();
+  } catch (err) {
+    console.warn('AI compare failed:', err);
+    renderCompareTable(products, { ratings, usernames, aiError: true });
+  }
+}
+
+async function runAiCompareAnalysis(products, ratings) {
+  const lines = products.map((p, i) => `${i+1}. ${p.name}, цена: ${p.price} сом, город: ${p.city||'не указан'}, рейтинг: ${ratings[i].average.toFixed(1)} (${ratings[i].count}), описание: ${(p.description||'нет описания').slice(0,200)}`).join('\n');
+  const prompt = `Проанализируй эти товары и скажи, какой лучше и почему:\n${lines}\n\nВерни JSON:\n{"best":"название лучшего товара","reason":"почему он лучший (2-3 предложения)","comparison":{"price":"кто дешевле и на сколько","quality":"кто лучше по описанию","seller":"у кого лучше рейтинг"},"verdict":"финальный вердикт: какой товар купить и почему"}\nОтвет — ТОЛЬКО валидный JSON без пояснений и markdown.`;
+  const result = await callPollinationsAI(prompt);
+  if (!result) throw new Error('AI недоступен');
+  const jsonMatch = result.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('Не удалось разобрать ответ AI');
+  return JSON.parse(jsonMatch[0]);
+}
+
+function computeCompareLabels(products, bestIdx) {
+  const n = products.length;
+  const labels = new Array(n).fill('good');
+  if (bestIdx >= 0) labels[bestIdx] = 'best';
+  if (n === 3 && bestIdx >= 0) {
+    const others = [0,1,2].filter(i => i !== bestIdx);
+    const [a,b] = others;
+    const priceA = parseFloat(products[a].price) || 0;
+    const priceB = parseFloat(products[b].price) || 0;
+    if (priceA >= priceB) labels[a] = 'weak'; else labels[b] = 'weak';
+  }
+  return labels;
+}
+
+function renderCompareTable(products, extra) {
+  const body = document.getElementById('compareModalBody');
+  if (!body) return;
+
+  if (extra?.loading) {
+    body.innerHTML = `<div style="text-align:center;padding:2.5rem"><div class="loader-ring" style="margin:0 auto 0.75rem"></div><div style="color:var(--text2);font-size:0.85rem">Готовим сравнение...</div></div>`;
+    return;
+  }
+
+  const usernames = extra?.usernames || products.map(() => 'Продавец');
+  const ratings = extra?.ratings || products.map(() => ({ average: 0, count: 0 }));
+  const bestIdx = extra?.ai ? products.findIndex(p => p.name === extra.ai.best) : -1;
+  const labels = extra?.ai ? computeCompareLabels(products, bestIdx) : products.map(() => null);
+
+  const rows = [
+    ['📷 Фото', products.map(p => `<img src="${esc(p.image||'https://placehold.co/150x150/0D1220/4A5A7A?text=📦')}" style="width:64px;height:64px;object-fit:contain;border-radius:10px;background:var(--surface2)" onerror="this.src='https://placehold.co/150x150/0D1220/4A5A7A?text=📦'">`)],
+    ['📝 Название', products.map(p => `<strong>${esc(p.name)}</strong>`)],
+    ['💰 Цена', products.map(p => `<span style="color:var(--accent2);font-weight:800">${fmtPrice(p.price)}</span>`)],
+    ['🏷️ Категория', products.map(p => esc(CAT_LABELS[p.category] || 'Разное'))],
+    ['📍 Город', products.map(p => esc(p.city || 'Не указан'))],
+    ['👤 Продавец', products.map((p,i) => `${esc(usernames[i])}<br><span style="color:var(--gold)">★ ${ratings[i].average.toFixed(1)}</span> <span style="color:var(--text3)">(${ratings[i].count})</span>`)],
+    ['📝 Описание', products.map(p => `<span style="font-size:0.78rem;color:var(--text2)">${esc((p.description||'Нет описания').slice(0,110))}${(p.description||'').length>110?'…':''}</span>`)],
+  ];
+
+  let aiRowCells;
+  if (extra?.aiLoading) {
+    aiRowCells = products.map(() => `<div class="loader-ring" style="margin:0 auto;width:20px;height:20px;border-width:2px"></div>`);
+  } else if (extra?.aiError) {
+    aiRowCells = products.map(() => `<span style="color:var(--text3);font-size:0.75rem">AI недоступен</span>`);
+  } else if (extra?.ai) {
+    aiRowCells = labels.map(label => {
+      if (label === 'best') return `<span style="color:var(--green);font-weight:700">✅ Лучший</span>`;
+      if (label === 'weak') return `<span style="color:var(--red);font-weight:700">❌ Слабый</span>`;
+      return `<span style="color:var(--gold);font-weight:700">⚠️ Хороший</span>`;
+    });
+  } else {
+    aiRowCells = products.map(() => '');
+  }
+
+  const tableHtml = `
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th></th>
+            ${products.map((p,i) => `<th>${i===bestIdx ? '<i class="fas fa-crown" style="color:var(--gold)"></i> ' : ''}Товар ${i+1}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(([label,cells]) => `<tr><td class="compare-row-label">${label}</td>${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}
+          <tr class="compare-ai-row"><td class="compare-row-label">🧠 AI резюме</td>${aiRowCells.map(c=>`<td>${c}</td>`).join('')}</tr>
+        </tbody>
+      </table>
+    </div>
+    ${extra?.ai ? `<div class="compare-ai-verdict"><i class="fas fa-robot"></i> <strong>AI-рекомендация:</strong> ${esc(extra.ai.verdict || extra.ai.reason || '')}</div>` : ''}
+    <div class="compare-actions">
+      <button class="apply-btn" onclick="addAllCompareToCart()"><i class="fas fa-cart-plus"></i> Добавить в корзину</button>
+      <button class="apply-btn" style="background:var(--surface2);color:var(--text2);box-shadow:none;border:1px solid var(--border)" onclick="copyCompareLink()"><i class="fas fa-link"></i> Скопировать ссылку</button>
+    </div>`;
+
+  body.innerHTML = tableHtml;
+}
+
+function addAllCompareToCart() {
+  let added = 0;
+  compareItems.forEach(id => {
+    if (!cart.includes(id)) { cart.push(id); added++; }
+  });
+  if (added > 0) {
+    localStorage.setItem('ds_cart', JSON.stringify(cart));
+    updateBadges();
+  }
+  showToast(added > 0 ? `Добавлено в корзину: ${added}` : 'Уже в корзине');
+}
+
+function copyCompareLink() {
+  const ids = [...compareItems].join(',');
+  const url = `${window.location.origin}${window.location.pathname}?compare=${encodeURIComponent(ids)}`;
+  copyLink(url);
+}
+
+function spawnConfetti() {
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden';
+  document.body.appendChild(container);
+  const emojis = ['🎉','⭐','✨','🏆'];
+  for (let i = 0; i < 22; i++) {
+    const el = document.createElement('span');
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.cssText = `position:absolute;top:-30px;left:${Math.random()*100}%;font-size:${14+Math.random()*16}px;animation:confettiFall ${1.6+Math.random()*1.2}s ease-in forwards;animation-delay:${Math.random()*0.4}s`;
+    container.appendChild(el);
+  }
+  setTimeout(() => container.remove(), 3200);
+}
+
 // ====== RECENTLY VIEWED ======
 const RV_KEY = 'ds_recently_viewed';
 const RV_MAX = 15;
@@ -3136,31 +3425,86 @@ function bannerGoTo(i) {
 function bannerNext() { bannerGoTo((bannerIndex + 1) % BANNERS.length); }
 function bannerPrev() { bannerGoTo((bannerIndex - 1 + BANNERS.length) % BANNERS.length); }
 
-// ====== CURRENCY CONVERTER ======
-// Approximate rates relative to 1 TJS (somoni). Update as needed.
-const CURRENCY_RATES = {
-  TJS: { rate: 1,        symbol: 'сом' },
-  USD: { rate: 0.092,    symbol: '$' },
-  EUR: { rate: 0.085,    symbol: '€' },
-  RUB: { rate: 8.6,      symbol: '₽' },
-  KGS: { rate: 8.0,      symbol: 'с' },
-  UZS: { rate: 1170,     symbol: 'сум' },
-  KZT: { rate: 47.5,     symbol: '₸' }
-};
+// ====== CURRENCY CONVERTER (real rates via ExchangeRate-API, TJS-based) ======
+const CURRENCY_LIST = ['TJS','USD','RUB','EUR','KGS','UZS','KZT','TMT'];
+const CURRENCY_SYMBOLS = { TJS:'смн', USD:'$', RUB:'₽', EUR:'€', KGS:'с', UZS:'сум', KZT:'₸', TMT:'m' };
+// Приблизительные курсы (валюта за 1 USD) — используются как запасной вариант, если API недоступен
+const FALLBACK_USD_RATES = { TJS: 10.9, USD: 1, RUB: 92, EUR: 0.92, KGS: 89, UZS: 12700, KZT: 450, TMT: 3.5 };
+const CURRENCY_CACHE_KEY = 'ds_currency_rates';
+const CURRENCY_CACHE_TIME_KEY = 'ds_currency_time';
+const CURRENCY_TTL = 3600000; // 1 час
+
 const CURRENCY_KEY = 'ds_currency';
 let activeCurrency = localStorage.getItem(CURRENCY_KEY) || 'TJS';
+let usdRates = null; // { TJS: x, USD: 1, RUB: x, ... } — сколько единиц валюты за 1 USD
+
+// Быстрая гидратация из кэша/фолбэка, чтобы цены отрисовались мгновенно
+function hydrateCurrencyRatesSync() {
+  const cached = localStorage.getItem(CURRENCY_CACHE_KEY);
+  if (cached) {
+    try { usdRates = JSON.parse(cached); return; } catch {}
+  }
+  usdRates = { ...FALLBACK_USD_RATES };
+}
+
+// Реальный запрос курсов с кэшированием на 1 час (см. задачу 2.3)
+async function loadCurrencyRates(force = false) {
+  const cachedTime = parseInt(localStorage.getItem(CURRENCY_CACHE_TIME_KEY) || '0', 10);
+  const cachedData = localStorage.getItem(CURRENCY_CACHE_KEY);
+  if (!force && cachedData && Date.now() - cachedTime < CURRENCY_TTL) {
+    try { usdRates = JSON.parse(cachedData); return true; } catch {}
+  }
+  try {
+    const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    if (!res.ok) throw new Error('Currency API HTTP ' + res.status);
+    const data = await res.json();
+    const rates = data.rates || {};
+    const merged = {};
+    CURRENCY_LIST.forEach(code => {
+      merged[code] = rates[code] || (cachedData ? (JSON.parse(cachedData)[code]) : null) || FALLBACK_USD_RATES[code];
+    });
+    usdRates = merged;
+    localStorage.setItem(CURRENCY_CACHE_KEY, JSON.stringify(merged));
+    localStorage.setItem(CURRENCY_CACHE_TIME_KEY, String(Date.now()));
+    return true;
+  } catch (err) {
+    console.warn('Currency API недоступен, используем кэш/приблизительные курсы:', err);
+    if (cachedData) {
+      try { usdRates = JSON.parse(cachedData); return false; } catch {}
+    }
+    usdRates = { ...FALLBACK_USD_RATES };
+    return false;
+  }
+}
 
 function initCurrency() {
-  const wrap = document.getElementById('currencyOptions');
-  if (wrap) {
-    wrap.innerHTML = Object.keys(CURRENCY_RATES).map(code => `
-      <div class="sort-option ${code === activeCurrency ? 'active' : ''}" id="curr-${code}" onclick="setCurrency('${code}')">
-        <i class="fas fa-coins"></i> <span>${code} — ${CURRENCY_RATES[code].symbol}</span>
-        <i class="fas fa-check sort-check"></i>
-      </div>`).join('');
-  }
+  hydrateCurrencyRatesSync();
+  renderCurrencyOptions();
   updateCurrencyLabel();
+  // Обновляем курсы в фоне (с учётом 1-часового кэша) и перерисовываем цены
+  loadCurrencyRates().then(() => {
+    renderCurrencyOptions();
+    refreshPricesUI();
+  });
 }
+
+function renderCurrencyOptions() {
+  const wrap = document.getElementById('currencyOptions');
+  if (!wrap) return;
+  wrap.innerHTML = CURRENCY_LIST.map(code => `
+    <div class="sort-option ${code === activeCurrency ? 'active' : ''}" id="curr-${code}" onclick="setCurrency('${code}')">
+      <i class="fas fa-coins"></i> <span>${code} — ${CURRENCY_SYMBOLS[code]}</span>
+      <i class="fas fa-check sort-check"></i>
+    </div>`).join('');
+  const info = document.getElementById('currencyUpdatedInfo');
+  if (info) {
+    const t2 = parseInt(localStorage.getItem(CURRENCY_CACHE_TIME_KEY) || '0', 10);
+    info.innerHTML = t2
+      ? `<i class="fas fa-clock"></i> Курсы обновлены: ${new Date(t2).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`
+      : `<i class="fas fa-clock"></i> Используются приблизительные курсы`;
+  }
+}
+
 function setCurrency(code) {
   activeCurrency = code;
   localStorage.setItem(CURRENCY_KEY, code);
@@ -3176,14 +3520,22 @@ function updateCurrencyLabel() {
   const label = document.getElementById('currencyBtnLabel');
   if (label) label.textContent = activeCurrency;
 }
-// Converts a TJS-som price into the active currency, formatted with symbol.
+// Конвертирует сумму в TJS в целевую валюту через кросс-курс относительно USD
+function convertFromTJS(amountTJS, targetCurrency) {
+  if (!usdRates || !usdRates.TJS) return amountTJS;
+  if (targetCurrency === 'TJS') return amountTJS;
+  const usdAmount = amountTJS / usdRates.TJS;
+  const rate = usdRates[targetCurrency] || FALLBACK_USD_RATES[targetCurrency] || 1;
+  return targetCurrency === 'USD' ? usdAmount : usdAmount * rate;
+}
+// Форматирует цену (хранится в сомони) в активную валюту с символом
 function fmtPrice(somAmount) {
   const n = parseFloat(somAmount) || 0;
-  const cfg = CURRENCY_RATES[activeCurrency] || CURRENCY_RATES.TJS;
-  const converted = n * cfg.rate;
-  const rounded = activeCurrency === 'TJS' ? Math.round(converted) : (converted < 100 ? converted.toFixed(2) : Math.round(converted));
+  const converted = convertFromTJS(n, activeCurrency);
+  const symbol = CURRENCY_SYMBOLS[activeCurrency] || CURRENCY_SYMBOLS.TJS;
+  const rounded = activeCurrency === 'TJS' ? Math.round(converted) : (converted < 100 ? Math.round(converted * 100) / 100 : Math.round(converted));
   const formatted = Number(rounded).toLocaleString('ru-RU');
-  return activeCurrency === 'TJS' ? `${formatted} ${cfg.symbol}` : `${formatted} ${cfg.symbol}`;
+  return `${formatted} ${symbol}`;
 }
 // Re-renders currently visible grid/cart/wishlist so prices reflect the active currency.
 function refreshPricesUI() {
@@ -3201,33 +3553,6 @@ function refreshPricesUI() {
 }
 
 // ====== AI SMART SEARCH (Pollinations) ======
-async function aiUnderstandQuery(query) {
-    const prompt = `Проанализируй запрос покупателя на маркетплейсе: "${query}".
-Определи, что он ищет. Верни JSON с полями:
-- category: одна из [electronics, clothing, home, beauty, sports, health, food, transport, realestate, appliances, shoes, accessories, books, toys, jewelry, chemistry, stationery, pets, garden, cars, services, furniture] или "" если непонятно
-- price_min: минимальная цена числом или null
-- price_max: максимальная цена числом или null
-- keywords: массив из 2-4 ключевых слов на русском для полнотекстового поиска
-- season: "лето"|"зима"|"весна"|"осень" или "" если не указано
-Ответ — ТОЛЬКО валидный JSON без пояснений и markdown.`;
-
-    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`;
-
-    try {
-        const response = await fetch(AI_PROXY + url);
-        if (!response.ok) throw new Error('Network error');
-        const text = await response.text();
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error('AI: не удалось разобрать ответ');
-        return JSON.parse(jsonMatch[0]);
-    } catch (err) {
-        console.warn('AI search failed, using fallback:', err);
-        // Fallback: простой поиск по ключевым словам
-        const words = query.split(/\s+/).filter(w => w.length > 2);
-        return { category: '', price_min: null, price_max: null, keywords: words, season: '' };
-    }
-}
-
 let lastAiFilters = null;
 
 async function startAiSearch(query) {
@@ -3341,6 +3666,12 @@ function openAiChat(pid) {
   renderAiChatMessages();
   openSheet('aiChatSheet');
   setTimeout(() => document.getElementById('aiChatInput')?.focus(), 350);
+}
+
+function clearAiChat() {
+  if (!currentAiProduct) return;
+  aiChatHistory[currentAiProduct.id] = [];
+  renderAiChatMessages();
 }
 
 function renderAiChatMessages() {
