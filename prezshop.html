@@ -126,7 +126,7 @@ body::before{
 }
 .slide.active .slide-hint{animation:riseIn .6s .2s cubic-bezier(.2,.8,.2,1) forwards;}
 
-.slide-body{margin-top:clamp(20px,3vw,40px);flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}
+.slide-body{margin-top:clamp(20px,3vw,40px);flex:1;display:flex;flex-direction:column;justify-content:flex-start;min-height:0;padding-bottom:20px;}
 
 @keyframes riseIn{to{opacity:1;transform:translateY(0);}}
 @keyframes scaleIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
@@ -388,6 +388,7 @@ table tr:hover td{background:rgba(255,255,255,.02);}
 .gradient-border .card{background:var(--bg-card);border-radius:17px;border:none;}
 
 .navigation{position:fixed;bottom:24px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:16px;z-index:50;}
+.navigation{display:none !important;}
 .nav-arrow{
   width:44px;height:44px;border-radius:50%;
   background:var(--glass);backdrop-filter:blur(12px);
@@ -401,6 +402,9 @@ table tr:hover td{background:rgba(255,255,255,.02);}
 .dot-btn{width:7px;height:7px;border-radius:50%;background:var(--text-muted);cursor:pointer;transition:all .4s cubic-bezier(.2,.8,.2,1);}
 .dot-btn.active{width:24px;border-radius:4px;background:linear-gradient(90deg,var(--accent2),var(--accent-green));}
 
+.nav-hint{position:fixed;bottom:18px;left:0;right:0;text-align:center;z-index:50;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;color:var(--text-muted);pointer-events:none;opacity:.7;}
+.nav-hint i{margin:0 3px;}
+@media (max-width:560px){.nav-hint{display:none;}}
 .slide-count{position:fixed;top:20px;right:24px;z-index:50;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);background:var(--glass);backdrop-filter:blur(12px);padding:6px 14px;border-radius:100px;border:1px solid var(--border2);}
 .brand-mark{position:fixed;top:20px;left:24px;z-index:50;font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;color:var(--text-primary);}
 .brand-mark img{height:32px;width:auto;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.3);}
@@ -475,7 +479,7 @@ table tr:hover td{background:rgba(255,255,255,.02);}
 @media (max-width:560px){
   .g2,.g3,.g4,.g5{grid-template-columns:1fr;}
   .three-col{grid-template-columns:1fr;}
-  .slide{padding:20px 16px 100px;}
+  .slide{padding:20px 16px 32px;}
   table{font-size:11.5px;}
   .timeline{flex-wrap:wrap;row-gap:16px;}
   .timeline::before{display:none;}
@@ -496,6 +500,7 @@ table tr:hover td{background:rgba(255,255,255,.02);}
 <div id="progress-bar"></div>
 <div class="brand-mark"><img src="https://dorosfamd.com/doroshop.png" alt="DOROShop" onerror="this.style.display='none'"><i class="fa-solid fa-bolt"></i> DOROShop</div>
 <div class="slide-count"><span id="cur">01</span> / 14</div>
+<div class="nav-hint"><i class="fa-solid fa-arrow-left"></i><i class="fa-solid fa-arrow-right"></i> навигация · свайп или стрелки клавиатуры</div>
 
 <div class="presentation">
 
