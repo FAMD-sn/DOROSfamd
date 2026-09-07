@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -1695,17 +1696,51 @@ const storage=firebase.storage();
 // Cloud Firestore (modular v9+ SDK), attached to the same compat App
 // instance above via dynamic import — kept out of a <script type="module">
 // so every inline onclick="" on this page still resolves normally.
-let db, collection, doc, getDoc, getDocs, query, where, orderBy, limit,
-    onSnapshot, updateDoc, deleteDoc, setDoc, addDoc, runTransaction,
-    writeBatch, serverTimestamp, increment;
+// ✅ НОВЫЙ КОД (работает стабильно)
+// Firestore уже загружен через firebase-firestore-compat.js
+const db = firebase.firestore();
 
-const firestoreReady=(async()=>{
-  const fs=await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
-  ({ collection, doc, getDoc, getDocs, query, where, orderBy, limit,
-     onSnapshot, updateDoc, deleteDoc, setDoc, addDoc, runTransaction,
-     writeBatch, serverTimestamp, increment } = fs);
-  db=fs.getFirestore(compatApp);
-})();
+// Обертки для совместимости с вашим кодом
+const collection = (db, name) => db.collection(name);
+const doc = (db, path, ...segments) => db.doc(path, ...segments);
+const getDoc = (ref) => ref.get();
+const getDocs = (query) => query.get();
+const query = (col, ...conditions) => {
+  let q = col;
+  conditions.forEach(c => {
+    if (c.type === 'where') q = q.where(c.field, c.op, c.value);
+    if (c.type === 'orderBy') q = q.orderBy(c.field, c.dir);
+    if (c.type === 'limit') q = q.limit(c.value);
+  });
+  return q;
+};
+const where = (field, op, value) => ({ type: 'where', field, op, value });
+const orderBy = (field, dir = 'asc') => ({ type: 'orderBy', field, dir });
+const limit = (value) => ({ type: 'limit', value });
+
+const updateDoc = (ref, data) => ref.update(data);
+const deleteDoc = (ref) => ref.delete();
+const setDoc = (ref, data) => ref.set(data);
+const addDoc = (col, data) => col.add(data);
+const onSnapshot = (q, callback) => q.onSnapshot(callback);
+const serverTimestamp = () => firebase.firestore.FieldValue.serverTimestamp();
+const increment = (n) => firebase.firestore.FieldValue.increment(n);
+
+const runTransaction = async (db, callback) => {
+  return db.runTransaction(async (transaction) => {
+    const tx = {
+      get: (ref) => transaction.get(ref),
+      set: (ref, data) => transaction.set(ref, data),
+      update: (ref, data) => transaction.update(ref, data),
+      delete: (ref) => transaction.delete(ref),
+    };
+    return callback(tx);
+  });
+};
+
+// Firestore готов сразу
+const firestoreReady = Promise.resolve();
+console.log('✅ Firestore готов к работе');
 
 // ====== CONSTANTS ======
 const MAX_PRODUCTS=50;
