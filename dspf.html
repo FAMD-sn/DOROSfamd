@@ -2493,68 +2493,61 @@ function buildProductForm(p=null){
 }
 
 // ====== FIREBASE STORAGE UPLOAD ======
-async function handleFileUpload(e){
-  const file=e.target.files[0];if(!file)return;
-  if(!file.type.startsWith('image/')){showToast('Выберите изображение','error');return}
-  if(file.size>10*1024*1024){showToast('Максимум 10 МБ','error');return}
-  if(tempUploadedUrl){await deleteStorageUrl(tempUploadedUrl);tempUploadedUrl=null;}
+// ====== FIREBASE STORAGE UPLOAD (НОВАЯ ВЕРСИЯ) ======
+// Теперь фото НЕ загружается в Storage сразу, а сохраняется локально
+let localImageData = null; // Для хранения blob/data URL
 
-  const compressed=await compressImage(file);
-  const spinner=document.getElementById('uploadSpinner');
-  const icon=document.getElementById('uploadIcon');
-  const label=document.getElementById('uploadLabel');
-  const progressWrap=document.getElementById('uploadProgressWrap');
-  const progressBar=document.getElementById('uploadProgressBar');
-  const progressLabel=document.getElementById('uploadProgressLabel');
-
-  if(spinner)spinner.style.display='block';
-  if(icon)icon.style.display='none';
-  if(label)label.textContent=t('uploading');
-  if(progressWrap)progressWrap.style.display='block';
-
-  try{
-    const fileName=`products/${currentUser.uid}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
-    const storageRef=storage.ref(fileName);
-    const uploadTask=storageRef.put(compressed);
-
-    uploadTask.on('state_changed',
-      (snapshot)=>{
-        const pct=Math.round((snapshot.bytesTransferred/snapshot.totalBytes)*100);
-        if(progressBar)progressBar.style.width=pct+'%';
-        if(progressLabel)progressLabel.textContent=pct+'%';
-      },
-      (error)=>{
-        showToast('Ошибка загрузки: '+error.message,'error');
-        if(spinner)spinner.style.display='none';
-        if(icon)icon.style.display='block';
-        if(label)label.textContent=t('choose_photo');
-        if(progressWrap)progressWrap.style.display='none';
-      },
-      async()=>{
-        const downloadURL=await uploadTask.snapshot.ref.getDownloadURL();
-        uploadedImageUrl=downloadURL;
-        tempUploadedUrl=downloadURL;
-        if(spinner)spinner.style.display='none';
-        if(icon)icon.style.display='block';
-        if(label)label.textContent='✅ Фото загружено';
-        if(progressWrap)progressWrap.style.display='none';
-        const preview=document.getElementById('imgPreview');
-        const wrap=document.getElementById('imgPreviewWrap');
-        if(preview)preview.src=downloadURL;
-        if(wrap)wrap.style.display='block';
-        const stylishBtn=document.getElementById('stylishCardBtn');
-        if(stylishBtn)stylishBtn.style.display='flex';
-        showToast('Фото загружено!','success');
-        runAiScan(downloadURL);
-      }
-    );
-  } catch(err){
-    showToast('Ошибка: '+err.message,'error');
-    if(spinner)spinner.style.display='none';
-    if(icon)icon.style.display='block';
-    if(label)label.textContent=t('choose_photo');
+async function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  if (!file.type.startsWith('image/')) {
+    showToast('Выберите изображение', 'error');
+    return;
   }
-  e.target.value='';
+  
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('Максимум 10 МБ', 'error');
+    return;
+  }
+
+  // Сохраняем файл локально (не загружаем в Storage!)
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    localImageData = event.target.result; // data URL
+    uploadedImageUrl = localImageData; // Временно храним локально
+    
+    // Показываем превью
+    const preview = document.getElementById('imgPreview');
+    const wrap = document.getElementById('imgPreviewWrap');
+    if (preview) preview.src = localImageData;
+    if (wrap) wrap.style.display = 'block';
+    
+    const label = document.getElementById('uploadLabel');
+    if (label) label.textContent = '✅ Фото выбрано (будет загружено при сохранении)';
+    
+    const stylishBtn = document.getElementById('stylishCardBtn');
+    if (stylishBtn) stylishBtn.style.display = 'flex';
+    
+    showToast('Фото выбрано! Нажмите "Сохранить" для загрузки', 'success');
+  };
+  reader.readAsDataURL(file);
+  
+  e.target.value = '';
+}
+
+// Удаляем локальное фото
+function removeImage() {
+  uploadedImageUrl = '';
+  localImageData = null;
+  const preview = document.getElementById('imgPreview');
+  const wrap = document.getElementById('imgPreviewWrap');
+  const label = document.getElementById('uploadLabel');
+  if (preview) preview.src = '';
+  if (wrap) wrap.style.display = 'none';
+  if (label) label.textContent = t('choose_photo');
+  const stylishBtn = document.getElementById('stylishCardBtn');
+  if (stylishBtn) stylishBtn.style.display = 'none';
 }
 
 async function compressImage(file){
@@ -2620,20 +2613,53 @@ async function saveProduct() {
   let youtube = document.getElementById('prodYoutube')?.value.trim() || '';
   let dcCard = document.getElementById('prodDcCard')?.value.replace(/\D/g, '') || '';
 
-  const data = {
-    name, price,
-    originalPrice: parseFloat(document.getElementById('prodOriginalPrice')?.value) || null,
-    city,
-    description: document.getElementById('prodDesc')?.value.trim(),
-    category,
-    subcategory,
-    phone, whatsapp, telegram, instagram, youtube, dcCard,
-    image: uploadedImageUrl,
-    userId: currentUser.uid,
-    username: document.getElementById('userName').textContent
-  };
+  const btn = document.querySelector('.modal-footer .btn-primary');
+  btn.innerHTML = '<span class="loader"></span> Сохранение...';
+  btn.disabled = true;
 
   try {
+    let finalImageUrl = uploadedImageUrl;
+    
+    // Если есть локальное фото (data URL) — загружаем в Storage
+    if (localImageData && localImageData.startsWith('data:image')) {
+      showToast('Загрузка фото...', 'warning');
+      
+      // Конвертируем data URL в Blob
+      const response = await fetch(localImageData);
+      const blob = await response.blob();
+      
+      const fileName = `products/${currentUser.uid}/${Date.now()}_product.jpg`;
+      const storageRef = storage.ref(fileName);
+      const uploadTask = storageRef.put(blob);
+      
+      // Ждем загрузки
+      const snapshot = await new Promise((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          null,
+          (error) => reject(error),
+          () => resolve(uploadTask.snapshot)
+        );
+      });
+      
+      finalImageUrl = await snapshot.ref.getDownloadURL();
+      uploadedImageUrl = finalImageUrl;
+      localImageData = null;
+    }
+
+    const data = {
+      name, price,
+      originalPrice: parseFloat(document.getElementById('prodOriginalPrice')?.value) || null,
+      city,
+      description: document.getElementById('prodDesc')?.value.trim(),
+      category,
+      subcategory,
+      phone, whatsapp, telegram, instagram, youtube, dcCard,
+      image: finalImageUrl,
+      userId: currentUser.uid,
+      username: document.getElementById('userName').textContent
+    };
+
     if (editingProductId) {
       data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
       await db.collection('products').doc(editingProductId).update(data);
@@ -2642,7 +2668,6 @@ async function saveProduct() {
       const userRef = db.collection('users').doc(currentUser.uid);
       await db.runTransaction(async (tx) => {
         const userSnap = await tx.get(userRef);
-        // ИСПРАВЛЕНО: используем .exists (свойство), а не .exists()
         const count = userSnap.exists ? (userSnap.data().productCount || 0) : 0;
         if (count >= MAX_PRODUCTS) {
           throw new Error('Лимит квоты исчерпан');
@@ -2652,29 +2677,58 @@ async function saveProduct() {
         tx.update(userRef, { productCount: firebase.firestore.FieldValue.increment(1) });
       });
     }
+    
     saveContactsToStorage({ city, phone, whatsapp, telegram, instagram, youtube, dcCard });
     tempUploadedUrl = null;
+    localImageData = null;
     closeModal('productModal');
     uploadedImageUrl = '';
     showToast(t('saved'), 'success');
+    await loadProducts();
   } catch (e) {
     if (e.message === 'Лимит квоты исчерпан') {
       showToast(t('quota_reached'), 'warning');
     } else {
       showToast('Error: ' + e.message, 'error');
     }
+  } finally {
+    btn.innerHTML = '<i class="fas fa-save"></i> ' + t('save');
+    btn.disabled = false;
   }
 }
 
 async function deleteProduct(pid) {
   if (!confirm(t('delete_confirm'))) return;
+  
   try {
+    // Находим товар
+    const product = allProducts.find(p => p.id === pid);
+    if (!product) {
+      showToast('Товар не найден', 'error');
+      return;
+    }
+    
     const userRef = db.collection('users').doc(currentUser.uid);
     const productRef = db.collection('products').doc(pid);
+    
+    // Удаляем из Firestore
     await db.runTransaction(async (tx) => {
       tx.delete(productRef);
       tx.update(userRef, { productCount: firebase.firestore.FieldValue.increment(-1) });
     });
+    
+    // Удаляем картинку из Storage (если есть)
+    if (product.image && product.image.includes('firebasestorage')) {
+      try {
+        const imageRef = storage.refFromURL(product.image);
+        await imageRef.delete();
+        console.log('✅ Картинка удалена из Storage');
+      } catch (storageError) {
+        console.warn('❌ Не удалось удалить картинку:', storageError);
+        // Не показываем ошибку пользователю, так как товар уже удалён
+      }
+    }
+    
     showToast('Товар удалён', 'success');
     await loadProducts();
   } catch (e) {
