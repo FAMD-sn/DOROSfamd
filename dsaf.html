@@ -552,7 +552,18 @@ if (!firebase.apps.length) {
 
 const auth = firebase.auth();
 const db = firebase.firestore();
-const functions = firebase.functions('europe-west3');
+
+// ====== ИСПРАВЛЕНИЕ: Правильный способ инициализации Cloud Functions ======
+// В compat-версии используем firebase.app().functions() для указания региона
+let functions;
+try {
+  // Способ 1: Через app с регионом
+  functions = firebase.app().functions('europe-west3');
+} catch(e) {
+  // Способ 2: Без региона (us-central1)
+  console.warn('Не удалось инициализировать функции с регионом europe-west3, используем default');
+  functions = firebase.functions();
+}
 
 db.settings({ 
   ignoreUndefinedProperties: true,
