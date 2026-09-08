@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -546,6 +545,8 @@ header {
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-functions-compat.js"></script>
+<!-- Добавляем Firestore CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 <script>
 // ==================== FIREBASE CONFIG ====================
 const firebaseConfig = {
@@ -557,21 +558,37 @@ const firebaseConfig = {
   appId: "1:343457643268:web:0687d0ea1137124dafae51"
 };
 
-const compatApp = firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
-const secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary');
-const secondaryAuth = secondaryApp.auth();
+// Инициализируем Firestore с настройками
+db.settings({ 
+  ignoreUndefinedProperties: true,
+  merge: true
+});
 
-// Cloud Firestore (modular v9+ SDK) attached to the same compat App via
-// dynamic import, so this page stays a classic script (all the inline
-// onclick="" handlers in the markup need that).
-let db, collection, doc, getDoc, getDocs, query, where, writeBatch, updateDoc, increment;
-const firestoreReady = (async () => {
-  const fs = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
-  ({ collection, doc, getDoc, getDocs, query, where, writeBatch, updateDoc, increment } = fs);
-  db = fs.getFirestore(compatApp);
-})();
+// Для совместимости с существующим кодом
+const collection = db.collection.bind(db);
+const doc = db.doc.bind(db);
+const getDoc = (docRef) => docRef.get();
+const getDocs = (queryRef) => queryRef.get();
+const query = (collectionRef, ...conditions) => {
+  let q = collectionRef;
+  conditions.forEach(cond => {
+    if (Array.isArray(cond) && cond.length === 3) {
+      q = q.where(cond[0], cond[1], cond[2]);
+    }
+  });
+  return q;
+};
+const where = (field, op, value) => [field, op, value];
+const writeBatch = db.batch.bind(db);
+const updateDoc = (ref, data) => ref.update(data);
+const increment = (num) => firebase.firestore.FieldValue.increment(num);
+
+// Для облачных функций
+const functions = firebase.functions('europe-west3');
 
 const ADMIN_EMAIL = 'doro@shop.com';
 const NINETY_DAYS = 90 * 24 * 60 * 60 * 1000;
@@ -580,6 +597,7 @@ let allProducts = [];
 let allUsers = {};
 let oldProducts = [];
 let currentConfirmCallback = null;
+let isFirestoreReady = false;
 
 // ==================== XSS PROTECTION ====================
 function escapeHtml(str) {
@@ -597,21 +615,27 @@ function escapeHtml(str) {
 // any other account only passes if its Firestore user doc has isAdmin === true.
 auth.onAuthStateChanged(async user => {
   if (!user) return;
-  await firestoreReady;
-  let isAdmin = user.email === ADMIN_EMAIL;
-  if (!isAdmin) {
-    const snap = await getDoc(doc(db, 'users', user.uid));
-    isAdmin = snap.exists() && snap.data().isAdmin === true;
-  }
-  if (isAdmin) {
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'block';
-    loadData();
-    setupSearchListeners();
-  } else {
-    auth.signOut();
-    showToast('Доступ запрещён', 'error');
-    setTimeout(() => location.href = '/DOROShop', 2000);
+  
+  try {
+    let isAdmin = user.email === ADMIN_EMAIL;
+    if (!isAdmin) {
+      const snap = await db.collection('users').doc(user.uid).get();
+      isAdmin = snap.exists && snap.data().isAdmin === true;
+    }
+    if (isAdmin) {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('admin-screen').style.display = 'block';
+      isFirestoreReady = true;
+      await loadData();
+      setupSearchListeners();
+    } else {
+      await auth.signOut();
+      showToast('Доступ запрещён', 'error');
+      setTimeout(() => location.href = '/DOROShop', 2000);
+    }
+  } catch (e) {
+    console.error('Auth error:', e);
+    showToast('Ошибка проверки прав: ' + e.message, 'error');
   }
 });
 
@@ -620,10 +644,6 @@ async function adminLogin() {
   const password = document.getElementById('auth-password').value;
   const errEl = document.getElementById('auth-error');
   errEl.textContent = '';
-  // Note: this early client-side check only blocks the plain ADMIN_EMAIL
-  // login form shortcut — the real gate is the isAdmin/email check in
-  // onAuthStateChanged above (and, ultimately, your Firestore security
-  // rules), since a client-side check alone can always be bypassed.
   try {
     await auth.signInWithEmailAndPassword(email, password);
   } catch(e) {
@@ -637,19 +657,35 @@ function adminLogout() {
 
 // ==================== LOAD DATA ====================
 async function loadData() {
-  await firestoreReady;
-  const [snapProducts, snapUsers] = await Promise.all([
-    getDocs(collection(db, 'products')),
-    getDocs(collection(db, 'users'))
-  ]);
-  allProducts = [];
-  allUsers = {};
-  snapUsers.forEach(d => { allUsers[d.id] = d.data(); });
-  snapProducts.forEach(d => { allProducts.push({ id: d.id, ...d.data() }); });
-  updateStats();
-  renderSellers();
-  renderAllProducts();
-  updateCleanupStats();
+  if (!isFirestoreReady) return;
+  
+  try {
+    const [snapProducts, snapUsers] = await Promise.all([
+      db.collection('products').get(),
+      db.collection('users').get()
+    ]);
+    
+    allProducts = [];
+    allUsers = {};
+    
+    snapUsers.forEach(d => { allUsers[d.id] = d.data(); });
+    snapProducts.forEach(d => { 
+      const data = d.data();
+      // Проверяем, что timestamp существует и это число
+      if (data.timestamp && typeof data.timestamp === 'object' && data.timestamp.seconds) {
+        data.timestamp = data.timestamp.seconds * 1000;
+      }
+      allProducts.push({ id: d.id, ...data }); 
+    });
+    
+    updateStats();
+    renderSellers();
+    renderAllProducts();
+    updateCleanupStats();
+  } catch (e) {
+    console.error('Error loading data:', e);
+    showToast('Ошибка загрузки данных: ' + e.message, 'error');
+  }
 }
 
 function updateStats() {
@@ -760,15 +796,14 @@ async function createSeller() {
   btn.disabled = true;
 
   try {
-    // ВЫЗЫВАЕМ ОБЛАЧНУЮ ФУНКЦИЮ ВО ФРАНКФУРТЕ ВМЕСТО ЛОКАЛЬНОЙ РЕГИСТРАЦИИ
-    const createSellerFn = firebase.app().functions('europe-west3').httpsCallable('createVerifiedSeller');
+    const createSellerFn = firebase.functions('europe-west3').httpsCallable('createVerifiedSeller');
     
     await createSellerFn({
       email: email,
       password: password,
       username: username,
       phone: phone,
-      city: '' // город можно оставить пустым или добавить поле
+      city: ''
     });
 
     document.getElementById('new-email').value = '';
@@ -779,7 +814,8 @@ async function createSeller() {
     
     await loadData();
   } catch(e) {
-    showToast('Ошибка функции: ' + e.message, 'error');
+    console.error('Create seller error:', e);
+    showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
   } finally {
     btn.innerHTML = '<i class="fas fa-user-plus"></i> Создать аккаунт продавца';
     btn.disabled = false;
@@ -809,21 +845,17 @@ async function deleteSellerByUid(uid, email) {
   showToast('Удаление продавца...', 'warning');
 
   try {
-    await firestoreReady;
-    // Batched write: delete the user doc, their ratings doc, and every one
-    // of their products together. writeBatch caps at 500 ops, so chunk the
-    // product deletes if a seller has an unusually large catalog.
-    const productsSnap = await getDocs(query(collection(db, 'products'), where('userId', '==', uid)));
+    const productsSnap = await db.collection('products').where('userId', '==', uid).get();
     const productRefs = productsSnap.docs.map(d => d.ref);
 
-    const CHUNK = 450; // leave headroom for the user + ratings doc deletes
+    const CHUNK = 450;
     for (let i = 0; i < productRefs.length || i === 0; i += CHUNK) {
-      const batch = writeBatch(db);
+      const batch = db.batch();
       const slice = productRefs.slice(i, i + CHUNK);
       slice.forEach(ref => batch.delete(ref));
       if (i === 0) {
-        batch.delete(doc(db, 'users', uid));
-        batch.delete(doc(db, 'userRatings', uid));
+        batch.delete(db.collection('users').doc(uid));
+        batch.delete(db.collection('userRatings').doc(uid));
       }
       await batch.commit();
       if (productRefs.length === 0) break;
@@ -832,17 +864,22 @@ async function deleteSellerByUid(uid, email) {
     showToast(`✅ Продавец ${email} удалён`, 'success');
     await loadData();
   } catch(e) {
-    showToast('Ошибка: ' + e.message, 'error');
+    console.error('Delete seller error:', e);
+    showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
   }
 }
 
 // ==================== FREEZE ====================
 async function toggleFreeze(uid, currentlyFrozen) {
-  await firestoreReady;
-  await updateDoc(doc(db, 'users', uid), { frozen: !currentlyFrozen });
-  allUsers[uid].frozen = !currentlyFrozen;
-  renderSellers(document.getElementById('seller-search')?.value || '');
-  showToast(currentlyFrozen ? 'Продавец разморожен' : 'Продавец заморожен', 'success');
+  try {
+    await db.collection('users').doc(uid).update({ frozen: !currentlyFrozen });
+    allUsers[uid].frozen = !currentlyFrozen;
+    renderSellers(document.getElementById('seller-search')?.value || '');
+    showToast(currentlyFrozen ? 'Продавец разморожен' : 'Продавец заморожен', 'success');
+  } catch(e) {
+    console.error('Toggle freeze error:', e);
+    showToast('Ошибка: ' + e.message, 'error');
+  }
 }
 
 // ==================== QUICK CLEANUP (ОДНА КНОПКА) ====================
@@ -865,23 +902,20 @@ async function quickCleanup() {
       btn.innerHTML = '<span class="loader"></span> Удаление ' + oldProducts_local.length + ' товаров...';
       
       try {
-        await firestoreReady;
         const decrements = {};
         oldProducts_local.forEach(p => {
           decrements[p.userId] = (decrements[p.userId] || 0) + 1;
         });
 
-        // Batched delete of every stale product doc + one counter decrement
-        // per affected seller, chunked to stay under writeBatch's 500-op cap.
         const CHUNK = 450;
         for (let i = 0; i < oldProducts_local.length; i += CHUNK) {
-          const batch = writeBatch(db);
+          const batch = db.batch();
           oldProducts_local.slice(i, i + CHUNK).forEach(p => {
-            batch.delete(doc(db, 'products', p.id));
+            batch.delete(db.collection('products').doc(p.id));
           });
           if (i === 0) {
             Object.entries(decrements).forEach(([uid, cnt]) => {
-              batch.update(doc(db, 'users', uid), { productCount: increment(-cnt) });
+              batch.update(db.collection('users').doc(uid), { productCount: firebase.firestore.FieldValue.increment(-cnt) });
             });
           }
           await batch.commit();
@@ -892,7 +926,8 @@ async function quickCleanup() {
         document.getElementById('cleanup-preview').innerHTML = '';
         document.getElementById('cleanup-btn').style.display = 'none';
       } catch(e) {
-        showToast('Ошибка: ' + e.message, 'error');
+        console.error('Quick cleanup error:', e);
+        showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
       } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;
@@ -918,7 +953,7 @@ async function previewOldProducts() {
         <img src="${escapeHtml(p.image) || 'https://via.placeholder.com/200x120?text=No+Image'}" onerror="this.src='https://via.placeholder.com/200x120'">
         <div class="pinfo">
           <div class="pname">${escapeHtml(p.name) || '—'}</div>
-          <div class="pmeta">${new Date(p.timestamp).toLocaleDateString('ru')} · ${escapeHtml(p.userId?.slice(0,6))}...</div>
+          <div class="pmeta">${p.timestamp ? new Date(p.timestamp).toLocaleDateString('ru') : '—'} · ${escapeHtml(p.userId?.slice(0,6))}...</div>
         </div>
       </div>`).join('') +
     (oldProducts.length > 6 ? `<div class="stat-card" style="display:flex;align-items:center;justify-content:center;"><div class="val">+${oldProducts.length-6}</div></div>` : '') +
@@ -938,7 +973,6 @@ async function cleanupOldProducts() {
       btn.innerHTML = '<span class="loader"></span> Удаление...';
 
       try {
-        await firestoreReady;
         const decrements = {};
         oldProducts.forEach(p => {
           decrements[p.userId] = (decrements[p.userId] || 0) + 1;
@@ -946,13 +980,13 @@ async function cleanupOldProducts() {
 
         const CHUNK = 450;
         for (let i = 0; i < oldProducts.length; i += CHUNK) {
-          const batch = writeBatch(db);
+          const batch = db.batch();
           oldProducts.slice(i, i + CHUNK).forEach(p => {
-            batch.delete(doc(db, 'products', p.id));
+            batch.delete(db.collection('products').doc(p.id));
           });
           if (i === 0) {
             Object.entries(decrements).forEach(([uid, cnt]) => {
-              batch.update(doc(db, 'users', uid), { productCount: increment(-cnt) });
+              batch.update(db.collection('users').doc(uid), { productCount: firebase.firestore.FieldValue.increment(-cnt) });
             });
           }
           await batch.commit();
@@ -964,7 +998,8 @@ async function cleanupOldProducts() {
         btn.style.display = 'none';
         await loadData();
       } catch(e) {
-        showToast('Ошибка: ' + e.message, 'error');
+        console.error('Cleanup error:', e);
+        showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-broom"></i> Удалить все найденные';
@@ -999,7 +1034,7 @@ function renderAllProducts(filter = '') {
         <img src="${escapeHtml(p.image) || 'https://via.placeholder.com/200x120'}" onerror="this.src='https://via.placeholder.com/200x120'">
         <div class="pinfo">
           <div class="pname">${escapeHtml(p.name) || '—'}</div>
-          <div class="pmeta">${escapeHtml(seller?.username) || p.userId?.slice(0,8)} · ${p.price} сом</div>
+          <div class="pmeta">${escapeHtml(seller?.username) || p.userId?.slice(0,8)} · ${p.price || '?'} сом</div>
           ${isOld ? '<div style="color:var(--danger);font-size:0.75rem;margin-top:0.25rem"><i class="fas fa-clock"></i> Устарел</div>' : ''}
           <div class="pactions">
             <button class="btn btn-danger btn-sm" onclick="adminDeleteProduct('${p.id}', '${p.userId}')">
@@ -1018,16 +1053,16 @@ async function adminDeleteProduct(productId, userId) {
     'Вы действительно хотите удалить этот товар?',
     async () => {
       try {
-        await firestoreReady;
-        const batch = writeBatch(db);
-        batch.delete(doc(db, 'products', productId));
+        const batch = db.batch();
+        batch.delete(db.collection('products').doc(productId));
         const current = allUsers[userId]?.productCount || 0;
-        if (current > 0) batch.update(doc(db, 'users', userId), { productCount: increment(-1) });
+        if (current > 0) batch.update(db.collection('users').doc(userId), { productCount: firebase.firestore.FieldValue.increment(-1) });
         await batch.commit();
         showToast('Товар удалён', 'success');
         await loadData();
       } catch(e) {
-        showToast('Ошибка: ' + e.message, 'error');
+        console.error('Delete product error:', e);
+        showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
       }
     }
   );
@@ -1066,6 +1101,11 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && document.getElementById('confirmOverlay').classList.contains('active')) {
     confirmReject();
   }
+});
+
+// Инициализация после загрузки страницы
+document.addEventListener('DOMContentLoaded', function() {
+  isFirestoreReady = true;
 });
 </script>
 </body>
