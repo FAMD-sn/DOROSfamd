@@ -550,6 +550,7 @@ if (!firebase.apps.length) {
 
 const auth = firebase.auth();
 const db = firebase.firestore();
+const storage = firebase.storage(); // ← ДОБАВЬТЕ ЭТУ СТРОКУ
 
 // ====== ИСПРАВЛЕНИЕ: Правильная инициализация Functions ======
 // Для compat-версии используем firebase.app().functions('регион')
@@ -1107,11 +1108,31 @@ async function adminDeleteProduct(productId, userId) {
     'Вы действительно хотите удалить этот товар?',
     async () => {
       try {
+        // Находим товар для получения URL картинки
+        const product = allProducts.find(p => p.id === productId);
+        
         const batch = db.batch();
         batch.delete(db.collection('products').doc(productId));
         const current = allUsers[userId]?.productCount || 0;
-        if (current > 0) batch.update(db.collection('users').doc(userId), { productCount: firebase.firestore.FieldValue.increment(-1) });
+        if (current > 0) {
+          batch.update(db.collection('users').doc(userId), { 
+            productCount: firebase.firestore.FieldValue.increment(-1) 
+          });
+        }
         await batch.commit();
+        
+        // Удаляем картинку из Storage (если есть)
+        if (product && product.image && product.image.includes('firebasestorage')) {
+          try {
+            const imageRef = storage.refFromURL(product.image);
+            await imageRef.delete();
+            console.log('✅ Картинка удалена из Storage');
+          } catch (storageError) {
+            console.warn('❌ Не удалось удалить картинку:', storageError);
+            // Не показываем ошибку пользователю
+          }
+        }
+        
         showToast('Товар удалён', 'success');
         await loadData();
       } catch(e) {
