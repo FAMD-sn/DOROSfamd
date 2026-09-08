@@ -8,15 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
-/*
-  DESIGN CONCEPT — "Ops console"
-  This is a single-operator back office for moderating a marketplace:
-  reviewing sellers, freezing bad actors, purging stale listings. It reads
-  like a systems console, not a marketing dashboard — dense, quiet, one
-  signal color reserved for action and attention. Every number (counts,
-  quotas, ids) sets in a monospace face because that's genuinely what
-  this screen is full of, not as decoration.
-*/
 :root {
   --ink: #14171C;
   --panel: #1B1F26;
@@ -33,7 +24,7 @@
   --success: #34D399;
   --success-strong: #4FE0B3;
   --success-soft: rgba(52,211,153,0.12);
-  --warning: var(--signal); /* kept as an alias: a couple of inline styles reference it directly */
+  --warning: var(--signal);
   --radius: 6px;
   --radius-sm: 4px;
   --sans: 'IBM Plex Sans', sans-serif;
@@ -51,7 +42,6 @@ body {
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-/* AUTH SCREEN */
 #auth-screen {
   display: flex; align-items: center; justify-content: center;
   min-height: 100vh;
@@ -77,7 +67,6 @@ body {
 .auth-logo i { color: var(--signal); }
 .auth-logo span { flex-basis: 100%; color: var(--text-dim); font-weight: 400; font-size: 0.8rem; margin-top: 0.35rem; font-family: var(--mono); }
 
-/* MAIN LAYOUT */
 #admin-screen { display: none; }
 header {
   background: var(--panel);
@@ -98,7 +87,6 @@ header {
 }
 .main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem; }
 
-/* CARDS */
 .cards-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1px; margin-bottom: 2rem;
@@ -120,7 +108,6 @@ header {
 .stat-card.danger { border-top-color: var(--danger); }
 .stat-card.danger .val { color: var(--danger); }
 
-/* SECTIONS */
 .section {
   background: var(--panel); border: 1px solid var(--line);
   border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem;
@@ -134,7 +121,6 @@ header {
 }
 .section-title i { color: var(--signal); font-size: 0.9rem; }
 
-/* FORMS */
 .form-group { margin-bottom: 1rem; }
 .form-label { display: block; margin-bottom: 0.4rem; font-size: 0.8rem; color: var(--text-dim); }
 .form-control {
@@ -148,7 +134,6 @@ header {
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media(max-width:600px) { .form-row { grid-template-columns: 1fr; } }
 
-/* BUTTONS */
 .btn {
   padding: 0.6rem 1.1rem; border: 1px solid transparent; border-radius: var(--radius-sm);
   font-weight: 600; font-size: 0.85rem; cursor: pointer;
@@ -175,15 +160,12 @@ header {
 .btn-full { width: 100%; justify-content: center; padding: 0.8rem; }
 .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.78rem; }
 
-/* LOADER */
 .loader {
   width: 22px; height: 22px; border: 2px solid var(--line);
   border-top-color: var(--signal); border-radius: 50%;
   animation: spin 0.7s linear infinite; display: inline-block;
 }
-.loader-sm { width: 15px; height: 15px; border-width: 2px; }
 
-/* TOAST */
 #toast {
   position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
   background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--signal);
@@ -197,7 +179,6 @@ header {
 #toast.error { border-left-color: var(--danger); color: var(--danger); }
 #toast.warning { border-left-color: var(--signal); color: var(--signal); }
 
-/* SELLERS TABLE */
 .sellers-table { width: 100%; border-collapse: collapse; }
 .sellers-table th, .sellers-table td {
   padding: 0.7rem 0.9rem; text-align: left;
@@ -221,7 +202,6 @@ header {
 .badge-active::before { background: var(--success); }
 .tbl-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
-/* TABS */
 .tabs {
   display: flex; gap: 0.25rem; border-bottom: 1px solid var(--line);
   margin-bottom: 1.5rem; flex-wrap: wrap;
@@ -237,7 +217,6 @@ header {
 .tab-content { display: none; }
 .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
 
-/* PRODUCTS LIST */
 .products-admin-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
@@ -256,7 +235,6 @@ header {
 .product-admin-card .pmeta { font-size: 0.73rem; color: var(--text-dim); font-family: var(--mono); }
 .product-admin-card .pactions { margin-top: 0.55rem; display: flex; gap: 0.5rem; }
 
-/* QUICK CLEANUP BUTTON */
 .quick-cleanup-card {
   background: var(--panel-2);
   border: 1px solid var(--line);
@@ -289,7 +267,6 @@ header {
 .cleanup-stat { display: flex; align-items: center; gap: 0.5rem; }
 .cleanup-stat span { font-family: var(--mono); color: var(--text); }
 
-/* CONFIRM MODAL */
 .confirm-overlay {
   position: fixed;
   inset: 0;
@@ -335,7 +312,6 @@ header {
   justify-content: flex-end;
 }
 
-/* SEARCH */
 .search-box {
   margin-bottom: 1rem;
   position: relative;
@@ -396,7 +372,6 @@ header {
   </header>
 
   <div class="main">
-    <!-- STATS CARDS -->
     <div class="cards-grid" id="stats-cards">
       <div class="stat-card">
         <div class="val" id="stat-products">—</div>
@@ -412,7 +387,6 @@ header {
       </div>
     </div>
 
-    <!-- TABS -->
     <div class="tabs">
       <div class="tab active" onclick="switchTab('sellers')"><i class="fas fa-users"></i> Продавцы</div>
       <div class="tab" onclick="switchTab('create')"><i class="fas fa-user-plus"></i> Создать</div>
@@ -421,7 +395,6 @@ header {
       <div class="tab" onclick="switchTab('products')"><i class="fas fa-box-open"></i> Все товары</div>
     </div>
 
-    <!-- TAB: SELLERS LIST -->
     <div class="tab-content active" id="tab-sellers">
       <div class="section">
         <div class="section-title"><i class="fas fa-users"></i> Список продавцов</div>
@@ -429,13 +402,10 @@ header {
           <i class="fas fa-search"></i>
           <input type="text" id="seller-search" placeholder="Поиск по имени или email...">
         </div>
-        <div id="sellers-list-wrap">
-          <div class="loader"></div>
-        </div>
+        <div id="sellers-list-wrap"><div class="loader"></div></div>
       </div>
     </div>
 
-    <!-- TAB: CREATE SELLER -->
     <div class="tab-content" id="tab-create">
       <div class="section">
         <div class="section-title"><i class="fas fa-user-plus"></i> Создать нового продавца</div>
@@ -465,7 +435,6 @@ header {
       </div>
     </div>
 
-    <!-- TAB: DELETE SELLER -->
     <div class="tab-content" id="tab-delete">
       <div class="section">
         <div class="section-title"><i class="fas fa-user-minus"></i> Удалить продавца</div>
@@ -483,12 +452,9 @@ header {
       </div>
     </div>
 
-    <!-- TAB: CLEANUP (УЛУЧШЕННАЯ) -->
     <div class="tab-content" id="tab-cleanup">
       <div class="section">
         <div class="section-title"><i class="fas fa-broom"></i> Очистка устаревших товаров</div>
-        
-        <!-- БЫСТРАЯ КНОПКА ОЧИСТКИ -->
         <div class="quick-cleanup-card">
           <button class="btn btn-danger quick-cleanup-btn" onclick="quickCleanup()" id="quick-cleanup-btn">
             <i class="fas fa-trash-alt"></i> 🗑️ БЫСТРАЯ ОЧИСТКА — удалить все товары старше 90 дней
@@ -499,9 +465,7 @@ header {
             <div class="cleanup-stat"><i class="fas fa-chart-line"></i> Освободится квот: <span id="cleanup-quota-release">—</span></div>
           </div>
         </div>
-
         <hr style="border-color: var(--line); margin: 1rem 0;">
-        
         <div id="cleanup-preview" style="margin-bottom:1rem;"></div>
         <div style="display:flex;gap:1rem;flex-wrap:wrap;">
           <button class="btn btn-warning" onclick="previewOldProducts()">
@@ -514,7 +478,6 @@ header {
       </div>
     </div>
 
-    <!-- TAB: ALL PRODUCTS -->
     <div class="tab-content" id="tab-products">
       <div class="section">
         <div class="section-title"><i class="fas fa-box-open"></i> Все товары в базе</div>
@@ -530,7 +493,6 @@ header {
 
 <div id="toast"></div>
 
-<!-- Custom Confirm Modal -->
 <div id="confirmOverlay" class="confirm-overlay">
   <div class="confirm-box">
     <div class="confirm-title" id="confirmTitle">Подтверждение</div>
@@ -542,11 +504,12 @@ header {
   </div>
 </div>
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-functions-compat.js"></script>
-<!-- Добавляем Firestore CDN -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
 <script>
 // ==================== FIREBASE CONFIG ====================
 const firebaseConfig = {
@@ -558,39 +521,25 @@ const firebaseConfig = {
   appId: "1:343457643268:web:0687d0ea1137124dafae51"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Инициализация Firebase (только если не инициализирован)
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Инициализируем Firestore с настройками
+// Настройки Firestore
 db.settings({ 
-  ignoreUndefinedProperties: true,
-  merge: true
+  ignoreUndefinedProperties: true
 });
 
-// Для совместимости с существующим кодом
-const collection = db.collection.bind(db);
-const doc = db.doc.bind(db);
-const getDoc = (docRef) => docRef.get();
-const getDocs = (queryRef) => queryRef.get();
-const query = (collectionRef, ...conditions) => {
-  let q = collectionRef;
-  conditions.forEach(cond => {
-    if (Array.isArray(cond) && cond.length === 3) {
-      q = q.where(cond[0], cond[1], cond[2]);
-    }
-  });
-  return q;
-};
-const where = (field, op, value) => [field, op, value];
-const writeBatch = db.batch.bind(db);
-const updateDoc = (ref, data) => ref.update(data);
-const increment = (num) => firebase.firestore.FieldValue.increment(num);
+// ====== ИСПРАВЛЕНИЕ: ОДИН экземпляр functions с регионом ======
+// Правильный синтаксис для compat-версии
+const functions = firebase.functions('europe-west3');
 
-// ====== ИСПРАВЛЕНИЕ: Правильный способ инициализации Cloud Functions ======
-// В compat-версии мы сначала получаем экземпляр приложения, затем функции
-const functions = firebase.functions();
-// Для указания региона: firebase.functions('europe-west3')
+// Если используете эмулятор (для локальной разработки):
+// functions.useFunctionsEmulator('http://localhost:5001');
 
 const ADMIN_EMAIL = 'doro@shop.com';
 const NINETY_DAYS = 90 * 24 * 60 * 60 * 1000;
@@ -612,9 +561,15 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// ==================== TOAST ====================
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3000);
+}
+
 // ==================== AUTH ====================
-// Two-factor admin check, as required: the fixed ADMIN_EMAIL always passes;
-// any other account only passes if its Firestore user doc has isAdmin === true.
 auth.onAuthStateChanged(async user => {
   if (!user) return;
   
@@ -637,7 +592,11 @@ auth.onAuthStateChanged(async user => {
     }
   } catch (e) {
     console.error('Auth error:', e);
-    showToast('Ошибка проверки прав: ' + e.message, 'error');
+    if (e.message && e.message.includes('Missing or insufficient permissions')) {
+      showToast('⚠️ Ошибка доступа к базе данных. Проверьте правила безопасности Firestore.', 'error');
+    } else {
+      showToast('Ошибка проверки прав: ' + e.message, 'error');
+    }
   }
 });
 
@@ -673,7 +632,6 @@ async function loadData() {
     snapUsers.forEach(d => { allUsers[d.id] = d.data(); });
     snapProducts.forEach(d => { 
       const data = d.data();
-      // Проверяем, что timestamp существует и это число
       if (data.timestamp && typeof data.timestamp === 'object' && data.timestamp.seconds) {
         data.timestamp = data.timestamp.seconds * 1000;
       }
@@ -686,7 +644,11 @@ async function loadData() {
     updateCleanupStats();
   } catch (e) {
     console.error('Error loading data:', e);
-    showToast('Ошибка загрузки данных: ' + e.message, 'error');
+    if (e.message && e.message.includes('Missing or insufficient permissions')) {
+      showToast('⚠️ Нет прав на чтение данных. Проверьте правила безопасности Firestore.', 'error');
+    } else {
+      showToast('Ошибка загрузки данных: ' + e.message, 'error');
+    }
   }
 }
 
@@ -709,7 +671,6 @@ function updateCleanupStats() {
   document.getElementById('cleanup-total').textContent = allProducts.length;
   document.getElementById('cleanup-old-count').textContent = oldCount;
   
-  // Calculate how many quotas will be freed
   const decrements = {};
   allProducts.forEach(p => {
     if (p.timestamp && (now - p.timestamp) > NINETY_DAYS) {
@@ -798,20 +759,8 @@ async function createSeller() {
   btn.disabled = true;
 
   try {
-    // ====== ИСПРАВЛЕНИЕ: Используем firebase.functions() без аргументов ======
-    // В совместимом API регион указывается через свойство region у функции,
-    // либо через настройки экземпляра functions.
+    // Используем functions с регионом
     const createSellerFn = functions.httpsCallable('createVerifiedSeller');
-    
-    // Для указания региона можно сделать так:
-    // functions.useFunctionsEmulator('http://localhost:5001'); // для эмулятора
-    // Или создать экземпляр с регионом:
-    // const regionFunctions = firebase.functions('europe-west3');
-    // const createSellerFn = regionFunctions.httpsCallable('createVerifiedSeller');
-    // Но самый простой способ — создать functions с регионом при инициализации:
-    // const functions = firebase.app().functions('europe-west3');
-    // 
-    // Мы переопределим functions ниже
     
     await createSellerFn({
       email: email,
@@ -830,7 +779,6 @@ async function createSeller() {
     await loadData();
   } catch(e) {
     console.error('Create seller error:', e);
-    // Если функция не найдена, показываем более понятное сообщение
     if (e.message && e.message.includes('NOT_FOUND')) {
       showToast('Ошибка: Функция createVerifiedSeller не найдена. Убедитесь, что функция развёрнута в Cloud Functions.', 'error');
     } else {
@@ -841,14 +789,6 @@ async function createSeller() {
     btn.disabled = false;
   }
 }
-
-// ====== ПЕРЕОПРЕДЕЛЯЕМ functions с регионом ======
-// Создаём новый экземпляр functions с указанием региона
-// Важно: это должно быть после инициализации Firebase
-const regionFunctions = firebase.functions('europe-west3');
-
-// Переопределяем основную функцию для использования региона
-// Используем firebase.functions() для вызова с регионом
 
 // ==================== DELETE SELLER ====================
 async function deleteSeller() {
@@ -910,7 +850,7 @@ async function toggleFreeze(uid, currentlyFrozen) {
   }
 }
 
-// ==================== QUICK CLEANUP (ОДНА КНОПКА) ====================
+// ==================== QUICK CLEANUP ====================
 async function quickCleanup() {
   const now = Date.now();
   const oldProducts_local = allProducts.filter(p => p.timestamp && (now - p.timestamp) > NINETY_DAYS);
@@ -964,7 +904,7 @@ async function quickCleanup() {
   );
 }
 
-// ==================== CLEANUP OLD PRODUCTS (PREVIEW) ====================
+// ==================== CLEANUP OLD PRODUCTS ====================
 async function previewOldProducts() {
   const now = Date.now();
   oldProducts = allProducts.filter(p => p.timestamp && (now - p.timestamp) > NINETY_DAYS);
@@ -1116,14 +1056,6 @@ document.getElementById('confirmAcceptBtn').addEventListener('click', () => {
   confirmReject();
 });
 
-// ==================== TOAST ====================
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show ' + type;
-  setTimeout(() => t.className = '', 3000);
-}
-
 // Close confirm on escape key
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && document.getElementById('confirmOverlay').classList.contains('active')) {
@@ -1135,56 +1067,6 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('DOMContentLoaded', function() {
   isFirestoreReady = true;
 });
-
-// ====== ОБНОВЛЕНИЕ функции createSeller для использования regionFunctions ======
-// Перезаписываем функцию createSeller с правильным вызовом
-// Сохраняем оригинальную функцию, чтобы можно было её переопределить
-const originalCreateSeller = window.createSeller;
-// Переопределяем createSeller с правильным использованием regionFunctions
-window.createSeller = async function() {
-  const email = document.getElementById('new-email').value.trim();
-  const password = document.getElementById('new-password').value;
-  const username = document.getElementById('new-username').value.trim();
-  const phone = document.getElementById('new-phone').value.trim();
-  
-  if (!email || !password || !username) { showToast('Заполните обязательные поля', 'error'); return; }
-  if (password.length < 6) { showToast('Пароль минимум 6 символов', 'error'); return; }
-
-  const btn = document.getElementById('create-btn');
-  btn.innerHTML = '<span class="loader"></span> Создание в облаке...';
-  btn.disabled = true;
-
-  try {
-    // Используем regionFunctions для вызова с регионом europe-west3
-    const createSellerFn = regionFunctions.httpsCallable('createVerifiedSeller');
-    
-    const result = await createSellerFn({
-      email: email,
-      password: password,
-      username: username,
-      phone: phone,
-      city: ''
-    });
-
-    document.getElementById('new-email').value = '';
-    document.getElementById('new-password').value = '';
-    document.getElementById('new-username').value = '';
-    document.getElementById('new-phone').value = '';
-    showToast('Продавец успешно создан!', 'success');
-    
-    await loadData();
-  } catch(e) {
-    console.error('Create seller error:', e);
-    if (e.message && e.message.includes('NOT_FOUND')) {
-      showToast('Ошибка: Функция createVerifiedSeller не найдена. Убедитесь, что функция развёрнута в Cloud Functions.', 'error');
-    } else {
-      showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
-    }
-  } finally {
-    btn.innerHTML = '<i class="fas fa-user-plus"></i> Создать аккаунт продавца';
-    btn.disabled = false;
-  }
-};
 </script>
 </body>
 </html>
