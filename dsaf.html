@@ -529,17 +529,25 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Настройки Firestore
+// Настройки Firestore - ИСПРАВЛЕНО: используем {merge: true}
 db.settings({ 
-  ignoreUndefinedProperties: true
+  ignoreUndefinedProperties: true,
+  merge: true
 });
 
-// ====== ИСПРАВЛЕНИЕ: ОДИН экземпляр functions с регионом ======
-// Правильный синтаксис для compat-версии
-const functions = firebase.functions('europe-west3');
-
-// Если используете эмулятор (для локальной разработки):
-// functions.useFunctionsEmulator('http://localhost:5001');
+// ====== ИСПРАВЛЕНИЕ: Правильный способ инициализации Cloud Functions ======
+// В compat-версии используем firebase.functions() БЕЗ аргументов,
+// а регион указываем через .useFunctionsEmulator или через app
+// Или используем firebase.app().functions('europe-west3')
+let functions;
+try {
+  // Способ 1: через app
+  functions = firebase.app().functions('europe-west3');
+} catch(e) {
+  // Способ 2: без региона (будет использовать us-central1 по умолчанию)
+  console.warn('Не удалось инициализировать функции с регионом europe-west3, используем default');
+  functions = firebase.functions();
+}
 
 const ADMIN_EMAIL = 'doro@shop.com';
 const NINETY_DAYS = 90 * 24 * 60 * 60 * 1000;
@@ -564,9 +572,11 @@ function escapeHtml(str) {
 // ==================== TOAST ====================
 function showToast(msg, type = '') {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg;
   t.className = 'show ' + type;
-  setTimeout(() => t.className = '', 3000);
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.className = '', 3000);
 }
 
 // ==================== AUTH ====================
@@ -695,6 +705,8 @@ function switchTab(name) {
 // ==================== SELLERS TABLE ====================
 function renderSellers(filter = '') {
   const wrap = document.getElementById('sellers-list-wrap');
+  if (!wrap) return;
+  
   const sellers = Object.entries(allUsers).filter(([_, u]) => {
     if (!filter) return true;
     const search = filter.toLowerCase();
@@ -759,7 +771,7 @@ async function createSeller() {
   btn.disabled = true;
 
   try {
-    // Используем functions с регионом
+    // Используем functions
     const createSellerFn = functions.httpsCallable('createVerifiedSeller');
     
     await createSellerFn({
@@ -979,6 +991,8 @@ async function cleanupOldProducts() {
 // ==================== ALL PRODUCTS ====================
 function renderAllProducts(filter = '') {
   const wrap = document.getElementById('all-products-wrap');
+  if (!wrap) return;
+  
   let filtered = allProducts;
   if (filter) {
     const search = filter.toLowerCase();
@@ -1067,6 +1081,10 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('DOMContentLoaded', function() {
   isFirestoreReady = true;
 });
+
+console.log('✅ Admin panel initialized');
+console.log('ℹ️ Firebase app:', firebase.apps.length > 0 ? 'initialized' : 'not initialized');
+console.log('ℹ️ Functions available:', typeof functions !== 'undefined' ? 'yes' : 'no');
 </script>
 </body>
 </html>
