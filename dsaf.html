@@ -335,6 +335,27 @@ header {
   color: var(--text-dim);
   font-size: 0.85rem;
 }
+
+/* Стиль для кнопки верификации */
+.btn-verify {
+  background: var(--success);
+  color: #06231A;
+  border: none;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: var(--sans);
+}
+.btn-verify:hover {
+  background: var(--success-strong);
+}
+.btn-verify:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 </style>
 </head>
 <body>
@@ -344,7 +365,7 @@ header {
   <div class="auth-box">
     <div class="auth-logo">
       <i class="fas fa-terminal"></i> DOROShop · Admin console
-      <span>Доступ по email или флагу isAdmin</span>
+      <span>Доступ только для администраторов</span>
     </div>
     <div class="form-group">
       <label class="form-label">Email</label>
@@ -409,6 +430,9 @@ header {
     <div class="tab-content" id="tab-create">
       <div class="section">
         <div class="section-title"><i class="fas fa-user-plus"></i> Создать нового продавца</div>
+        <p style="color:var(--text-dim);margin-bottom:1rem;font-size:0.85rem;">
+          Продавец будет создан в Authentication и Firestore. Custom Claims (verifiedSeller) будут установлены автоматически.
+        </p>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Email *</label>
@@ -432,6 +456,7 @@ header {
         <button class="btn btn-success" onclick="createSeller()" id="create-btn">
           <i class="fas fa-user-plus"></i> Создать аккаунт продавца
         </button>
+        <div id="create-result" style="margin-top:0.75rem;font-size:0.85rem;"></div>
       </div>
     </div>
 
@@ -521,33 +546,18 @@ const firebaseConfig = {
   appId: "1:343457643268:web:0687d0ea1137124dafae51"
 };
 
-// Инициализация Firebase (только если не инициализирован)
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
 const auth = firebase.auth();
 const db = firebase.firestore();
+const functions = firebase.functions('europe-west3');
 
-// Настройки Firestore - ИСПРАВЛЕНО: используем {merge: true}
 db.settings({ 
   ignoreUndefinedProperties: true,
   merge: true
 });
-
-// ====== ИСПРАВЛЕНИЕ: Правильный способ инициализации Cloud Functions ======
-// В compat-версии используем firebase.functions() БЕЗ аргументов,
-// а регион указываем через .useFunctionsEmulator или через app
-// Или используем firebase.app().functions('europe-west3')
-let functions;
-try {
-  // Способ 1: через app
-  functions = firebase.app().functions('europe-west3');
-} catch(e) {
-  // Способ 2: без региона (будет использовать us-central1 по умолчанию)
-  console.warn('Не удалось инициализировать функции с регионом europe-west3, используем default');
-  functions = firebase.functions();
-}
 
 const ADMIN_EMAIL = 'doro@shop.com';
 const NINETY_DAYS = 90 * 24 * 60 * 60 * 1000;
@@ -557,6 +567,7 @@ let allUsers = {};
 let oldProducts = [];
 let currentConfirmCallback = null;
 let isFirestoreReady = false;
+let adminPassword = '';
 
 // ==================== XSS PROTECTION ====================
 function escapeHtml(str) {
@@ -593,6 +604,11 @@ auth.onAuthStateChanged(async user => {
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('admin-screen').style.display = 'block';
       isFirestoreReady = true;
+      
+      // Сохраняем пароль админа
+      const passInput = document.getElementById('auth-password');
+      if (passInput) adminPassword = passInput.value;
+      
       await loadData();
       setupSearchListeners();
     } else {
@@ -720,17 +736,24 @@ function renderSellers(filter = '') {
   }
   
   let html = `<div style="overflow-x:auto"><table class="sellers-table">
-    <thead><tr><th>Имя</th><th>Email</th><th>Телефон</th><th>Товаров</th><th>Статус</th><th>Действия</th></tr></thead><tbody>`;
+    <thead><tr><th>Имя</th><th>Email</th><th>Телефон</th><th>Товаров</th><th>Статус</th><th>Верификация</th><th>Действия</th></tr></thead><tbody>`;
   
   sellers.forEach(([uid, u]) => {
     const pCount = allProducts.filter(p => p.userId === uid).length;
     const frozen = u.frozen === true;
+    const verified = u.verified === true;
     html += `<tr>
       <td>${escapeHtml(u.username) || '—'}</td>
       <td>${escapeHtml(u.email) || '—'}</td>
       <td>${escapeHtml(u.phone) || '—'}</td>
       <td>${pCount} / 50</td>
       <td><span class="${frozen ? 'badge-frozen' : 'badge-active'}">${frozen ? 'Заморожен' : 'Активен'}</span></td>
+      <td>
+        <span class="${verified ? 'badge-active' : 'badge-frozen'}">
+          ${verified ? '✅ Верифицирован' : '❌ Не верифицирован'}
+        </span>
+        ${!verified ? `<button class="btn-verify" onclick="verifySeller('${uid}')"><i class="fas fa-check"></i> Верифицировать</button>` : ''}
+      </td>
       <td><div class="tbl-actions">
         <button class="btn btn-warning btn-sm" onclick="toggleFreeze('${uid}', ${frozen})">
           <i class="fas fa-${frozen ? 'unlock' : 'lock'}"></i> ${frozen ? 'Разморозить' : 'Заморозить'}
@@ -756,46 +779,143 @@ function setupSearchListeners() {
   }
 }
 
-// ==================== CREATE SELLER ====================
+// ==================== VERIFY SELLER (Custom Claims) ====================
+async function verifySeller(uid) {
+  if (!uid) {
+    showToast('❌ UID продавца не указан', 'error');
+    return;
+  }
+  
+  const btn = event?.target;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loader-sm" style="display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--success);border-radius:50%;animation:spin 0.7s linear infinite;"></span>';
+  }
+  
+  try {
+    // 1. Обновляем Firestore
+    await db.collection('users').doc(uid).update({
+      verified: true,
+      verifiedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // 2. Устанавливаем Custom Claims через Cloud Function
+    const setClaimsFn = functions.httpsCallable('setSellerClaims');
+    await setClaimsFn({ uid: uid, verifiedSeller: true });
+    
+    // 3. Обновляем локальные данные
+    if (allUsers[uid]) {
+      allUsers[uid].verified = true;
+    }
+    
+    showToast('✅ Продавец верифицирован!', 'success');
+    renderSellers(document.getElementById('seller-search')?.value || '');
+    
+  } catch (e) {
+    console.error('Verify seller error:', e);
+    if (e.message && e.message.includes('NOT_FOUND')) {
+      showToast('❌ Cloud Function "setSellerClaims" не найдена. Разверните функцию в Firebase.', 'error');
+    } else {
+      showToast('❌ Ошибка верификации: ' + (e.message || 'Неизвестная ошибка'), 'error');
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check"></i> Верифицировать';
+    }
+  }
+}
+
+// ==================== CREATE SELLER (ТОЛЬКО FIRESTORE) ====================
 async function createSeller() {
   const email = document.getElementById('new-email').value.trim();
   const password = document.getElementById('new-password').value;
   const username = document.getElementById('new-username').value.trim();
   const phone = document.getElementById('new-phone').value.trim();
+  const resultDiv = document.getElementById('create-result');
   
-  if (!email || !password || !username) { showToast('Заполните обязательные поля', 'error'); return; }
-  if (password.length < 6) { showToast('Пароль минимум 6 символов', 'error'); return; }
+  if (!email || !password || !username) { 
+    showToast('Заполните обязательные поля', 'error'); 
+    return; 
+  }
+  if (password.length < 6) { 
+    showToast('Пароль минимум 6 символов', 'error'); 
+    return; 
+  }
 
   const btn = document.getElementById('create-btn');
-  btn.innerHTML = '<span class="loader"></span> Создание в облаке...';
+  btn.innerHTML = '<span class="loader"></span> Создание...';
   btn.disabled = true;
+  resultDiv.innerHTML = '';
 
   try {
-    // Используем functions
-    const createSellerFn = functions.httpsCallable('createVerifiedSeller');
+    // Сохраняем текущего пользователя (админа)
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      showToast('Вы не авторизованы как администратор', 'error');
+      return;
+    }
     
-    await createSellerFn({
-      email: email,
-      password: password,
+    // 1. Создаем пользователя в Authentication
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const uid = userCredential.user.uid;
+    
+    // 2. Сохраняем данные ТОЛЬКО В FIRESTORE
+    await db.collection('users').doc(uid).set({
       username: username,
-      phone: phone,
-      city: ''
+      email: email,
+      phone: phone || '',
+      city: '',
+      verified: true,
+      frozen: false,
+      productCount: 0,
+      isAdmin: false,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-
+    
+    // 3. Устанавливаем Custom Claims через Cloud Function
+    try {
+      const setClaimsFn = functions.httpsCallable('setSellerClaims');
+      await setClaimsFn({ uid: uid, verifiedSeller: true });
+      resultDiv.innerHTML = '<span style="color:var(--success)">✅ Custom Claims установлены</span>';
+    } catch (claimsError) {
+      console.warn('Custom Claims не установлены:', claimsError);
+      resultDiv.innerHTML = '<span style="color:var(--warning)">⚠️ Custom Claims не установлены. Используйте кнопку "Верифицировать" вручную.</span>';
+    }
+    
+    // 4. Выходим из аккаунта продавца и возвращаемся к админу
+    await auth.signOut();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Входим обратно как админ
+    if (adminPassword) {
+      await auth.signInWithEmailAndPassword(ADMIN_EMAIL, adminPassword);
+    } else {
+      // Если пароль не сохранен, просим ввести заново
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('admin-screen').style.display = 'none';
+      showToast('Пожалуйста, войдите снова как администратор', 'warning');
+      return;
+    }
+    
+    // Очищаем форму
     document.getElementById('new-email').value = '';
     document.getElementById('new-password').value = '';
     document.getElementById('new-username').value = '';
     document.getElementById('new-phone').value = '';
-    showToast('Продавец успешно создан!', 'success');
+    showToast('✅ Продавец успешно создан!', 'success');
     
     await loadData();
   } catch(e) {
     console.error('Create seller error:', e);
-    if (e.message && e.message.includes('NOT_FOUND')) {
-      showToast('Ошибка: Функция createVerifiedSeller не найдена. Убедитесь, что функция развёрнута в Cloud Functions.', 'error');
+    if (e.code === 'auth/email-already-in-use') {
+      showToast('❌ Этот email уже используется', 'error');
+    } else if (e.code === 'auth/weak-password') {
+      showToast('❌ Пароль слишком слабый (минимум 6 символов)', 'error');
     } else {
       showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
     }
+    resultDiv.innerHTML = '<span style="color:var(--danger)">❌ ' + (e.message || 'Неизвестная ошибка') + '</span>';
   } finally {
     btn.innerHTML = '<i class="fas fa-user-plus"></i> Создать аккаунт продавца';
     btn.disabled = false;
@@ -825,6 +945,7 @@ async function deleteSellerByUid(uid, email) {
   showToast('Удаление продавца...', 'warning');
 
   try {
+    // Удаляем товары продавца
     const productsSnap = await db.collection('products').where('userId', '==', uid).get();
     const productRefs = productsSnap.docs.map(d => d.ref);
 
@@ -839,6 +960,14 @@ async function deleteSellerByUid(uid, email) {
       }
       await batch.commit();
       if (productRefs.length === 0) break;
+    }
+
+    // Удаляем пользователя из Authentication (через Cloud Function)
+    try {
+      const deleteUserFn = functions.httpsCallable('deleteUser');
+      await deleteUserFn({ uid: uid });
+    } catch (e) {
+      console.warn('Не удалось удалить пользователя из Authentication:', e);
     }
 
     showToast(`✅ Продавец ${email} удалён`, 'success');
