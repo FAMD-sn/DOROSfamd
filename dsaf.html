@@ -165,6 +165,11 @@ header {
   border-top-color: var(--signal); border-radius: 50%;
   animation: spin 0.7s linear infinite; display: inline-block;
 }
+.loader-sm {
+  width: 14px; height: 14px; border: 2px solid var(--line);
+  border-top-color: var(--success); border-radius: 50%;
+  animation: spin 0.7s linear infinite; display: inline-block;
+}
 
 #toast {
   position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
@@ -336,7 +341,6 @@ header {
   font-size: 0.85rem;
 }
 
-/* Стиль для кнопки верификации */
 .btn-verify {
   background: var(--success);
   color: #06231A;
@@ -349,13 +353,8 @@ header {
   transition: background 0.15s;
   font-family: var(--sans);
 }
-.btn-verify:hover {
-  background: var(--success-strong);
-}
-.btn-verify:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.btn-verify:hover { background: var(--success-strong); }
+.btn-verify:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -529,7 +528,6 @@ header {
   </div>
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-functions-compat.js"></script>
@@ -553,15 +551,11 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ====== ИСПРАВЛЕНИЕ: Правильный способ инициализации Cloud Functions ======
-// В compat-версии используем firebase.app().functions() для указания региона
+// Инициализация Cloud Functions
 let functions;
 try {
-  // Способ 1: Через app с регионом
-  functions = firebase.app().functions('europe-west3');
+  functions = firebase.app().functions('us-central1');
 } catch(e) {
-  // Способ 2: Без региона (us-central1)
-  console.warn('Не удалось инициализировать функции с регионом europe-west3, используем default');
   functions = firebase.functions();
 }
 
@@ -616,9 +610,8 @@ auth.onAuthStateChanged(async user => {
       document.getElementById('admin-screen').style.display = 'block';
       isFirestoreReady = true;
       
-      // Сохраняем пароль админа
       const passInput = document.getElementById('auth-password');
-      if (passInput) adminPassword = passInput.value;
+      if (passInput && passInput.value) adminPassword = passInput.value;
       
       await loadData();
       setupSearchListeners();
@@ -629,11 +622,7 @@ auth.onAuthStateChanged(async user => {
     }
   } catch (e) {
     console.error('Auth error:', e);
-    if (e.message && e.message.includes('Missing or insufficient permissions')) {
-      showToast('⚠️ Ошибка доступа к базе данных. Проверьте правила безопасности Firestore.', 'error');
-    } else {
-      showToast('Ошибка проверки прав: ' + e.message, 'error');
-    }
+    showToast('Ошибка проверки прав: ' + e.message, 'error');
   }
 });
 
@@ -644,6 +633,7 @@ async function adminLogin() {
   errEl.textContent = '';
   try {
     await auth.signInWithEmailAndPassword(email, password);
+    adminPassword = password;
   } catch(e) {
     errEl.textContent = 'Ошибка: ' + e.message;
   }
@@ -681,11 +671,7 @@ async function loadData() {
     updateCleanupStats();
   } catch (e) {
     console.error('Error loading data:', e);
-    if (e.message && e.message.includes('Missing or insufficient permissions')) {
-      showToast('⚠️ Нет прав на чтение данных. Проверьте правила безопасности Firestore.', 'error');
-    } else {
-      showToast('Ошибка загрузки данных: ' + e.message, 'error');
-    }
+    showToast('Ошибка загрузки данных: ' + e.message, 'error');
   }
 }
 
@@ -790,7 +776,7 @@ function setupSearchListeners() {
   }
 }
 
-// ==================== VERIFY SELLER (Custom Claims) ====================
+// ==================== VERIFY SELLER ====================
 async function verifySeller(uid) {
   if (!uid) {
     showToast('❌ UID продавца не указан', 'error');
@@ -800,21 +786,18 @@ async function verifySeller(uid) {
   const btn = event?.target;
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<span class="loader-sm" style="display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--success);border-radius:50%;animation:spin 0.7s linear infinite;"></span>';
+    btn.innerHTML = '<span class="loader-sm"></span>';
   }
   
   try {
-    // 1. Обновляем Firestore
     await db.collection('users').doc(uid).update({
       verified: true,
       verifiedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     
-    // 2. Устанавливаем Custom Claims через Cloud Function
     const setClaimsFn = functions.httpsCallable('setSellerClaims');
     await setClaimsFn({ uid: uid, verifiedSeller: true });
     
-    // 3. Обновляем локальные данные
     if (allUsers[uid]) {
       allUsers[uid].verified = true;
     }
@@ -824,11 +807,7 @@ async function verifySeller(uid) {
     
   } catch (e) {
     console.error('Verify seller error:', e);
-    if (e.message && e.message.includes('NOT_FOUND')) {
-      showToast('❌ Cloud Function "setSellerClaims" не найдена. Разверните функцию в Firebase.', 'error');
-    } else {
-      showToast('❌ Ошибка верификации: ' + (e.message || 'Неизвестная ошибка'), 'error');
-    }
+    showToast('❌ Ошибка верификации: ' + (e.message || 'Неизвестная ошибка'), 'error');
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -837,7 +816,7 @@ async function verifySeller(uid) {
   }
 }
 
-// ==================== CREATE SELLER (ТОЛЬКО FIRESTORE) ====================
+// ==================== CREATE SELLER ====================
 async function createSeller() {
   const email = document.getElementById('new-email').value.trim();
   const password = document.getElementById('new-password').value;
@@ -860,18 +839,21 @@ async function createSeller() {
   resultDiv.innerHTML = '';
 
   try {
-    // Сохраняем текущего пользователя (админа)
     const currentUser = auth.currentUser;
     if (!currentUser) {
       showToast('Вы не авторизованы как администратор', 'error');
       return;
     }
     
-    // 1. Создаем пользователя в Authentication
+    // Сохраняем email и пароль админа
+    const adminEmail = currentUser.email;
+    const adminPass = adminPassword || document.getElementById('auth-password').value;
+    
+    // 1. Создаем пользователя
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const uid = userCredential.user.uid;
     
-    // 2. Сохраняем данные ТОЛЬКО В FIRESTORE
+    // 2. Сохраняем в Firestore
     await db.collection('users').doc(uid).set({
       username: username,
       email: email,
@@ -884,7 +866,7 @@ async function createSeller() {
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     
-    // 3. Устанавливаем Custom Claims через Cloud Function
+    // 3. Устанавливаем Custom Claims
     try {
       const setClaimsFn = functions.httpsCallable('setSellerClaims');
       await setClaimsFn({ uid: uid, verifiedSeller: true });
@@ -894,18 +876,17 @@ async function createSeller() {
       resultDiv.innerHTML = '<span style="color:var(--warning)">⚠️ Custom Claims не установлены. Используйте кнопку "Верифицировать" вручную.</span>';
     }
     
-    // 4. Выходим из аккаунта продавца и возвращаемся к админу
+    // 4. Выходим из аккаунта продавца и заходим обратно как админ
     await auth.signOut();
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Входим обратно как админ
-    if (adminPassword) {
-      await auth.signInWithEmailAndPassword(ADMIN_EMAIL, adminPassword);
+    if (adminPass) {
+      await auth.signInWithEmailAndPassword(adminEmail, adminPass);
     } else {
-      // Если пароль не сохранен, просим ввести заново
       document.getElementById('auth-screen').style.display = 'flex';
       document.getElementById('admin-screen').style.display = 'none';
-      showToast('Пожалуйста, войдите снова как администратор', 'warning');
+      document.getElementById('auth-email').value = adminEmail;
+      showToast('Введите пароль администратора', 'warning');
       return;
     }
     
@@ -919,14 +900,27 @@ async function createSeller() {
     await loadData();
   } catch(e) {
     console.error('Create seller error:', e);
+    
     if (e.code === 'auth/email-already-in-use') {
       showToast('❌ Этот email уже используется', 'error');
+      resultDiv.innerHTML = '<span style="color:var(--danger)">❌ Email уже используется</span>';
     } else if (e.code === 'auth/weak-password') {
       showToast('❌ Пароль слишком слабый (минимум 6 символов)', 'error');
+      resultDiv.innerHTML = '<span style="color:var(--danger)">❌ Слишком слабый пароль</span>';
     } else {
       showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
+      resultDiv.innerHTML = '<span style="color:var(--danger)">❌ ' + (e.message || 'Неизвестная ошибка') + '</span>';
     }
-    resultDiv.innerHTML = '<span style="color:var(--danger)">❌ ' + (e.message || 'Неизвестная ошибка') + '</span>';
+    
+    // Пытаемся восстановить сессию админа
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
+        await auth.signInWithEmailAndPassword(ADMIN_EMAIL, adminPassword || document.getElementById('auth-password').value);
+      }
+    } catch (loginError) {
+      console.warn('Не удалось автоматически войти как админ:', loginError);
+    }
   } finally {
     btn.innerHTML = '<i class="fas fa-user-plus"></i> Создать аккаунт продавца';
     btn.disabled = false;
@@ -956,7 +950,6 @@ async function deleteSellerByUid(uid, email) {
   showToast('Удаление продавца...', 'warning');
 
   try {
-    // Удаляем товары продавца
     const productsSnap = await db.collection('products').where('userId', '==', uid).get();
     const productRefs = productsSnap.docs.map(d => d.ref);
 
@@ -973,7 +966,6 @@ async function deleteSellerByUid(uid, email) {
       if (productRefs.length === 0) break;
     }
 
-    // Удаляем пользователя из Authentication (через Cloud Function)
     try {
       const deleteUserFn = functions.httpsCallable('deleteUser');
       await deleteUserFn({ uid: uid });
@@ -1014,7 +1006,7 @@ async function quickCleanup() {
   
   showConfirm(
     'Быстрая очистка',
-    `Найдено ${oldProducts_local.length} товаров старше 90 дней.\n\nПосле удаления они будут полностью удалены из базы данных и освободят квоты продавцов.\n\n⚠️ Это действие НЕОБРАТИМО!`,
+    `Найдено ${oldProducts_local.length} товаров старше 90 дней.\n\n⚠️ Это действие НЕОБРАТИМО!`,
     async () => {
       const btn = document.getElementById('quick-cleanup-btn');
       const originalText = btn.innerHTML;
@@ -1217,7 +1209,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Инициализация после загрузки страницы
+// Инициализация
 document.addEventListener('DOMContentLoaded', function() {
   isFirestoreReady = true;
 });
