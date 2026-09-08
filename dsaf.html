@@ -551,8 +551,16 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Инициализация Cloud Functions (регион us-central1)
-const functions = firebase.functions('us-central1');
+// ====== ИСПРАВЛЕНИЕ: Правильная инициализация Functions ======
+// Для compat-версии используем firebase.app().functions('регион')
+let functions;
+try {
+  functions = firebase.app().functions('us-central1');
+  console.log('✅ Functions initialized with region: us-central1');
+} catch(e) {
+  console.warn('⚠️ Failed to initialize functions with region, using default:', e);
+  functions = firebase.functions();
+}
 
 db.settings({ 
   ignoreUndefinedProperties: true,
