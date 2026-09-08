@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -1221,13 +1219,13 @@ img{max-width:100%;height:auto}
   </div>
 </div>
 
-<!-- FIREBASE: Auth + Storage stay on the classic "compat" SDK (unaffected by
-     this migration); the database layer below now runs on Cloud Firestore
-     via the modular v9+ SDK, loaded through dynamic import() so this stays
-     a classic script (inline onclick="" handlers in this page need that). -->
+<!-- FIREBASE: Auth + Storage + Firestore all on the classic "compat" SDK
+     loaded via CDN — no dynamic import needed, keeps every inline onclick
+     on this page working as expected. -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
 // ======================================================================
@@ -1428,7 +1426,7 @@ const SUBCAT_LABELS = {
     refrigerators:'Muzlatgichlar',washing:'Kir yuvish mashinalari',
     cooking:'Pechlar/duxovkalar',vacuum:'Changyutgichlar',ac:'Konditsionerlar',
     small_appliances:'Kichik texnika',
-    men_shoes:'Erkaklar',women_shoes:'Ayollar',kids_shoes:'Bolalar',sport_shoes:'Sport',
+    men_shoes:'Erkaklar',women_shoes:'Ayollar',bolalar_shoes:"Bolalar",sport_shoes:'Sport',
     bags:'Sumkalar',watches:'Soatlar',belts:'Kamarlar',sunglasses:"Ko'zoynaklar",hats:'Bosh kiyimlar',
   },
   en: {
@@ -1694,30 +1692,13 @@ const firebaseConfig={
 const compatApp=firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
 const storage=firebase.storage();
-
-// Cloud Firestore (modular v9+ SDK), attached to the same compat App
-// instance above via dynamic import — kept out of a <script type="module">
-// so every inline onclick="" on this page still resolves normally.
-let db, collection, doc, getDoc, getDocs, query, where, orderBy, limit,
-    onSnapshot, updateDoc, deleteDoc, setDoc, addDoc, runTransaction,
-    writeBatch, serverTimestamp, increment;
-
-const firestoreReady=(async()=>{
-  const fs=await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
-  ({ collection, doc, getDoc, getDocs, query, where, orderBy, limit,
-     onSnapshot, updateDoc, deleteDoc, setDoc, addDoc, runTransaction,
-     writeBatch, serverTimestamp, increment } = fs);
-  db=fs.getFirestore(compatApp);
-})();
+const db = firebase.firestore();
 
 // ====== CONSTANTS ======
 const MAX_PRODUCTS=50;
 
 // ======================================================================
 // AI SERVER CONFIG — локальный сервер, который держит Replicate API-ключ
-// Запустите ai-server.js (или ai_server.py) на своей машине/хостинге,
-// иначе AI-функции просто покажут статус "офлайн" и не будут мешать
-// ручному заполнению карточки.
 // ======================================================================
 const AI_SERVER_URL = 'http://localhost:8787';
 let aiServerOnline = false;
@@ -1900,11 +1881,9 @@ function validateProduct(){
 }
 
 // ======================================================================
-// AI SUPER-SCANNER — вызывает локальный сервер (ai-server.js), который
-// хранит Replicate API-ключ и никогда не отдаёт его в браузер.
+// AI SUPER-SCANNER
 // ======================================================================
 function setAiStep(stepId, state){
-  // state: 'active' | 'done' | ''
   const el=document.getElementById(stepId);
   if(!el)return;
   el.classList.remove('active','done');
@@ -1949,7 +1928,7 @@ function finishAiStepsAnimation(success){
 async function runAiScan(imageUrl){
   await checkAiServer();
   if(!aiServerOnline){
-    showToast('AI-сервер выключен. Запустите ai-server.js, чтобы включить автозаполнение (см. README)','warning');
+    showToast('AI-сервер выключен. Запустите ai-server.js','warning');
     return;
   }
   const animPromise=playAiStepsAnimation();
@@ -1999,7 +1978,7 @@ async function generateStylishCard(){
   const body=document.getElementById('stylishCardBody');
   if(!aiServerOnline){
     body.innerHTML=`<div class="stylish-card-error"><i class="fas fa-plug" style="font-size:1.6rem;display:block;margin-bottom:0.5rem"></i>
-      AI-сервер выключен.<br>Запустите ai-server.js на своём компьютере или сервере, чтобы использовать генерацию карточек (см. README.md).</div>`;
+      AI-сервер выключен.<br>Запустите ai-server.js на своём компьютере или сервере.</div>`;
     return;
   }
   body.innerHTML=`<div class="stylish-card-loading">
@@ -2103,7 +2082,7 @@ async function aiImproveDescription(){
   }
 }
 
-// ====== FORM DATA CHECK (for close confirmation) ======
+// ====== FORM DATA CHECK ======
 function formHasData(){
   const fields=['prodName','prodPrice','prodCity','prodDesc'];
   for(const id of fields){
@@ -2193,24 +2172,20 @@ function quickPreviewProduct(pid){
 // ====== INIT ======
 document.addEventListener('DOMContentLoaded',()=>{
   applyLang();initTheme();setView(currentView);
-  // Close lang panel when clicking outside
   document.addEventListener('click',(e)=>{
     if(!e.target.closest('#langBtn')&&!e.target.closest('#langPanel'))
       document.getElementById('langPanel').style.display='none';
   });
-  // Search
   const si=document.getElementById('searchInput');
   if(si){let st;si.addEventListener('input',()=>{clearTimeout(st);st=setTimeout(filterProducts,300)})}
-  // Login on Enter
   document.getElementById('loginPassword')?.addEventListener('keydown',(e)=>{if(e.key==='Enter')login()});
   document.getElementById('loginEmail')?.addEventListener('keydown',(e)=>{if(e.key==='Enter')login()});
 });
 
 // ====== AUTH ======
 auth.onAuthStateChanged(async(user)=>{
-  await firestoreReady;
   if(user){
-    const snap=await getDoc(doc(db,'users',user.uid));
+    const snap=await db.collection('users').doc(user.uid).get();
     const data=snap.data();
     if(data?.frozen){auth.signOut();showToast('Аккаунт заморожен','error');return}
     currentUser=user;showDashboard(data,user);
@@ -2252,19 +2227,12 @@ function logout(){auth.signOut()}
 async function loadProducts(){
   document.getElementById('productsGrid').innerHTML='<div class="loader"></div>';
   try{
-    await firestoreReady;
-    // Sellers can only see their own products — enforce the same rule
-    // server-side with a Firestore security rule:
-    //   match /products/{id} { allow read: if resource.data.userId == request.auth.uid || ... }
-    const myProductsQuery=query(collection(db,'products'),where('userId','==',currentUser.uid));
-    const snap=await getDocs(myProductsQuery);
+    const snap=await db.collection('products').where('userId','==',currentUser.uid).get();
     allProducts=[];
     snap.forEach(d=>allProducts.push({id:d.id,...d.data()}));
     updateStats();renderCategoryFilter();filterProducts();
-    // Realtime listener — Firestore reports the whole matching result set on
-    // every change plus a per-doc diff via docChanges(), unlike RTDB's
-    // separate child_added/child_changed/child_removed events.
-    onSnapshot(myProductsQuery,(liveSnap)=>{
+    // Realtime listener
+    db.collection('products').where('userId','==',currentUser.uid).onSnapshot((liveSnap)=>{
       let changed=false;
       for(const change of liveSnap.docChanges()){
         const p={id:change.doc.id,...change.doc.data()};
@@ -2353,7 +2321,6 @@ function openAddModal(){
   document.getElementById('modalTitle').textContent=t('add_product');
   document.getElementById('modalBody').innerHTML=buildProductForm();
   updateSubcategory();
-  // Autofill contacts from previous save
   const saved=loadSavedContacts();
   if(saved)applyContactsToForm(saved);
   openModal('productModal');
@@ -2642,7 +2609,6 @@ async function saveProduct(){
     showToast(t('quota_reached'),'warning');return;
   }
 
-  // Clean contact fields
   let phone=document.getElementById('prodPhone')?.value.trim()||'';
   let whatsapp=document.getElementById('prodWhatsapp')?.value.trim()||'';
   let telegram=document.getElementById('prodTelegram')?.value.trim()||'';
@@ -2667,28 +2633,24 @@ async function saveProduct(){
   };
 
   try{
-    await firestoreReady;
     if(editingProductId){
-      data.updatedAt=serverTimestamp();
-      await updateDoc(doc(db,'products',editingProductId),data);
+      data.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('products').doc(editingProductId).update(data);
     } else {
-      data.timestamp=serverTimestamp();
-      // Atomic add: read the seller's productCount, refuse past the quota,
-      // create the product doc, and bump the counter — all in one
-      // transaction so a race between two tabs can never blow past MAX_PRODUCTS.
-      const userRef=doc(db,'users',currentUser.uid);
-      const newProductRef=doc(collection(db,'products'));
-      await runTransaction(db,async(tx)=>{
+      data.timestamp=firebase.firestore.FieldValue.serverTimestamp();
+      // Use transaction for atomic add
+      const userRef=db.collection('users').doc(currentUser.uid);
+      await db.runTransaction(async(tx)=>{
         const userSnap=await tx.get(userRef);
         const count=userSnap.exists()?(userSnap.data().productCount||0):0;
         if(count>=MAX_PRODUCTS){
           throw new Error('Лимит квоты исчерпан');
         }
+        const newProductRef=db.collection('products').doc();
         tx.set(newProductRef,data);
-        tx.update(userRef,{productCount:increment(1)});
+        tx.update(userRef,{productCount:firebase.firestore.FieldValue.increment(1)});
       });
     }
-    // Save contacts for autofill
     saveContactsToStorage({city,phone,whatsapp,telegram,instagram,youtube,dcCard});
     tempUploadedUrl=null;
     closeModal('productModal');
@@ -2703,14 +2665,11 @@ async function saveProduct(){
 async function deleteProduct(pid){
   if(!confirm(t('delete_confirm')))return;
   try{
-    await firestoreReady;
-    // Atomic delete: remove the product doc and decrement the seller's
-    // productCount together in one transaction.
-    const userRef=doc(db,'users',currentUser.uid);
-    const productRef=doc(db,'products',pid);
-    await runTransaction(db,async(tx)=>{
+    const userRef=db.collection('users').doc(currentUser.uid);
+    const productRef=db.collection('products').doc(pid);
+    await db.runTransaction(async(tx)=>{
       tx.delete(productRef);
-      tx.update(userRef,{productCount:increment(-1)});
+      tx.update(userRef,{productCount:firebase.firestore.FieldValue.increment(-1)});
     });
   } catch(e){showToast('Error: '+e.message,'error')}
 }
@@ -2733,7 +2692,6 @@ function closeModal(id){
   const anyOpen=document.querySelectorAll('.modal-bg.on').length>0;
   if(!anyOpen)document.body.style.overflow='';
 }
-// Click outside to close
 document.addEventListener('click',(e)=>{
   if(e.target.classList.contains('modal-bg')){
     const id=e.target.id;
@@ -2770,14 +2728,13 @@ document.getElementById('installAndroidBtn').addEventListener('click',async()=>{
   }
 });
 
-// ====== SERVICE WORKER — scoped to seller panel only ======
+// ====== SERVICE WORKER ======
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('/sw.js',{ scope: '/testdsp.html' })
       .catch(err=>console.log('SW registration failed',err));
   });
 }
-
 </script>
 </body>
 </html>
