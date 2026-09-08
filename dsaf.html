@@ -430,7 +430,7 @@ header {
       <div class="section">
         <div class="section-title"><i class="fas fa-user-plus"></i> Создать нового продавца</div>
         <p style="color:var(--text-dim);margin-bottom:1rem;font-size:0.85rem;">
-          Продавец будет создан в Authentication и Firestore. Custom Claims (verifiedSeller) будут установлены автоматически.
+          Продавец будет создан через Cloud Function. Данные сохранятся в Firestore.
         </p>
         <div class="form-row">
           <div class="form-group">
@@ -463,7 +463,7 @@ header {
       <div class="section">
         <div class="section-title"><i class="fas fa-user-minus"></i> Удалить продавца</div>
         <p style="color:var(--text-dim);margin-bottom:1rem;font-size:0.9rem;">
-          Введите Email продавца. Будут удалены его профиль и все товары. Возврат квот произойдёт автоматически.
+          Введите Email продавца. Будут удалены его профиль и все товары.
         </p>
         <div class="form-group">
           <label class="form-label">Email продавца для удаления</label>
@@ -551,13 +551,8 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Инициализация Cloud Functions
-let functions;
-try {
-  functions = firebase.app().functions('us-central1');
-} catch(e) {
-  functions = firebase.functions();
-}
+// Инициализация Cloud Functions (регион us-central1)
+const functions = firebase.functions('us-central1');
 
 db.settings({ 
   ignoreUndefinedProperties: true,
@@ -572,7 +567,6 @@ let allUsers = {};
 let oldProducts = [];
 let currentConfirmCallback = null;
 let isFirestoreReady = false;
-let adminPassword = '';
 
 // ==================== XSS PROTECTION ====================
 function escapeHtml(str) {
@@ -609,10 +603,6 @@ auth.onAuthStateChanged(async user => {
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('admin-screen').style.display = 'block';
       isFirestoreReady = true;
-      
-      const passInput = document.getElementById('auth-password');
-      if (passInput && passInput.value) adminPassword = passInput.value;
-      
       await loadData();
       setupSearchListeners();
     } else {
@@ -633,7 +623,6 @@ async function adminLogin() {
   errEl.textContent = '';
   try {
     await auth.signInWithEmailAndPassword(email, password);
-    adminPassword = password;
   } catch(e) {
     errEl.textContent = 'Ошибка: ' + e.message;
   }
@@ -816,7 +805,7 @@ async function verifySeller(uid) {
   }
 }
 
-// ==================== CREATE SELLER ====================
+// ==================== CREATE SELLER (ЧЕРЕЗ CLOUD FUNCTION) ====================
 async function createSeller() {
   const email = document.getElementById('new-email').value.trim();
   const password = document.getElementById('new-password').value;
@@ -839,88 +828,33 @@ async function createSeller() {
   resultDiv.innerHTML = '';
 
   try {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-      showToast('Вы не авторизованы как администратор', 'error');
-      return;
-    }
-    
-    // Сохраняем email и пароль админа
-    const adminEmail = currentUser.email;
-    const adminPass = adminPassword || document.getElementById('auth-password').value;
-    
-    // 1. Создаем пользователя
-    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    const uid = userCredential.user.uid;
-    
-    // 2. Сохраняем в Firestore
-    await db.collection('users').doc(uid).set({
-      username: username,
+    // ВЫЗЫВАЕМ CLOUD FUNCTION ДЛЯ СОЗДАНИЯ ПРОДАВЦА
+    const createSellerFn = functions.httpsCallable('createVerifiedSeller');
+    const result = await createSellerFn({
       email: email,
+      password: password,
+      username: username,
       phone: phone || '',
-      city: '',
-      verified: true,
-      frozen: false,
-      productCount: 0,
-      isAdmin: false,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      city: ''
     });
-    
-    // 3. Устанавливаем Custom Claims
-    try {
-      const setClaimsFn = functions.httpsCallable('setSellerClaims');
-      await setClaimsFn({ uid: uid, verifiedSeller: true });
-      resultDiv.innerHTML = '<span style="color:var(--success)">✅ Custom Claims установлены</span>';
-    } catch (claimsError) {
-      console.warn('Custom Claims не установлены:', claimsError);
-      resultDiv.innerHTML = '<span style="color:var(--warning)">⚠️ Custom Claims не установлены. Используйте кнопку "Верифицировать" вручную.</span>';
-    }
-    
-    // 4. Выходим из аккаунта продавца и заходим обратно как админ
-    await auth.signOut();
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    if (adminPass) {
-      await auth.signInWithEmailAndPassword(adminEmail, adminPass);
+
+    if (result.data && result.data.success) {
+      document.getElementById('new-email').value = '';
+      document.getElementById('new-password').value = '';
+      document.getElementById('new-username').value = '';
+      document.getElementById('new-phone').value = '';
+      resultDiv.innerHTML = '<span style="color:var(--success)">✅ ' + (result.data.message || 'Продавец создан!') + '</span>';
+      showToast('✅ Продавец успешно создан!', 'success');
+      await loadData();
     } else {
-      document.getElementById('auth-screen').style.display = 'flex';
-      document.getElementById('admin-screen').style.display = 'none';
-      document.getElementById('auth-email').value = adminEmail;
-      showToast('Введите пароль администратора', 'warning');
-      return;
+      showToast('❌ Ошибка: ' + (result.data?.message || 'Неизвестная ошибка'), 'error');
+      resultDiv.innerHTML = '<span style="color:var(--danger)">❌ ' + (result.data?.message || 'Неизвестная ошибка') + '</span>';
     }
-    
-    // Очищаем форму
-    document.getElementById('new-email').value = '';
-    document.getElementById('new-password').value = '';
-    document.getElementById('new-username').value = '';
-    document.getElementById('new-phone').value = '';
-    showToast('✅ Продавец успешно создан!', 'success');
-    
-    await loadData();
   } catch(e) {
     console.error('Create seller error:', e);
-    
-    if (e.code === 'auth/email-already-in-use') {
-      showToast('❌ Этот email уже используется', 'error');
-      resultDiv.innerHTML = '<span style="color:var(--danger)">❌ Email уже используется</span>';
-    } else if (e.code === 'auth/weak-password') {
-      showToast('❌ Пароль слишком слабый (минимум 6 символов)', 'error');
-      resultDiv.innerHTML = '<span style="color:var(--danger)">❌ Слишком слабый пароль</span>';
-    } else {
-      showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
-      resultDiv.innerHTML = '<span style="color:var(--danger)">❌ ' + (e.message || 'Неизвестная ошибка') + '</span>';
-    }
-    
-    // Пытаемся восстановить сессию админа
-    try {
-      const currentUser = auth.currentUser;
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
-        await auth.signInWithEmailAndPassword(ADMIN_EMAIL, adminPassword || document.getElementById('auth-password').value);
-      }
-    } catch (loginError) {
-      console.warn('Не удалось автоматически войти как админ:', loginError);
-    }
+    const errorMsg = e.message || 'Неизвестная ошибка';
+    showToast('❌ Ошибка: ' + errorMsg, 'error');
+    resultDiv.innerHTML = '<span style="color:var(--danger)">❌ ' + errorMsg + '</span>';
   } finally {
     btn.innerHTML = '<i class="fas fa-user-plus"></i> Создать аккаунт продавца';
     btn.disabled = false;
@@ -1202,14 +1136,12 @@ document.getElementById('confirmAcceptBtn').addEventListener('click', () => {
   confirmReject();
 });
 
-// Close confirm on escape key
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && document.getElementById('confirmOverlay').classList.contains('active')) {
     confirmReject();
   }
 });
 
-// Инициализация
 document.addEventListener('DOMContentLoaded', function() {
   isFirestoreReady = true;
 });
