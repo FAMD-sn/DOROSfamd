@@ -587,8 +587,10 @@ const writeBatch = db.batch.bind(db);
 const updateDoc = (ref, data) => ref.update(data);
 const increment = (num) => firebase.firestore.FieldValue.increment(num);
 
-// Для облачных функций
-const functions = firebase.functions('europe-west3');
+// ====== ИСПРАВЛЕНИЕ: Правильный способ инициализации Cloud Functions ======
+// В compat-версии мы сначала получаем экземпляр приложения, затем функции
+const functions = firebase.functions();
+// Для указания региона: firebase.functions('europe-west3')
 
 const ADMIN_EMAIL = 'doro@shop.com';
 const NINETY_DAYS = 90 * 24 * 60 * 60 * 1000;
@@ -796,7 +798,20 @@ async function createSeller() {
   btn.disabled = true;
 
   try {
-    const createSellerFn = firebase.functions('europe-west3').httpsCallable('createVerifiedSeller');
+    // ====== ИСПРАВЛЕНИЕ: Используем firebase.functions() без аргументов ======
+    // В совместимом API регион указывается через свойство region у функции,
+    // либо через настройки экземпляра functions.
+    const createSellerFn = functions.httpsCallable('createVerifiedSeller');
+    
+    // Для указания региона можно сделать так:
+    // functions.useFunctionsEmulator('http://localhost:5001'); // для эмулятора
+    // Или создать экземпляр с регионом:
+    // const regionFunctions = firebase.functions('europe-west3');
+    // const createSellerFn = regionFunctions.httpsCallable('createVerifiedSeller');
+    // Но самый простой способ — создать functions с регионом при инициализации:
+    // const functions = firebase.app().functions('europe-west3');
+    // 
+    // Мы переопределим functions ниже
     
     await createSellerFn({
       email: email,
@@ -815,12 +830,25 @@ async function createSeller() {
     await loadData();
   } catch(e) {
     console.error('Create seller error:', e);
-    showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
+    // Если функция не найдена, показываем более понятное сообщение
+    if (e.message && e.message.includes('NOT_FOUND')) {
+      showToast('Ошибка: Функция createVerifiedSeller не найдена. Убедитесь, что функция развёрнута в Cloud Functions.', 'error');
+    } else {
+      showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
+    }
   } finally {
     btn.innerHTML = '<i class="fas fa-user-plus"></i> Создать аккаунт продавца';
     btn.disabled = false;
   }
 }
+
+// ====== ПЕРЕОПРЕДЕЛЯЕМ functions с регионом ======
+// Создаём новый экземпляр functions с указанием региона
+// Важно: это должно быть после инициализации Firebase
+const regionFunctions = firebase.functions('europe-west3');
+
+// Переопределяем основную функцию для использования региона
+// Используем firebase.functions() для вызова с регионом
 
 // ==================== DELETE SELLER ====================
 async function deleteSeller() {
@@ -1107,6 +1135,56 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('DOMContentLoaded', function() {
   isFirestoreReady = true;
 });
+
+// ====== ОБНОВЛЕНИЕ функции createSeller для использования regionFunctions ======
+// Перезаписываем функцию createSeller с правильным вызовом
+// Сохраняем оригинальную функцию, чтобы можно было её переопределить
+const originalCreateSeller = window.createSeller;
+// Переопределяем createSeller с правильным использованием regionFunctions
+window.createSeller = async function() {
+  const email = document.getElementById('new-email').value.trim();
+  const password = document.getElementById('new-password').value;
+  const username = document.getElementById('new-username').value.trim();
+  const phone = document.getElementById('new-phone').value.trim();
+  
+  if (!email || !password || !username) { showToast('Заполните обязательные поля', 'error'); return; }
+  if (password.length < 6) { showToast('Пароль минимум 6 символов', 'error'); return; }
+
+  const btn = document.getElementById('create-btn');
+  btn.innerHTML = '<span class="loader"></span> Создание в облаке...';
+  btn.disabled = true;
+
+  try {
+    // Используем regionFunctions для вызова с регионом europe-west3
+    const createSellerFn = regionFunctions.httpsCallable('createVerifiedSeller');
+    
+    const result = await createSellerFn({
+      email: email,
+      password: password,
+      username: username,
+      phone: phone,
+      city: ''
+    });
+
+    document.getElementById('new-email').value = '';
+    document.getElementById('new-password').value = '';
+    document.getElementById('new-username').value = '';
+    document.getElementById('new-phone').value = '';
+    showToast('Продавец успешно создан!', 'success');
+    
+    await loadData();
+  } catch(e) {
+    console.error('Create seller error:', e);
+    if (e.message && e.message.includes('NOT_FOUND')) {
+      showToast('Ошибка: Функция createVerifiedSeller не найдена. Убедитесь, что функция развёрнута в Cloud Functions.', 'error');
+    } else {
+      showToast('Ошибка: ' + (e.message || 'Неизвестная ошибка'), 'error');
+    }
+  } finally {
+    btn.innerHTML = '<i class="fas fa-user-plus"></i> Создать аккаунт продавца';
+    btn.disabled = false;
+  }
+};
 </script>
 </body>
 </html>
